@@ -1,3 +1,5 @@
+import { TtsSchema } from "./_schemas";
+
 const RATE_LIMIT = 20;
 const rateLimitMap = new Map<string, { count: number; reset: number }>();
 
@@ -25,39 +27,63 @@ export async function onRequestPost(context: any) {
     return Response.json({ error: 'TTS service not configured' }, { status: 500 });
   }
 
-  let body: { text: string; voice?: string };
+  let raw: unknown;
   try {
-    body = await request.json();
+    raw = await request.json();
   } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { text, voice } = body;
-  if (!text || typeof text !== 'string' || text.length === 0) {
-    return Response.json({ error: 'text is required' }, { status: 400 });
+  const parsed = TtsSchema.safeParse(raw);
+  if (!parsed.success) {
+    return Response.json({ error: 'Validation failed', issues: parsed.error.issues }, { status: 400 });
   }
-  if (text.length > 2000) {
-    return Response.json({ error: 'text must be 2000 characters or less' }, { status: 400 });
-  }
+  const { text, voice } = parsed.data;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+    // Use Cloudflare AI Gateway to avoid region restrictions on OpenAI
+    const gateway = env.AI_GATEWAY_URL || 'https://gateway.ai.cloudflare.com/v1';
+    const accountId = env.CF_ACCOUNT_ID;
+    const gatewayId = env.AI_GATEWAY_ID;
+
+    // If AI Gateway is configured, use it; otherwise try direct OpenAI
+    const apiUrl = (accountId && gatewayId)
+      ? `${gateway}/${accountId}/${gatewayId}/openai/audio/speech`
+      : 'https://api.openai.com/v1/audio/speech';
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
+        'cf-skip-cache': 'true',  // Skip AI Gateway cache — binary audio responses cache incorrectly
       },
       body: JSON.stringify({
         model: 'tts-1',
         input: text,
-        voice: voice || 'nova',
+        voice,
         response_format: 'mp3',
       }),
     });
 
     if (!response.ok) {
-      console.error(`[tts API error] OpenAI returned ${response.status}`);
-      return Response.json({ error: 'TTS generation failed' }, { status: 500 });
+      const errBody = await response.text().catch(() => '');
+      console.error(`[tts API error] OpenAI returned ${response.status}: ${errBody}`);
+      return Response.json({ error: 'TTS generation failed', status: response.status, detail: errBody.slice(0, 200) }, { status: 500 });
+    }
+
+    // Track TTS usage in KV (non-blocking)
+    if (env.MEO_STATS) {
+      const today = new Date().toISOString().slice(0, 10);
+      const statsKey = `stats:${today}`;
+      (context as any).waitUntil((async () => {
+        try {
+          const raw = await env.MEO_STATS.get(statsKey);
+          const stats = raw ? JSON.parse(raw) : { messages: 0, sessions: [], ips: [], ttsCount: 0 };
+          stats.ttsCount = (stats.ttsCount || 0) + 1;
+          await env.MEO_STATS.put(statsKey, JSON.stringify(stats), { expirationTtl: 7 * 86400 });
+        } catch {}
+      })());
     }
 
     return new Response(response.body, {

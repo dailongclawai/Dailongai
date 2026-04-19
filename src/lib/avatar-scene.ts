@@ -27,7 +27,7 @@ export class AvatarScene {
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
-  private clock: THREE.Clock;
+  // Replaced THREE.Clock (deprecated in v0.183) with performance.now()
   private vrm: VRM | null;
   private analyser: AudioAnalyser;
   private audioAttached: boolean;
@@ -41,6 +41,12 @@ export class AvatarScene {
   private _bones: ArmBones | null;
   private _aPose: APose | null;
   private _spkAmp: number;
+  private _gestureIndex: number;
+  private _gestureTimer: number;
+  private _gestureDuration: number;
+  private _isSpeaking: boolean;
+  private _startTime: number;
+  private _prevTime: number;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -59,7 +65,8 @@ export class AvatarScene {
 
     this._setupLights();
 
-    this.clock = new THREE.Clock();
+    this._startTime = performance.now() / 1000;
+    this._prevTime = this._startTime;
     this.vrm = null;
     this.analyser = new AudioAnalyser();
     this.audioAttached = false;
@@ -72,6 +79,10 @@ export class AvatarScene {
     this._bones = null;
     this._aPose = null;
     this._spkAmp = 0;
+    this._gestureIndex = 0;
+    this._gestureTimer = 0;
+    this._gestureDuration = 3 + Math.random() * 2;
+    this._isSpeaking = false;
 
     this._boundResize = () => this._resize();
     window.addEventListener('resize', this._boundResize);
@@ -138,13 +149,30 @@ export class AvatarScene {
     this._bones = { lUpperArm, rUpperArm, lLowerArm, rLowerArm };
     this._aPose = { z: A_POSE, x: A_FWD, elbow: ELBOW };
 
+    // Diagnostic: log available bones
+    const humanoid = vrm.humanoid;
+    if (humanoid) {
+      const boneNames = ['head', 'spine', 'chest', 'leftUpperArm', 'rightUpperArm', 'leftLowerArm', 'rightLowerArm'];
+      const found: string[] = [];
+      const missing: string[] = [];
+      for (const name of boneNames) {
+        if (humanoid.getNormalizedBoneNode(name as any)) found.push(name);
+        else missing.push(name);
+      }
+      console.log('[avatar] bones found:', found.join(', '));
+      if (missing.length) console.warn('[avatar] bones MISSING:', missing.join(', '));
+    } else {
+      console.error('[avatar] NO humanoid on VRM — bones will not work');
+    }
+    console.log('[avatar] _bones set:', { lUA: !!lUpperArm, rUA: !!rUpperArm, lLA: !!lLowerArm, rLA: !!rLowerArm });
+
     vrm.scene.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(vrm.scene);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
     const height = size.y || 1.6;
     const fovRad = (this.camera.fov * Math.PI) / 180;
-    const distance = (height * 1.15 / 2) / Math.tan(fovRad / 2);
+    const distance = (height * 1.65 / 2) / Math.tan(fovRad / 2);
     this.camera.position.set(center.x, center.y, center.z + distance);
     this.camera.lookAt(center.x, center.y, center.z);
   }
@@ -158,6 +186,15 @@ export class AvatarScene {
       this.audioAttached = true;
     } catch (err) {
       console.warn('[avatar] attachAudioStream failed:', err);
+    }
+  }
+
+  setSpeaking(speaking: boolean): void {
+    this._isSpeaking = speaking;
+    console.log('[avatar] setSpeaking:', speaking, 'gesture:', this._gestureIndex, 'bones:', !!this._bones);
+    if (speaking) {
+      this._gestureIndex = (this._gestureIndex + 1) % 5;
+      this._gestureTimer = 0;
     }
   }
 
@@ -201,13 +238,14 @@ export class AvatarScene {
     if (!this.vrm?.expressionManager) return;
 
     this.nextBlinkAt -= dt;
+    const elapsed = performance.now() / 1000 - this._startTime;
     if (this.nextBlinkAt <= 0 && this.blinkPhase === 0) {
       this.blinkPhase = 1;
-      this.blinkStart = this.clock.elapsedTime;
+      this.blinkStart = elapsed;
     }
 
     if (this.blinkPhase > 0) {
-      const t = this.clock.elapsedTime - this.blinkStart;
+      const t = elapsed - this.blinkStart;
       const closeDur = 0.08;
       const holdDur = 0.05;
       const openDur = 0.12;
@@ -232,61 +270,168 @@ export class AvatarScene {
   start(): void {
     const loop = (): void => {
       this._raf = requestAnimationFrame(loop);
-      const dt = Math.min(this.clock.getDelta(), 0.1);
+      const now = performance.now() / 1000;
+      const dt = Math.min(now - this._prevTime, 0.1);
+      this._prevTime = now;
 
       if (this.vrm) {
-        const t = this.clock.elapsedTime;
+        const t = now - this._startTime;
         const Ap = this._aPose || { z: 1.05, x: 0.18, elbow: 0.80 };
 
         this._updateLipSync(dt);
         this._updateBlink(dt);
 
         const rawSpk = Math.min(Math.max(0, this.smoothedRms - 0.025) * 6, 1);
-        this._spkAmp = this._spkAmp * 0.94 + rawSpk * 0.06;
+        // Use _isSpeaking flag as fallback when audio analyser has no data
+        const targetSpk = this._isSpeaking ? Math.max(rawSpk, 0.5) : rawSpk;
+        this._spkAmp = this._spkAmp * 0.92 + targetSpk * 0.08;
         const spk = this._spkAmp;
 
-        // Body sway
-        this.vrm.scene.rotation.y = Math.sin(t * 0.35) * (0.05 + spk * 0.03);
+        // Cycle gesture when speaking
+        if (spk > 0.1) {
+          this._gestureTimer += dt;
+          if (this._gestureTimer > this._gestureDuration) {
+            this._gestureTimer = 0;
+            this._gestureIndex = (this._gestureIndex + 1) % 5;
+            this._gestureDuration = 2.5 + Math.random() * 2;
+          }
+        }
+        const gi = this._gestureIndex;
+
+        // Body sway — more expressive when speaking
+        this.vrm.scene.rotation.y = Math.sin(t * 0.35) * (0.05 + spk * 0.06);
         this.vrm.scene.position.y = Math.sin(t * 1.6) * 0.008;
 
-        // Arm animations
+        // --- GESTURE SYSTEM: 5 patterns ---
         const armSway = Math.sin(t * 0.9) * 0.04;
 
-        if (this._bones?.lUpperArm) {
-          this._bones.lUpperArm.rotation.z = -Ap.z - armSway;
-          this._bones.lUpperArm.rotation.x = Ap.x + spk * (0.12 + Math.sin(t * 2.7) * 0.06);
-          this._bones.lUpperArm.rotation.y = spk * Math.sin(t * 1.8) * 0.06;
-        }
-        if (this._bones?.rUpperArm) {
-          this._bones.rUpperArm.rotation.z = Ap.z + armSway;
-          this._bones.rUpperArm.rotation.x = Ap.x + spk * (0.12 + Math.sin(t * 2.7 + 1.6) * 0.06);
-          this._bones.rUpperArm.rotation.y = spk * Math.sin(t * 1.8 + 1.6) * -0.06;
+        if (gi === 0 || spk < 0.05) {
+          // Gesture 0: Default — gentle arm raise when speaking
+          if (this._bones?.lUpperArm) {
+            this._bones.lUpperArm.rotation.z = -Ap.z - armSway;
+            this._bones.lUpperArm.rotation.x = Ap.x + spk * (0.15 + Math.sin(t * 2.7) * 0.08);
+            this._bones.lUpperArm.rotation.y = spk * Math.sin(t * 1.8) * 0.08;
+          }
+          if (this._bones?.rUpperArm) {
+            this._bones.rUpperArm.rotation.z = Ap.z + armSway;
+            this._bones.rUpperArm.rotation.x = Ap.x + spk * (0.15 + Math.sin(t * 2.7 + 1.6) * 0.08);
+            this._bones.rUpperArm.rotation.y = spk * Math.sin(t * 1.8 + 1.6) * -0.08;
+          }
+          if (this._bones?.lLowerArm) {
+            this._bones.lLowerArm.rotation.x = Ap.elbow + Math.sin(t * 0.7) * 0.06 + spk * 0.2;
+            this._bones.lLowerArm.rotation.y = 0.08 + spk * Math.sin(t * 1.9) * 0.12;
+          }
+          if (this._bones?.rLowerArm) {
+            this._bones.rLowerArm.rotation.x = Ap.elbow + Math.sin(t * 0.7) * 0.06 + spk * 0.2;
+            this._bones.rLowerArm.rotation.y = -0.08 - spk * Math.sin(t * 1.9 + 1.4) * 0.12;
+          }
+        } else if (gi === 1) {
+          // Gesture 1: Right hand to chin — thinking/explaining
+          if (this._bones?.lUpperArm) {
+            this._bones.lUpperArm.rotation.z = -Ap.z - armSway;
+            this._bones.lUpperArm.rotation.x = Ap.x + spk * 0.1;
+            this._bones.lUpperArm.rotation.y = 0;
+          }
+          if (this._bones?.rUpperArm) {
+            this._bones.rUpperArm.rotation.z = 0.4 + Math.sin(t * 0.8) * 0.03;
+            this._bones.rUpperArm.rotation.x = 0.6 + Math.sin(t * 1.2) * 0.05;
+            this._bones.rUpperArm.rotation.y = -0.2;
+          }
+          if (this._bones?.lLowerArm) {
+            this._bones.lLowerArm.rotation.x = Ap.elbow + spk * 0.15;
+            this._bones.lLowerArm.rotation.y = 0.08;
+          }
+          if (this._bones?.rLowerArm) {
+            this._bones.rLowerArm.rotation.x = 1.4 + Math.sin(t * 1.5) * 0.06;
+            this._bones.rLowerArm.rotation.y = -0.3;
+          }
+        } else if (gi === 2) {
+          // Gesture 2: Both hands open — presenting/welcoming
+          if (this._bones?.lUpperArm) {
+            this._bones.lUpperArm.rotation.z = -0.6 + Math.sin(t * 1.1) * 0.05;
+            this._bones.lUpperArm.rotation.x = 0.35 + Math.sin(t * 0.9) * 0.06;
+            this._bones.lUpperArm.rotation.y = Math.sin(t * 1.4) * 0.08;
+          }
+          if (this._bones?.rUpperArm) {
+            this._bones.rUpperArm.rotation.z = 0.6 - Math.sin(t * 1.1 + 0.5) * 0.05;
+            this._bones.rUpperArm.rotation.x = 0.35 + Math.sin(t * 0.9 + 0.5) * 0.06;
+            this._bones.rUpperArm.rotation.y = -Math.sin(t * 1.4 + 0.5) * 0.08;
+          }
+          if (this._bones?.lLowerArm) {
+            this._bones.lLowerArm.rotation.x = 0.5 + Math.sin(t * 1.3) * 0.08;
+            this._bones.lLowerArm.rotation.y = 0.15;
+          }
+          if (this._bones?.rLowerArm) {
+            this._bones.rLowerArm.rotation.x = 0.5 + Math.sin(t * 1.3 + 0.8) * 0.08;
+            this._bones.rLowerArm.rotation.y = -0.15;
+          }
+        } else if (gi === 3) {
+          // Gesture 3: Left hand wave — friendly/greeting
+          if (this._bones?.lUpperArm) {
+            this._bones.lUpperArm.rotation.z = -0.3;
+            this._bones.lUpperArm.rotation.x = 0.5 + Math.sin(t * 2.5) * 0.1;
+            this._bones.lUpperArm.rotation.y = 0.15;
+          }
+          if (this._bones?.rUpperArm) {
+            this._bones.rUpperArm.rotation.z = Ap.z + armSway;
+            this._bones.rUpperArm.rotation.x = Ap.x + spk * 0.1;
+            this._bones.rUpperArm.rotation.y = 0;
+          }
+          if (this._bones?.lLowerArm) {
+            this._bones.lLowerArm.rotation.x = 1.2 + Math.sin(t * 3.5) * 0.15;
+            this._bones.lLowerArm.rotation.y = 0.2 + Math.sin(t * 4.0) * 0.2;
+          }
+          if (this._bones?.rLowerArm) {
+            this._bones.rLowerArm.rotation.x = Ap.elbow + spk * 0.15;
+            this._bones.rLowerArm.rotation.y = -0.08;
+          }
+        } else {
+          // Gesture 4: Emphatic — both arms animated expressively
+          if (this._bones?.lUpperArm) {
+            this._bones.lUpperArm.rotation.z = -0.7 + Math.sin(t * 1.8) * 0.1;
+            this._bones.lUpperArm.rotation.x = 0.3 + spk * Math.sin(t * 2.2) * 0.15;
+            this._bones.lUpperArm.rotation.y = Math.sin(t * 1.5) * 0.1;
+          }
+          if (this._bones?.rUpperArm) {
+            this._bones.rUpperArm.rotation.z = 0.7 - Math.sin(t * 1.8 + 1.0) * 0.1;
+            this._bones.rUpperArm.rotation.x = 0.3 + spk * Math.sin(t * 2.2 + 1.0) * 0.15;
+            this._bones.rUpperArm.rotation.y = -Math.sin(t * 1.5 + 1.0) * 0.1;
+          }
+          if (this._bones?.lLowerArm) {
+            this._bones.lLowerArm.rotation.x = 0.6 + spk * (0.3 + Math.sin(t * 2.8) * 0.15);
+            this._bones.lLowerArm.rotation.y = 0.1 + Math.sin(t * 2.0) * 0.15;
+          }
+          if (this._bones?.rLowerArm) {
+            this._bones.rLowerArm.rotation.x = 0.6 + spk * (0.3 + Math.sin(t * 2.8 + 1.2) * 0.15);
+            this._bones.rLowerArm.rotation.y = -0.1 - Math.sin(t * 2.0 + 1.2) * 0.15;
+          }
         }
 
-        const elbowIdle = Math.sin(t * 0.7) * 0.06;
-        const elbowSpk = spk * (0.15 + Math.sin(t * 2.1) * 0.10);
-
-        if (this._bones?.lLowerArm) {
-          this._bones.lLowerArm.rotation.x = Ap.elbow + elbowIdle + elbowSpk;
-          this._bones.lLowerArm.rotation.y = 0.08 + spk * Math.sin(t * 1.9) * 0.10;
-        }
-        if (this._bones?.rLowerArm) {
-          this._bones.rLowerArm.rotation.x = Ap.elbow + elbowIdle + elbowSpk;
-          this._bones.rLowerArm.rotation.y = -0.08 - spk * Math.sin(t * 1.9 + 1.4) * 0.10;
-        }
-
-        // Head movement
+        // Head movement — more expressive per gesture
         const headBone = this.vrm.humanoid?.getNormalizedBoneNode('head');
         if (headBone) {
-          headBone.rotation.y = Math.sin(t * 0.5) * 0.08 + spk * Math.sin(t * 2.3) * 0.12;
-          headBone.rotation.x = Math.sin(t * 0.3) * 0.04 + spk * Math.sin(t * 3.1) * 0.08;
+          const headBase = Math.sin(t * 0.5) * 0.08;
+          const nodBase = Math.sin(t * 0.3) * 0.04;
+          if (gi === 1) {
+            // Thinking — tilt head
+            headBone.rotation.y = headBase + 0.1;
+            headBone.rotation.x = nodBase - 0.06;
+            headBone.rotation.z = 0.08;
+          } else if (gi === 3) {
+            // Wave — look at hand briefly
+            headBone.rotation.y = headBase - 0.12 + spk * Math.sin(t * 2.0) * 0.08;
+            headBone.rotation.x = nodBase + spk * 0.05;
+          } else {
+            headBone.rotation.y = headBase + spk * Math.sin(t * 2.3) * 0.15;
+            headBone.rotation.x = nodBase + spk * Math.sin(t * 3.1) * 0.1;
+          }
         }
 
         // Spine & chest breathing
         const spine = this.vrm.humanoid?.getNormalizedBoneNode('spine');
         if (spine) {
-          spine.rotation.y = Math.sin(t * 0.7) * 0.015 + spk * Math.sin(t * 1.5) * 0.03;
-          spine.rotation.x = spk * Math.sin(t * 2.1) * 0.015;
+          spine.rotation.y = Math.sin(t * 0.7) * 0.015 + spk * Math.sin(t * 1.5) * 0.04;
+          spine.rotation.x = spk * Math.sin(t * 2.1) * 0.02;
         }
 
         const chest = this.vrm.humanoid?.getNormalizedBoneNode('chest');

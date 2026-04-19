@@ -1,43 +1,75 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useI18n } from '@/lib/i18n';
 
 const MeoChatFullscreen = dynamic(() => import('./MeoChatFullscreen'), { ssr: false });
+const MeoAvatarThumb = dynamic(() => import('./MeoAvatarThumb'), { ssr: false });
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const { t } = useI18n();
 
+  useEffect(() => {
+    window.dispatchEvent(new Event(open ? 'meo-chat:open' : 'meo-chat:close'));
+  }, [open]);
+
   return (
     <>
       {/* FAB Button */}
       {!open && (
-        <button onClick={() => setOpen(true)} className="fixed bottom-6 right-6 z-[60] border-none bg-transparent p-0 cursor-pointer">
-          <div className="flex items-center gap-2.5 bg-[#0f1117] border border-orange-500/50 rounded-full py-2.5 px-4 pl-3 relative shadow-lg shadow-orange-500/10 hover:shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all duration-300">
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center shrink-0">
-              <BotIcon />
+        <button onClick={() => setOpen(true)} className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-[60] border-none bg-transparent p-0 cursor-pointer group">
+          <div className="flex items-center gap-3 rounded-2xl py-2.5 px-4 pl-2.5 relative transition-all duration-300 group-hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #1a1008 0%, #0d0d14 50%, #081118 100%)',
+              border: '1px solid rgba(249,115,22,0.25)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(249,115,22,0.08), inset 0 1px 0 rgba(255,255,255,0.03)',
+            }}>
+            {/* Hover glow */}
+            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{ boxShadow: '0 0 30px rgba(249,115,22,0.15), 0 0 60px rgba(0,180,160,0.08)' }} />
+
+            {/* Online dot */}
+            <span className="absolute -top-1 -right-1 z-10">
+              <span className="block w-3 h-3 bg-green-500 rounded-full border-2 border-[#0d0d14]" />
+            </span>
+
+            {/* Avatar thumbnail */}
+            <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 relative"
+              style={{
+                border: '2px solid rgba(249,115,22,0.35)',
+                boxShadow: '0 0 12px rgba(249,115,22,0.15)',
+              }}>
+              <MeoAvatarThumb size={48} />
             </div>
-            <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-white whitespace-nowrap">{t('chat.fab_title')}</span>
-              <span className="text-[10px] text-orange-500/85 font-semibold whitespace-nowrap">{t('chat.fab_subtitle')}</span>
+
+            {/* Text */}
+            <div className="flex flex-col gap-0.5 pr-1">
+              <span className="text-[14px] font-bold text-white whitespace-nowrap tracking-wide">{t('chat.fab_title')}</span>
+              <span className="text-[10px] font-semibold whitespace-nowrap tracking-wider"
+                style={{ background: 'linear-gradient(90deg, #f97316, #00d4aa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                {t('chat.fab_subtitle')}
+              </span>
             </div>
+
+            {/* Decorative accent line */}
+            <div className="absolute bottom-0 left-[20%] right-[20%] h-[1px]"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(249,115,22,0.3), rgba(0,212,170,0.2), transparent)' }} />
           </div>
+
+          <style>{`
+            @keyframes fabPing { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0; transform:scale(2.5); } }
+            @keyframes fabGlow {
+              0%,100% { box-shadow: 0 0 12px rgba(249,115,22,0.2); border-color: rgba(249,115,22,0.35); }
+              50% { box-shadow: 0 0 22px rgba(249,115,22,0.35), 0 0 40px rgba(0,180,160,0.1); border-color: rgba(249,115,22,0.5); }
+            }
+          `}</style>
         </button>
       )}
 
       {/* Fullscreen Chat */}
       {open && <MeoChatFullscreen onClose={() => setOpen(false)} />}
     </>
-  );
-}
-
-function BotIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
-      <path d="M12 2a2 2 0 012 2c0 .74-.4 1.38-1 1.73V7h1a7 7 0 017 7H4a7 7 0 017-7h1V5.73c-.6-.35-1-.99-1-1.73a2 2 0 012-2zm-2 14h4v2h-4v-2zm-4 0h2v2H6v-2zm10 0h2v2h-2v-2z" />
-    </svg>
   );
 }

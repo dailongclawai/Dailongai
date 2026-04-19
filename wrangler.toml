@@ -1,0 +1,17 @@
+name = "dai-long-landing"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "out"
+
+[ai]
+binding = "AI"
+
+[[kv_namespaces]]
+binding = "MEO_STATS"
+id = "54abe743ed8e4a2dbb8ac0f8d1824a96"
+
+# RAG: knowledge base for AI Meo Meo (created via:
+#   wrangler vectorize create dailongai-blog --dimensions=1024 --metric=cosine
+# )
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "dailongai-blog"

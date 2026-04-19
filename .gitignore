@@ -40,3 +40,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .dev.vars
+
+# local-only tooling and plans (not for public repo)
+.superpowers/
+docs/superpowers/
+.claude/
+.lighthouseci/
+playwright-report/
+test-results/
+public/images/_responsive/
+public/_pagefind/
+
+# allow committed example env files
+!**/.env.example

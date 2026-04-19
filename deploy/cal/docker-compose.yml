@@ -1,0 +1,61 @@
+version: "3.9"
+
+# Cal.com self-host on VPS for cal.dailongai.com
+# Prereqs:
+#   - DNS: cal.dailongai.com → VPS (Cloudflare orange-cloud OFF for first cert issue, then ON)
+#   - Caddy/Nginx in front terminating TLS and proxying :3000
+#   - Postgres reachable on $DATABASE_URL (use external managed PG or another container)
+#   - Generate NEXTAUTH_SECRET, CALENDSO_ENCRYPTION_KEY: openssl rand -base64 32
+#
+# First boot:
+#   docker compose up -d
+#   docker compose exec calcom yarn workspace @calcom/prisma db-deploy
+#   docker compose exec calcom yarn workspace @calcom/prisma db-seed   # optional demo data
+#
+# Update:
+#   docker compose pull && docker compose up -d
+
+services:
+  calcom:
+    image: calcom/cal.com:latest
+    container_name: calcom
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      NEXT_PUBLIC_WEBAPP_URL: "https://cal.dailongai.com"
+      NEXT_PUBLIC_API_V2_URL: "https://cal.dailongai.com/api/v2"
+      NEXTAUTH_URL: "https://cal.dailongai.com"
+      NEXTAUTH_SECRET: "${NEXTAUTH_SECRET}"
+      CALENDSO_ENCRYPTION_KEY: "${CALENDSO_ENCRYPTION_KEY}"
+      DATABASE_URL: "${DATABASE_URL}"
+      DATABASE_DIRECT_URL: "${DATABASE_URL}"
+      EMAIL_FROM: "no-reply@dailongai.com"
+      EMAIL_SERVER_HOST: "${SMTP_HOST}"
+      EMAIL_SERVER_PORT: "${SMTP_PORT:-587}"
+      EMAIL_SERVER_USER: "${SMTP_USER}"
+      EMAIL_SERVER_PASSWORD: "${SMTP_PASS}"
+      NODE_ENV: production
+    depends_on:
+      - postgres
+    networks:
+      - calnet
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: calcom-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: calcom
+      POSTGRES_USER: calcom
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - calcom_pg_data:/var/lib/postgresql/data
+    networks:
+      - calnet
+
+volumes:
+  calcom_pg_data:
+
+networks:
+  calnet:
