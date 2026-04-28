@@ -5,12 +5,12 @@ import { useI18n, localeNames } from '@/lib/i18n';
 import type { Locale } from '@/lib/i18n';
 
 const flagUrls: Record<Locale, string> = {
-  vi: 'https://flagcdn.com/w40/vn.png',
-  en: 'https://flagcdn.com/w40/gb.png',
-  zh: 'https://flagcdn.com/w40/cn.png',
-  ja: 'https://flagcdn.com/w40/jp.png',
-  ko: 'https://flagcdn.com/w40/kr.png',
-  ru: 'https://flagcdn.com/w40/ru.png',
+  vi: '/flags/vn.png',
+  en: '/flags/gb.png',
+  zh: '/flags/cn.png',
+  ja: '/flags/jp.png',
+  ko: '/flags/kr.png',
+  ru: '/flags/ru.png',
 };
 
 const locales: Locale[] = ['vi', 'en', 'zh', 'ja', 'ko', 'ru'];
