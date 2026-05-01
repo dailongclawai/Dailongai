@@ -3,3 +3,5 @@
 /products /san-pham 301
 /contact /lien-he 301
 /health-status /thuc-trang-suc-khoe 301
+/ai / 301
+/ai/* / 301
