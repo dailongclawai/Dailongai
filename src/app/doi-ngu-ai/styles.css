@@ -1,20 +1,53 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap');
 
-.team-page-3d {
-  background: #050810;
-  color: #e8eaed;
+.team-page-jack {
+  background: #0C0C0C;
+  color: #D7E2EA;
+  font-family: 'Kanit', sans-serif;
   min-height: 100vh;
-  position: relative;
+  overflow-x: clip;
 }
 
-.team-page-3d .scene3d-wrap {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
+.team-page-jack .hero-heading {
+  background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
-.team-page-3d header,
-.team-page-3d footer {
-  position: relative;
-  z-index: 20;
+.team-page-jack .contact-btn {
+  background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%);
+  box-shadow:
+    0 4px 4px rgba(181, 1, 167, 0.25),
+    4px 4px 12px #7721B1 inset;
+  outline: 2px solid #ffffff;
+  outline-offset: -3px;
+  color: #ffffff;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border-radius: 9999px;
+}
+.team-page-jack .contact-btn:hover { transform: translateY(-2px); }
+
+.team-page-jack .live-project-btn {
+  border-radius: 9999px;
+  border: 2px solid #D7E2EA;
+  color: #D7E2EA;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.team-page-jack .live-project-btn:hover { background: rgba(215, 226, 234, 0.1); }
+
+.team-page-jack header,
+.team-page-jack footer {
+  font-family: 'Kanit', sans-serif;
 }
