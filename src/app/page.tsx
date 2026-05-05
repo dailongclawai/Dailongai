@@ -4,7 +4,6 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import CertificationsSection from "@/components/CertificationsSection";
 import SolutionsSection from "@/components/SolutionsSection";
-import StatsSection from "@/components/StatsSection";
 
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
@@ -20,7 +19,6 @@ export default function Home() {
         <AboutSection />
         <SolutionsSection />
         <CertificationsSection />
-        <StatsSection />
 
         <ContactForm />
       </main>

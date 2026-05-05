@@ -1,10 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { product, contactInfo } from "@/data/siteData";
 import { useI18n } from "@/lib/i18n";
-
-const LaserPulse = dynamic(() => import("@/components/LaserPulse"), { ssr: false });
 
 export default function HeroSection() {
   const { t } = useI18n();
@@ -44,11 +41,6 @@ export default function HeroSection() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Laser Pulse 3D animation */}
-        <div className="w-full h-[250px] sm:h-[320px] lg:h-[380px] mb-8 sm:mb-12">
-          <LaserPulse />
         </div>
 
         {/* Product images — no animation, render immediately for LCP */}
