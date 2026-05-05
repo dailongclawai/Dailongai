@@ -27,6 +27,13 @@ const videoLibrary = [
     image: "https://i.ytimg.com/vi/mSNff8wZ4ck/maxresdefault.jpg",
     youtubeId: "mSNff8wZ4ck",
   },
+  {
+    id: "co-bv-zhi-dun-2026",
+    category: "Khách hàng",
+    title: "Cô nhiều năm làm ở bệnh viện nói về máy ZhiDun",
+    image: "https://i.ytimg.com/vi/mO_-0Xy03DE/maxresdefault.jpg",
+    youtubeId: "mO_-0Xy03DE",
+  },
 ];
 
 type PaginationItem = number | "ellipsis";
