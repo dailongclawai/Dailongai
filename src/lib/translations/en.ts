@@ -4,6 +4,7 @@ const en: Record<string, string> = {
     'nav.about': 'About Us',
     'nav.products': 'Products',
     'nav.health': 'Health Issues',
+    'nav.team': 'AI Team',
     'nav.contact': 'Contact',
     'nav.blog': 'Blog',
     'nav.consult': 'CONSULT',

@@ -4,6 +4,7 @@ const ko: Record<string, string> = {
     'nav.about': '회사 소개',
     'nav.products': '제품',
     'nav.health': '건강 현황',
+    'nav.team': 'AI 팀',
     'nav.contact': '문의',
     'nav.blog': '블로그',
     'nav.consult': '상담',

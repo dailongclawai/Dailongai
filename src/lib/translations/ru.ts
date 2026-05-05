@@ -3,6 +3,7 @@ const ru: Record<string, string> = {
     'nav.about': 'О нас',
     'nav.products': 'Продукция',
     'nav.health': 'Здоровье',
+    'nav.team': 'AI Команда',
     'nav.contact': 'Контакты',
     'nav.blog': 'Блог',
     'nav.consult': 'КОНСУЛЬТАЦИЯ',

@@ -4,6 +4,7 @@ const ja: Record<string, string> = {
     'nav.about': '会社概要',
     'nav.products': '製品',
     'nav.health': '健康課題',
+    'nav.team': 'AIチーム',
     'nav.contact': 'お問い合わせ',
     'nav.blog': 'ブログ',
     'nav.consult': 'ご相談',

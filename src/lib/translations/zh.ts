@@ -4,6 +4,7 @@ const zh: Record<string, string> = {
     'nav.about': '关于我们',
     'nav.products': '产品',
     'nav.health': '健康现状',
+    'nav.team': 'AI 团队',
     'nav.contact': '联系我们',
     'nav.blog': '博客',
     'nav.consult': '咨询',

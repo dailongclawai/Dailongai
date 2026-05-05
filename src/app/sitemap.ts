@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/about-us`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/san-pham`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${baseUrl}/thuc-trang-suc-khoe`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${baseUrl}/doi-ngu-ai`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/lien-he`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
   ];

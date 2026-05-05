@@ -4,6 +4,7 @@ const vi: Record<string, string> = {
     'nav.about': 'Về chúng tôi',
     'nav.products': 'Sản phẩm',
     'nav.health': 'Thực trạng',
+    'nav.team': 'Đội Ngũ AI',
     'nav.contact': 'Liên hệ',
     'nav.blog': 'Blog',
     'nav.consult': 'TƯ VẤN',
