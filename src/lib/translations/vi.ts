@@ -518,7 +518,7 @@ const vi: Record<string, string> = {
     // Team page (/doi-ngu-ai)
     'team.boss.heading': 'Ông Chủ',
     'team.boss.role': 'Founder & Chairman · Đại Long Medical',
-    'team.boss.bio': 'Người sáng lập Đại Long Medical · Tổng chỉ huy hạm đội 17 Sen Agent vận hành 24/7. Sứ mệnh: đặt Việt Nam lên bản đồ healthcare AI thế giới.',
+    'team.boss.bio': 'Người sáng lập Đại Long Medical · Kiến trúc sư hạm đội 17 Sen Agent vận hành 24/7. Sứ mệnh: đặt Việt Nam lên bản đồ healthcare AI thế giới.',
 
     'team.deptgrid.heading': 'Hạm Đội AI',
 
