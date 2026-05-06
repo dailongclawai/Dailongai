@@ -1,9 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600&family=Kanit:wght@300;400;700;900&display=swap');
 
 .team-page-jack {
-  background: #0C0C0C;
-  color: #D7E2EA;
-  font-family: 'Kanit', sans-serif;
+  background-color: #0e0e11;
+  background-image:
+    linear-gradient(rgba(255, 144, 105, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 144, 105, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: #f0edf1;
+  font-family: 'Manrope', 'Kanit', sans-serif;
   min-height: 100vh;
   overflow-x: clip;
 }
@@ -17,22 +21,98 @@
 }
 
 .team-page-jack .contact-btn {
-  background: linear-gradient(123deg, #18011F 7%, #B600A8 37%, #7621B0 72%, #BE4C00 100%);
+  background: linear-gradient(135deg, #ff9069 0%, #ff7948 100%);
   box-shadow:
-    0 4px 4px rgba(181, 1, 167, 0.25),
-    4px 4px 12px #7721B1 inset;
-  outline: 2px solid #ffffff;
-  outline-offset: -3px;
-  color: #ffffff;
-  font-weight: 500;
+    0 4px 16px rgba(255, 144, 105, 0.35),
+    0 0 0 2px rgba(255, 255, 255, 0.08) inset;
+  color: #591800;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   border-radius: 9999px;
 }
-.team-page-jack .contact-btn:hover { transform: translateY(-2px); }
+.team-page-jack .contact-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(255, 144, 105, 0.5);
+}
+
+.team-page-jack .scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 0.5;
+}
+.team-page-jack .scanline-overlay::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(0deg, transparent 0%, rgba(255, 144, 105, 0.1) 50%, transparent 100%);
+  top: -100px;
+  animation: jack-scanline 8s linear infinite;
+}
+@keyframes jack-scanline {
+  0% { top: -100px; }
+  100% { top: 100%; }
+}
+
+.team-page-jack .grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 144, 105, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 144, 105, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.team-page-jack .side-nav {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+}
+@media (min-width: 1024px) {
+  .team-page-jack .side-nav { display: flex; }
+}
+.team-page-jack .side-nav-bar {
+  width: 4px;
+  height: 128px;
+  background: rgba(72, 71, 75, 0.3);
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+}
+.team-page-jack .side-nav-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 25%;
+  background: #ff9069;
+  box-shadow: 0 0 10px #ff9069;
+}
+.team-page-jack .side-nav-text {
+  writing-mode: vertical-rl;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #acaaae;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.team-page-jack .side-nav-text .active { color: #ff9069; }
 
 .team-page-jack .live-project-btn {
   border-radius: 9999px;
