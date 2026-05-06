@@ -57,22 +57,27 @@ function SenCard({ sen, dept, index }: { sen: Sen; dept: Department; index: numb
         >
           {sen.mission}
         </p>
-        {sen.proof && (
-          <a
-            href={sen.proof.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-all duration-200"
-            style={{
-              border: `1px solid ${dept.hex}`,
-              color: dept.hex,
-              letterSpacing: "0.15em",
-              fontFamily: "Inter, sans-serif",
-            }}
-          >
-            <ProofIcon platform={sen.proof.platform} color={dept.hex} />
-            {sen.proof.label}
-          </a>
+        {sen.proofs && sen.proofs.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2 justify-center">
+            {sen.proofs.map((p) => (
+              <a
+                key={p.url}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-widest transition-all duration-200 hover:scale-105"
+                style={{
+                  border: `1px solid ${dept.hex}`,
+                  color: dept.hex,
+                  letterSpacing: "0.15em",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              >
+                <ProofIcon platform={p.platform} color={dept.hex} />
+                {p.label}
+              </a>
+            ))}
+          </div>
         )}
       </div>
     </FadeIn>

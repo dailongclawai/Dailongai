@@ -1,10 +1,16 @@
+export type ProofChannel = {
+  label: string;
+  url: string;
+  platform: "tiktok" | "facebook" | "web" | "telegram";
+};
+
 export type Sen = {
   id: string;
   name: string;
   role: string;
   mission: string;
   avatar: string;
-  proof?: { label: string; url: string; platform: "tiktok" | "facebook" | "web" | "telegram" };
+  proofs?: ProofChannel[];
 };
 
 export type DeptColor = "cyan" | "yellow" | "green" | "magenta";
@@ -40,9 +46,14 @@ export const departments: Department[] = [
     hex: "#ffea00",
     members: [
       { id: "005", name: "Sen Meta", role: "Facebook Manager", mission: "Đăng bài Page Đại Long, ad approval workflow.", avatar: "sen-meta.jpeg",
-        proof: { label: "Page Đại Long", url: "https://facebook.com/dailongmedical", platform: "facebook" } },
+        proofs: [
+          { label: "FB Page A", url: "https://www.facebook.com/profile.php?id=61560732146657", platform: "facebook" },
+          { label: "FB Page B", url: "https://www.facebook.com/profile.php?id=61589370053042", platform: "facebook" },
+        ] },
       { id: "006", name: "Sen TikTok", role: "TikTok Producer", mission: "Sports repost, video upload, auto-caption tự động.", avatar: "sen-tiktok.jpeg",
-        proof: { label: "Kênh TikTok", url: "https://tiktok.com/@dailongmedical", platform: "tiktok" } },
+        proofs: [
+          { label: "Kênh TikTok", url: "https://tiktok.com/@dailongai", platform: "tiktok" },
+        ] },
       { id: "007", name: "Sen Designer", role: "Designer", mission: "Tạo poster, thumbnail, banner qua Playwright render.", avatar: "sen-designer.jpeg" },
       { id: "008", name: "Sen Outreach", role: "Partner Outreach", mission: "Tìm kiếm và tiếp cận đối tác B2B chiến lược.", avatar: "sen-outreach.png" },
     ],
