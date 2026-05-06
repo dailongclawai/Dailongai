@@ -8,10 +8,14 @@ import HeroPortrait from "./HeroPortrait";
 export default function HeroSection() {
   return (
     <section className="relative h-screen flex flex-col" style={{ overflowX: "clip" }}>
-      <FadeIn delay={0.15} y={40} className="overflow-hidden mt-12 sm:mt-10 md:mt-8 px-4">
+      <FadeIn delay={0.15} y={40} className="mt-[348px] sm:mt-[340px] md:mt-[332px] px-4">
         <h1
-          className="hero-heading font-black uppercase tracking-tight leading-none w-full text-center"
-          style={{ fontSize: "clamp(2.5rem, 12vw, 14vw)" as string }}
+          className="hero-heading font-black uppercase tracking-tight w-full text-center"
+          style={{
+            fontSize: "clamp(2.5rem, 12vw, 14vw)" as string,
+            lineHeight: 1.18,
+            paddingTop: "0.1em",
+          }}
         >
           ĐỘI NGŨ AI
         </h1>

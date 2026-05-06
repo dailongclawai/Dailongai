@@ -18,6 +18,8 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
+  line-height: 1.18;
+  padding-top: 0.12em;
 }
 
 .team-page-jack .contact-btn {

@@ -1,10 +1,12 @@
 "use client";
 
 import FadeIn from "./FadeIn";
+import DataLayerIcon from "./DataLayerIcon";
+
+type IconKey = "supabase" | "shared-memory" | "fleet-events" | "fleet-registry" | "entity-facts" | "rag-knowledge";
 
 type DataLayer = {
-  key: string;
-  emoji: string;
+  key: IconKey;
   name: string;
   tableName: string;
   description: string;
@@ -15,7 +17,6 @@ type DataLayer = {
 const LAYERS: DataLayer[] = [
   {
     key: "supabase",
-    emoji: "🗄️",
     name: "Supabase Postgres",
     tableName: "projects · 50+ tables",
     description: "Single source of truth: agent registry, memory pool, fleet events, entity facts, viral signals, Đại Long CRM.",
@@ -24,7 +25,6 @@ const LAYERS: DataLayer[] = [
   },
   {
     key: "shared-memory",
-    emoji: "🧠",
     name: "shared_memory",
     tableName: "table · trace_id indexed",
     description: "Memory pool fleet — Boss notes, agent decisions, project state. Hybrid vector + keyword search, sleep-time consolidation.",
@@ -33,7 +33,6 @@ const LAYERS: DataLayer[] = [
   },
   {
     key: "fleet-events",
-    emoji: "📡",
     name: "fleet_events bus",
     tableName: "table · realtime stream",
     description: "Real-time event bus — agent X notifies agent Y, dispatch task, completion signals. SSOT cho cross-agent comms.",
@@ -42,7 +41,6 @@ const LAYERS: DataLayer[] = [
   },
   {
     key: "fleet-registry",
-    emoji: "🛰️",
     name: "fleet_registry",
     tableName: "table · agent endpoints",
     description: "Agent registry với role + endpoint + secret. Resolves bridge dispatch routing, enables sen-fleet CLI.",
@@ -51,7 +49,6 @@ const LAYERS: DataLayer[] = [
   },
   {
     key: "entity-facts",
-    emoji: "🔗",
     name: "entity_facts_canonical",
     tableName: "table · cluster + reconcile",
     description: "Temporal facts với expiry + canonical reconcile (Gemini Flash, cosine 0.85). Daily cron 04:50, 600 canonical/627 raw.",
@@ -60,7 +57,6 @@ const LAYERS: DataLayer[] = [
   },
   {
     key: "rag-knowledge",
-    emoji: "📚",
     name: "Knowledge RAG",
     tableName: "187 chunks · pgvector",
     description: "Embeddings 187 chunk blog dailongai + product info + warranty + medical context. Vector recall sub-100ms.",
@@ -91,7 +87,7 @@ export default function DataInfraSection() {
       </FadeIn>
       <FadeIn delay={0.1} y={30} className="mb-16">
         <h2
-          className="hero-heading font-black uppercase text-center leading-none tracking-tight"
+          className="hero-heading font-black uppercase text-center tracking-tight"
           style={{ fontSize: "clamp(2rem, 7vw, 96px)" as string }}
         >
           Hạ Tầng Dữ Liệu
@@ -109,8 +105,8 @@ export default function DataInfraSection() {
                 boxShadow: `0 0 24px ${layer.hex}0c`,
               }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="text-3xl">{layer.emoji}</div>
+              <div className="flex items-center gap-4 mb-4">
+                <DataLayerIcon icon={layer.key} color={layer.hex} size={56} />
                 <div className="flex-1">
                   <div
                     className="font-bold uppercase"

@@ -78,7 +78,7 @@ export default function AboutSection() {
       <div className="flex flex-col items-center gap-10 sm:gap-14 md:gap-16 relative z-10">
         <FadeIn delay={0} y={40}>
           <h2
-            className="hero-heading font-black uppercase leading-none tracking-tight text-center"
+            className="hero-heading font-black uppercase tracking-tight text-center"
             style={{ fontSize: "clamp(3rem, 12vw, 160px)" as string }}
           >
             Về Đội Ngũ
