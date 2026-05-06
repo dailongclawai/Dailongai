@@ -168,6 +168,7 @@ export default function RootLayout({
         <Observability />
         <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18055317984" />
         <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-X9YDDLXX3H');gtag('config','AW-18055317984');` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(c,e){var a=c.tracksma=c.tracksma||[];if(!a.initialize&&!a.invoked){a.invoked=!0;a.methods="trackSubmit trackClick trackLink trackForm page identify reset track".split(" ");a.factory=function(b){return function(){var d=Array.prototype.slice.call(arguments);d.unshift(b);a.push(d);return a}};for(c=0;c<a.methods.length;c++){var f=a.methods[c];a[f]=a.factory(f)}a.load=function(b,d){a.SNIPPET_APP=b;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="https://s.eclick.vn/smaevents.js";d=e.getElementsByTagName("script")[0];d.parentNode.insertBefore(b,d)};a.load(1000021131)}})(window,document)` }} />
       </body>
     </html>
   );
