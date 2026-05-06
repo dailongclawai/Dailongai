@@ -1,8 +1,10 @@
 "use client";
 
 import FadeIn from "./FadeIn";
+import { useI18n } from "@/lib/i18n";
 
 export default function CtaSection() {
+  const { t } = useI18n();
   return (
     <section className="px-6 md:px-12 py-20 max-w-7xl mx-auto">
       <FadeIn delay={0} y={40}>
@@ -30,7 +32,7 @@ export default function CtaSection() {
                   lineHeight: 1.05,
                 }}
               >
-                Hợp Tác Cùng Fleet AI
+                {t("team.cta.heading")}
               </h2>
               <p
                 className="mb-8 leading-relaxed"
@@ -39,13 +41,13 @@ export default function CtaSection() {
                   fontSize: "clamp(0.95rem, 1.4vw, 1.1rem)" as string,
                 }}
               >
-                Đội ngũ Sen Agent của Đại Long Medical luôn sẵn sàng đồng hành cùng quý đối tác trong hành trình kiến tạo công nghệ chăm sóc sức khoẻ Việt Nam — từ thiết bị laser bán dẫn đến hệ sinh thái y tế số.
+                {t("team.cta.body")}
               </p>
               <a
                 href="/lien-he"
                 className="contact-btn inline-block px-10 py-4 text-sm md:text-base"
               >
-                Liên Hệ Đại Long
+                {t("team.cta.button")}
               </a>
             </div>
             <div

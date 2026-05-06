@@ -2,6 +2,7 @@
 
 import FadeIn from "./FadeIn";
 import DataLayerIcon from "./DataLayerIcon";
+import { useI18n } from "@/lib/i18n";
 
 type IconKey = "supabase" | "shared-memory" | "fleet-events" | "fleet-registry" | "entity-facts" | "rag-knowledge";
 
@@ -9,72 +10,25 @@ type DataLayer = {
   key: IconKey;
   name: string;
   tableName: string;
-  description: string;
-  consumers: string;
+  descKey: string;
+  consumersKey: string;
   hex: string;
 };
 
 const LAYERS: DataLayer[] = [
-  {
-    key: "supabase",
-    name: "Supabase Postgres",
-    tableName: "projects · 50+ tables",
-    description: "Single source of truth: agent registry, memory pool, fleet events, entity facts, viral signals, Đại Long CRM.",
-    consumers: "All 17 Sen + Mission Control",
-    hex: "#00f2ff",
-  },
-  {
-    key: "shared-memory",
-    name: "shared_memory",
-    tableName: "table · trace_id indexed",
-    description: "Memory pool fleet — Boss notes, agent decisions, project state. Hybrid vector + keyword search, sleep-time consolidation.",
-    consumers: "Sen Prime · Sen Coder · Sen CEO · Sen Manus",
-    hex: "#ff9069",
-  },
-  {
-    key: "fleet-events",
-    name: "fleet_events bus",
-    tableName: "table · realtime stream",
-    description: "Real-time event bus — agent X notifies agent Y, dispatch task, completion signals. SSOT cho cross-agent comms.",
-    consumers: "All 17 Sen subscribe",
-    hex: "#00ff88",
-  },
-  {
-    key: "fleet-registry",
-    name: "fleet_registry",
-    tableName: "table · agent endpoints",
-    description: "Agent registry với role + endpoint + secret. Resolves bridge dispatch routing, enables sen-fleet CLI.",
-    consumers: "Sen Dispatch · Sen Prime · Bridge Worker",
-    hex: "#ffea00",
-  },
-  {
-    key: "entity-facts",
-    name: "entity_facts_canonical",
-    tableName: "table · cluster + reconcile",
-    description: "Temporal facts với expiry + canonical reconcile (Gemini Flash, cosine 0.85). Daily cron 04:50, 600 canonical/627 raw.",
-    consumers: "Sen Prime · Sen Memory consolidator",
-    hex: "#ff00ff",
-  },
-  {
-    key: "rag-knowledge",
-    name: "Knowledge RAG",
-    tableName: "187 chunks · pgvector",
-    description: "Embeddings 187 chunk blog dailongai + product info + warranty + medical context. Vector recall sub-100ms.",
-    consumers: "Sen Voice · Sen Meo Meo · Sen CEO outreach",
-    hex: "#ff2d88",
-  },
+  { key: "supabase", name: "Supabase Postgres", tableName: "projects · 50+ tables", descKey: "team.datainfra.layer.supabase.desc", consumersKey: "team.datainfra.layer.supabase.consumers", hex: "#00f2ff" },
+  { key: "shared-memory", name: "shared_memory", tableName: "table · trace_id indexed", descKey: "team.datainfra.layer.shared.desc", consumersKey: "team.datainfra.layer.shared.consumers", hex: "#ff9069" },
+  { key: "fleet-events", name: "fleet_events bus", tableName: "table · realtime stream", descKey: "team.datainfra.layer.events.desc", consumersKey: "team.datainfra.layer.events.consumers", hex: "#00ff88" },
+  { key: "fleet-registry", name: "fleet_registry", tableName: "table · agent endpoints", descKey: "team.datainfra.layer.registry.desc", consumersKey: "team.datainfra.layer.registry.consumers", hex: "#ffea00" },
+  { key: "entity-facts", name: "entity_facts_canonical", tableName: "table · cluster + reconcile", descKey: "team.datainfra.layer.facts.desc", consumersKey: "team.datainfra.layer.facts.consumers", hex: "#ff00ff" },
+  { key: "rag-knowledge", name: "Knowledge RAG", tableName: "187 chunks · pgvector", descKey: "team.datainfra.layer.rag.desc", consumersKey: "team.datainfra.layer.rag.consumers", hex: "#ff2d88" },
 ];
 
-const CAPABILITIES = [
-  { icon: "📥", text: "Đọc/ghi memory chéo agent qua shared_memory pool" },
-  { icon: "🔔", text: "Subscribe sự kiện real-time qua fleet_events bus" },
-  { icon: "🔍", text: "Hybrid semantic + graph search với 1-hop expansion" },
-  { icon: "🧬", text: "Truy cập RAG knowledge base 187 chunk blog Đại Long" },
-  { icon: "🚀", text: "Dispatch task chéo agent qua sen-fleet CLI / MCP" },
-  { icon: "🔐", text: "Approve mutations qua Telegram gate (Sen Manus)" },
-];
+const CAPABILITY_ICONS = ["📥", "🔔", "🔍", "🧬", "🚀", "🔐"];
+const CAPABILITY_KEYS = [1, 2, 3, 4, 5, 6].map((i) => `team.datainfra.cap${i}`);
 
 export default function DataInfraSection() {
+  const { t } = useI18n();
   return (
     <section className="px-6 md:px-12 py-24 max-w-7xl mx-auto">
       <FadeIn delay={0} y={30} className="text-center mb-4">
@@ -82,7 +36,7 @@ export default function DataInfraSection() {
           className="font-medium uppercase tracking-widest mb-3"
           style={{ color: "#ff9069", fontSize: 11, letterSpacing: "0.3em", fontFamily: "Inter, sans-serif" }}
         >
-          // Phase 04 · Operational Stack //
+          // {t("team.datainfra.eyebrow")} //
         </p>
       </FadeIn>
       <FadeIn delay={0.1} y={30} className="mb-16">
@@ -90,7 +44,7 @@ export default function DataInfraSection() {
           className="hero-heading font-black uppercase text-center tracking-tight"
           style={{ fontSize: "clamp(2rem, 7vw, 96px)" as string }}
         >
-          Hạ Tầng Dữ Liệu
+          {t("team.datainfra.heading")}
         </h2>
       </FadeIn>
 
@@ -130,7 +84,7 @@ export default function DataInfraSection() {
                 className="text-sm leading-relaxed mb-5 flex-grow"
                 style={{ color: "#acaaae" }}
               >
-                {layer.description}
+                {t(layer.descKey)}
               </p>
               <div
                 className="pt-4 border-t"
@@ -144,13 +98,13 @@ export default function DataInfraSection() {
                     fontFamily: "Inter, sans-serif",
                   }}
                 >
-                  → Consumers
+                  → {t("team.datainfra.consumers")}
                 </div>
                 <div
                   className="text-xs font-medium"
                   style={{ color: "#f0edf1", lineHeight: 1.5 }}
                 >
-                  {layer.consumers}
+                  {t(layer.consumersKey)}
                 </div>
               </div>
             </div>
@@ -171,7 +125,7 @@ export default function DataInfraSection() {
               className="font-medium uppercase tracking-widest text-xs"
               style={{ color: "#ff9069", letterSpacing: "0.3em", fontFamily: "Inter, sans-serif" }}
             >
-              // Agent Capabilities //
+              // {t("team.datainfra.capabilities_eyebrow")} //
             </div>
             <div
               className="h-[1px] flex-grow"
@@ -188,18 +142,18 @@ export default function DataInfraSection() {
               lineHeight: 1.3,
             }}
           >
-            Mỗi Sen Agent có khả năng:
+            {t("team.datainfra.capabilities_heading")}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {CAPABILITIES.map((cap, i) => (
-              <FadeIn key={i} delay={i * 0.05} y={16}>
+            {CAPABILITY_KEYS.map((capKey, i) => (
+              <FadeIn key={capKey} delay={i * 0.05} y={16}>
                 <div className="flex items-start gap-3">
-                  <div className="text-xl flex-none mt-0.5">{cap.icon}</div>
+                  <div className="text-xl flex-none mt-0.5">{CAPABILITY_ICONS[i]}</div>
                   <div
                     className="text-sm leading-relaxed"
                     style={{ color: "#acaaae" }}
                   >
-                    {cap.text}
+                    {t(capKey)}
                   </div>
                 </div>
               </FadeIn>

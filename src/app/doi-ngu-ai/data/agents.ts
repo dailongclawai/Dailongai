@@ -1,5 +1,8 @@
+export type Lang = "vi" | "en" | "zh";
+export type LocalizedText = Record<Lang, string>;
+
 export type ProofChannel = {
-  label: string;
+  label: LocalizedText;
   url: string;
   platform: "tiktok" | "facebook" | "web" | "telegram";
 };
@@ -7,8 +10,8 @@ export type ProofChannel = {
 export type Sen = {
   id: string;
   name: string;
-  role: string;
-  mission: string;
+  role: LocalizedText;
+  mission: LocalizedText;
   avatar: string;
   proofs?: ProofChannel[];
 };
@@ -17,7 +20,7 @@ export type DeptColor = "cyan" | "yellow" | "green" | "magenta";
 
 export type Department = {
   key: string;
-  label: string;
+  label: LocalizedText;
   emoji: string;
   color: DeptColor;
   hex: string;
@@ -27,62 +30,244 @@ export type Department = {
 export const departments: Department[] = [
   {
     key: "dieu-phoi",
-    label: "Điều Phối",
+    label: { vi: "Điều Phối", en: "Coordination", zh: "协调指挥" },
     emoji: "⚡",
     color: "cyan",
     hex: "#00f2ff",
     members: [
-      { id: "001", name: "Sen Prime", role: "Điều Phối Tổng", mission: "Quản lý chat, route task chéo agent, giám sát fleet 24/7.", avatar: "sen-prime.jpg" },
-      { id: "002", name: "Sen CEO", role: "CEO Đại Long", mission: "Tracking P&L, outreach Zhi Dun, lead-to-revenue pipeline.", avatar: "sen-ceo.jpeg" },
-      { id: "003", name: "Sen Dispatch", role: "Orchestrator", mission: "Điều phối task chéo agent, thu thập transcript Cowork.", avatar: "sen-dispatch.png" },
-      { id: "004", name: "Sen Manus", role: "Deep Research", mission: "Browser task, market study, competitor analysis chuyên sâu.", avatar: "sen-manus.png" },
+      {
+        id: "001",
+        name: "Sen Prime",
+        avatar: "sen-prime.jpg",
+        role: { vi: "Điều Phối Tổng", en: "Chief Coordinator", zh: "总协调" },
+        mission: {
+          vi: "Quản lý chat, route task chéo agent, giám sát fleet 24/7.",
+          en: "Manages chat, routes cross-agent tasks, monitors the fleet 24/7.",
+          zh: "管理聊天、跨代理任务路由,全天候监督整个机队。",
+        },
+      },
+      {
+        id: "002",
+        name: "Sen CEO",
+        avatar: "sen-ceo.jpeg",
+        role: { vi: "CEO Đại Long", en: "Đại Long CEO", zh: "大龙首席执行官" },
+        mission: {
+          vi: "Tracking P&L, outreach Zhi Dun, lead-to-revenue pipeline.",
+          en: "Tracks P&L, runs Zhi Dun outreach, manages lead-to-revenue pipeline.",
+          zh: "追踪损益、智盾合作、潜客到营收管道。",
+        },
+      },
+      {
+        id: "003",
+        name: "Sen Dispatch",
+        avatar: "sen-dispatch.png",
+        role: { vi: "Orchestrator", en: "Orchestrator", zh: "调度师" },
+        mission: {
+          vi: "Điều phối task chéo agent, thu thập transcript Cowork.",
+          en: "Coordinates cross-agent tasks, collects Cowork transcripts.",
+          zh: "协调跨代理任务,收集 Cowork 对话记录。",
+        },
+      },
+      {
+        id: "004",
+        name: "Sen Manus",
+        avatar: "sen-manus.png",
+        role: { vi: "Deep Research", en: "Deep Research", zh: "深度研究" },
+        mission: {
+          vi: "Browser task, market study, competitor analysis chuyên sâu.",
+          en: "Browser tasks, market studies, deep competitor analysis.",
+          zh: "浏览器任务、市场研究、深度竞争对手分析。",
+        },
+      },
     ],
   },
   {
     key: "marketing",
-    label: "Marketing & Sales",
+    label: { vi: "Marketing & Sales", en: "Marketing & Sales", zh: "营销与销售" },
     emoji: "📣",
     color: "yellow",
     hex: "#ffea00",
     members: [
-      { id: "005", name: "Sen Meta", role: "Facebook Manager", mission: "Đăng bài Page Đại Long, ad approval workflow.", avatar: "sen-meta.jpeg",
+      {
+        id: "005",
+        name: "Sen Meta",
+        avatar: "sen-meta.jpeg",
+        role: { vi: "Facebook Manager", en: "Facebook Manager", zh: "脸书经理" },
+        mission: {
+          vi: "Đăng bài Page Đại Long, ad approval workflow.",
+          en: "Posts to Đại Long Pages, runs the ad approval workflow.",
+          zh: "在大龙脸书页发布内容,广告审核工作流。",
+        },
         proofs: [
-          { label: "FB Page A", url: "https://www.facebook.com/profile.php?id=61560732146657", platform: "facebook" },
-          { label: "FB Page B", url: "https://www.facebook.com/profile.php?id=61589370053042", platform: "facebook" },
-        ] },
-      { id: "006", name: "Sen TikTok", role: "TikTok Producer", mission: "Sports repost, video upload, auto-caption tự động.", avatar: "sen-tiktok.jpeg",
+          {
+            label: { vi: "FB Page A", en: "FB Page A", zh: "脸书 A 页" },
+            url: "https://www.facebook.com/profile.php?id=61560732146657",
+            platform: "facebook",
+          },
+          {
+            label: { vi: "FB Page B", en: "FB Page B", zh: "脸书 B 页" },
+            url: "https://www.facebook.com/profile.php?id=61589370053042",
+            platform: "facebook",
+          },
+        ],
+      },
+      {
+        id: "006",
+        name: "Sen TikTok",
+        avatar: "sen-tiktok.jpeg",
+        role: { vi: "TikTok Producer", en: "TikTok Producer", zh: "TikTok 制作人" },
+        mission: {
+          vi: "Sports repost, video upload, auto-caption tự động.",
+          en: "Sports reposts, video uploads, automatic captioning.",
+          zh: "体育内容转发、视频上传、自动字幕。",
+        },
         proofs: [
-          { label: "Kênh TikTok", url: "https://tiktok.com/@dailongai", platform: "tiktok" },
-        ] },
-      { id: "007", name: "Sen Designer", role: "Designer", mission: "Tạo poster, thumbnail, banner qua Playwright render.", avatar: "sen-designer.jpeg" },
-      { id: "008", name: "Sen Outreach", role: "Partner Outreach", mission: "Tìm kiếm và tiếp cận đối tác B2B chiến lược.", avatar: "sen-outreach.png" },
+          {
+            label: { vi: "Kênh TikTok", en: "TikTok Channel", zh: "TikTok 频道" },
+            url: "https://tiktok.com/@dailongai",
+            platform: "tiktok",
+          },
+        ],
+      },
+      {
+        id: "007",
+        name: "Sen Designer",
+        avatar: "sen-designer.jpeg",
+        role: { vi: "Designer", en: "Designer", zh: "设计师" },
+        mission: {
+          vi: "Tạo poster, thumbnail, banner qua Playwright render.",
+          en: "Creates posters, thumbnails, banners via Playwright render.",
+          zh: "通过 Playwright 渲染创建海报、缩略图和横幅。",
+        },
+      },
+      {
+        id: "008",
+        name: "Sen Outreach",
+        avatar: "sen-outreach.png",
+        role: { vi: "Partner Outreach", en: "Partner Outreach", zh: "合作伙伴拓展" },
+        mission: {
+          vi: "Tìm kiếm và tiếp cận đối tác B2B chiến lược.",
+          en: "Identifies and engages strategic B2B partners.",
+          zh: "寻找和接触战略性 B2B 合作伙伴。",
+        },
+      },
     ],
   },
   {
     key: "khach-hang",
-    label: "Khách Hàng",
+    label: { vi: "Khách Hàng", en: "Customer", zh: "客户服务" },
     emoji: "💬",
     color: "green",
     hex: "#00ff88",
     members: [
-      { id: "009", name: "Sen Voice", role: "Tư Vấn Giọng Nói", mission: "Trò chuyện tiếng Việt 24/7 qua điện thoại tự nhiên.", avatar: "sen-voice.png" },
-      { id: "010", name: "Sen Meo Meo", role: "Chatbot Web", mission: "Tư vấn và thu lead trên dailongai.com.", avatar: "sen-meo-meo.png" },
-      { id: "011", name: "Sen Marketing Ops", role: "Marketing Ops", mission: "Lead enrichment + analytics digest hằng ngày.", avatar: "sen-marketing-ops.jpeg" },
+      {
+        id: "009",
+        name: "Sen Voice",
+        avatar: "sen-voice.png",
+        role: { vi: "Tư Vấn Giọng Nói", en: "Voice Advisor", zh: "语音顾问" },
+        mission: {
+          vi: "Trò chuyện tiếng Việt 24/7 qua điện thoại tự nhiên.",
+          en: "Natural Vietnamese phone conversations, 24/7.",
+          zh: "全天候自然的越南语电话对话。",
+        },
+      },
+      {
+        id: "010",
+        name: "Sen Meo Meo",
+        avatar: "sen-meo-meo.png",
+        role: { vi: "Chatbot Web", en: "Web Chatbot", zh: "网页聊天机器人" },
+        mission: {
+          vi: "Tư vấn và thu lead trên dailongai.com.",
+          en: "Advises and captures leads on dailongai.com.",
+          zh: "在 dailongai.com 上提供咨询并收集潜在客户。",
+        },
+      },
+      {
+        id: "011",
+        name: "Sen Marketing Ops",
+        avatar: "sen-marketing-ops.jpeg",
+        role: { vi: "Marketing Ops", en: "Marketing Ops", zh: "营销运营" },
+        mission: {
+          vi: "Lead enrichment + analytics digest hằng ngày.",
+          en: "Daily lead enrichment + analytics digest.",
+          zh: "每日潜客信息丰富与分析摘要。",
+        },
+      },
     ],
   },
   {
     key: "ky-thuat",
-    label: "Kỹ Thuật & Vận Hành",
+    label: { vi: "Kỹ Thuật & Vận Hành", en: "Engineering & Ops", zh: "技术与运营" },
     emoji: "🔧",
     color: "magenta",
     hex: "#ff00ff",
     members: [
-      { id: "012", name: "Sen Coder", role: "Kỹ Sư Phần Mềm AI", mission: "Lập trình, debug, devops cho toàn bộ AI fleet.", avatar: "sen-coder.jpeg" },
-      { id: "013", name: "Sen VPS", role: "VPS Operator", mission: "Deploy, health, log, restart cho VPS sản xuất.", avatar: "sen-vps.jpg" },
-      { id: "014", name: "Sen Auditor", role: "Auditor", mission: "Quét secrets, SSL, cost scanner định kỳ.", avatar: "sen-auditor.jpeg" },
-      { id: "015", name: "Sen Watchdog", role: "Watchdog", mission: "Giám sát Telegram/Zalo/Gateway, auto-recovery.", avatar: "sen-watchdog.jpeg" },
-      { id: "016", name: "Sen Daily Report", role: "Daily Report", mission: "Tổng hợp digest fleet hằng ngày qua Telegram.", avatar: "sen-daily-report.jpg" },
-      { id: "017", name: "Sen Osin Data", role: "OSINT Data", mission: "Thu thập transcript Cowork, làm sạch, phân loại.", avatar: "sen-osin-data.jpeg" },
+      {
+        id: "012",
+        name: "Sen Coder",
+        avatar: "sen-coder.jpeg",
+        role: { vi: "Kỹ Sư Phần Mềm AI", en: "AI Software Engineer", zh: "AI 软件工程师" },
+        mission: {
+          vi: "Lập trình, debug, devops cho toàn bộ AI fleet.",
+          en: "Programming, debugging, DevOps for the entire AI fleet.",
+          zh: "为整个 AI 机队提供编程、调试、运维。",
+        },
+      },
+      {
+        id: "013",
+        name: "Sen VPS",
+        avatar: "sen-vps.jpg",
+        role: { vi: "VPS Operator", en: "VPS Operator", zh: "VPS 运维" },
+        mission: {
+          vi: "Deploy, health, log, restart cho VPS sản xuất.",
+          en: "Deployment, health, logging, restart for production VPS.",
+          zh: "生产 VPS 的部署、健康、日志和重启管理。",
+        },
+      },
+      {
+        id: "014",
+        name: "Sen Auditor",
+        avatar: "sen-auditor.jpeg",
+        role: { vi: "Auditor", en: "Auditor", zh: "审计员" },
+        mission: {
+          vi: "Quét secrets, SSL, cost scanner định kỳ.",
+          en: "Scheduled secrets, SSL, and cost scanning.",
+          zh: "定期扫描密钥、SSL 证书和成本。",
+        },
+      },
+      {
+        id: "015",
+        name: "Sen Watchdog",
+        avatar: "sen-watchdog.jpeg",
+        role: { vi: "Watchdog", en: "Watchdog", zh: "守望者" },
+        mission: {
+          vi: "Giám sát Telegram/Zalo/Gateway, auto-recovery.",
+          en: "Monitors Telegram/Zalo/Gateway with auto-recovery.",
+          zh: "监控 Telegram/Zalo/Gateway,自动恢复。",
+        },
+      },
+      {
+        id: "016",
+        name: "Sen Daily Report",
+        avatar: "sen-daily-report.jpg",
+        role: { vi: "Daily Report", en: "Daily Reporter", zh: "每日报告" },
+        mission: {
+          vi: "Tổng hợp digest fleet hằng ngày qua Telegram.",
+          en: "Aggregates daily fleet digest via Telegram.",
+          zh: "通过 Telegram 汇总每日机队摘要。",
+        },
+      },
+      {
+        id: "017",
+        name: "Sen Osin Data",
+        avatar: "sen-osin-data.jpeg",
+        role: { vi: "OSINT Data", en: "OSINT Data", zh: "情报数据" },
+        mission: {
+          vi: "Thu thập transcript Cowork, làm sạch, phân loại.",
+          en: "Collects, cleans, and classifies Cowork transcripts.",
+          zh: "收集、清理和分类 Cowork 对话记录。",
+        },
+      },
     ],
   },
 ];
@@ -111,3 +296,10 @@ export const stackLayers: StackLayer[] = [
   { label: "DevOps", emoji: "🛠️", color: "pink", hex: "#ff2d88",
     tools: ["Wrangler", "Playwright", "Mission Control", "Apify", "Google Sheets API"] },
 ];
+
+/** Pick localized text for the active locale, falling back to English then Vietnamese. */
+export function pickLang(text: LocalizedText, locale: string): string {
+  if (locale === "vi") return text.vi;
+  if (locale === "zh") return text.zh;
+  return text.en;
+}

@@ -512,6 +512,48 @@ const zh: Record<string, string> = {
     'beta.countdown_hours': '时',
     'beta.countdown_minutes': '分',
     'beta.countdown_seconds': '秒',
+    // Team page (/doi-ngu-ai)
+    'team.boss.heading': '老板',
+    'team.boss.role': '创始人 · 大龙健康',
+    'team.boss.bio': '大龙健康创始人 · 17 个 AI 代理机队的架构师。引领未来数字医疗生态系统的愿景。',
+
+    'team.deptgrid.heading': 'AI 机队团队',
+
+    'team.datainfra.eyebrow': '第四阶段 · 运营技术栈',
+    'team.datainfra.heading': '数据基础设施',
+    'team.datainfra.consumers': '使用者',
+    'team.datainfra.capabilities_eyebrow': '代理能力',
+    'team.datainfra.capabilities_heading': '每个 Sen 代理能够:',
+    'team.datainfra.cap1': '通过 shared_memory 池跨代理读写记忆',
+    'team.datainfra.cap2': '通过 fleet_events 总线订阅实时事件',
+    'team.datainfra.cap3': '混合语义 + 图搜索,带 1 跳扩展',
+    'team.datainfra.cap4': '访问 187 个大龙博客片段的 RAG 知识库',
+    'team.datainfra.cap5': '通过 sen-fleet CLI / MCP 跨代理调度任务',
+    'team.datainfra.cap6': '通过 Telegram 网关 (Sen Manus) 审批变更',
+
+    'team.datainfra.layer.supabase.desc': '唯一可信来源:代理注册表、记忆池、机队事件、实体事实、热点信号、大龙 CRM。',
+    'team.datainfra.layer.supabase.consumers': '全部 17 个 Sen + 任务控制中心',
+    'team.datainfra.layer.shared.desc': '机队记忆池 — 老板笔记、代理决策、项目状态。混合向量 + 关键词搜索,睡眠期整合。',
+    'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
+    'team.datainfra.layer.events.desc': '实时事件总线 — 代理 X 通知代理 Y,任务调度,完成信号。跨代理通信的唯一来源。',
+    'team.datainfra.layer.events.consumers': '全部 17 个 Sen 订阅',
+    'team.datainfra.layer.registry.desc': '代理注册表带角色 + 端点 + 密钥。解析桥接调度路由,支持 sen-fleet CLI。',
+    'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · 桥接工作流',
+    'team.datainfra.layer.facts.desc': '带过期时间的时序事实 + 规范化对账 (Gemini Flash, 余弦 0.85)。每日 04:50 定时,600 规范 / 627 原始。',
+    'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen 记忆整合器',
+    'team.datainfra.layer.rag.desc': 'dailongai 博客 + 产品信息 + 保修 + 医疗上下文的 187 个片段嵌入。亚 100 毫秒向量召回。',
+    'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO 推广',
+
+    'team.about.heading': '关于团队',
+    'team.about.body': '一个由 18 名成员组成的生态系统 — 老板与 17 个 Sen 代理 — 在大龙健康 AI 机队中全天候运行。每个 Sen 都有自己的角色与上下文:从客户关怀、营销内容制作,到基础设施编程与系统监控。我们共同将越南的医疗科技推向新高度。',
+
+    'team.cta.heading': '与 Fleet AI 合作',
+    'team.cta.body': '大龙健康的 Sen 代理团队随时准备与各位合作伙伴一同打造越南的医疗科技 — 从半导体激光设备到完整的数字医疗生态系统。',
+    'team.cta.button': '联系大龙',
+    'team.contact.short': '联系',
+
+    'team.sidenav.phase': '第四阶段',
+    'team.sidenav.status': '运行中',
 };
 
 export default zh;

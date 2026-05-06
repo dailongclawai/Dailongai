@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { allMembers, departments, type Sen } from "../data/agents";
+import { allMembers, departments, pickLang, type Sen } from "../data/agents";
+import { useI18n } from "@/lib/i18n";
 
 function deptOf(sen: Sen) {
   return departments.find((d) => d.members.includes(sen))!;
@@ -14,7 +15,7 @@ function tileBg(hex: string) {
   return `radial-gradient(circle at 30% 20%, ${hex}33, transparent 60%), linear-gradient(180deg, rgba(20,20,28,0.9), rgba(8,8,14,0.95))`;
 }
 
-function Tile({ sen }: { sen: Sen }) {
+function Tile({ sen, locale }: { sen: Sen; locale: string }) {
   const dept = deptOf(sen);
   return (
     <div
@@ -64,7 +65,7 @@ function Tile({ sen }: { sen: Sen }) {
           fontWeight: 500,
         }}
       >
-        {sen.role}
+        {pickLang(sen.role, locale)}
       </div>
     </div>
   );
@@ -73,6 +74,7 @@ function Tile({ sen }: { sen: Sen }) {
 export default function MarqueeSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [offset, setOffset] = useState(0);
+  const { locale } = useI18n();
 
   useEffect(() => {
     const onScroll = () => {
@@ -110,7 +112,7 @@ export default function MarqueeSection() {
             willChange: "transform",
           }}
         >
-          {row1.map((s, i) => <Tile key={`r1-${i}`} sen={s} />)}
+          {row1.map((s, i) => <Tile key={`r1-${i}`} sen={s} locale={locale} />)}
         </div>
         <div
           className="flex gap-3"
@@ -119,7 +121,7 @@ export default function MarqueeSection() {
             willChange: "transform",
           }}
         >
-          {row2.map((s, i) => <Tile key={`r2-${i}`} sen={s} />)}
+          {row2.map((s, i) => <Tile key={`r2-${i}`} sen={s} locale={locale} />)}
         </div>
       </div>
     </section>

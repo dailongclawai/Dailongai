@@ -1,8 +1,10 @@
 "use client";
 
 import FadeIn from "./FadeIn";
+import { useI18n } from "@/lib/i18n";
 
 export default function BossTierSection() {
+  const { t } = useI18n();
   return (
     <section className="relative flex flex-col items-center px-6 md:px-12 py-24 md:py-32 max-w-7xl mx-auto">
       <div
@@ -40,13 +42,13 @@ export default function BossTierSection() {
             lineHeight: 0.95,
           }}
         >
-          Ông Chủ
+          {t("team.boss.heading")}
         </h2>
         <p
           className="font-semibold tracking-widest uppercase mb-6 text-sm md:text-base"
           style={{ color: "#ff9069", letterSpacing: "0.2em" }}
         >
-          Founder &amp; Chairman · Đại Long Medical
+          {t("team.boss.role")}
         </p>
         <div
           className="max-w-2xl mx-auto p-6 rounded-2xl backdrop-blur-md"
@@ -59,7 +61,7 @@ export default function BossTierSection() {
             className="leading-relaxed text-base md:text-lg"
             style={{ color: "#acaaae" }}
           >
-            Người sáng lập Đại Long Medical · Kiến trúc sư AI fleet 17 agent. Tầm nhìn dẫn dắt hệ sinh thái y tế số tương lai.
+            {t("team.boss.bio")}
           </p>
         </div>
       </FadeIn>

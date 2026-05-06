@@ -3,9 +3,7 @@
 import FadeIn from "./FadeIn";
 import AnimatedText from "./AnimatedText";
 import ContactButton from "./ContactButton";
-
-const ABOUT_TEXT =
-  "Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong fleet AI của Đại Long Medical. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.";
+import { useI18n } from "@/lib/i18n";
 
 function Blob({
   position,
@@ -41,6 +39,7 @@ function Blob({
 }
 
 export default function AboutSection() {
+  const { t } = useI18n();
   return (
     <section
       className="relative min-h-screen flex flex-col items-center justify-center px-5 sm:px-8 md:px-10 py-20 overflow-hidden"
@@ -81,17 +80,17 @@ export default function AboutSection() {
             className="hero-heading font-black uppercase tracking-tight text-center"
             style={{ fontSize: "clamp(3rem, 12vw, 160px)" as string }}
           >
-            Về Đội Ngũ
+            {t("team.about.heading")}
           </h2>
         </FadeIn>
 
         <AnimatedText
-          text={ABOUT_TEXT}
+          text={t("team.about.body")}
           className="font-medium text-center leading-relaxed max-w-[680px]"
         />
 
         <FadeIn delay={0.2} y={20}>
-          <ContactButton label="Liên Hệ Đại Long" href="/lien-he" />
+          <ContactButton label={t("team.cta.button")} href="/lien-he" />
         </FadeIn>
       </div>
     </section>

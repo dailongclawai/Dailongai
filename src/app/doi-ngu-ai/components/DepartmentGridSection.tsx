@@ -1,9 +1,10 @@
 "use client";
 
 import FadeIn from "./FadeIn";
-import { departments, type Sen, type Department } from "../data/agents";
+import { departments, pickLang, type Sen, type Department } from "../data/agents";
+import { useI18n } from "@/lib/i18n";
 
-function SenCard({ sen, dept, index }: { sen: Sen; dept: Department; index: number }) {
+function SenCard({ sen, dept, index, locale }: { sen: Sen; dept: Department; index: number; locale: string }) {
   return (
     <FadeIn delay={index * 0.06} y={24}>
       <div
@@ -49,13 +50,13 @@ function SenCard({ sen, dept, index }: { sen: Sen; dept: Department; index: numb
             fontFamily: "Inter, sans-serif",
           }}
         >
-          {sen.role}
+          {pickLang(sen.role, locale)}
         </p>
         <p
           className="leading-relaxed"
           style={{ color: "#acaaae", fontSize: 13 }}
         >
-          {sen.mission}
+          {pickLang(sen.mission, locale)}
         </p>
         {sen.proofs && sen.proofs.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2 justify-center">
@@ -74,7 +75,7 @@ function SenCard({ sen, dept, index }: { sen: Sen; dept: Department; index: numb
                 }}
               >
                 <ProofIcon platform={p.platform} color={dept.hex} />
-                {p.label}
+                {pickLang(p.label, locale)}
               </a>
             ))}
           </div>
@@ -111,6 +112,7 @@ const COLS_PER_DEPT: Record<string, string> = {
 };
 
 export default function DepartmentGridSection() {
+  const { t, locale } = useI18n();
   return (
     <section className="px-6 md:px-12 py-20 max-w-7xl mx-auto">
       <FadeIn delay={0} y={30} className="mb-16">
@@ -118,7 +120,7 @@ export default function DepartmentGridSection() {
           className="hero-heading font-black uppercase text-center tracking-tight"
           style={{ fontSize: "clamp(2.5rem, 9vw, 120px)" as string }}
         >
-          Đội Ngũ AI Fleet
+          {t("team.deptgrid.heading")}
         </h2>
       </FadeIn>
 
@@ -134,7 +136,7 @@ export default function DepartmentGridSection() {
                   letterSpacing: "0.05em",
                 }}
               >
-                {dept.emoji} {dept.label}
+                {dept.emoji} {pickLang(dept.label, locale)}
               </h3>
               <div
                 className="h-[1px] flex-grow"
@@ -145,7 +147,7 @@ export default function DepartmentGridSection() {
             </FadeIn>
             <div className={`grid grid-cols-1 ${COLS_PER_DEPT[dept.key] ?? "sm:grid-cols-2 lg:grid-cols-3"} gap-6`}>
               {dept.members.map((sen, i) => (
-                <SenCard key={sen.id} sen={sen} dept={dept} index={i} />
+                <SenCard key={sen.id} sen={sen} dept={dept} index={i} locale={locale} />
               ))}
             </div>
           </section>

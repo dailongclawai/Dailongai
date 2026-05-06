@@ -512,6 +512,48 @@ const en: Record<string, string> = {
     'beta.countdown_hours': 'Hrs',
     'beta.countdown_minutes': 'Min',
     'beta.countdown_seconds': 'Sec',
+    // Team page (/doi-ngu-ai)
+    'team.boss.heading': 'The Boss',
+    'team.boss.role': 'Founder & Chairman · Đại Long Medical',
+    'team.boss.bio': 'Founder of Đại Long Medical · Architect of the 17-agent AI fleet. Vision to lead the future digital healthcare ecosystem.',
+
+    'team.deptgrid.heading': 'AI Fleet Team',
+
+    'team.datainfra.eyebrow': 'Phase 04 · Operational Stack',
+    'team.datainfra.heading': 'Data Infrastructure',
+    'team.datainfra.consumers': 'Consumers',
+    'team.datainfra.capabilities_eyebrow': 'Agent Capabilities',
+    'team.datainfra.capabilities_heading': 'Every Sen Agent can:',
+    'team.datainfra.cap1': 'Read/write cross-agent memory via shared_memory pool',
+    'team.datainfra.cap2': 'Subscribe to real-time events via fleet_events bus',
+    'team.datainfra.cap3': 'Hybrid semantic + graph search with 1-hop expansion',
+    'team.datainfra.cap4': 'Access RAG knowledge base of 187 Đại Long blog chunks',
+    'team.datainfra.cap5': 'Dispatch cross-agent tasks via sen-fleet CLI / MCP',
+    'team.datainfra.cap6': 'Approve mutations through the Telegram gate (Sen Manus)',
+
+    'team.datainfra.layer.supabase.desc': 'Single source of truth: agent registry, memory pool, fleet events, entity facts, viral signals, Đại Long CRM.',
+    'team.datainfra.layer.supabase.consumers': 'All 17 Sen + Mission Control',
+    'team.datainfra.layer.shared.desc': 'Fleet memory pool — Boss notes, agent decisions, project state. Hybrid vector + keyword search, sleep-time consolidation.',
+    'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
+    'team.datainfra.layer.events.desc': 'Real-time event bus — agent X notifies agent Y, task dispatch, completion signals. SSOT for cross-agent comms.',
+    'team.datainfra.layer.events.consumers': 'All 17 Sen subscribe',
+    'team.datainfra.layer.registry.desc': 'Agent registry with role + endpoint + secret. Resolves bridge dispatch routing, enables sen-fleet CLI.',
+    'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · Bridge Worker',
+    'team.datainfra.layer.facts.desc': 'Temporal facts with expiry + canonical reconcile (Gemini Flash, cosine 0.85). Daily cron at 04:50, 600 canonical / 627 raw.',
+    'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen Memory consolidator',
+    'team.datainfra.layer.rag.desc': 'Embeddings of 187 chunks from dailongai blog + product info + warranty + medical context. Sub-100ms vector recall.',
+    'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
+
+    'team.about.heading': 'About The Team',
+    'team.about.body': 'An ecosystem of 18 members — Boss and 17 Sen Agents — operating 24/7 inside the Đại Long Medical AI fleet. Each Sen has its own role and context: from customer care and marketing content production to infrastructure programming and system monitoring. Together, we are taking healthcare technology in Vietnam to a new level.',
+
+    'team.cta.heading': 'Partner with Fleet AI',
+    'team.cta.body': 'Đại Long Medical\'s Sen Agent team is always ready to accompany our partners on the journey of building healthcare technology in Vietnam — from semiconductor laser devices to a full digital medical ecosystem.',
+    'team.cta.button': 'Contact Đại Long',
+    'team.contact.short': 'Contact',
+
+    'team.sidenav.phase': 'Phase 04',
+    'team.sidenav.status': 'Operational',
 };
 
 export default en;

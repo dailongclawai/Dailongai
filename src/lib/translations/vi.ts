@@ -515,6 +515,48 @@ const vi: Record<string, string> = {
     'beta.countdown_hours': 'Giờ',
     'beta.countdown_minutes': 'Phút',
     'beta.countdown_seconds': 'Giây',
+    // Team page (/doi-ngu-ai)
+    'team.boss.heading': 'Ông Chủ',
+    'team.boss.role': 'Founder & Chairman · Đại Long Medical',
+    'team.boss.bio': 'Người sáng lập Đại Long Medical · Kiến trúc sư AI fleet 17 agent. Tầm nhìn dẫn dắt hệ sinh thái y tế số tương lai.',
+
+    'team.deptgrid.heading': 'Đội Ngũ AI Fleet',
+
+    'team.datainfra.eyebrow': 'Phase 04 · Operational Stack',
+    'team.datainfra.heading': 'Hạ Tầng Dữ Liệu',
+    'team.datainfra.consumers': 'Consumers',
+    'team.datainfra.capabilities_eyebrow': 'Agent Capabilities',
+    'team.datainfra.capabilities_heading': 'Mỗi Sen Agent có khả năng:',
+    'team.datainfra.cap1': 'Đọc/ghi memory chéo agent qua shared_memory pool',
+    'team.datainfra.cap2': 'Subscribe sự kiện real-time qua fleet_events bus',
+    'team.datainfra.cap3': 'Hybrid semantic + graph search với 1-hop expansion',
+    'team.datainfra.cap4': 'Truy cập RAG knowledge base 187 chunk blog Đại Long',
+    'team.datainfra.cap5': 'Dispatch task chéo agent qua sen-fleet CLI / MCP',
+    'team.datainfra.cap6': 'Approve mutations qua Telegram gate (Sen Manus)',
+
+    'team.datainfra.layer.supabase.desc': 'Single source of truth: agent registry, memory pool, fleet events, entity facts, viral signals, Đại Long CRM.',
+    'team.datainfra.layer.supabase.consumers': 'Toàn bộ 17 Sen + Mission Control',
+    'team.datainfra.layer.shared.desc': 'Memory pool fleet — Boss notes, agent decisions, project state. Hybrid vector + keyword search, sleep-time consolidation.',
+    'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
+    'team.datainfra.layer.events.desc': 'Real-time event bus — agent X notifies agent Y, dispatch task, completion signals. SSOT cho cross-agent comms.',
+    'team.datainfra.layer.events.consumers': 'Toàn bộ 17 Sen subscribe',
+    'team.datainfra.layer.registry.desc': 'Agent registry với role + endpoint + secret. Resolves bridge dispatch routing, enables sen-fleet CLI.',
+    'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · Bridge Worker',
+    'team.datainfra.layer.facts.desc': 'Temporal facts với expiry + canonical reconcile (Gemini Flash, cosine 0.85). Daily cron 04:50, 600 canonical/627 raw.',
+    'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen Memory consolidator',
+    'team.datainfra.layer.rag.desc': 'Embeddings 187 chunk blog dailongai + product info + warranty + medical context. Vector recall sub-100ms.',
+    'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
+
+    'team.about.heading': 'Về Đội Ngũ',
+    'team.about.body': 'Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong fleet AI của Đại Long Medical. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.',
+
+    'team.cta.heading': 'Hợp Tác Cùng Fleet AI',
+    'team.cta.body': 'Đội ngũ Sen Agent của Đại Long Medical luôn sẵn sàng đồng hành cùng quý đối tác trong hành trình kiến tạo công nghệ chăm sóc sức khoẻ Việt Nam — từ thiết bị laser bán dẫn đến hệ sinh thái y tế số.',
+    'team.cta.button': 'Liên Hệ Đại Long',
+    'team.contact.short': 'Liên Hệ',
+
+    'team.sidenav.phase': 'Phase 04',
+    'team.sidenav.status': 'Operational',
 };
 
 export default vi;
