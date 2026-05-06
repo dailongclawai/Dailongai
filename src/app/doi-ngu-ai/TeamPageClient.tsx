@@ -1,6 +1,5 @@
 "use client";
 
-import HeroSection from "./components/HeroSection";
 import BossTierSection from "./components/BossTierSection";
 import MarqueeSection from "./components/MarqueeSection";
 import DepartmentGridSection from "./components/DepartmentGridSection";
@@ -20,7 +19,6 @@ export default function TeamPageClient() {
         </div>
       </div>
 
-      <HeroSection />
       <BossTierSection />
       <MarqueeSection />
       <DepartmentGridSection />
