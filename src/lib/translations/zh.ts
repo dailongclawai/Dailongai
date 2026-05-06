@@ -517,7 +517,7 @@ const zh: Record<string, string> = {
     'team.boss.role': '创始人 · 大龙健康',
     'team.boss.bio': '大龙健康创始人 · 17 名 Sen Agent 舰队总指挥,全天候 24/7 运行。使命:让越南登上全球医疗 AI 版图。',
 
-    'team.deptgrid.heading': 'AI 机队团队',
+    'team.deptgrid.heading': 'AI 舰队',
 
     'team.datainfra.eyebrow': '第四阶段 · 运营技术栈',
     'team.datainfra.heading': '数据基础设施',
@@ -531,9 +531,9 @@ const zh: Record<string, string> = {
     'team.datainfra.cap5': '通过 sen-fleet CLI / MCP 跨代理调度任务',
     'team.datainfra.cap6': '通过 Telegram 网关 (Sen Manus) 审批变更',
 
-    'team.datainfra.layer.supabase.desc': '唯一可信来源:代理注册表、记忆池、机队事件、实体事实、热点信号、大龙 CRM。',
+    'team.datainfra.layer.supabase.desc': '唯一可信来源:代理注册表、记忆池、舰队事件、实体事实、热点信号、大龙 CRM。',
     'team.datainfra.layer.supabase.consumers': '全部 17 个 Sen + 任务控制中心',
-    'team.datainfra.layer.shared.desc': '机队记忆池 — 老板笔记、代理决策、项目状态。混合向量 + 关键词搜索,睡眠期整合。',
+    'team.datainfra.layer.shared.desc': '舰队记忆池 — 老板笔记、代理决策、项目状态。混合向量 + 关键词搜索,睡眠期整合。',
     'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
     'team.datainfra.layer.events.desc': '实时事件总线 — 代理 X 通知代理 Y,任务调度,完成信号。跨代理通信的唯一来源。',
     'team.datainfra.layer.events.consumers': '全部 17 个 Sen 订阅',
@@ -545,9 +545,9 @@ const zh: Record<string, string> = {
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO 推广',
 
     'team.about.heading': '关于团队',
-    'team.about.body': '一个由 18 名成员组成的生态系统 — 老板与 17 个 Sen 代理 — 在大龙健康 AI 机队中全天候运行。每个 Sen 都有自己的角色与上下文:从客户关怀、营销内容制作,到基础设施编程与系统监控。我们共同将越南的医疗科技推向新高度。',
+    'team.about.body': '一个由 18 名成员组成的生态系统 — 老板与 17 个 Sen 代理 — 在大龙健康 AI 舰队中全天候运行。每个 Sen 都有自己的角色与上下文:从客户关怀、营销内容制作,到基础设施编程与系统监控。我们共同将越南的医疗科技推向新高度。',
 
-    'team.cta.heading': '与 Fleet AI 合作',
+    'team.cta.heading': '与 AI 舰队合作',
     'team.cta.body': '大龙健康的 Sen 代理团队随时准备与各位合作伙伴一同打造越南的医疗科技 — 从半导体激光设备到完整的数字医疗生态系统。',
     'team.cta.button': '联系大龙',
     'team.contact.short': '联系',

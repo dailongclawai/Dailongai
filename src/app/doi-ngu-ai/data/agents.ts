@@ -43,7 +43,7 @@ export const departments: Department[] = [
         mission: {
           vi: "Quản lý chat, route task chéo agent, giám sát fleet 24/7.",
           en: "Manages chat, routes cross-agent tasks, monitors the fleet 24/7.",
-          zh: "管理聊天、跨代理任务路由,全天候监督整个机队。",
+          zh: "管理聊天、跨代理任务路由,全天候监督整个舰队。",
         },
       },
       {
@@ -209,8 +209,8 @@ export const departments: Department[] = [
         role: { vi: "Kỹ Sư Phần Mềm AI", en: "AI Software Engineer", zh: "AI 软件工程师" },
         mission: {
           vi: "Lập trình, debug, devops cho toàn bộ hạm đội AI.",
-          en: "Programming, debugging, DevOps for the entire AI fleet.",
-          zh: "为整个 AI 机队提供编程、调试、运维。",
+          en: "Programming, debugging, DevOps for the entire AI Fleet.",
+          zh: "为整个 AI 舰队提供编程、调试、运维。",
         },
       },
       {
@@ -254,7 +254,7 @@ export const departments: Department[] = [
         mission: {
           vi: "Tổng hợp digest fleet hằng ngày qua Telegram.",
           en: "Aggregates daily fleet digest via Telegram.",
-          zh: "通过 Telegram 汇总每日机队摘要。",
+          zh: "通过 Telegram 汇总每日舰队摘要。",
         },
       },
       {

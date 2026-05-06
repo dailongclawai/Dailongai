@@ -517,7 +517,7 @@ const en: Record<string, string> = {
     'team.boss.role': 'Founder & Chairman · Đại Long Medical',
     'team.boss.bio': 'Founder of Đại Long Medical · Commander of the 17-Sen Agent fleet running 24/7. Mission: put Vietnam on the global healthcare-AI map.',
 
-    'team.deptgrid.heading': 'AI Fleet Team',
+    'team.deptgrid.heading': 'AI Fleet',
 
     'team.datainfra.eyebrow': 'Phase 04 · Operational Stack',
     'team.datainfra.heading': 'Data Infrastructure',
@@ -545,9 +545,9 @@ const en: Record<string, string> = {
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
 
     'team.about.heading': 'About The Team',
-    'team.about.body': 'An ecosystem of 18 members — Boss and 17 Sen Agents — operating 24/7 inside the Đại Long Medical AI fleet. Each Sen has its own role and context: from customer care and marketing content production to infrastructure programming and system monitoring. Together, we are taking healthcare technology in Vietnam to a new level.',
+    'team.about.body': 'An ecosystem of 18 members — Boss and 17 Sen Agents — operating 24/7 inside the Đại Long Medical AI Fleet. Each Sen has its own role and context: from customer care and marketing content production to infrastructure programming and system monitoring. Together, we are taking healthcare technology in Vietnam to a new level.',
 
-    'team.cta.heading': 'Partner with Fleet AI',
+    'team.cta.heading': 'Partner with the AI Fleet',
     'team.cta.body': 'Đại Long Medical\'s Sen Agent team is always ready to accompany our partners on the journey of building healthcare technology in Vietnam — from semiconductor laser devices to a full digital medical ecosystem.',
     'team.cta.button': 'Contact Đại Long',
     'team.contact.short': 'Contact',
