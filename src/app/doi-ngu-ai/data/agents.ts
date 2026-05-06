@@ -61,7 +61,7 @@ export const departments: Department[] = [
         id: "003",
         name: "Sen Dispatch",
         avatar: "sen-dispatch.png",
-        role: { vi: "Orchestrator", en: "Orchestrator", zh: "调度师" },
+        role: { vi: "Điều Phối Tác Vụ", en: "Orchestrator", zh: "调度师" },
         mission: {
           vi: "Điều phối task chéo agent, thu thập transcript Cowork.",
           en: "Coordinates cross-agent tasks, collects Cowork transcripts.",
@@ -72,7 +72,7 @@ export const departments: Department[] = [
         id: "004",
         name: "Sen Manus",
         avatar: "sen-manus.png",
-        role: { vi: "Deep Research", en: "Deep Research", zh: "深度研究" },
+        role: { vi: "Nghiên Cứu Chuyên Sâu", en: "Deep Research", zh: "深度研究" },
         mission: {
           vi: "Browser task, market study, competitor analysis chuyên sâu.",
           en: "Browser tasks, market studies, deep competitor analysis.",
@@ -83,7 +83,7 @@ export const departments: Department[] = [
   },
   {
     key: "marketing",
-    label: { vi: "Marketing & Sales", en: "Marketing & Sales", zh: "营销与销售" },
+    label: { vi: "Tiếp Thị & Kinh Doanh", en: "Marketing & Sales", zh: "营销与销售" },
     emoji: "📣",
     color: "yellow",
     hex: "#ffea00",
@@ -92,7 +92,7 @@ export const departments: Department[] = [
         id: "005",
         name: "Sen Meta",
         avatar: "sen-meta.jpeg",
-        role: { vi: "Facebook Manager", en: "Facebook Manager", zh: "脸书经理" },
+        role: { vi: "Quản Lý Facebook", en: "Facebook Manager", zh: "脸书经理" },
         mission: {
           vi: "Đăng bài Page Đại Long, ad approval workflow.",
           en: "Posts to Đại Long Pages, runs the ad approval workflow.",
@@ -115,7 +115,7 @@ export const departments: Department[] = [
         id: "006",
         name: "Sen TikTok",
         avatar: "sen-tiktok.jpeg",
-        role: { vi: "TikTok Producer", en: "TikTok Producer", zh: "TikTok 制作人" },
+        role: { vi: "Nhà Sản Xuất TikTok", en: "TikTok Producer", zh: "TikTok 制作人" },
         mission: {
           vi: "Sports repost, video upload, auto-caption tự động.",
           en: "Sports reposts, video uploads, automatic captioning.",
@@ -133,7 +133,7 @@ export const departments: Department[] = [
         id: "007",
         name: "Sen Designer",
         avatar: "sen-designer.jpeg",
-        role: { vi: "Designer", en: "Designer", zh: "设计师" },
+        role: { vi: "Thiết Kế", en: "Designer", zh: "设计师" },
         mission: {
           vi: "Tạo poster, thumbnail, banner qua Playwright render.",
           en: "Creates posters, thumbnails, banners via Playwright render.",
@@ -144,7 +144,7 @@ export const departments: Department[] = [
         id: "008",
         name: "Sen Outreach",
         avatar: "sen-outreach.png",
-        role: { vi: "Partner Outreach", en: "Partner Outreach", zh: "合作伙伴拓展" },
+        role: { vi: "Phát Triển Đối Tác", en: "Partner Outreach", zh: "合作伙伴拓展" },
         mission: {
           vi: "Tìm kiếm và tiếp cận đối tác B2B chiến lược.",
           en: "Identifies and engages strategic B2B partners.",
@@ -175,7 +175,7 @@ export const departments: Department[] = [
         id: "010",
         name: "Sen Meo Meo",
         avatar: "sen-meo-meo.png",
-        role: { vi: "Chatbot Web", en: "Web Chatbot", zh: "网页聊天机器人" },
+        role: { vi: "Trợ Lý Web", en: "Web Chatbot", zh: "网页聊天机器人" },
         mission: {
           vi: "Tư vấn và thu lead trên dailongai.com.",
           en: "Advises and captures leads on dailongai.com.",
@@ -186,7 +186,7 @@ export const departments: Department[] = [
         id: "011",
         name: "Sen Marketing Ops",
         avatar: "sen-marketing-ops.jpeg",
-        role: { vi: "Marketing Ops", en: "Marketing Ops", zh: "营销运营" },
+        role: { vi: "Vận Hành Marketing", en: "Marketing Ops", zh: "营销运营" },
         mission: {
           vi: "Lead enrichment + analytics digest hằng ngày.",
           en: "Daily lead enrichment + analytics digest.",
@@ -217,7 +217,7 @@ export const departments: Department[] = [
         id: "013",
         name: "Sen VPS",
         avatar: "sen-vps.jpg",
-        role: { vi: "VPS Operator", en: "VPS Operator", zh: "VPS 运维" },
+        role: { vi: "Vận Hành VPS", en: "VPS Operator", zh: "VPS 运维" },
         mission: {
           vi: "Deploy, health, log, restart cho VPS sản xuất.",
           en: "Deployment, health, logging, restart for production VPS.",
@@ -228,7 +228,7 @@ export const departments: Department[] = [
         id: "014",
         name: "Sen Auditor",
         avatar: "sen-auditor.jpeg",
-        role: { vi: "Auditor", en: "Auditor", zh: "审计员" },
+        role: { vi: "Kiểm Toán Hệ Thống", en: "Auditor", zh: "审计员" },
         mission: {
           vi: "Quét secrets, SSL, cost scanner định kỳ.",
           en: "Scheduled secrets, SSL, and cost scanning.",
@@ -239,7 +239,7 @@ export const departments: Department[] = [
         id: "015",
         name: "Sen Watchdog",
         avatar: "sen-watchdog.jpeg",
-        role: { vi: "Watchdog", en: "Watchdog", zh: "守望者" },
+        role: { vi: "Giám Sát Hệ Thống", en: "Watchdog", zh: "守望者" },
         mission: {
           vi: "Giám sát Telegram/Zalo/Gateway, auto-recovery.",
           en: "Monitors Telegram/Zalo/Gateway with auto-recovery.",
@@ -250,7 +250,7 @@ export const departments: Department[] = [
         id: "016",
         name: "Sen Daily Report",
         avatar: "sen-daily-report.jpg",
-        role: { vi: "Daily Report", en: "Daily Reporter", zh: "每日报告" },
+        role: { vi: "Báo Cáo Hằng Ngày", en: "Daily Reporter", zh: "每日报告" },
         mission: {
           vi: "Tổng hợp digest fleet hằng ngày qua Telegram.",
           en: "Aggregates daily fleet digest via Telegram.",
@@ -261,7 +261,7 @@ export const departments: Department[] = [
         id: "017",
         name: "Sen Osin Data",
         avatar: "sen-osin-data.jpeg",
-        role: { vi: "OSINT Data", en: "OSINT Data", zh: "情报数据" },
+        role: { vi: "Dữ Liệu OSINT", en: "OSINT Data", zh: "情报数据" },
         mission: {
           vi: "Thu thập transcript Cowork, làm sạch, phân loại.",
           en: "Collects, cleans, and classifies Cowork transcripts.",

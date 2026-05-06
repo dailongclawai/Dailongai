@@ -517,12 +517,12 @@ const vi: Record<string, string> = {
     'beta.countdown_seconds': 'Giây',
     // Team page (/doi-ngu-ai)
     'team.boss.heading': 'Ông Chủ',
-    'team.boss.role': 'Founder & Chairman · Đại Long Medical',
+    'team.boss.role': 'Người Sáng Lập & Chủ Tịch · Đại Long Medical',
     'team.boss.bio': 'Người sáng lập Đại Long Medical · Kiến trúc sư hạm đội 17 Sen Agent vận hành 24/7. Tầm nhìn dẫn dắt hệ sinh thái công nghệ chăm sóc sức khoẻ số tương lai.',
 
     'team.deptgrid.heading': 'Hạm Đội AI',
 
-    'team.datainfra.eyebrow': 'Phase 04 · Hạ tầng Vận hành',
+    'team.datainfra.eyebrow': 'Giai Đoạn 04 · Hạ Tầng Vận Hành',
     'team.datainfra.heading': 'Hạ Tầng Dữ Liệu',
     'team.datainfra.consumers': 'Đối tượng sử dụng',
     'team.datainfra.capabilities_eyebrow': 'Năng lực Agent',
@@ -555,8 +555,8 @@ const vi: Record<string, string> = {
     'team.cta.button': 'Liên Hệ Đại Long',
     'team.contact.short': 'Liên Hệ',
 
-    'team.sidenav.phase': 'Phase 04',
-    'team.sidenav.status': 'Operational',
+    'team.sidenav.phase': 'Giai Đoạn 04',
+    'team.sidenav.status': 'Đang Vận Hành',
 };
 
 export default vi;
