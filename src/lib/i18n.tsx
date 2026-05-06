@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback, ReactNode 
 import type { Locale } from './translations';
 import { localeNames, loadTranslations } from './translations';
 import vi from './translations/vi';
+import en from './translations/en';
 
 interface I18nContextType {
   locale: Locale;
@@ -69,7 +70,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string): string => {
-    return messages[key] ?? vi[key] ?? key;
+    return messages[key] ?? en[key] ?? vi[key] ?? key;
   }, [messages]);
 
   return (
