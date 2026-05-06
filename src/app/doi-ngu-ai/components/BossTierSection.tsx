@@ -1,7 +1,6 @@
 "use client";
 
 import FadeIn from "./FadeIn";
-import BossEmblem from "./BossEmblem";
 import { useI18n } from "@/lib/i18n";
 
 export default function BossTierSection() {
@@ -23,14 +22,23 @@ export default function BossTierSection() {
             style={{ background: "rgba(255, 144, 105, 0.25)" }}
           />
           <div
-            className="relative w-56 h-56 md:w-64 md:h-64 rounded-full flex items-center justify-center overflow-hidden"
+            className="relative w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden"
             style={{
-              background: "radial-gradient(circle at 50% 40%, rgba(255, 144, 105, 0.12), #19191d 70%)",
+              background: "#19191d",
               border: "2px solid rgba(255, 144, 105, 0.35)",
-              boxShadow: "0 0 40px rgba(255, 144, 105, 0.25), inset 0 0 30px rgba(255, 144, 105, 0.08)",
+              boxShadow: "0 0 40px rgba(255, 144, 105, 0.25)",
             }}
           >
-            <BossEmblem size={200} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/team/boss.svg"
+              alt="Ông Chủ"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+            />
           </div>
         </div>
       </FadeIn>
