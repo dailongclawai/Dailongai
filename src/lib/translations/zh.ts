@@ -515,7 +515,7 @@ const zh: Record<string, string> = {
     // Team page (/doi-ngu-ai)
     'team.boss.heading': '老板',
     'team.boss.role': '创始人 · 大龙健康',
-    'team.boss.bio': '大龙健康创始人 · 17 个 AI 代理机队的架构师。引领未来数字医疗生态系统的愿景。',
+    'team.boss.bio': '大龙健康创始人 · 17 名 Sen Agent 舰队总指挥,全天候 24/7 运行。使命:让越南登上全球医疗 AI 版图。',
 
     'team.deptgrid.heading': 'AI 机队团队',
 

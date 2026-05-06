@@ -518,9 +518,9 @@ const vi: Record<string, string> = {
     // Team page (/doi-ngu-ai)
     'team.boss.heading': 'Ông Chủ',
     'team.boss.role': 'Founder & Chairman · Đại Long Medical',
-    'team.boss.bio': 'Người sáng lập Đại Long Medical · Kiến trúc sư AI fleet 17 agent. Tầm nhìn dẫn dắt hệ sinh thái y tế số tương lai.',
+    'team.boss.bio': 'Người sáng lập Đại Long Medical · Tổng chỉ huy hạm đội 17 Sen Agent vận hành 24/7. Sứ mệnh: đặt Việt Nam lên bản đồ healthcare AI thế giới.',
 
-    'team.deptgrid.heading': 'Đội Ngũ AI Fleet',
+    'team.deptgrid.heading': 'Hạm Đội AI',
 
     'team.datainfra.eyebrow': 'Phase 04 · Hạ tầng Vận hành',
     'team.datainfra.heading': 'Hạ Tầng Dữ Liệu',
@@ -548,9 +548,9 @@ const vi: Record<string, string> = {
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
 
     'team.about.heading': 'Về Đội Ngũ',
-    'team.about.body': 'Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong fleet AI của Đại Long Medical. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.',
+    'team.about.body': 'Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong hạm đội AI của Đại Long Medical. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.',
 
-    'team.cta.heading': 'Hợp Tác Cùng Fleet AI',
+    'team.cta.heading': 'Hợp Tác Cùng Hạm Đội AI',
     'team.cta.body': 'Đội ngũ Sen Agent của Đại Long Medical luôn sẵn sàng đồng hành cùng quý đối tác trong hành trình kiến tạo công nghệ chăm sóc sức khoẻ Việt Nam — từ thiết bị laser bán dẫn đến hệ sinh thái y tế số.',
     'team.cta.button': 'Liên Hệ Đại Long',
     'team.contact.short': 'Liên Hệ',

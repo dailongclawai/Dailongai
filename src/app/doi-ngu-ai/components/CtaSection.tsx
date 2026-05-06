@@ -56,7 +56,7 @@ export default function CtaSection() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                alt="Đại Long AI fleet"
+                alt="Đại Long hạm đội AI"
                 src="/images/team/ha-tang.png"
                 style={{
                   width: "100%",

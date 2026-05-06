@@ -208,7 +208,7 @@ export const departments: Department[] = [
         avatar: "sen-coder.jpeg",
         role: { vi: "Kỹ Sư Phần Mềm AI", en: "AI Software Engineer", zh: "AI 软件工程师" },
         mission: {
-          vi: "Lập trình, debug, devops cho toàn bộ AI fleet.",
+          vi: "Lập trình, debug, devops cho toàn bộ hạm đội AI.",
           en: "Programming, debugging, DevOps for the entire AI fleet.",
           zh: "为整个 AI 机队提供编程、调试、运维。",
         },

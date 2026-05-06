@@ -8,7 +8,8 @@ import "./styles.css";
 export const metadata: Metadata = {
   title: "Đội Ngũ AI | Đại Long Medical",
   description:
-    "18 thành viên · 1 tầm nhìn — Đội ngũ AI fleet của Đại Long Medical: Boss và 17 Sen Agent vận hành 24/7, từ chăm sóc khách hàng đến vận hành hạ tầng.",
+    "18 thành viên · 1 tầm nhìn — Hạm đội AI của Đại Long Medical: Boss và 17 Sen Agent vận hành 24/7, từ chăm sóc khách hàng đến vận hành hạ tầng.",
+  alternates: { canonical: "/doi-ngu-ai" },
 };
 
 export default function DoiNguAiPage() {
