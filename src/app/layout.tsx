@@ -35,18 +35,6 @@ export const metadata: Metadata = {
     "Đại Long — Đơn vị tiên phong cung cấp thiết bị laser trị liệu và giải pháp công nghệ y tế hiện đại. Ứng dụng công nghệ tiên tiến vào chăm sóc sức khỏe.",
   keywords:
     "công nghệ y tế, thiết bị laser, Đại Long, laser trị liệu, Zhidun, công nghệ chăm sóc sức khỏe",
-  alternates: {
-    canonical: siteUrl,
-    languages: {
-      "vi-VN": siteUrl,
-      "en": siteUrl,
-      "zh": siteUrl,
-      "ja": siteUrl,
-      "ko": siteUrl,
-      "ru": siteUrl,
-      "x-default": siteUrl,
-    },
-  },
   openGraph: {
     title: "Đại Long | Công nghệ & Y tế",
     description: "Giải pháp Laser Trị liệu & Công nghệ Y tế Hiện đại",

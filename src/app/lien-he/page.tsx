@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Liên hệ | Đại Long — Tư vấn & Đặt hàng ZhiDun CEO",
   description:
     "Liên hệ Đại Long để được tư vấn và đặt hàng thiết bị laser trị liệu ZhiDun CEO chính hãng. Hotline 0935 999 922.",
+  alternates: { canonical: "/lien-he" },
 };
 
 export default function LienHePage() {

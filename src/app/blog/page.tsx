@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: "Blog | Đại Long — Kiến thức Laser Trị liệu & Sức khỏe",
   description:
     "Khám phá kiến thức chuyên sâu về công nghệ laser trị liệu, nghiên cứu lâm sàng, hướng dẫn sử dụng và chia sẻ từ chuyên gia y tế tại Đại Long.",
+  alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog | Đại Long — Kiến thức Laser Trị liệu & Sức khỏe",
     description:

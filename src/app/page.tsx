@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import SmoothScroll from "@/components/SmoothScroll";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
@@ -8,6 +9,10 @@ import SolutionsSection from "@/components/SolutionsSection";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 import ZaloButton from "@/components/ZaloButton";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (

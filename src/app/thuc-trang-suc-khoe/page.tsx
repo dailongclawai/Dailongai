@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Thực trạng Tiểu đường & Huyết áp cao tại Việt Nam | Đại Long",
   description:
     "Số liệu cập nhật về bệnh tiểu đường và huyết áp cao tại Việt Nam — tỷ lệ mắc, xu hướng tăng, nhóm tuổi nguy cơ và giải pháp phòng ngừa.",
+  alternates: { canonical: "/thuc-trang-suc-khoe" },
 };
 
 export default function ThucTrangSucKhoe() {

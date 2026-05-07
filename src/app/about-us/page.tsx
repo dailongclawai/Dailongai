@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Về chúng tôi | Đại Long — Phân phối ZhiDun CEO chính hãng",
   description:
     "Tìm hiểu về Công ty TNHH Công nghệ và Y tế Đại Long — đơn vị phân phối độc quyền thiết bị laser trị liệu ZhiDun CEO tại Việt Nam.",
+  alternates: { canonical: "/about-us" },
 };
 
 export default function AboutUsPage() {
