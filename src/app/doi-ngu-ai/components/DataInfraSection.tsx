@@ -17,7 +17,7 @@ type DataLayer = {
 
 const LAYERS: DataLayer[] = [
   { key: "supabase", name: "Supabase Postgres", tableName: "projects · 50+ tables", descKey: "team.datainfra.layer.supabase.desc", consumersKey: "team.datainfra.layer.supabase.consumers", hex: "#00f2ff" },
-  { key: "shared-memory", name: "shared_memory", tableName: "table · trace_id indexed", descKey: "team.datainfra.layer.shared.desc", consumersKey: "team.datainfra.layer.shared.consumers", hex: "#ff9069" },
+  { key: "shared-memory", name: "shared_memory", tableName: "table · cross-agent pool", descKey: "team.datainfra.layer.shared.desc", consumersKey: "team.datainfra.layer.shared.consumers", hex: "#ff9069" },
   { key: "fleet-events", name: "fleet_events bus", tableName: "table · realtime stream", descKey: "team.datainfra.layer.events.desc", consumersKey: "team.datainfra.layer.events.consumers", hex: "#00ff88" },
   { key: "fleet-registry", name: "fleet_registry", tableName: "table · agent endpoints", descKey: "team.datainfra.layer.registry.desc", consumersKey: "team.datainfra.layer.registry.consumers", hex: "#ffea00" },
   { key: "entity-facts", name: "entity_facts_canonical", tableName: "table · cluster + reconcile", descKey: "team.datainfra.layer.facts.desc", consumersKey: "team.datainfra.layer.facts.consumers", hex: "#ff00ff" },

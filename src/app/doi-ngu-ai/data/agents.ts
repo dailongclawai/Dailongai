@@ -117,9 +117,9 @@ export const departments: Department[] = [
         avatar: "sen-tiktok.jpeg",
         role: { vi: "Nhà Sản Xuất TikTok", en: "TikTok Producer", zh: "TikTok 制作人" },
         mission: {
-          vi: "Sports repost, video upload, auto-caption tự động.",
-          en: "Sports reposts, video uploads, automatic captioning.",
-          zh: "体育内容转发、视频上传、自动字幕。",
+          vi: "Video giáo dục ngắn, case explainer, demo sản phẩm laser, auto-caption.",
+          en: "Short-form education videos, case explainers, laser product demos, auto-caption.",
+          zh: "短视频科普、案例讲解、激光产品演示、自动字幕。",
         },
         proofs: [
           {
@@ -261,7 +261,7 @@ export const departments: Department[] = [
         id: "017",
         name: "Sen Osin Data",
         avatar: "sen-osin-data.jpeg",
-        role: { vi: "Dữ Liệu OSINT", en: "OSINT Data", zh: "情报数据" },
+        role: { vi: "Dữ Liệu OSIN", en: "OSIN Data", zh: "Osin数据" },
         mission: {
           vi: "Thu thập transcript Cowork, làm sạch, phân loại.",
           en: "Collects, cleans, and classifies Cowork transcripts.",

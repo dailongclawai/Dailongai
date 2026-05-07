@@ -514,8 +514,8 @@ const en: Record<string, string> = {
     'beta.countdown_seconds': 'Sec',
     // Team page (/doi-ngu-ai)
     'team.boss.heading': 'The Boss',
-    'team.boss.role': 'Founder & Chairman · Đại Long Medical',
-    'team.boss.bio': 'Founder of Đại Long Medical · Architect of the 17-Sen Agent fleet running 24/7. Vision to lead the future digital healthcare technology ecosystem.',
+    'team.boss.role': 'Founder & Chairman · Đại Long Health Care',
+    'team.boss.bio': 'Founder of Đại Long Health Care · AI system Entrepreneur running the 17-Sen Agent fleet 24/7. Vision to lead the future digital healthcare technology ecosystem.',
 
     'team.deptgrid.heading': 'AI Fleet',
 
@@ -537,18 +537,18 @@ const en: Record<string, string> = {
     'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
     'team.datainfra.layer.events.desc': 'Real-time event bus — agent X notifies agent Y, task dispatch, completion signals. SSOT for cross-agent comms.',
     'team.datainfra.layer.events.consumers': 'All 17 Sen subscribe',
-    'team.datainfra.layer.registry.desc': 'Agent registry with role + endpoint + secret. Resolves bridge dispatch routing, enables sen-fleet CLI.',
+    'team.datainfra.layer.registry.desc': 'Agent registry with role and endpoint. Resolves bridge dispatch routing, enables sen-fleet CLI.',
     'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · Bridge Worker',
-    'team.datainfra.layer.facts.desc': 'Temporal facts with expiry + canonical reconcile (Gemini Flash, cosine 0.85). Daily cron at 04:50, 600 canonical / 627 raw.',
+    'team.datainfra.layer.facts.desc': 'Temporal facts with expiry and automatic canonical reconciliation, deduplicated daily to keep information accurate.',
     'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen Memory consolidator',
     'team.datainfra.layer.rag.desc': 'Embeddings of 187 chunks from dailongai blog + product info + warranty + medical context. Sub-100ms vector recall.',
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
 
     'team.about.heading': 'About The Team',
-    'team.about.body': 'An ecosystem of 18 members — Boss and 17 Sen Agents — operating 24/7 inside the Đại Long Medical AI Fleet. Each Sen has its own role and context: from customer care and marketing content production to infrastructure programming and system monitoring. Together, we are taking healthcare technology in Vietnam to a new level.',
+    'team.about.body': 'An ecosystem of 18 members — Boss and 17 Sen Agents — operating 24/7 inside the Đại Long Health Care AI Fleet. Each Sen has its own role and context: from customer care and marketing content production to infrastructure programming and system monitoring. Together, we are taking healthcare technology in Vietnam to a new level.',
 
     'team.cta.heading': 'Partner with the AI Fleet',
-    'team.cta.body': 'Đại Long Medical\'s Sen Agent team is always ready to accompany our partners on the journey of building healthcare technology in Vietnam — from semiconductor laser devices to a full digital medical ecosystem.',
+    'team.cta.body': 'Đại Long Health Care\'s Sen Agent team is always ready to accompany our partners on the journey of building healthcare technology in Vietnam — from semiconductor laser devices to a full digital medical ecosystem.',
     'team.cta.button': 'Contact Đại Long',
     'team.contact.short': 'Contact',
 

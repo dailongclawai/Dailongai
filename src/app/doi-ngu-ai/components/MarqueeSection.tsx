@@ -15,11 +15,12 @@ function tileBg(hex: string) {
   return `radial-gradient(circle at 30% 20%, ${hex}33, transparent 60%), linear-gradient(180deg, rgba(20,20,28,0.9), rgba(8,8,14,0.95))`;
 }
 
-function Tile({ sen, locale }: { sen: Sen; locale: string }) {
+function Tile({ sen, locale, ariaHidden }: { sen: Sen; locale: string; ariaHidden?: boolean }) {
   const dept = deptOf(sen);
   return (
     <div
       className="rounded-2xl overflow-hidden flex-none flex flex-col items-center justify-center p-5"
+      aria-hidden={ariaHidden ? "true" : undefined}
       style={{
         width: 280,
         height: 280,
@@ -95,8 +96,7 @@ export default function MarqueeSection() {
   }, []);
 
   const trans = offset - 200;
-  const row1 = [...ROW1, ...ROW1, ...ROW1];
-  const row2 = [...ROW2, ...ROW2, ...ROW2];
+  const sets = [0, 1, 2];
 
   return (
     <section
@@ -112,7 +112,11 @@ export default function MarqueeSection() {
             willChange: "transform",
           }}
         >
-          {row1.map((s, i) => <Tile key={`r1-${i}`} sen={s} locale={locale} />)}
+          {sets.flatMap((setIdx) =>
+            ROW1.map((s, i) => (
+              <Tile key={`r1-${setIdx}-${i}`} sen={s} locale={locale} ariaHidden={setIdx > 0} />
+            )),
+          )}
         </div>
         <div
           className="flex gap-3"
@@ -121,7 +125,11 @@ export default function MarqueeSection() {
             willChange: "transform",
           }}
         >
-          {row2.map((s, i) => <Tile key={`r2-${i}`} sen={s} locale={locale} />)}
+          {sets.flatMap((setIdx) =>
+            ROW2.map((s, i) => (
+              <Tile key={`r2-${setIdx}-${i}`} sen={s} locale={locale} ariaHidden={setIdx > 0} />
+            )),
+          )}
         </div>
       </div>
     </section>

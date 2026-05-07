@@ -515,7 +515,7 @@ const zh: Record<string, string> = {
     // Team page (/doi-ngu-ai)
     'team.boss.heading': '老板',
     'team.boss.role': '创始人 · 大龙健康',
-    'team.boss.bio': '大龙健康创始人 · 17 名 Sen Agent 舰队架构师,全天候 24/7 运行。引领未来数字医疗科技生态系统的愿景。',
+    'team.boss.bio': '大龙健康创始人 · AI系统企业家,运营 17 名 Sen Agent 舰队全天候 24/7。引领未来数字医疗科技生态系统的愿景。',
 
     'team.deptgrid.heading': 'AI 舰队',
 
@@ -537,9 +537,9 @@ const zh: Record<string, string> = {
     'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
     'team.datainfra.layer.events.desc': '实时事件总线 — 代理 X 通知代理 Y,任务调度,完成信号。跨代理通信的唯一来源。',
     'team.datainfra.layer.events.consumers': '全部 17 个 Sen 订阅',
-    'team.datainfra.layer.registry.desc': '代理注册表带角色 + 端点 + 密钥。解析桥接调度路由,支持 sen-fleet CLI。',
+    'team.datainfra.layer.registry.desc': '代理注册表带角色和端点。解析桥接调度路由,支持 sen-fleet CLI。',
     'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · 桥接工作流',
-    'team.datainfra.layer.facts.desc': '带过期时间的时序事实 + 规范化对账 (Gemini Flash, 余弦 0.85)。每日 04:50 定时,600 规范 / 627 原始。',
+    'team.datainfra.layer.facts.desc': '带过期时间的时序事实,每日自动规范化对账,保持信息准确。',
     'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen 记忆整合器',
     'team.datainfra.layer.rag.desc': 'dailongai 博客 + 产品信息 + 保修 + 医疗上下文的 187 个片段嵌入。亚 100 毫秒向量召回。',
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO 推广',

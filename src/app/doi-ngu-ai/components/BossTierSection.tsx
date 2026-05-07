@@ -31,7 +31,7 @@ export default function BossTierSection() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/team/boss.jpeg"
+              src="/images/team/boss.jpeg?v=2"
               alt="Ông Chủ"
               style={{
                 width: "100%",

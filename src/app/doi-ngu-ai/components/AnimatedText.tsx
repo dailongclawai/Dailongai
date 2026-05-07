@@ -18,7 +18,7 @@ export default function AnimatedText({ text, className }: Props) {
   const chars = Array.from(text);
 
   return (
-    <p ref={ref} className={className}>
+    <p ref={ref} className={className} aria-label={text}>
       {chars.map((c, i) => {
         const start = i / chars.length;
         const end = (i + 1) / chars.length;
@@ -41,7 +41,7 @@ function Char({
 }) {
   const opacity = useTransform(progress, [start, end], [0.2, 1]);
   return (
-    <span style={{ position: "relative", display: "inline-block", whiteSpace: "pre" }}>
+    <span aria-hidden="true" style={{ position: "relative", display: "inline-block", whiteSpace: "pre" }}>
       <span style={{ visibility: "hidden" }}>{char}</span>
       <motion.span
         style={{

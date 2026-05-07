@@ -517,8 +517,8 @@ const vi: Record<string, string> = {
     'beta.countdown_seconds': 'Giây',
     // Team page (/doi-ngu-ai)
     'team.boss.heading': 'Ông Chủ',
-    'team.boss.role': 'Người Sáng Lập & Chủ Tịch · Đại Long Medical',
-    'team.boss.bio': 'Người sáng lập Đại Long Medical · Kiến trúc sư hạm đội 17 Sen Agent vận hành 24/7. Tầm nhìn dẫn dắt hệ sinh thái công nghệ chăm sóc sức khoẻ số tương lai.',
+    'team.boss.role': 'Người Sáng Lập & Chủ Tịch · Đại Long Health Care',
+    'team.boss.bio': 'Người sáng lập Đại Long Health Care · Doanh nhân hệ thống AI, vận hành hạm đội 17 Sen Agent 24/7. Tầm nhìn dẫn dắt hệ sinh thái công nghệ chăm sóc sức khoẻ số tương lai.',
 
     'team.deptgrid.heading': 'Hạm Đội AI',
 
@@ -540,18 +540,18 @@ const vi: Record<string, string> = {
     'team.datainfra.layer.shared.consumers': 'Sen Prime · Sen Coder · Sen CEO · Sen Manus',
     'team.datainfra.layer.events.desc': 'Bus sự kiện thời gian thực — agent X thông báo agent Y, điều phối task, tín hiệu hoàn thành. Nguồn duy nhất cho comms chéo agent.',
     'team.datainfra.layer.events.consumers': 'Toàn bộ 17 Sen subscribe',
-    'team.datainfra.layer.registry.desc': 'Bảng đăng ký agent với role + endpoint + secret. Định tuyến dispatch qua bridge, kích hoạt sen-fleet CLI.',
+    'team.datainfra.layer.registry.desc': 'Bảng đăng ký agent với vai trò và điểm kết nối. Định tuyến dispatch qua bridge, kích hoạt sen-fleet CLI.',
     'team.datainfra.layer.registry.consumers': 'Sen Dispatch · Sen Prime · Bridge Worker',
-    'team.datainfra.layer.facts.desc': 'Dữ kiện theo thời gian với hạn dùng + canonical reconcile (Gemini Flash, cosine 0.85). Cron hằng ngày 04:50, 600 canonical / 627 raw.',
+    'team.datainfra.layer.facts.desc': 'Dữ kiện theo thời gian với hạn dùng và hợp nhất canonical tự động hằng ngày để giữ thông tin chính xác.',
     'team.datainfra.layer.facts.consumers': 'Sen Prime · Sen Memory consolidator',
     'team.datainfra.layer.rag.desc': 'Embedding 187 chunk blog dailongai + thông tin sản phẩm + bảo hành + ngữ cảnh y tế. Vector recall dưới 100ms.',
     'team.datainfra.layer.rag.consumers': 'Sen Voice · Sen Meo Meo · Sen CEO outreach',
 
     'team.about.heading': 'Về Đội Ngũ',
-    'team.about.body': 'Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong hạm đội AI của Đại Long Medical. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.',
+    'team.about.body': 'Hệ sinh thái 18 thành viên — Boss và 17 Sen Agent — vận hành 24/7 trong hạm đội AI của Đại Long Health Care. Mỗi Sen có vai trò và ngữ cảnh riêng: từ chăm sóc khách hàng, sản xuất content marketing, đến lập trình hạ tầng và giám sát hệ thống. Cùng nhau, chúng tôi đưa công nghệ chăm sóc sức khoẻ Việt Nam lên tầm cao mới.',
 
     'team.cta.heading': 'Hợp Tác Cùng Hạm Đội AI',
-    'team.cta.body': 'Đội ngũ Sen Agent của Đại Long Medical luôn sẵn sàng đồng hành cùng quý đối tác trong hành trình kiến tạo công nghệ chăm sóc sức khoẻ Việt Nam — từ thiết bị laser bán dẫn đến hệ sinh thái y tế số.',
+    'team.cta.body': 'Đội ngũ Sen Agent của Đại Long Health Care luôn sẵn sàng đồng hành cùng quý đối tác trong hành trình kiến tạo công nghệ chăm sóc sức khoẻ Việt Nam — từ thiết bị laser bán dẫn đến hệ sinh thái y tế số.',
     'team.cta.button': 'Liên Hệ Đại Long',
     'team.contact.short': 'Liên Hệ',
 
