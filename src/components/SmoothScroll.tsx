@@ -38,19 +38,30 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
         document.body.classList.add("js-loaded", "no-animations");
       }
     };
-    // Defer heavy GSAP+Lenis init until first user interaction
+    // Defer GSAP+Lenis init to idle time (after LCP) — avoids blocking first user click.
     let started = false;
-    const events = ["scroll", "click", "keydown", "touchstart"] as const;
-    const startOnInteraction = () => {
+    const start = () => {
       if (started) return;
       started = true;
-      events.forEach((e) => window.removeEventListener(e, startOnInteraction));
       init();
     };
-    events.forEach((e) => window.addEventListener(e, startOnInteraction, { passive: true }));
+
+    type IdleWindow = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const w = window as IdleWindow;
+    let idleHandle: number | undefined;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    if (w.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(start, { timeout: 2000 });
+    } else {
+      timeoutHandle = setTimeout(start, 1800);
+    }
 
     return () => {
-      events.forEach((e) => window.removeEventListener(e, startOnInteraction));
+      if (idleHandle !== undefined && w.cancelIdleCallback) w.cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
     };
   }, []);
 

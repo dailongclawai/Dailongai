@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useI18n } from '@/lib/i18n';
 
-const MeoChatFullscreen = dynamic(() => import('./MeoChatFullscreen'), { ssr: false });
+const loadMeoChat = () => import('./MeoChatFullscreen');
+const MeoChatFullscreen = dynamic(loadMeoChat, { ssr: false });
 const MeoAvatarThumb = dynamic(() => import('./MeoAvatarThumb'), { ssr: false });
 
 export default function ChatWidget() {
@@ -14,6 +15,27 @@ export default function ChatWidget() {
   useEffect(() => {
     window.dispatchEvent(new Event(open ? 'meo-chat:open' : 'meo-chat:close'));
   }, [open]);
+
+  // Idle-preload Meo chat bundle so first click does not pay parse cost on main thread
+  useEffect(() => {
+    type IdleWindow = Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const w = window as IdleWindow;
+    let idleHandle: number | undefined;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+    const preload = () => { void loadMeoChat(); };
+    if (w.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(preload, { timeout: 4000 });
+    } else {
+      timeoutHandle = setTimeout(preload, 3000);
+    }
+    return () => {
+      if (idleHandle !== undefined && w.cancelIdleCallback) w.cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
+    };
+  }, []);
 
   return (
     <>

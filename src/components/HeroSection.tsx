@@ -18,8 +18,8 @@ export default function HeroSection() {
       <div className="absolute bottom-0 -left-1/4 w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] rounded-full" style={{ background: "radial-gradient(circle, rgba(var(--color-tertiary), 0.08) 0%, transparent 70%)", contain: "layout paint" }} />
 
       <div className="max-w-screen-2xl mx-auto w-full" style={{ paddingTop: "100px", paddingBottom: "48px" }}>
-        {/* Headline + description — single animation wrapper to reduce composite layers */}
-        <div className="relative text-center max-w-5xl mx-auto mb-10 sm:mb-14 animate-[fadeUp_0.5s_ease-out_both]">
+        {/* Headline + description — no animation: this block contains the LCP candidate */}
+        <div className="relative text-center max-w-5xl mx-auto mb-10 sm:mb-14">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-highest border border-primary/20 mb-4">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             <span className="text-[9px] sm:text-[10px] font-headline font-bold uppercase tracking-widest text-primary">{t('hero.exclusive')}</span>
