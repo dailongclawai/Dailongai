@@ -110,3 +110,32 @@ describe('MeoChatPanel — session timer', () => {
     expect(screen.getByText(/Hết thời gian chat/)).toBeInTheDocument();
   });
 });
+
+describe('MeoChatPanel — TTS opt-in', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('plays TTS only after the speaker icon is clicked', async () => {
+    const playSpy = vi.fn().mockResolvedValue(undefined);
+    const pauseSpy = vi.fn();
+    Object.defineProperty(window.HTMLMediaElement.prototype, 'play', { configurable: true, value: playSpy });
+    Object.defineProperty(window.HTMLMediaElement.prototype, 'pause', { configurable: true, value: pauseSpy });
+    // URL.createObjectURL is not available in jsdom; stub it so the TTS flow can proceed
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock');
+    const fetchSpy = vi.spyOn(global, 'fetch').mockImplementation((url) => {
+      if (String(url).includes('/api/tts')) {
+        return Promise.resolve(new Response(new ArrayBuffer(2048), { status: 200, headers: { 'Content-Type': 'audio/mpeg' } }));
+      }
+      return Promise.resolve(new Response(JSON.stringify({ content: 'Câu trả lời TTS' }), { status: 200 }));
+    });
+    renderPanel();
+    act(() => { vi.advanceTimersByTime(450); });
+    fireEvent.click(screen.getByRole('button', { name: /ZhiDun là gì/i }));
+    await waitFor(() => expect(screen.getByText('Câu trả lời TTS')).toBeInTheDocument());
+    expect(playSpy).not.toHaveBeenCalled();
+    const speaker = screen.getAllByRole('button', { name: /Play voice/i })[0];
+    fireEvent.click(speaker);
+    await waitFor(() => expect(playSpy).toHaveBeenCalled());
+    fetchSpy.mockRestore();
+  });
+});

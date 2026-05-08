@@ -64,6 +64,56 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   const abortRef = useRef<AbortController | null>(null);
   const sessionIdRef = useRef(`meo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const playingObjectUrlRef = useRef<string>('');
+
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.volume = 1.0;
+    }
+  }, []);
+
+  function stopTTS() {
+    const audio = audioRef.current;
+    if (audio) { audio.pause(); audio.currentTime = 0; }
+    if (playingObjectUrlRef.current) {
+      URL.revokeObjectURL(playingObjectUrlRef.current);
+      playingObjectUrlRef.current = '';
+    }
+    setPlayingId(null);
+  }
+
+  async function playTTS(id: string, text: string) {
+    if (playingId === id) { stopTTS(); return; }
+    stopTTS();
+    const audio = audioRef.current;
+    if (!audio) return;
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.slice(0, 2000) }),
+      });
+      if (!res.ok) return;
+      const buf = await res.arrayBuffer();
+      if (buf.byteLength < 1000) return;
+      const url = URL.createObjectURL(new Blob([buf], { type: 'audio/mpeg' }));
+      playingObjectUrlRef.current = url;
+      audio.src = url;
+      audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
+      audio.onerror = () => { setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
+      setPlayingId(id);
+      await audio.play();
+    } catch {
+      setPlayingId(null);
+    }
+  }
+
+  // Cleanup on unmount
+  useEffect(() => () => stopTTS(), []);
+
   async function handleSend(text: string) {
     const msg = text.trim();
     if (!msg || busy || expired) return;
@@ -120,7 +170,19 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
       </header>
       <div role="log">
         {messages.map(m => (
-          <div key={m.id} data-role={m.role}>{m.content}</div>
+          <div key={m.id} data-role={m.role}>
+            <span>{m.content}</span>
+            {m.role === 'assistant' && (
+              <button
+                type="button"
+                aria-label={playingId === m.id ? 'Stop voice playback' : 'Play voice'}
+                aria-pressed={playingId === m.id}
+                onClick={() => playTTS(m.id, m.content)}
+              >
+                {playingId === m.id ? '⏹' : '🔊'}
+              </button>
+            )}
+          </div>
         ))}
       </div>
       {showQuickReplies && (
