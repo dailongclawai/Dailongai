@@ -25,3 +25,22 @@ if (typeof window !== "undefined" && (window as Partial<JsdomWindow>).jsdom) {
 // to gate fake-timer support. Vitest does not provide this global, so we
 // alias `jest = vi` here to keep `waitFor` working under `vi.useFakeTimers()`.
 (globalThis as typeof globalThis & { jest: typeof vi }).jest = vi;
+
+// jsdom does not implement window.matchMedia; provide a no-op stub so that
+// vi.spyOn(window, 'matchMedia') can override it in individual tests.
+if (typeof window !== "undefined" && typeof window.matchMedia === "undefined") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    configurable: true,
+    value: (query: string): MediaQueryList => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    }),
+  });
+}

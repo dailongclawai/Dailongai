@@ -165,3 +165,29 @@ describe('MeoChatPanel — error retry', () => {
     fetchSpy.mockRestore();
   });
 });
+
+describe('MeoChatPanel — layout invariants', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('uses sheet shape on mobile (matchMedia min-width:768px = false)', () => {
+    const mql = { matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn(), media: '(min-width: 768px)' };
+    vi.spyOn(window, 'matchMedia').mockReturnValue(mql as unknown as MediaQueryList);
+    renderPanel();
+    expect(screen.getByRole('dialog').dataset.shape).toBe('sheet');
+  });
+
+  it('uses panel shape on desktop', () => {
+    const mql = { matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn(), media: '(min-width: 768px)' };
+    vi.spyOn(window, 'matchMedia').mockReturnValue(mql as unknown as MediaQueryList);
+    renderPanel();
+    expect(screen.getByRole('dialog').dataset.shape).toBe('panel');
+  });
+
+  it('does not render any element with backdrop-blur or a <canvas>', () => {
+    renderPanel();
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.querySelector('canvas')).toBeNull();
+    expect(dialog.outerHTML).not.toMatch(/backdrop-blur/);
+  });
+});
