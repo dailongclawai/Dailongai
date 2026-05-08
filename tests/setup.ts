@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom/vitest";
+import { vi } from "vitest";
 
 // Node.js 25 ships a built-in (but non-functional) global.localStorage stub.
 // vitest's populateGlobal skips keys that already exist in the Node global unless
@@ -19,3 +20,8 @@ if (typeof window !== "undefined" && (window as Partial<JsdomWindow>).jsdom) {
     configurable: true,
   });
 }
+
+// @testing-library/dom's asyncWrapper checks `typeof jest !== 'undefined'`
+// to gate fake-timer support. Vitest does not provide this global, so we
+// alias `jest = vi` here to keep `waitFor` working under `vi.useFakeTimers()`.
+(globalThis as typeof globalThis & { jest: typeof vi }).jest = vi;

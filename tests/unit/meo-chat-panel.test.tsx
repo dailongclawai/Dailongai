@@ -3,10 +3,6 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { I18nProvider } from '@/lib/i18n';
 import MeoChatPanel from '@/components/MeoChatPanel';
 
-// Vitest fake-timer compatibility: @testing-library/dom's asyncWrapper detects
-// fake timers via `typeof jest !== 'undefined'`; alias vi so detection works.
-(globalThis as typeof globalThis & { jest: typeof vi }).jest = vi;
-
 function renderPanel() {
   return render(
     <I18nProvider>
