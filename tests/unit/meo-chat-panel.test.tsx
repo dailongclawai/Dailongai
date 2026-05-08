@@ -91,3 +91,17 @@ describe('MeoChatPanel — send', () => {
     fetchSpy.mockRestore();
   });
 });
+
+describe('MeoChatPanel — session timer', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('shows the expired overlay with "6 phút" copy after 6 minutes', () => {
+    renderPanel();
+    act(() => { vi.advanceTimersByTime(361_000); });
+    expect(screen.getByText(/Hết thời gian chat/)).toBeInTheDocument();
+    expect(screen.getByText(/6 phút/)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Gọi 0935 999 922/ })).toBeInTheDocument();
+    expect(screen.queryByText(/3 phút/)).not.toBeInTheDocument();
+  });
+});

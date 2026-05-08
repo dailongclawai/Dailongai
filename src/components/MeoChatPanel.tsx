@@ -18,11 +18,25 @@ function genId() {
   return `m-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+const SESSION_MAX_SEC = 6 * 60; // 6 minutes
+
 export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   const { t, locale } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
   const welcomeShownRef = useRef(false);
+  const [timeLeft, setTimeLeft] = useState(SESSION_MAX_SEC);
+  const [expired, setExpired] = useState(false);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) { clearInterval(id); setExpired(true); return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const QUICK_REPLIES = [t('chat.qr1'), t('chat.qr4'), t('chat.qr5'), t('chat.qr6')];
 
@@ -48,7 +62,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
 
   async function handleSend(text: string) {
     const msg = text.trim();
-    if (!msg || busy) return;
+    if (!msg || busy || expired) return;
     setBusy(true);
     const userMsg: Message = { role: 'user', content: msg, time: nowTime(), id: genId() };
     setMessages(prev => [...prev, userMsg]);
@@ -93,6 +107,11 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
       <header>
         <h2>AI Meo Meo</h2>
         <p>Powered by Do Ngoc Long</p>
+        {timeLeft <= 30 && !expired && (
+          <span data-role="countdown" aria-live="polite">
+            {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+          </span>
+        )}
         <button type="button" onClick={() => { abortRef.current?.abort(); onClose(); }} aria-label="Close">×</button>
       </header>
       <div role="log">
@@ -105,6 +124,14 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
           {QUICK_REPLIES.map(q => (
             <button type="button" key={q} onClick={() => handleSend(q)}>{q}</button>
           ))}
+        </div>
+      )}
+      {expired && (
+        <div role="alertdialog" aria-label="Session expired" data-state="expired">
+          <h3>Hết thời gian chat</h3>
+          <p>Phiên chat miễn phí tối đa 6 phút. Để được tư vấn chi tiết hơn, vui lòng liên hệ hotline.</p>
+          <a href="tel:0935999922">Gọi 0935 999 922</a>
+          <button type="button" onClick={() => { abortRef.current?.abort(); onClose(); }}>Đóng</button>
         </div>
       )}
     </div>
