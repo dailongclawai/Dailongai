@@ -36,6 +36,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   }, [t]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: locale change must update welcome bubble content; functional updater is safe (deps don't include messages).
     setMessages(prev =>
       prev.length === 1 && prev[0].role === 'assistant'
         ? [{ ...prev[0], content: t('chat.welcome') }]

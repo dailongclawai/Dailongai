@@ -4,8 +4,12 @@ import "@testing-library/jest-dom/vitest";
 // vitest's populateGlobal skips keys that already exist in the Node global unless
 // they are in its KEYS allowlist — so jsdom's Storage never replaces the Node stub.
 // We restore jsdom's real Storage object here so Web Storage APIs work in tests.
-if (typeof window !== "undefined" && (window as any).jsdom) {
-  const jsdomWindow = (window as any).jsdom.window;
+interface JsdomWindow extends Window {
+  jsdom: { window: Window & typeof globalThis };
+}
+
+if (typeof window !== "undefined" && (window as Partial<JsdomWindow>).jsdom) {
+  const jsdomWindow = (window as unknown as JsdomWindow).jsdom.window;
   Object.defineProperty(globalThis, "localStorage", {
     get: () => jsdomWindow.localStorage,
     configurable: true,
