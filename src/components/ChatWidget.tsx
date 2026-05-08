@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useI18n } from '@/lib/i18n';
 
-const loadMeoChat = () => import('./MeoChatFullscreen');
-const MeoChatFullscreen = dynamic(loadMeoChat, { ssr: false });
-const MeoAvatarThumb = dynamic(() => import('./MeoAvatarThumb'), { ssr: false });
+const loadMeoChat = () => import('./MeoChatPanel');
+const MeoChatPanel = dynamic(loadMeoChat, { ssr: false });
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -57,14 +56,21 @@ export default function ChatWidget() {
               <span className="block w-3 h-3 bg-green-500 rounded-full border-2 border-[#0d0d14]" />
             </span>
 
-            {/* Avatar thumbnail */}
-            <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 relative"
+            {/* Sparkle icon (inline SVG, no extra bundle) */}
+            <span
+              aria-hidden="true"
               style={{
-                border: '2px solid rgba(249,115,22,0.35)',
-                boxShadow: '0 0 12px rgba(249,115,22,0.15)',
-              }}>
-              <MeoAvatarThumb size={48} />
-            </div>
+                width: 40, height: 40, borderRadius: 12,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'color-mix(in srgb, var(--primary-container) 18%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--primary) 30%, transparent)',
+                color: 'var(--primary)',
+              }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2l1.8 4.7L18 8l-4.2 1.3L12 14l-1.8-4.7L6 8l4.2-1.3L12 2zm6 9l1 2.5 2.5 1-2.5 1L18 18l-1-2.5L14.5 14.5 17 13.5 18 11zM5 13l.8 2L8 15.8 6 16.5 5 19l-.8-2.5L2 16l2.2-.7L5 13z"/>
+              </svg>
+            </span>
 
             {/* Text */}
             <div className="flex flex-col gap-0.5 pr-1">
@@ -91,7 +97,7 @@ export default function ChatWidget() {
       )}
 
       {/* Fullscreen Chat */}
-      {open && <MeoChatFullscreen onClose={() => setOpen(false)} />}
+      {open && <MeoChatPanel onClose={() => setOpen(false)} />}
     </>
   );
 }
