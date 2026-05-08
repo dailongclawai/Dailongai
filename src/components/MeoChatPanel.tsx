@@ -31,12 +31,16 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const id = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev <= 1) { clearInterval(id); setExpired(true); return 0; }
+        if (prev <= 1) { clearInterval(id); return 0; }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (timeLeft === 0) setExpired(true);
+  }, [timeLeft]);
 
   const QUICK_REPLIES = [t('chat.qr1'), t('chat.qr4'), t('chat.qr5'), t('chat.qr6')];
 

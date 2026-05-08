@@ -104,4 +104,13 @@ describe('MeoChatPanel — session timer', () => {
     expect(screen.getByRole('link', { name: /Gọi 0935 999 922/ })).toBeInTheDocument();
     expect(screen.queryByText(/3 phút/)).not.toBeInTheDocument();
   });
+
+  it('shows the M:SS countdown when 30 seconds remain and hides it on expiry', () => {
+    renderPanel();
+    act(() => { vi.advanceTimersByTime(330_000); }); // 360 - 330 = 30 seconds left
+    expect(screen.getByText('0:30')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(31_000); }); // crosses 0
+    expect(screen.queryByText(/^0:/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Hết thời gian chat/)).toBeInTheDocument();
+  });
 });
