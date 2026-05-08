@@ -24,6 +24,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   const { t, locale } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
+  const [retryAvailable, setRetryAvailable] = useState(false);
   const welcomeShownRef = useRef(false);
   const [timeLeft, setTimeLeft] = useState(SESSION_MAX_SEC);
   const [expired, setExpired] = useState(false);
@@ -63,6 +64,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
 
   const abortRef = useRef<AbortController | null>(null);
   const sessionIdRef = useRef(`meo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const lastUserMsgRef = useRef<string>('');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mountedRef = useRef(true);
@@ -132,6 +134,8 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
     const msg = text.trim();
     if (!msg || busy || expired) return;
     setBusy(true);
+    setRetryAvailable(false);
+    lastUserMsgRef.current = msg;
     const userMsg: Message = { role: 'user', content: msg, time: nowTime(), id: genId() };
     setMessages(prev => [...prev, userMsg]);
 
@@ -159,8 +163,12 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
     } catch (err) {
       if ((err as Error).name === 'AbortError') return;
       setMessages(prev => [...prev, {
-        role: 'assistant', content: t('chat.disconnect'), time: nowTime(), id: genId(),
+        role: 'assistant',
+        content: t('chat.disconnect'),
+        time: nowTime(),
+        id: genId(),
       }]);
+      setRetryAvailable(true);
     } finally {
       setBusy(false);
     }
@@ -199,6 +207,11 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
           </div>
         ))}
       </div>
+      {retryAvailable && !busy && !expired && (
+        <button type="button" onClick={() => { setRetryAvailable(false); handleSend(lastUserMsgRef.current); }}>
+          Thử lại
+        </button>
+      )}
       {showQuickReplies && (
         <div role="group" aria-label="Quick replies">
           {QUICK_REPLIES.map(q => (

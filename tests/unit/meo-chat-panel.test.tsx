@@ -143,3 +143,25 @@ describe('MeoChatPanel — TTS opt-in', () => {
     fetchSpy.mockRestore();
   });
 });
+
+describe('MeoChatPanel — error retry', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('shows a retry button on network failure and resends on click', async () => {
+    let calls = 0;
+    const fetchSpy = vi.spyOn(global, 'fetch').mockImplementation(() => {
+      calls += 1;
+      if (calls === 1) return Promise.reject(new TypeError('network'));
+      return Promise.resolve(new Response(JSON.stringify({ content: 'Sau retry' }), { status: 200 }));
+    });
+    renderPanel();
+    act(() => { vi.advanceTimersByTime(450); });
+    fireEvent.click(screen.getByRole('button', { name: /ZhiDun là gì/i }));
+    const retryBtn = await screen.findByRole('button', { name: /Thử lại/i });
+    fireEvent.click(retryBtn);
+    await waitFor(() => expect(screen.getByText('Sau retry')).toBeInTheDocument());
+    expect(calls).toBe(2);
+    fetchSpy.mockRestore();
+  });
+});
