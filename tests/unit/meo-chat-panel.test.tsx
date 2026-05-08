@@ -1,7 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { I18nProvider } from '@/lib/i18n';
 import MeoChatPanel from '@/components/MeoChatPanel';
+
+// Vitest fake-timer compatibility: @testing-library/dom's asyncWrapper detects
+// fake timers via `typeof jest !== 'undefined'`; alias vi so detection works.
+(globalThis as typeof globalThis & { jest: typeof vi }).jest = vi;
 
 function renderPanel() {
   return render(
@@ -39,5 +43,51 @@ describe('MeoChatPanel — empty state', () => {
     renderPanel();
     expect(screen.getByText('AI Meo Meo')).toBeInTheDocument();
     expect(screen.getByText(/Powered by Do Ngoc Long/i)).toBeInTheDocument();
+  });
+});
+
+describe('MeoChatPanel — send', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('sends a quick reply, hides quick-reply group, and renders the AI response', async () => {
+    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ content: 'Câu trả lời mẫu' }), { status: 200 })
+    );
+    renderPanel();
+    act(() => { vi.advanceTimersByTime(450); });
+    const qr = screen.getByRole('button', { name: /ZhiDun là gì/i });
+    fireEvent.click(qr);
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
+    const [, init] = fetchSpy.mock.calls[0];
+    expect((init as RequestInit).headers).toMatchObject({ 'Content-Type': 'application/json' });
+    await waitFor(() => expect(screen.getByText('Câu trả lời mẫu')).toBeInTheDocument());
+    expect(screen.queryByRole('group', { name: /Quick replies/ })).not.toBeInTheDocument();
+    fetchSpy.mockRestore();
+  });
+
+  it('aborts the in-flight chat fetch when onClose runs mid-request', async () => {
+    let captured: AbortSignal | undefined;
+    const fetchSpy = vi.spyOn(global, 'fetch').mockImplementation((_url, init) => {
+      captured = (init as RequestInit).signal ?? undefined;
+      return new Promise(() => {}); // never resolves
+    });
+    const onClose = vi.fn();
+    render(
+      <I18nProvider>
+        <MeoChatPanel onClose={onClose} />
+      </I18nProvider>
+    );
+    act(() => { vi.advanceTimersByTime(450); });
+    fireEvent.click(screen.getByRole('button', { name: /ZhiDun là gì/i }));
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: /Close/i }));
+    expect(captured?.aborted).toBe(true);
+    fetchSpy.mockRestore();
   });
 });

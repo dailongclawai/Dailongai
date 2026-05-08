@@ -36,13 +36,55 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   }, [t]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: locale change must update welcome bubble content; functional updater is safe (deps don't include messages).
     setMessages(prev =>
       prev.length === 1 && prev[0].role === 'assistant'
         ? [{ ...prev[0], content: t('chat.welcome') }]
         : prev
     );
   }, [locale, t]);
+
+  const abortRef = useRef<AbortController | null>(null);
+  const sessionIdRef = useRef(`meo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+
+  async function handleSend(text: string) {
+    const msg = text.trim();
+    if (!msg || busy) return;
+    setBusy(true);
+    const userMsg: Message = { role: 'user', content: msg, time: nowTime(), id: genId() };
+    setMessages(prev => [...prev, userMsg]);
+
+    const history = [...messages, userMsg]
+      .slice(-10)
+      .map(m => ({ role: m.role, content: m.content }));
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Chat-Session': sessionIdRef.current,
+        },
+        body: JSON.stringify({ messages: history }),
+        signal: controller.signal,
+      });
+      const data = await res.json();
+      const reply = data.content ?? t('chat.error');
+      setMessages(prev => [...prev, {
+        role: 'assistant', content: reply, time: nowTime(), id: genId(),
+      }]);
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      setMessages(prev => [...prev, {
+        role: 'assistant', content: t('chat.disconnect'), time: nowTime(), id: genId(),
+      }]);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   const showQuickReplies = messages.length <= 1 && !busy;
 
@@ -51,7 +93,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
       <header>
         <h2>AI Meo Meo</h2>
         <p>Powered by Do Ngoc Long</p>
-        <button type="button" onClick={onClose} aria-label="Close">×</button>
+        <button type="button" onClick={() => { abortRef.current?.abort(); onClose(); }} aria-label="Close">×</button>
       </header>
       <div role="log">
         {messages.map(m => (
@@ -61,7 +103,7 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
       {showQuickReplies && (
         <div role="group" aria-label="Quick replies">
           {QUICK_REPLIES.map(q => (
-            <button type="button" key={q}>{q}</button>
+            <button type="button" key={q} onClick={() => handleSend(q)}>{q}</button>
           ))}
         </div>
       )}
