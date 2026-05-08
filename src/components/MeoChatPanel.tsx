@@ -21,11 +21,13 @@ function genId() {
 const SESSION_MAX_SEC = 6 * 60; // 6 minutes
 
 function useShape(): 'sheet' | 'panel' {
-  const [shape, setShape] = useState<'sheet' | 'panel'>('sheet');
+  const [shape, setShape] = useState<'sheet' | 'panel'>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+      ? 'panel' : 'sheet'
+  );
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 768px)');
     const update = () => setShape(mql.matches ? 'panel' : 'sheet');
-    update();
     mql.addEventListener('change', update);
     return () => mql.removeEventListener('change', update);
   }, []);
@@ -33,11 +35,12 @@ function useShape(): 'sheet' | 'panel' {
 }
 
 function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
+  const [reduced, setReduced] = useState<boolean>(() =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   useEffect(() => {
     const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReduced(mql.matches);
-    update();
     mql.addEventListener('change', update);
     return () => mql.removeEventListener('change', update);
   }, []);
@@ -263,9 +266,6 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
         />
       )}
       <div role="dialog" aria-label="AI Meo Meo chat" data-shape={shape} style={wrapperStyle}>
-        {shape === 'sheet' && (
-          <div aria-hidden="true" style={{ alignSelf: 'center', width: 36, height: 4, borderRadius: 2, background: 'var(--outline-variant)', marginTop: 8, marginBottom: 4 }} />
-        )}
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderBottom: '1px solid var(--outline-variant)' }}>
           <div>
             <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--primary)' }}>AI Meo Meo</h2>
@@ -317,12 +317,13 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
               )}
             </div>
           ))}
-          {retryAvailable && !busy && !expired && (
-            <button type="button" aria-label="Thử lại" onClick={() => { setRetryAvailable(false); handleSend(lastUserMsgRef.current); }} style={{ alignSelf: 'flex-start', marginTop: 4, padding: '6px 12px', background: 'transparent', border: '1px solid var(--primary)', borderRadius: 999, color: 'var(--primary)', fontSize: 12, cursor: 'pointer' }}>
-              Thử lại
-            </button>
-          )}
         </div>
+
+        {retryAvailable && !busy && !expired && (
+          <button type="button" aria-label="Thử lại" onClick={() => { setRetryAvailable(false); handleSend(lastUserMsgRef.current); }} style={{ alignSelf: 'flex-start', marginTop: 4, padding: '6px 12px', background: 'transparent', border: '1px solid var(--primary)', borderRadius: 999, color: 'var(--primary)', fontSize: 12, cursor: 'pointer' }}>
+            Thử lại
+          </button>
+        )}
 
         {showQuickReplies && (
           <div role="group" aria-label="Quick replies" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '0 16px 12px' }}>
