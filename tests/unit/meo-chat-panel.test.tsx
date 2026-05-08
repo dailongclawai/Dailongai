@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { I18nProvider } from '@/lib/i18n';
 import MeoChatPanel from '@/components/MeoChatPanel';
@@ -16,10 +16,16 @@ describe('MeoChatPanel — empty state', () => {
     vi.useFakeTimers();
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders the four quick-reply buttons before any message is sent', () => {
     renderPanel();
     expect(screen.getByRole('button', { name: /ZhiDun hoạt động/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ZhiDun là gì/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chất lượng máy ZhiDun/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Bước sóng 650nm/i })).toBeInTheDocument();
   });
 
   it('renders the welcome bubble after 400ms', () => {
