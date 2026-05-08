@@ -65,8 +65,11 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   const sessionIdRef = useRef(`meo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; }, []);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const playingObjectUrlRef = useRef<string>('');
+  const ttsAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -76,13 +79,15 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
   }, []);
 
   function stopTTS() {
+    ttsAbortRef.current?.abort();
+    ttsAbortRef.current = null;
     const audio = audioRef.current;
     if (audio) { audio.pause(); audio.currentTime = 0; }
     if (playingObjectUrlRef.current) {
       URL.revokeObjectURL(playingObjectUrlRef.current);
       playingObjectUrlRef.current = '';
     }
-    setPlayingId(null);
+    if (mountedRef.current) setPlayingId(null);
   }
 
   async function playTTS(id: string, text: string) {
@@ -90,29 +95,38 @@ export default function MeoChatPanel({ onClose }: { onClose: () => void }) {
     stopTTS();
     const audio = audioRef.current;
     if (!audio) return;
+    const controller = new AbortController();
+    ttsAbortRef.current = controller;
     try {
       const res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.slice(0, 2000) }),
+        signal: controller.signal,
       });
       if (!res.ok) return;
       const buf = await res.arrayBuffer();
       if (buf.byteLength < 1000) return;
+      if (controller.signal.aborted) return;
       const url = URL.createObjectURL(new Blob([buf], { type: 'audio/mpeg' }));
       playingObjectUrlRef.current = url;
       audio.src = url;
-      audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
-      audio.onerror = () => { setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
+      audio.onended = () => { if (mountedRef.current) setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
+      audio.onerror = () => { if (mountedRef.current) setPlayingId(null); URL.revokeObjectURL(url); playingObjectUrlRef.current = ''; };
       setPlayingId(id);
       await audio.play();
-    } catch {
-      setPlayingId(null);
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') return;
+      if (mountedRef.current) setPlayingId(null);
     }
   }
 
   // Cleanup on unmount
-  useEffect(() => () => stopTTS(), []);
+  useEffect(() => () => {
+    stopTTS();
+    const a = audioRef.current;
+    if (a) { a.onended = null; a.onerror = null; }
+  }, []);
 
   async function handleSend(text: string) {
     const msg = text.trim();

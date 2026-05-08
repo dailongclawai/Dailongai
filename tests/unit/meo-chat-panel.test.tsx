@@ -133,9 +133,13 @@ describe('MeoChatPanel — TTS opt-in', () => {
     fireEvent.click(screen.getByRole('button', { name: /ZhiDun là gì/i }));
     await waitFor(() => expect(screen.getByText('Câu trả lời TTS')).toBeInTheDocument());
     expect(playSpy).not.toHaveBeenCalled();
-    const speaker = screen.getAllByRole('button', { name: /Play voice/i })[0];
+    const speakers = screen.getAllByRole('button', { name: /Play voice/i });
+    expect(speakers).toHaveLength(2); // welcome + AI response
+    const speaker = speakers[1]; // AI response bubble
+    expect(speaker).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(speaker);
     await waitFor(() => expect(playSpy).toHaveBeenCalled());
+    await waitFor(() => expect(speaker).toHaveAttribute('aria-pressed', 'true'));
     fetchSpy.mockRestore();
   });
 });
