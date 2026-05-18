@@ -47,6 +47,12 @@ export default function CertificationsSection() {
       issuerKey: "cert_section.item5_issuer",
       alt: "CCPIT — Bìa chứng nhận",
     },
+    {
+      src: "/certificates/iso-13485.webp",
+      titleKey: "cert_section.item6_title",
+      issuerKey: "cert_section.item6_issuer",
+      alt: "Chứng nhận ISO 13485:2016 hệ thống quản lý chất lượng thiết bị y tế",
+    },
   ];
 
   const close = useCallback(() => setActiveIndex(null), []);
@@ -140,7 +146,7 @@ export default function CertificationsSection() {
           </p>
         </div>
 
-        <div className="cert-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+        <div className="cert-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
           {certs.map((c, i) => (
             <button
               key={c.src}

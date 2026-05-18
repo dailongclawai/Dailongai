@@ -23,7 +23,7 @@ export const aboutFeatures = [
     icon: "shield",
     title: "Giấy phép Bộ Y tế",
     description:
-      "Được cấp giấy phép lưu hành số 260000036/PCBB-HN bởi Sở Y tế Hà Nội và giấy phép lưu hành tại Trung Quốc.",
+      "Được cấp giấy phép lưu hành số 260001468/PCBB-HN bởi Sở Y tế Hà Nội và giấy phép lưu hành tại Trung Quốc.",
   },
   {
     icon: "cpu",
@@ -64,7 +64,7 @@ export const product = {
     "Hỗ trợ tuần hoàn máu, vi tuần hoàn",
     "Hỗ trợ cải thiện giấc ngủ",
     "Hỗ trợ tăng cường trí nhớ",
-    "Hỗ trợ phòng ngừa đột quỵ, tai biến",
+    "Hỗ trợ phòng ngừa đột quỵ",
   ],
 };
 
@@ -77,7 +77,7 @@ export const solutions = [
     image: "/images/zhidun-2.webp",
     highlights: [
       "Laser bán dẫn 650nm công suất thấp",
-      "Giấy phép lưu hành: 260000036/PCBB-HN",
+      "Giấy phép lưu hành: 260001468/PCBB-HN",
       "Bảo hành chính hãng 5 năm",
     ],
   },
@@ -190,7 +190,7 @@ export const processSteps = [
 export const certifications = [
   { code: "ISO 13485", label: "Hệ thống quản lý chất lượng TBYT quốc tế" },
   { code: "ISO 9001", label: "Hệ thống quản lý chất lượng quốc tế" },
-  { code: "GP Lưu hành VN", label: "260000036/PCBB-HN — Sở Y tế Hà Nội" },
+  { code: "GP Lưu hành VN", label: "260001468/PCBB-HN — Sở Y tế Hà Nội" },
   { code: "GP Lưu hành TQ", label: "Giấy phép lưu hành tại Trung Quốc" },
   { code: "GP Mua bán", label: "250000599/PCBMB-HN — Sở Y tế Hà Nội" },
   { code: "CFS", label: "Giấy chứng nhận lưu hành tự do" },
