@@ -15,7 +15,8 @@ INSERT INTO public.profiles (id, full_name, role, status, supervisor_id) VALUES
     ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'active', NULL),
     ('00000000-0000-0000-0000-000000000002', 'Supervisor 1', 'supervisor', 'active', NULL),
     ('00000000-0000-0000-0000-000000000003', 'Dealer 1', 'dealer', 'active', '00000000-0000-0000-0000-000000000002'),
-    ('00000000-0000-0000-0000-000000000004', 'Dealer 2', 'dealer', 'active', NULL);
+    ('00000000-0000-0000-0000-000000000004', 'Dealer 2', 'dealer', 'active', NULL)
+ON CONFLICT (id) DO UPDATE SET full_name=EXCLUDED.full_name, role=EXCLUDED.role, status=EXCLUDED.status, supervisor_id=EXCLUDED.supervisor_id;
 
 -- Test as dealer 1
 SET LOCAL ROLE authenticated;

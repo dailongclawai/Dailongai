@@ -15,7 +15,8 @@ INSERT INTO public.profiles (id, full_name, role, status, supervisor_id) VALUES
     ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'active', NULL),
     ('00000000-0000-0000-0000-000000000002', 'SV1', 'supervisor', 'active', NULL),
     ('00000000-0000-0000-0000-000000000003', 'D1', 'dealer', 'active', '00000000-0000-0000-0000-000000000002'),
-    ('00000000-0000-0000-0000-000000000004', 'D2', 'dealer', 'active', NULL);
+    ('00000000-0000-0000-0000-000000000004', 'D2', 'dealer', 'active', NULL)
+ON CONFLICT (id) DO UPDATE SET full_name=EXCLUDED.full_name, role=EXCLUDED.role, status=EXCLUDED.status, supervisor_id=EXCLUDED.supervisor_id;
 
 INSERT INTO public.product_models (id, code, name, base_price) VALUES
     ('10000000-0000-0000-0000-000000000001', 'ZD-A', 'Zhi Dun A', 50000000),

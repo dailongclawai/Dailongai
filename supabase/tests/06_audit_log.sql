@@ -10,7 +10,8 @@ INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
     ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000003', 'authenticated', 'authenticated', 'd1@dailongai.com');
 INSERT INTO public.profiles (id, full_name, role, status) VALUES
     ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'active'),
-    ('00000000-0000-0000-0000-000000000003', 'D1', 'dealer', 'active');
+    ('00000000-0000-0000-0000-000000000003', 'D1', 'dealer', 'active')
+ON CONFLICT (id) DO UPDATE SET full_name=EXCLUDED.full_name, role=EXCLUDED.role, status=EXCLUDED.status;
 INSERT INTO public.product_models (id, code, name, base_price)
 VALUES ('10000000-0000-0000-0000-000000000001', 'ZD-A', 'Zhi Dun A', 50000000);
 INSERT INTO public.dealer_commissions (dealer_id, model_id, commission_type, rate_value, effective_from, set_by)

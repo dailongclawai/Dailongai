@@ -13,7 +13,8 @@ INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
 INSERT INTO public.profiles (id, full_name, role, status, supervisor_id) VALUES
     ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin', 'active', NULL),
     ('00000000-0000-0000-0000-000000000002', 'SV1', 'supervisor', 'active', NULL),
-    ('00000000-0000-0000-0000-000000000003', 'D1', 'dealer', 'active', '00000000-0000-0000-0000-000000000002');
+    ('00000000-0000-0000-0000-000000000003', 'D1', 'dealer', 'active', '00000000-0000-0000-0000-000000000002')
+ON CONFLICT (id) DO UPDATE SET full_name=EXCLUDED.full_name, role=EXCLUDED.role, status=EXCLUDED.status, supervisor_id=EXCLUDED.supervisor_id;
 
 INSERT INTO public.dealer_commissions
     (dealer_id, model_id, commission_type, rate_value, effective_from, set_by)
