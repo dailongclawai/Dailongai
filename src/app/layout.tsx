@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Space_Grotesk, Inter, Geist } from "next/font/google";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
 import BackgroundMusic from "@/components/BackgroundMusic";
 import Observability from "@/components/Observability";
 import { I18nProvider } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-headline",
@@ -65,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${spaceGrotesk.variable} ${inter.variable} dark antialiased`}>
+    <html lang="vi" className={cn("dark", "antialiased", spaceGrotesk.variable, inter.variable, "font-sans", geist.variable)}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
