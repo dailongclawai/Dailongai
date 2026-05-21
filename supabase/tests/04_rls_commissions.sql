@@ -1,6 +1,10 @@
 BEGIN;
 SELECT plan(4);
 
+-- Hermetic: clear any seed data so test fixtures load cleanly. ROLLBACK restores.
+TRUNCATE public.profiles, public.product_models CASCADE;
+DELETE FROM auth.users;
+
 INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
     ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'admin@dailongai.com'),
     ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000002', 'authenticated', 'authenticated', 'sv1@dailongai.com'),
