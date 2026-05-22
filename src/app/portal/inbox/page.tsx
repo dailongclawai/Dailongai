@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 import {
   getInboxMessages,
   markMessageRead,
@@ -90,8 +92,13 @@ export default function InboxPage() {
     return 'dealer';
   };
 
+  const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
+  const nav = isAdmin
+    ? <AdminNav />
+    : <Link href={dashHref} className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">← Bảng điều khiển</Link>;
+
   return (
-    <PortalShell variant={variantFor()}>
+    <PortalShell variant={variantFor()} nav={nav}>
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">
           {unread > 0 ? `${unread} chưa đọc` : 'Tất cả đã đọc'}
