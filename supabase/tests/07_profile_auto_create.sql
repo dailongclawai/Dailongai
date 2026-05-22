@@ -21,9 +21,9 @@ SELECT results_eq(
 );
 
 SELECT results_eq(
-    $$SELECT status::text FROM public.profiles WHERE id = '11111111-1111-1111-1111-111111111111'$$,
-    ARRAY['pending'],
-    'auto-created profile has status=pending'
+    $$SELECT role::text, status::text FROM public.profiles WHERE id = '11111111-1111-1111-1111-111111111111'$$,
+    $$VALUES ('dealer','active')$$,
+    'auto-created profile is an active dealer by default'
 );
 
 SELECT results_eq(
