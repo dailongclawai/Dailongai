@@ -43,24 +43,29 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
     setErrors({});
     setLoading(true);
     const client = getSupabaseClient();
-    const { error } =
-      mode === 'login'
-        ? await client.auth.signInWithPassword({ email, password })
-        : await client.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/portal/auth/callback`,
-              data: ref ? { ref } : undefined,
-            },
-          });
+    if (mode === 'login') {
+      const { error } = await client.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) { toast.error(error.message); return; }
+      window.location.assign('/portal');
+      return;
+    }
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/portal/auth/callback`,
+        data: ref ? { ref } : undefined,
+      },
+    });
     setLoading(false);
     if (error) {
       toast.error(error.message);
-    } else if (mode === 'register') {
-      toast.success('Kiểm tra email để xác thực tài khoản');
-    } else {
+    } else if (data.session) {
+      // No email confirmation required → account is live, go straight home.
       window.location.assign('/portal');
+    } else {
+      toast.success('Kiểm tra email để xác thực tài khoản');
     }
   };
 
