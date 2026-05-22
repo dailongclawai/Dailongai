@@ -38,3 +38,48 @@ export interface CommissionRule {
   effective_from: string;
   effective_to: string | null;
 }
+
+export interface Order {
+  id: string;
+  dealer_id: string;
+  model_id: string;
+  serial_number: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_address: string | null;
+  sale_price: number;
+  sale_date: string;
+  status: 'pending' | 'approved' | 'rejected' | 'paid' | 'voided';
+  receipt_image_url: string | null;
+  rejection_reason: string | null;
+  created_at: string;
+}
+
+export interface DealerSummary {
+  dealer_id: string;
+  orders_pending: number;
+  orders_approved: number;
+  orders_paid: number;
+  units_ytd: number;
+  month_sales: number;
+  commission_pending: number;
+  commission_paid: number;
+}
+
+export interface TeamMember {
+  supervisor_id: string;
+  dealer_id: string;
+  dealer_name: string | null;
+  orders_pending: number;
+  units_ytd: number;
+  month_sales: number;
+}
+
+export interface FleetSummary {
+  active_dealers: number;
+  units_ytd: number;
+  units_month: number;
+  orders_pending: number;
+  revenue_ytd: number;
+  commission_pending: number;
+}
