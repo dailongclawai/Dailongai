@@ -59,7 +59,7 @@ export function PortalShell({
             {profile && (
               <span className="flex items-center gap-1 text-[#e2e2e5]/60">
                 <Link href="/portal/profile" className="transition-colors hover:text-[#ff5625]">
-                  {profile.full_name?.split(' ').slice(-1)[0] ?? profile.email?.split('@')[0] ?? 'Tài khoản'}
+                  Tài khoản
                 </Link>
                 <span>·</span>
                 <button type="button" onClick={handleSignOut} className="transition-colors hover:text-[#ff5625]">
