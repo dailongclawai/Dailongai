@@ -1,8 +1,9 @@
 'use client';
-// Editorial Infographic dealer dashboard — folded from /portal-preview Variant D.
-// Mock numbers for v1; Plan 3 wires real orders/commissions via Supabase.
 
-import type { Profile } from '@/lib/portal-types';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import type { Profile, Order, DealerSummary } from '@/lib/portal-types';
+import { getDealerSummary, getDealerOrders } from '@/lib/portal-queries';
 
 const display = { fontFamily: 'var(--font-display), Georgia, serif' };
 const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
@@ -20,29 +21,24 @@ const tiers = [
   { id: 4, label: 'Tier 4', minUnits: 300, percent: 25 },
 ];
 
-// Placeholder data — will be replaced by Supabase queries in Plan 3
-const mock = {
-  monthSales: 0,
-  commissionPending: 0,
-  ordersPending: 0,
-  ordersPaid: 0,
-  ordersApproved: 0,
-  unitsYtd: 0,
-  monthlySeries: [
-    { month: 'T12/25', sales: 0 },
-    { month: 'T01/26', sales: 0 },
-    { month: 'T02/26', sales: 0 },
-    { month: 'T03/26', sales: 0 },
-    { month: 'T04/26', sales: 0 },
-    { month: 'T05/26', sales: 0 },
-  ],
-  recentOrders: [] as Array<{ id: string; serial: string; customer: string; model: string; price: number; date: string; status: string; commission: number }>,
-};
-
 export function DealerDashboard({ profile }: { profile: Profile }) {
-  const currentTier = tiers.slice().reverse().find((t) => mock.unitsYtd >= t.minUnits)!;
-  const nextTier = tiers.find((t) => t.minUnits > mock.unitsYtd) ?? currentTier;
-  const unitsToNext = Math.max(0, nextTier.minUnits - mock.unitsYtd);
+  const [summary, setSummary] = useState<DealerSummary | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+
+  useEffect(() => {
+    getDealerSummary(profile.id).then(setSummary);
+    getDealerOrders(profile.id).then(setOrders);
+  }, [profile.id]);
+
+  const unitsYtd = summary?.units_ytd ?? 0;
+  const monthSales = summary?.month_sales ?? 0;
+  const commissionPending = summary?.commission_pending ?? 0;
+  const ordersPending = summary?.orders_pending ?? 0;
+  const ordersDone = (summary?.orders_approved ?? 0) + (summary?.orders_paid ?? 0);
+
+  const currentTier = tiers.slice().reverse().find((t) => unitsYtd >= t.minUnits)!;
+  const nextTier = tiers.find((t) => t.minUnits > unitsYtd) ?? currentTier;
+  const unitsToNext = Math.max(0, nextTier.minUnits - unitsYtd);
   const ladderMax = 300;
   const firstName = profile.full_name?.split(' ').slice(-1)[0] ?? 'Đại lý';
 
@@ -55,25 +51,22 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             Chào <span className="italic">{firstName}</span>.
           </h1>
         </div>
-        <button className="rounded-full border border-[#0e1525] bg-[#0e1525] px-6 py-2.5 text-sm font-medium text-[#f5f1e8] hover:bg-[#bc7e3b] hover:border-[#bc7e3b]">
+        <Link href="/portal/dealer/orders/new" className="rounded-full border border-[#0e1525] bg-[#0e1525] px-6 py-2.5 text-sm font-medium text-[#f5f1e8] hover:bg-[#bc7e3b] hover:border-[#bc7e3b]">
           + Ghi nhận đơn mới
-        </button>
+        </Link>
       </div>
 
       <section className="grid grid-cols-12 gap-10">
         <div className="col-span-7">
           <p className="text-xs uppercase tracking-[0.25em] text-[#0e1525]/50">Doanh số tháng này</p>
           <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-3 text-[140px] font-light leading-[0.85] tracking-tighter">
-            {fmtShortVnd(mock.monthSales).replace(/[^0-9]/g, '') || '0'}
+            {fmtShortVnd(monthSales).replace(/[^0-9]/g, '') || '0'}
             <span style={numeric} className="ml-2 align-top text-3xl text-[#bc7e3b]">
-              {mock.monthSales >= 1_000_000 ? 'tr ₫' : '₫'}
+              {monthSales >= 1_000_000 ? 'tr ₫' : '₫'}
             </span>
           </p>
           <p className="mt-4 text-sm text-[#0e1525]/60">
-            <span style={numeric}>{mock.ordersPaid + mock.ordersApproved}</span> máy đã chốt tháng này
-          </p>
-          <p className="mt-2 text-xs italic text-[#0e1525]/40">
-            (Plan 3 sẽ wire dữ liệu thật từ bảng orders + commission_payouts)
+            <span style={numeric}>{ordersDone}</span> máy đã chốt tháng này
           </p>
         </div>
 
@@ -85,17 +78,17 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             </p>
             <p className="mt-3 text-sm text-[#f5f1e8]/80">Tự động chi 5–10 hàng tháng cho mọi đơn approved</p>
             <p className="mt-2 text-[11px] text-[#f5f1e8]/50">
-              Đợt này: <span style={numeric}>{fmtShortVnd(mock.commissionPending)}</span> VND dự kiến
+              Đợt này: <span style={numeric}>{fmtShortVnd(commissionPending)}</span> VND dự kiến
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl border border-[#0e1525]/10 bg-white/60 p-4">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#0e1525]/50">Đơn chờ duyệt</p>
-              <p style={numeric} className="mt-2 text-3xl font-medium">{mock.ordersPending}</p>
+              <p style={numeric} className="mt-2 text-3xl font-medium">{ordersPending}</p>
             </div>
             <div className="rounded-xl border border-[#0e1525]/10 bg-white/60 p-4">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#0e1525]/50">Đã chốt</p>
-              <p style={numeric} className="mt-2 text-3xl font-medium">{mock.ordersPaid + mock.ordersApproved}</p>
+              <p style={numeric} className="mt-2 text-3xl font-medium">{ordersDone}</p>
             </div>
           </div>
         </div>
@@ -110,14 +103,14 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             </h2>
           </div>
           <p className="text-xs text-[#0e1525]/60">
-            YTD: <span style={numeric}>{mock.unitsYtd}</span> máy
+            YTD: <span style={numeric}>{unitsYtd}</span> máy
           </p>
         </div>
         <div className="mt-10">
           <div className="relative h-1 rounded-full bg-[#0e1525]/10">
             <div
               className="absolute left-0 top-0 h-1 rounded-full bg-gradient-to-r from-[#bc7e3b] to-[#d8a86a]"
-              style={{ width: `${(mock.unitsYtd / ladderMax) * 100}%` }}
+              style={{ width: `${(unitsYtd / ladderMax) * 100}%` }}
             />
             {tiers.slice(0, 4).map((t) => (
               <div
@@ -127,7 +120,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               >
                 <div
                   className={`h-4 w-4 rounded-full border-2 ${
-                    mock.unitsYtd >= t.minUnits ? 'border-[#bc7e3b] bg-[#bc7e3b]' : 'border-[#0e1525]/30 bg-[#f5f1e8]'
+                    unitsYtd >= t.minUnits ? 'border-[#bc7e3b] bg-[#bc7e3b]' : 'border-[#0e1525]/30 bg-[#f5f1e8]'
                   }`}
                 />
               </div>
@@ -138,7 +131,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               <div key={t.id} className={t.id === currentTier.id ? 'opacity-100' : 'opacity-50'}>
                 <p className="text-[10px] uppercase tracking-[0.25em] text-[#0e1525]/50">{t.label}</p>
                 <p style={numeric} className="mt-1 text-lg font-medium">{t.minUnits}+ máy</p>
-                <p style={display} className={`text-2xl ${mock.unitsYtd >= t.minUnits ? 'text-[#bc7e3b]' : 'text-[#0e1525]'}`}>
+                <p style={display} className={`text-2xl ${unitsYtd >= t.minUnits ? 'text-[#bc7e3b]' : 'text-[#0e1525]'}`}>
                   {t.percent}%
                 </p>
               </div>
@@ -163,16 +156,21 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             <h2 style={display} className="mt-1 text-3xl font-light italic">Đơn gần đây</h2>
           </div>
         </div>
-        {mock.recentOrders.length === 0 ? (
+        {orders.length === 0 ? (
           <div className="mt-6 rounded-xl border-2 border-dashed border-[#0e1525]/15 p-12 text-center text-sm text-[#0e1525]/60">
             <p>Chưa có đơn nào ghi nhận.</p>
-            <p className="mt-2 text-xs italic text-[#0e1525]/40">
-              Bấm “Ghi nhận đơn mới” phía trên để tạo đơn đầu tiên (sẽ live ở Plan 3).
-            </p>
           </div>
         ) : (
           <div className="mt-6 divide-y divide-[#0e1525]/10">
-            {/* Plan 3 renders order rows here */}
+            {orders.slice(0, 10).map((o, i) => (
+              <div key={o.id} className="grid grid-cols-12 items-center gap-4 py-4 text-sm">
+                <span className="col-span-1 text-[#0e1525]/30" style={numeric}>{String(i + 1).padStart(2, '0')}</span>
+                <span className="col-span-4 font-medium">{o.customer_name}</span>
+                <span className="col-span-3 text-[#0e1525]/60" style={numeric}>{o.serial_number}</span>
+                <span className="col-span-2 text-right" style={numeric}>{fmtShortVnd(o.sale_price)}</span>
+                <span className="col-span-2 text-right text-xs uppercase tracking-wider text-[#bc7e3b]">{o.status}</span>
+              </div>
+            ))}
           </div>
         )}
       </section>
