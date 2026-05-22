@@ -30,7 +30,8 @@ export default function SupervisorDashboard() {
 
   useEffect(() => {
     if (!session) return;
-    const link = `${window.location.origin}/portal/register?ref=${session.user.id}`;
+    const base = process.env.NEXT_PUBLIC_PORTAL_URL || window.location.origin;
+    const link = `${base}/portal/register?ref=${session.user.id}`;
     setRefLink(link);
     QRCode.toDataURL(link, { width: 240, margin: 1 }).then(setQr).catch(() => setQr(''));
   }, [session]);
