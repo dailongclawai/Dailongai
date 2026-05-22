@@ -107,7 +107,7 @@ export default function SupervisorDashboard() {
                 <td className="px-4 py-3 text-right" style={numeric}>{t.units_ytd}</td>
                 <td className="px-4 py-3 text-right" style={numeric}>{t.orders_pending}</td>
                 <td className="px-4 py-3 text-right">
-                  <Link href={`/portal/supervisor/team/${t.dealer_id}`} className="text-xs text-[#bc7e3b] hover:underline">Chi tiết →</Link>
+                  <Link href={`/portal/supervisor/team?dealer=${t.dealer_id}`} className="text-xs text-[#bc7e3b] hover:underline">Chi tiết →</Link>
                 </td>
               </tr>
             ))}

@@ -75,6 +75,14 @@ export interface TeamMember {
   month_sales: number;
 }
 
+export interface CommissionPlan {
+  id: string;
+  label: string;
+  commission_type: 'fixed' | 'percent';
+  rate_value: number;
+  active: boolean;
+}
+
 export interface FleetSummary {
   active_dealers: number;
   units_ytd: number;

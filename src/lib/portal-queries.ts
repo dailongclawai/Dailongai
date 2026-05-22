@@ -1,5 +1,23 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel } from './portal-types';
+import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan } from './portal-types';
+
+export async function getCommissionPlans(): Promise<CommissionPlan[]> {
+  const { data } = await getSupabaseClient()
+    .from('commission_plans')
+    .select('*')
+    .eq('active', true)
+    .order('commission_type')
+    .order('rate_value');
+  return (data as CommissionPlan[]) ?? [];
+}
+
+export async function setDealerCommission(dealerId: string, planId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('supervisor_set_commission', {
+    p_dealer_id: dealerId,
+    p_plan_id: planId,
+  });
+  if (error) throw error;
+}
 
 export async function getDealerSummary(dealerId: string): Promise<DealerSummary | null> {
   const { data } = await getSupabaseClient()
