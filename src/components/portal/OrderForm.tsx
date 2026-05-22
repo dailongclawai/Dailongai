@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { getActiveModels, recordOrderBatch } from '@/lib/portal-queries';
+
 import type { BatchItem } from '@/lib/portal-queries';
 import type { ProductModel } from '@/lib/portal-types';
 
@@ -83,8 +84,10 @@ export function OrderForm({ userId: _userId }: { userId: string }) {
         receiptImageUrl: null,
         items,
       });
-      toast.success(`Đã ghi nhận ${count} máy, chờ admin duyệt`);
-      router.replace('/portal/dashboard');
+      const dateStr = customer.saleDate.replace(/-/g, '');
+      router.replace(
+        `/portal/dealer/orders/confirm?count=${count}&total=${total}&date=${dateStr}`,
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Lỗi ghi nhận đơn');
       setBusy(false);
