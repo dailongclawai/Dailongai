@@ -94,6 +94,32 @@ export async function recordOrder(input: RecordOrderInput): Promise<string> {
   return data as string;
 }
 
+export interface BatchItem {
+  model_id: string;
+  serial_number: string;
+  sale_price: number;
+}
+
+export async function recordOrderBatch(input: {
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string | null;
+  saleDate: string;
+  receiptImageUrl: string | null;
+  items: BatchItem[];
+}): Promise<number> {
+  const { data, error } = await getSupabaseClient().rpc('record_order_batch', {
+    p_customer_name: input.customerName,
+    p_customer_phone: input.customerPhone,
+    p_customer_address: input.customerAddress,
+    p_sale_date: input.saleDate,
+    p_receipt_image_url: input.receiptImageUrl,
+    p_items: input.items,
+  });
+  if (error) throw error;
+  return data as number;
+}
+
 export async function uploadReceipt(userId: string, file: File): Promise<string> {
   const ext = file.name.split('.').pop() ?? 'jpg';
   const path = `${userId}/${Date.now()}.${ext}`;
