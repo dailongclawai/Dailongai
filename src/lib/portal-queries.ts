@@ -282,6 +282,28 @@ export async function deleteSalesDocument(id: string): Promise<void> {
   if (error) throw error;
 }
 
+// ── Supervisors (admin) ─────────────────────────────────────────────────
+export interface SupervisorRow {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  created_at: string;
+}
+
+export async function getAllSupervisors(): Promise<SupervisorRow[]> {
+  const { data } = await getSupabaseClient()
+    .from('profiles')
+    .select('id, full_name, email, created_at')
+    .eq('role', 'supervisor')
+    .order('created_at');
+  return (data as SupervisorRow[]) ?? [];
+}
+
+export async function getAllTeamMembers(): Promise<TeamMember[]> {
+  const { data } = await getSupabaseClient().from('supervisor_team_summary').select('*');
+  return (data as TeamMember[]) ?? [];
+}
+
 // ── Audit log (admin) ───────────────────────────────────────────────────
 export async function getAuditLog(limit = 100): Promise<AuditEntry[]> {
   const { data } = await getSupabaseClient()
