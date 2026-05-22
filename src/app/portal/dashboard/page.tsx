@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { DealerDashboard } from '@/components/portal/DealerDashboard';
@@ -28,7 +29,7 @@ export default function DashboardPage() {
   if (loading || !session || !profile || profile.role !== 'dealer') return null;
 
   return (
-    <PortalShell variant={profile.role}>
+    <PortalShell variant={profile.role} nav={<Link href="/portal/documents" className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">Tài liệu</Link>}>
       <DealerDashboard profile={profile} />
     </PortalShell>
   );

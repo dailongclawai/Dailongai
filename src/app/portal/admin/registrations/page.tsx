@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 import { toast } from 'sonner';
 import type { Profile, ProductModel, ProfileRole } from '@/lib/portal-types';
 
@@ -43,12 +43,7 @@ export default function RegistrationsPage() {
   return (
     <PortalShell
       variant="admin"
-      nav={
-        <>
-          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
-          <Link href="/portal/admin/registrations" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Đăng ký</Link>
-        </>
-      }
+      nav={<AdminNav />}
     >
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần xử lý</p>

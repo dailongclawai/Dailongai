@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 
 interface Row {
   id: string;
@@ -59,13 +59,7 @@ export default function AdminUpgradePage() {
   return (
     <PortalShell
       variant="admin"
-      nav={
-        <>
-          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
-          <Link href="/portal/admin/orders" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Đơn hàng</Link>
-          <Link href="/portal/admin/upgrade" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Nâng cấp</Link>
-        </>
-      }
+      nav={<AdminNav />}
     >
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Phân quyền</p>

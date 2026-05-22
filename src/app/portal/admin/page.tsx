@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
-import Link from 'next/link';
+import { AdminNav } from '@/components/portal/AdminNav';
 import { AdminConsole } from '@/components/portal/AdminConsole';
 
 export default function AdminHome() {
@@ -28,15 +28,7 @@ export default function AdminHome() {
   return (
     <PortalShell
       variant="admin"
-      nav={
-        <>
-          <Link href="/portal/admin" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Tổng quan</Link>
-          <Link href="/portal/admin/orders" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Đơn hàng</Link>
-          <Link href="/portal/admin/payouts" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Hoa hồng</Link>
-          <Link href="/portal/admin/upgrade" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Nâng cấp</Link>
-          <Link href="/portal/admin/reports" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Báo cáo</Link>
-        </>
-      }
+      nav={<AdminNav />}
     >
       <AdminConsole />
     </PortalShell>

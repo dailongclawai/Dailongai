@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import * as XLSX from 'xlsx';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 import { toast } from 'sonner';
 import type { Order } from '@/lib/portal-types';
 
@@ -47,12 +47,7 @@ export default function ReportsPage() {
   return (
     <PortalShell
       variant="admin"
-      nav={
-        <>
-          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
-          <Link href="/portal/admin/reports" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Báo cáo</Link>
-        </>
-      }
+      nav={<AdminNav />}
     >
       <div className="mb-6 flex items-end justify-between">
         <div>

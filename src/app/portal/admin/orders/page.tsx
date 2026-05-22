@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { getPendingOrders } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 import { OrderApprovalRow } from '@/components/portal/OrderApprovalRow';
 import type { Order } from '@/lib/portal-types';
 
@@ -33,15 +33,7 @@ export default function AdminOrdersPage() {
   return (
     <PortalShell
       variant="admin"
-      nav={
-        <>
-          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
-          <Link href="/portal/admin/orders" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Đơn hàng</Link>
-          <Link href="/portal/admin/payouts" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Hoa hồng</Link>
-          <Link href="/portal/admin/upgrade" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Nâng cấp</Link>
-          <Link href="/portal/admin/reports" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Báo cáo</Link>
-        </>
-      }
+      nav={<AdminNav />}
     >
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần duyệt</p>

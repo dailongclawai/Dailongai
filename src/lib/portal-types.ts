@@ -122,3 +122,27 @@ export interface FleetSummary {
   revenue_ytd: number;
   commission_pending: number;
 }
+
+export type DocCategory = 'catalog' | 'video' | 'contract_template' | 'manual';
+export type DocVisibility = 'all' | 'dealer' | 'supervisor';
+
+export interface SalesDocument {
+  id: string;
+  title: string;
+  file_url: string;
+  category: DocCategory;
+  visible_to: DocVisibility;
+  uploaded_by: string;
+  created_at: string;
+}
+
+export interface AuditEntry {
+  id: string;
+  actor_id: string | null;
+  action: string;
+  target_table: string;
+  target_id: string | null;
+  before: Record<string, unknown> | null;
+  after: Record<string, unknown> | null;
+  created_at: string;
+}
