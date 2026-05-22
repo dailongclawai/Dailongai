@@ -1,13 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
+import { getDealerLedger } from '@/lib/portal-queries';
+import type { LedgerRow } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
 import { toast } from 'sonner';
+
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -23,6 +27,7 @@ export default function ProfilePage() {
   const [idNumber, setIdNumber] = useState('');
   const [bizAddress, setBizAddress] = useState('');
   const [busy, setBusy] = useState(false);
+  const [ledger, setLedger] = useState<LedgerRow[]>([]);
 
   useEffect(() => {
     if (loading) return;
@@ -37,8 +42,25 @@ export default function ProfilePage() {
       setBizName(profile.business_name ?? '');
       setIdNumber(profile.id_number ?? '');
       setBizAddress(profile.business_address ?? '');
+      if (profile.role === 'dealer') getDealerLedger(profile.id).then(setLedger);
     }
   }, [loading, session, profile, router]);
+
+  const payout = useMemo(() => {
+    let pending = 0, paid = 0, last: string | null = null;
+    for (const r of ledger) {
+      const c = r.commission;
+      if (!c || c.voided_at) continue;
+      const amt = Number(c.amount);
+      if (c.paid_at) {
+        paid += amt;
+        if (!last || c.paid_at > last) last = c.paid_at;
+      } else {
+        pending += amt;
+      }
+    }
+    return { pending, paid, last };
+  }, [ledger]);
 
   const saveCompliance = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +119,7 @@ export default function ProfilePage() {
 
   if (loading || !session || !profile) return null;
 
+  const payoutComplete = !!(profile.bank_name && profile.bank_account_name && profile.bank_account_number);
   const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
   const nav = profile.role === 'admin'
     ? <AdminNav />
@@ -162,33 +185,108 @@ export default function ProfilePage() {
             Đổi mật khẩu
           </button>
         </form>
-        <form onSubmit={savePayout} className="space-y-4 rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] p-6 backdrop-blur md:col-span-2">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-base font-semibold">Thông tin nhận hoa hồng</h2>
-            <span className="text-[11px] text-[#fadcd5]/40">Dùng để chuyển khoản hoa hồng</span>
+        <section className="grid gap-6 md:col-span-2 lg:grid-cols-12">
+          {/* Main payout form card */}
+          <div className="lg:col-span-8">
+            <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] shadow-2xl">
+              {payoutComplete ? (
+                <div className="flex items-center justify-between border-b border-emerald-500/20 bg-emerald-500/10 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                      <span className="material-symbols-outlined fill text-[20px]">check_circle</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-emerald-400">Đã xác minh</p>
+                      <p className="text-[11px] text-emerald-400/70">Tài khoản đã sẵn sàng nhận thanh toán hoa hồng.</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-500/50">Verified</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between border-b border-amber-500/20 bg-amber-500/10 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
+                      <span className="material-symbols-outlined text-[20px]">error</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-amber-400">Chưa hoàn tất</p>
+                      <p className="text-[11px] text-amber-400/70">Bổ sung đủ ngân hàng, chủ tài khoản và số tài khoản để nhận hoa hồng.</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-500/50">Pending</span>
+                </div>
+              )}
+              <form onSubmit={savePayout} className="space-y-6 p-8">
+                <h3 className="border-l-4 border-[#ffb5a1] pl-4 text-base font-semibold">Thông tin nhận hoa hồng</h3>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs uppercase tracking-wider text-[#fadcd5]/60">Ngân hàng</label>
+                    <input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="VD: Vietcombank" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#271814] px-4 py-3 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs uppercase tracking-wider text-[#fadcd5]/60">Chủ tài khoản</label>
+                    <input value={bankHolder} onChange={(e) => setBankHolder(e.target.value)} placeholder="NGUYEN VAN A" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#271814] px-4 py-3 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs uppercase tracking-wider text-[#fadcd5]/60">Số tài khoản</label>
+                    <input value={bankNumber} onChange={(e) => setBankNumber(e.target.value)} placeholder="Nhập số tài khoản" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#271814] px-4 py-3 font-mono text-sm tabular-nums tracking-wider text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-xs uppercase tracking-wider text-[#fadcd5]/60">Khu vực / Tỉnh thành <span className="italic text-[#fadcd5]/30">(Tùy chọn)</span></label>
+                    <input value={province} onChange={(e) => setProvince(e.target.value)} placeholder="VD: Hà Nội" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#271814] px-4 py-3 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]" />
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <button type="submit" disabled={busy} className="flex items-center gap-2 rounded-lg bg-[#ff5626] px-8 py-3 text-sm font-bold text-white glow-primary-hover transition-all hover:bg-[#ff5626]/90 active:scale-[0.98] disabled:opacity-50">
+                    <span className="material-symbols-outlined text-[20px]">save</span>
+                    Lưu thông tin
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">Ngân hàng</label>
-              <input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="VD: Vietcombank" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 focus:border-[#ffb5a1] outline-none" />
+
+          {/* Side panels */}
+          <div className="space-y-6 lg:col-span-4">
+            <div className="group relative overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#372621] p-6">
+              <div className="absolute -right-4 -top-4 opacity-5 transition-opacity group-hover:opacity-10">
+                <span className="material-symbols-outlined text-[120px]">verified_user</span>
+              </div>
+              <div className="flex gap-4">
+                <span className="material-symbols-outlined text-[24px] text-[#ffb5a1]">info</span>
+                <div>
+                  <h4 className="mb-2 text-sm font-semibold">Quy định chi trả</h4>
+                  <p className="text-sm leading-relaxed text-[#e4beb4]">
+                    Hoa hồng chỉ được chi trả về tài khoản đã <span className="font-bold text-[#ffb5a1]">xác minh</span> chính chủ. Việc thay đổi thông tin có thể mất 24h để phê duyệt lại.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">Chủ tài khoản</label>
-              <input value={bankHolder} onChange={(e) => setBankHolder(e.target.value)} placeholder="Tên in trên thẻ" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 focus:border-[#ffb5a1] outline-none" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">Số tài khoản</label>
-              <input value={bankNumber} onChange={(e) => setBankNumber(e.target.value)} placeholder="Số tài khoản" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 focus:border-[#ffb5a1] outline-none font-mono tabular-nums" />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">Khu vực / Tỉnh thành</label>
-              <input value={province} onChange={(e) => setProvince(e.target.value)} placeholder="VD: Hà Nội" className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 focus:border-[#ffb5a1] outline-none" />
-            </div>
+
+            {profile.role === 'dealer' && (
+              <div className="rounded-2xl border border-[#5b4039]/30 bg-[#2c1c17] p-6">
+                <h4 className="mb-4 text-sm font-semibold">Tổng quan thanh toán</h4>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between border-b border-[#5b4039]/20 py-2">
+                    <span className="text-xs text-[#fadcd5]/60">Số dư chờ chi</span>
+                    <span className="font-mono text-sm font-bold text-[#84cfff] tabular-nums">{fmtVnd(payout.pending)} ₫</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-[#5b4039]/20 py-2">
+                    <span className="text-xs text-[#fadcd5]/60">Tổng đã nhận</span>
+                    <span className="font-mono text-sm text-emerald-400 tabular-nums">{fmtVnd(payout.paid)} ₫</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-xs text-[#fadcd5]/60">Lần thanh toán cuối</span>
+                    <span className="text-xs text-[#fadcd5]">{payout.last ? new Date(payout.last).toLocaleDateString('vi-VN') : '—'}</span>
+                  </div>
+                </div>
+                <Link href="/portal/dealer/commission" className="mt-6 block w-full rounded-lg border border-[#84cfff] py-2 text-center text-xs font-bold uppercase tracking-wider text-[#84cfff] transition-all hover:bg-[#84cfff]/5">
+                  Xem sổ hoa hồng
+                </Link>
+              </div>
+            )}
           </div>
-          <button type="submit" disabled={busy} className="rounded-full bg-[#ff5626] px-5 py-2 text-sm font-medium text-white glow-primary-hover hover:bg-[#ff5626]/90 disabled:opacity-50">
-            Lưu thông tin nhận hoa hồng
-          </button>
-        </form>
+        </section>
         <form onSubmit={saveCompliance} className="space-y-4 rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] p-6 backdrop-blur md:col-span-2">
           <div className="flex items-baseline justify-between">
             <h2 className="text-base font-semibold">Hồ sơ doanh nghiệp</h2>
