@@ -1,8 +1,8 @@
 'use client';
-// Admin Console — folded from /portal-preview/admin
-// Mock data placeholders; Plan 3 wires real fleet stats from Supabase.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getAdminFleet } from '@/lib/portal-queries';
+import type { FleetSummary } from '@/lib/portal-types';
 
 const display = { fontFamily: 'var(--font-display), Georgia, serif' };
 const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
@@ -20,22 +20,16 @@ const tiers = [
   { id: 4, minUnits: 300, percent: 25 },
 ];
 
-const mockFleet = {
-  revenueYtdAll: 0,
-  unitsYtdAll: 0,
-  unitsThisMonth: 0,
-  activeDealers: 0,
-  pendingRegistrations: 0,
-  pendingApprovals: 0,
-  commissionPendingNow: 0,
-  payoutDealersCount: 0,
-};
-
 const compareUnits = [50, 150, 250, 350];
 const priceAvg = 50_000_000;
 
 export function AdminConsole() {
+  const [fleet, setFleet] = useState<FleetSummary | null>(null);
   const [scheme, setScheme] = useState<'tier' | 'flat'>('tier');
+
+  useEffect(() => { getAdminFleet().then(setFleet); }, []);
+
+  const f = fleet ?? { active_dealers: 0, units_ytd: 0, units_month: 0, orders_pending: 0, revenue_ytd: 0, commission_pending: 0 };
 
   return (
     <div className="space-y-12 py-4">
@@ -73,22 +67,19 @@ export function AdminConsole() {
         <div className="col-span-5">
           <p className="text-[11px] uppercase tracking-[0.25em] text-[#0e1525]/50">Tổng doanh thu YTD</p>
           <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-2 text-[100px] font-light leading-[0.85] tracking-tighter">
-            0
+            {fmtShortVnd(f.revenue_ytd).replace(/[^0-9.]/g, '') || '0'}
             <span style={numeric} className="ml-2 align-top text-3xl text-[#c46a5e]">tỷ ₫</span>
           </p>
           <p className="mt-3 text-sm text-[#0e1525]/60">
-            <span style={numeric}>{mockFleet.unitsYtdAll}</span> máy đã chốt · <span style={numeric}>{mockFleet.activeDealers}</span> đại lý active
-          </p>
-          <p className="mt-2 text-xs italic text-[#0e1525]/40">
-            (Plan 3 wire dữ liệu thật từ orders + commission_payouts)
+            <span style={numeric}>{f.units_ytd}</span> máy đã chốt · <span style={numeric}>{f.active_dealers}</span> đại lý active
           </p>
         </div>
         <div className="col-span-7 grid grid-cols-2 gap-3">
           {[
-            { label: 'Đã bán T05', value: mockFleet.unitsThisMonth, tone: 'text-[#5d8d6a]' },
-            { label: 'Đơn chờ duyệt', value: mockFleet.pendingApprovals, tone: 'text-[#c46a5e]' },
-            { label: 'Đăng ký mới', value: mockFleet.pendingRegistrations, tone: 'text-[#bc7e3b]' },
-            { label: 'Hoa hồng pending', value: fmtShortVnd(mockFleet.commissionPendingNow), tone: 'text-[#0e1525]' },
+            { label: 'Đã bán T05', value: f.units_month, tone: 'text-[#5d8d6a]' },
+            { label: 'Đơn chờ duyệt', value: f.orders_pending, tone: 'text-[#c46a5e]' },
+            { label: 'Đại lý active', value: f.active_dealers, tone: 'text-[#bc7e3b]' },
+            { label: 'Hoa hồng pending', value: fmtShortVnd(f.commission_pending), tone: 'text-[#0e1525]' },
           ].map((k) => (
             <div key={k.label} className="rounded-xl border border-[#0e1525]/10 bg-white/60 p-4">
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#0e1525]/50">{k.label}</p>
@@ -107,7 +98,7 @@ export function AdminConsole() {
           Tự động chi 5-10 hàng tháng cho mọi đơn approved trước 30/T trước
         </p>
         <p className="mt-1 text-[11px] text-[#f5f1e8]/60">
-          Tổng dự kiến: <span style={numeric}>{fmtShortVnd(mockFleet.commissionPendingNow)}</span> · cho <span style={numeric}>{mockFleet.payoutDealersCount}</span> đại lý
+          Tổng dự kiến: <span style={numeric}>{fmtShortVnd(f.commission_pending)}</span> · cho <span style={numeric}>{f.active_dealers}</span> đại lý
         </p>
       </section>
 
@@ -178,7 +169,7 @@ export function AdminConsole() {
               </div>
             </div>
             <p className="text-xs leading-relaxed text-[#0e1525]/70">
-              Phương án dự phòng nếu Tier overhead quá lớn. Có thể switch sau ở Plan 3.
+              Phương án dự phòng nếu Tier overhead quá lớn. Có thể switch sau.
             </p>
           </div>
         </div>
