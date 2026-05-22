@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, PortalMessage } from './portal-types';
+import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, PortalMessage, PayoutRow, AdminPayoutRow } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -183,6 +183,31 @@ export async function adminReply(messageId: string, body: string): Promise<void>
   const { error } = await getSupabaseClient().rpc('admin_reply', {
     p_message_id: messageId,
     p_body: body,
+  });
+  if (error) throw error;
+}
+
+export async function getMyPayouts(): Promise<PayoutRow[]> {
+  const { data } = await getSupabaseClient()
+    .from('commission_payouts')
+    .select('*')
+    .is('voided_at', null)
+    .order('calculated_at', { ascending: false });
+  return (data as PayoutRow[]) ?? [];
+}
+
+export async function getAdminPayoutQueue(): Promise<AdminPayoutRow[]> {
+  const { data } = await getSupabaseClient()
+    .from('admin_payout_queue')
+    .select('*')
+    .order('calculated_at', { ascending: false });
+  return (data as AdminPayoutRow[]) ?? [];
+}
+
+export async function adminProcessPayout(payoutId: string, proofRef: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('admin_process_payout', {
+    p_payout_id: payoutId,
+    p_proof_ref: proofRef,
   });
   if (error) throw error;
 }

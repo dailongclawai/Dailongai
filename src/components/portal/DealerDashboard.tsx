@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import type { Profile, Order, DealerSummary } from '@/lib/portal-types';
-import { getDealerSummary, getDealerOrders } from '@/lib/portal-queries';
+import type { Profile, Order, DealerSummary, PayoutRow } from '@/lib/portal-types';
+import { getDealerSummary, getDealerOrders, getMyPayouts } from '@/lib/portal-queries';
 
 const display = { fontFamily: 'var(--font-display), Georgia, serif' };
 const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
@@ -24,10 +24,12 @@ const tiers = [
 export function DealerDashboard({ profile }: { profile: Profile }) {
   const [summary, setSummary] = useState<DealerSummary | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRow[]>([]);
 
   useEffect(() => {
     getDealerSummary(profile.id).then(setSummary);
     getDealerOrders(profile.id).then(setOrders);
+    getMyPayouts().then(setPayouts);
   }, [profile.id]);
 
   const unitsYtd = summary?.units_ytd ?? 0;
@@ -44,10 +46,10 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
 
   return (
     <div className="space-y-12 py-4">
-      <div className="flex items-baseline justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#bc7e3b]">Số 05 / 2026 · Báo cáo tháng</p>
-          <h1 style={display} className="mt-2 text-5xl font-light leading-none tracking-tight">
+          <h1 style={display} className="mt-2 text-4xl font-light leading-none tracking-tight md:text-5xl">
             Chào <span className="italic">{firstName}</span>.
           </h1>
         </div>
@@ -56,10 +58,10 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
         </Link>
       </div>
 
-      <section className="grid grid-cols-12 gap-10">
-        <div className="col-span-7">
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-10">
+        <div className="md:col-span-7">
           <p className="text-xs uppercase tracking-[0.25em] text-[#0e1525]/50">Doanh số tháng này</p>
-          <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-3 text-[140px] font-light leading-[0.85] tracking-tighter">
+          <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-3 text-[72px] font-light leading-[0.85] tracking-tighter md:text-[140px]">
             {fmtShortVnd(monthSales).replace(/[^0-9]/g, '') || '0'}
             <span style={numeric} className="ml-2 align-top text-3xl text-[#bc7e3b]">
               {monthSales >= 1_000_000 ? 'tr ₫' : '₫'}
@@ -70,7 +72,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
           </p>
         </div>
 
-        <div className="col-span-5 space-y-4">
+        <div className="space-y-4 md:col-span-5">
           <div className="overflow-hidden rounded-2xl border border-[#0e1525] bg-[#0e1525] p-6 text-[#f5f1e8]">
             <p className="text-[10px] uppercase tracking-[0.3em] text-[#bc7e3b]">Kỳ chi trả kế tiếp</p>
             <p style={display} className="mt-3 text-5xl font-light leading-none">
@@ -163,17 +165,50 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
         ) : (
           <div className="mt-6 divide-y divide-[#0e1525]/10">
             {orders.slice(0, 10).map((o, i) => (
-              <div key={o.id} className="grid grid-cols-12 items-center gap-4 py-4 text-sm">
-                <span className="col-span-1 text-[#0e1525]/30" style={numeric}>{String(i + 1).padStart(2, '0')}</span>
-                <span className="col-span-4 font-medium">{o.customer_name}</span>
-                <span className="col-span-3 text-[#0e1525]/60" style={numeric}>{o.serial_number}</span>
-                <span className="col-span-2 text-right" style={numeric}>{fmtShortVnd(o.sale_price)}</span>
-                <span className="col-span-2 text-right text-xs uppercase tracking-wider text-[#bc7e3b]">{o.status}</span>
+              <div key={o.id} className="flex flex-wrap items-center gap-2 py-3 text-sm md:grid md:grid-cols-12 md:gap-4">
+                <span className="text-[#0e1525]/30 md:col-span-1" style={numeric}>{String(i + 1).padStart(2, '0')}</span>
+                <span className="font-medium md:col-span-4">{o.customer_name}</span>
+                <span className="text-[#0e1525]/60 md:col-span-3" style={numeric}>{o.serial_number}</span>
+                <span className="text-right md:col-span-2" style={numeric}>{fmtShortVnd(o.sale_price)}</span>
+                <span className="text-right text-xs uppercase tracking-wider text-[#bc7e3b] md:col-span-2">{o.status}</span>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      {/* Payout history */}
+      {payouts.length > 0 && (
+        <section>
+          <div className="flex items-baseline justify-between border-b border-[#0e1525]/15 pb-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#5d8d6a]">Lịch sử</p>
+              <h2 style={display} className="mt-1 text-3xl font-light italic">Hoa hồng</h2>
+            </div>
+          </div>
+          <div className="mt-6 divide-y divide-[#0e1525]/10">
+            {payouts.slice(0, 12).map((p) => (
+              <div key={p.id} className="flex items-center justify-between gap-4 py-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${p.paid_at ? 'bg-[#5d8d6a]' : 'bg-[#bc7e3b]'}`} />
+                  <span style={numeric} className="text-xs text-[#0e1525]/60">
+                    {new Date(p.calculated_at).toLocaleDateString('vi-VN')}
+                  </span>
+                  {p.payment_proof_url && (
+                    <span className="text-[10px] text-[#0e1525]/40">Ref: {p.payment_proof_url}</span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p style={numeric} className={`font-semibold ${p.paid_at ? 'text-[#5d8d6a]' : 'text-[#bc7e3b]'}`}>
+                    {new Intl.NumberFormat('vi-VN').format(Number(p.amount))} đ
+                  </p>
+                  <p className="text-[10px] text-[#0e1525]/40">{p.paid_at ? 'Đã nhận' : 'Chờ chi trả'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

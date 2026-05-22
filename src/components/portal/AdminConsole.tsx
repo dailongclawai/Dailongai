@@ -63,10 +63,10 @@ export function AdminConsole() {
         </div>
       </div>
 
-      <section className="grid grid-cols-12 gap-8">
-        <div className="col-span-5">
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-8">
+        <div className="md:col-span-5">
           <p className="text-[11px] uppercase tracking-[0.25em] text-[#0e1525]/50">Tổng doanh thu YTD</p>
-          <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-2 text-[100px] font-light leading-[0.85] tracking-tighter">
+          <p style={{ ...display, fontVariationSettings: '"opsz" 144, "SOFT" 100' }} className="mt-2 text-[64px] font-light leading-[0.85] tracking-tighter md:text-[100px]">
             {fmtShortVnd(f.revenue_ytd).replace(/[^0-9.]/g, '') || '0'}
             <span style={numeric} className="ml-2 align-top text-3xl text-[#c46a5e]">tỷ ₫</span>
           </p>
@@ -74,7 +74,7 @@ export function AdminConsole() {
             <span style={numeric}>{f.units_ytd}</span> máy đã chốt · <span style={numeric}>{f.active_dealers}</span> đại lý active
           </p>
         </div>
-        <div className="col-span-7 grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 md:col-span-7">
           {[
             { label: 'Đã bán T05', value: f.units_month, tone: 'text-[#5d8d6a]' },
             { label: 'Đơn chờ duyệt', value: f.orders_pending, tone: 'text-[#c46a5e]' },
@@ -110,7 +110,7 @@ export function AdminConsole() {
           </div>
           <p className="text-xs text-[#0e1525]/60">Áp dụng từ 2026-05-22</p>
         </div>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           <div className="rounded-2xl border-2 border-[#bc7e3b] bg-[#bc7e3b]/5 p-6">
             <div className="mb-4 flex items-baseline justify-between">
               <h3 style={display} className="text-xl">Phương án A · Tier (đã chọn)</h3>
@@ -178,7 +178,7 @@ export function AdminConsole() {
       <section className="rounded-3xl border border-[#0e1525]/15 bg-white/60 p-8 backdrop-blur">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#bc7e3b]">Chính sách chi trả</p>
         <h2 style={display} className="mt-1 text-3xl font-light italic">Tự động · ngày 5–10</h2>
-        <div className="mt-6 grid grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
             { step: '01', label: 'Khoá kỳ', detail: 'Mọi đơn approved trước 23:59 ngày 30/T sẽ được tính vào đợt chi.' },
             { step: '02', label: 'Tính + duyệt', detail: 'Ngày 1–4: trigger tính commission_payouts, admin sanity check.' },

@@ -93,6 +93,27 @@ export interface PortalMessage {
   created_at: string;
 }
 
+export interface PayoutRow {
+  id: string;
+  order_id: string;
+  recipient_id: string;
+  recipient_role: 'dealer' | 'supervisor';
+  amount: string;
+  calculated_at: string;
+  paid_at: string | null;
+  payment_proof_url: string | null;
+  voided_at: string | null;
+}
+
+export interface AdminPayoutRow extends PayoutRow {
+  recipient_name: string | null;
+  recipient_email: string | null;
+  serial_number: string;
+  sale_date: string;
+  sale_price: number;
+  customer_name: string;
+}
+
 export interface FleetSummary {
   active_dealers: number;
   units_ytd: number;

@@ -39,7 +39,9 @@ export default function AdminOrdersPage() {
         <>
           <Link href="/portal/admin" className="text-[#0e1525]/60 hover:text-[#0e1525]">Tổng quan</Link>
           <Link href="/portal/admin/orders" className="border-b-2 border-[#0e1525] pb-1 font-semibold">Đơn hàng</Link>
-          <Link href="/portal/admin/registrations" className="text-[#0e1525]/60 hover:text-[#0e1525]">Đăng ký</Link>
+          <Link href="/portal/admin/payouts" className="text-[#0e1525]/60 hover:text-[#0e1525]">Hoa hồng</Link>
+          <Link href="/portal/admin/upgrade" className="text-[#0e1525]/60 hover:text-[#0e1525]">Nâng cấp</Link>
+          <Link href="/portal/admin/reports" className="text-[#0e1525]/60 hover:text-[#0e1525]">Báo cáo</Link>
         </>
       }
     >

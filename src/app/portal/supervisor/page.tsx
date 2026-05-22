@@ -6,9 +6,9 @@ import Link from 'next/link';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
-import { getSupervisorTeam } from '@/lib/portal-queries';
+import { getSupervisorTeam, getMyPayouts } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
-import type { TeamMember } from '@/lib/portal-types';
+import type { TeamMember, PayoutRow } from '@/lib/portal-types';
 
 const display = { fontFamily: 'var(--font-display), Georgia, serif' };
 const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
@@ -18,6 +18,7 @@ export default function SupervisorDashboard() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
   const [team, setTeam] = useState<TeamMember[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRow[]>([]);
   const [refLink, setRefLink] = useState('');
   const [qr, setQr] = useState('');
 
@@ -25,7 +26,10 @@ export default function SupervisorDashboard() {
     if (loading) return;
     if (!session) router.replace('/portal/login');
     else if (profile?.role !== 'supervisor') router.replace('/portal/dashboard');
-    else getSupervisorTeam(session.user.id).then(setTeam);
+    else {
+      getSupervisorTeam(session.user.id).then(setTeam);
+      getMyPayouts().then(setPayouts);
+    }
   }, [loading, session, profile, router]);
 
   useEffect(() => {
@@ -52,7 +56,7 @@ export default function SupervisorDashboard() {
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#5d8d6a]">Toàn đội</p>
         <h1 style={display} className="mt-2 text-4xl font-light italic">Đội của tôi</h1>
       </div>
-      <div className="mb-8 grid grid-cols-3 gap-4">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-[#0e1525]/10 bg-white/60 p-5">
           <p className="text-[10px] uppercase tracking-[0.2em] text-[#0e1525]/50">Đại lý</p>
           <p style={numeric} className="mt-2 text-3xl font-medium">{team.length}</p>
@@ -88,8 +92,8 @@ export default function SupervisorDashboard() {
           </div>
         </div>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-[#0e1525]/15 bg-white/80">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#0e1525]/15 bg-white/80">
+        <table className="w-full min-w-[480px] text-left text-sm">
           <thead className="border-b border-[#0e1525]/15 bg-[#f5f1e8] text-[10px] uppercase tracking-wider text-[#0e1525]/60">
             <tr>
               <th className="px-4 py-3">Đại lý</th>
@@ -114,6 +118,39 @@ export default function SupervisorDashboard() {
           </tbody>
         </table>
       </div>
+
+      {/* Supervisor own commission earnings */}
+      {payouts.length > 0 && (
+        <section className="mt-8">
+          <div className="mb-4 flex items-baseline gap-3">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#5d8d6a]">Hoa hồng supervisor của tôi</p>
+            <span style={numeric} className="text-sm text-[#0e1525]/60">
+              Chờ: {new Intl.NumberFormat('vi-VN').format(payouts.filter(p => !p.paid_at).reduce((s, p) => s + Number(p.amount), 0))} đ
+            </span>
+          </div>
+          <div className="divide-y divide-[#0e1525]/10 overflow-hidden rounded-2xl border border-[#0e1525]/15 bg-white/80">
+            {payouts.slice(0, 10).map((p) => (
+              <div key={p.id} className="flex items-center justify-between gap-4 px-5 py-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${p.paid_at ? 'bg-[#5d8d6a]' : 'bg-[#bc7e3b]'}`} />
+                  <span style={numeric} className="text-xs text-[#0e1525]/60">
+                    {new Date(p.calculated_at).toLocaleDateString('vi-VN')}
+                  </span>
+                  {p.payment_proof_url && (
+                    <span className="text-[10px] text-[#0e1525]/40">Ref: {p.payment_proof_url}</span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p style={numeric} className={`font-semibold ${p.paid_at ? 'text-[#5d8d6a]' : 'text-[#bc7e3b]'}`}>
+                    {new Intl.NumberFormat('vi-VN').format(Number(p.amount))} đ
+                  </p>
+                  <p className="text-[10px] text-[#0e1525]/40">{p.paid_at ? 'Đã nhận' : 'Chờ chi trả'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </PortalShell>
   );
 }
