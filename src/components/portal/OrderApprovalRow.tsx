@@ -6,8 +6,6 @@ import { approveOrder, rejectOrder } from '@/lib/portal-queries';
 import { getSupabaseClient } from '@/lib/supabase';
 import type { Order } from '@/lib/portal-types';
 
-const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
-
 export function OrderApprovalRow({ order, adminId, onResolved }: { order: Order; adminId: string; onResolved: () => void }) {
   const [busy, setBusy] = useState(false);
 
@@ -31,20 +29,20 @@ export function OrderApprovalRow({ order, adminId, onResolved }: { order: Order;
   };
 
   return (
-    <tr className="border-t border-[#0e1525]/10 hover:bg-[#f5f1e8]/50">
-      <td className="px-4 py-3" style={numeric}>{order.serial_number}</td>
-      <td className="px-4 py-3">{order.customer_name}<div className="text-[11px] text-[#0e1525]/60" style={numeric}>{order.customer_phone}</div></td>
-      <td className="px-4 py-3 text-right" style={numeric}>{new Intl.NumberFormat('vi-VN').format(order.sale_price)}</td>
-      <td className="px-4 py-3" style={numeric}>{order.sale_date}</td>
+    <tr className="border-t border-white/10 hover:bg-white/5">
+      <td className="px-4 py-3 font-mono tabular-nums">{order.serial_number}</td>
+      <td className="px-4 py-3">{order.customer_name}<div className="font-mono text-[11px] tabular-nums text-[#e2e2e5]/60">{order.customer_phone}</div></td>
+      <td className="px-4 py-3 text-right font-mono tabular-nums">{new Intl.NumberFormat('vi-VN').format(order.sale_price)}</td>
+      <td className="px-4 py-3 font-mono tabular-nums">{order.sale_date}</td>
       <td className="px-4 py-3">
         {order.receipt_image_url
-          ? <button onClick={viewReceipt} className="text-xs text-[#bc7e3b] hover:underline">Xem ảnh</button>
-          : <span className="text-xs text-[#0e1525]/40">—</span>}
+          ? <button onClick={viewReceipt} className="text-xs text-[#ff5625] hover:underline">Xem ảnh</button>
+          : <span className="text-xs text-[#e2e2e5]/40">—</span>}
       </td>
       <td className="px-4 py-3 text-right">
         <div className="flex justify-end gap-2">
-          <button onClick={approve} disabled={busy} className="rounded-full bg-[#0e1525] px-3 py-1.5 text-xs font-medium text-[#f5f1e8] hover:bg-[#bc7e3b] disabled:opacity-50">Duyệt</button>
-          <button onClick={reject} disabled={busy} className="rounded-full border border-[#0e1525]/30 px-3 py-1.5 text-xs font-medium hover:bg-[#0e1525]/5 disabled:opacity-50">Từ chối</button>
+          <button onClick={approve} disabled={busy} className="rounded-full bg-[#ff5625] px-3 py-1.5 text-xs font-medium text-white glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50">Duyệt</button>
+          <button onClick={reject} disabled={busy} className="rounded-full border border-[#f87171]/40 px-3 py-1.5 text-xs font-medium text-[#f87171] hover:border-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-50">Từ chối</button>
         </div>
       </td>
     </tr>

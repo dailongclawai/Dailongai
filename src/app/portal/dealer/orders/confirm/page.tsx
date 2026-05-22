@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
 
-const display = { fontFamily: 'var(--font-display), Georgia, serif' };
-const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
 const BANK_BIN = '970407';
@@ -52,24 +50,24 @@ export default function OrderConfirmPage() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#5d8d6a]/15">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#34d399]/15">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
               <path
                 d="M5 13l4 4L19 7"
-                stroke="#5d8d6a"
+                stroke="#34d399"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#5d8d6a]">Đặt hàng thành công</p>
-          <h1 style={display} className="mt-2 text-3xl font-light italic">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#34d399]">Đặt hàng thành công</p>
+          <h1 className="mt-2 font-headline text-3xl">
             Chờ admin duyệt đơn
           </h1>
-          <p className="mt-2 text-sm text-[#0e1525]/60">
+          <p className="mt-2 text-sm text-[#e2e2e5]/60">
             {count} máy · tổng giá trị{' '}
-            <span style={numeric} className="font-semibold text-[#0e1525]">
+            <span className="font-mono font-semibold tabular-nums text-[#e2e2e5]">
               {fmtVnd(total)} đ
             </span>
           </p>
@@ -78,52 +76,52 @@ export default function OrderConfirmPage() {
         {/* 2-col: instructions + QR */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Left: payment details */}
-          <div className="rounded-2xl border border-[#bc7e3b]/30 bg-[#bc7e3b]/5 p-6">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#bc7e3b]">
+          <div className="rounded-2xl border border-[#ff5625]/30 bg-[#ff5625]/5 p-6">
+            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
               Thanh toán ngay
             </p>
-            <p className="mb-5 text-sm text-[#0e1525]/60">
+            <p className="mb-5 text-sm text-[#e2e2e5]/60">
               Chuyển khoản đúng số tiền và ghi rõ nội dung để đơn được xử lý nhanh nhất.
             </p>
-            <div className="space-y-0 divide-y divide-[#0e1525]/10 text-sm">
+            <div className="space-y-0 divide-y divide-white/10 text-sm">
               <div className="flex justify-between py-3">
-                <span className="text-[#0e1525]/50">Ngân hàng</span>
+                <span className="text-[#e2e2e5]/50">Ngân hàng</span>
                 <span className="font-medium">{BANK_NAME}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#0e1525]/50">Số tài khoản</span>
-                <span style={numeric} className="font-semibold tracking-wider">
+                <span className="text-[#e2e2e5]/50">Số tài khoản</span>
+                <span className="font-mono font-semibold tracking-wider tabular-nums">
                   {BANK_ACCOUNT}
                 </span>
               </div>
               <div className="flex items-start justify-between gap-4 py-3">
-                <span className="shrink-0 text-[#0e1525]/50">Chủ tài khoản</span>
+                <span className="shrink-0 text-[#e2e2e5]/50">Chủ tài khoản</span>
                 <span className="text-right text-xs font-medium leading-relaxed">{BANK_OWNER}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#0e1525]/50">Số tiền</span>
-                <span style={numeric} className="font-semibold text-[#bc7e3b]">
+                <span className="text-[#e2e2e5]/50">Số tiền</span>
+                <span className="font-mono font-semibold tabular-nums text-[#ff5625]">
                   {fmtVnd(total)} đ
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-[#0e1525]/5 px-3 py-3">
-                <span className="text-[#0e1525]/50">Nội dung CK</span>
-                <span style={numeric} className="font-bold tracking-widest text-[#0e1525]">
+              <div className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-3">
+                <span className="text-[#e2e2e5]/50">Nội dung CK</span>
+                <span className="font-mono font-bold tracking-widest tabular-nums text-[#e2e2e5]">
                   {note}
                 </span>
               </div>
             </div>
             <Link
               href="/portal/dashboard"
-              className="mt-6 block text-center text-xs text-[#0e1525]/40 hover:text-[#bc7e3b]"
+              className="mt-6 block text-center text-xs text-[#e2e2e5]/40 hover:text-[#ff5625]"
             >
               ← Về dashboard
             </Link>
           </div>
 
           {/* Right: VietQR */}
-          <div className="flex flex-col items-center rounded-2xl border border-[#0e1525]/15 bg-white/80 p-6">
-            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#0e1525]/50">
+          <div className="flex flex-col items-center rounded-2xl border border-white/12 bg-[#1e2022] p-6">
+            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">
               Đại Long Bank QR
             </p>
             {total > 0 ? (
@@ -134,9 +132,9 @@ export default function OrderConfirmPage() {
                 className="w-full max-w-[300px] rounded-xl"
               />
             ) : (
-              <div className="h-64 w-64 animate-pulse rounded-xl bg-[#0e1525]/5" />
+              <div className="h-64 w-64 animate-pulse rounded-xl bg-white/5" />
             )}
-            <p className="mt-5 text-center text-xs text-[#0e1525]/40">
+            <p className="mt-5 text-center text-xs text-[#e2e2e5]/40">
               Mở app ngân hàng → Quét mã → Kiểm tra thông tin → Thanh toán
             </p>
           </div>

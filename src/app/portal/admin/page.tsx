@@ -30,11 +30,11 @@ export default function AdminHome() {
       variant="admin"
       nav={
         <>
-          <Link href="/portal/admin" className="border-b-2 border-[#0e1525] pb-1 font-semibold">Tổng quan</Link>
-          <Link href="/portal/admin/orders" className="text-[#0e1525]/60 hover:text-[#0e1525]">Đơn hàng</Link>
-          <Link href="/portal/admin/payouts" className="text-[#0e1525]/60 hover:text-[#0e1525]">Hoa hồng</Link>
-          <Link href="/portal/admin/upgrade" className="text-[#0e1525]/60 hover:text-[#0e1525]">Nâng cấp</Link>
-          <Link href="/portal/admin/reports" className="text-[#0e1525]/60 hover:text-[#0e1525]">Báo cáo</Link>
+          <Link href="/portal/admin" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Tổng quan</Link>
+          <Link href="/portal/admin/orders" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Đơn hàng</Link>
+          <Link href="/portal/admin/payouts" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Hoa hồng</Link>
+          <Link href="/portal/admin/upgrade" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Nâng cấp</Link>
+          <Link href="/portal/admin/reports" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Báo cáo</Link>
         </>
       }
     >

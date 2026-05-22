@@ -72,12 +72,12 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
   return (
     <form onSubmit={submit} className="space-y-3">
       {mode === 'register' && ref && (
-        <p className="rounded-lg bg-[#5d8d6a]/10 px-3 py-2 text-xs text-[#5d8d6a]">
+        <p className="rounded-lg bg-[#34d399]/10 px-3 py-2 text-xs text-[#34d399]">
           Bạn đang đăng ký qua lời mời của một quản lý — tài khoản sẽ thuộc nhánh của họ.
         </p>
       )}
       <div>
-        <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wider text-[#0e1525]/60">
+        <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
           Email
         </label>
         <input
@@ -86,12 +86,12 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded-lg border border-[#0e1525]/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#0e1525]"
+          className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
         />
-        {errors.email && <p className="mt-1 text-xs text-[#c46a5e]">{errors.email}</p>}
+        {errors.email && <p className="mt-1 text-xs text-[#f87171]">{errors.email}</p>}
       </div>
       <div>
-        <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wider text-[#0e1525]/60">
+        <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
           Mật khẩu
         </label>
         <input
@@ -100,14 +100,14 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full rounded-lg border border-[#0e1525]/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#0e1525]"
+          className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
         />
-        {errors.password && <p className="mt-1 text-xs text-[#c46a5e]">{errors.password}</p>}
+        {errors.password && <p className="mt-1 text-xs text-[#f87171]">{errors.password}</p>}
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-[#0e1525] py-3 text-sm font-medium text-[#f5f1e8] transition-colors hover:bg-[#bc7e3b] disabled:opacity-50"
+        className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
       >
         {loading ? 'Đang xử lý…' : mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
       </button>

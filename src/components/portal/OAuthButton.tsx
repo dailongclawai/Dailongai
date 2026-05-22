@@ -47,7 +47,7 @@ export function OAuthButton({ provider }: { provider: 'google' | 'facebook' }) {
       type="button"
       onClick={handle}
       disabled={busy}
-      className="flex w-full items-center justify-center gap-3 rounded-full border border-[#0e1525]/15 bg-white px-6 py-3 text-sm font-medium text-[#0e1525] transition-colors hover:border-[#0e1525] disabled:opacity-50"
+      className="flex w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-[#1e2022] px-6 py-3 text-sm font-medium text-[#e2e2e5] transition-colors hover:border-[#ff5625] hover:text-[#ff5625] disabled:opacity-50"
     >
       {icon}
       {busy ? 'Đang chuyển hướng…' : label}

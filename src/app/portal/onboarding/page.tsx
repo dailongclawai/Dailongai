@@ -9,8 +9,6 @@ import { toast } from 'sonner';
 
 const phoneSchema = z.string().regex(/^0\d{9,10}$/, 'SĐT không hợp lệ (ví dụ: 0901234567)');
 
-const display = { fontFamily: 'var(--font-display), Georgia, serif' };
-
 export default function OnboardingPage() {
   const router = useRouter();
   const { session, profile, loading, refresh } = useAuth();
@@ -51,15 +49,15 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md space-y-6 rounded-3xl border border-[#0e1525]/15 bg-white/90 p-10 shadow-sm">
+      <div className="glass-panel w-full max-w-md space-y-6 rounded-3xl border border-white/10 p-10">
         <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#bc7e3b]">Bước cuối</p>
-          <h1 style={display} className="mt-3 text-3xl font-light italic">Hoàn tất hồ sơ</h1>
-          <p className="mt-2 text-sm text-[#0e1525]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Bước cuối</p>
+          <h1 className="mt-3 font-headline text-3xl">Hoàn tất hồ sơ</h1>
+          <p className="mt-2 text-sm text-[#e2e2e5]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
         </div>
         <form onSubmit={submit} className="space-y-5">
           <div>
-            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#0e1525]/60">
+            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
               Số điện thoại
             </label>
             <input
@@ -68,17 +66,17 @@ export default function OnboardingPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="0901234567"
-              className="w-full rounded-lg border border-[#0e1525]/15 bg-white px-3 py-2 text-sm outline-none focus:border-[#0e1525]"
+              className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
             />
-            {phoneError && <p className="mt-1 text-xs text-[#c46a5e]">{phoneError}</p>}
+            {phoneError && <p className="mt-1 text-xs text-[#f87171]">{phoneError}</p>}
           </div>
-          <p className="rounded-lg bg-[#f5f1e8] px-4 py-3 text-xs text-[#0e1525]/60">
+          <p className="rounded-lg bg-[#1e2022] px-4 py-3 text-xs text-[#e2e2e5]/60">
             Loại tài khoản (đại lý / supervisor) sẽ do admin Đại Long gán khi duyệt hồ sơ.
           </p>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-[#0e1525] py-3 text-sm font-medium text-[#f5f1e8] hover:bg-[#bc7e3b] disabled:opacity-50"
+            className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
           >
             {submitting ? 'Đang gửi…' : 'Hoàn tất'}
           </button>

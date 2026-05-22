@@ -10,8 +10,6 @@ import { PortalShell } from '@/components/portal/PortalShell';
 import { toast } from 'sonner';
 import type { Order } from '@/lib/portal-types';
 
-const display = { fontFamily: 'var(--font-display), Georgia, serif' };
-
 export default function ReportsPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
@@ -51,21 +49,21 @@ export default function ReportsPage() {
       variant="admin"
       nav={
         <>
-          <Link href="/portal/admin" className="text-[#0e1525]/60 hover:text-[#0e1525]">Tổng quan</Link>
-          <Link href="/portal/admin/reports" className="border-b-2 border-[#0e1525] pb-1 font-semibold">Báo cáo</Link>
+          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
+          <Link href="/portal/admin/reports" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Báo cáo</Link>
         </>
       }
     >
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#c46a5e]">Báo cáo</p>
-          <h1 style={display} className="mt-2 text-4xl font-light italic">Toàn bộ đơn hàng</h1>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Báo cáo</p>
+          <h1 className="mt-2 font-headline text-4xl">Toàn bộ đơn hàng</h1>
         </div>
-        <button onClick={exportExcel} className="rounded-full bg-[#0e1525] px-5 py-2.5 text-sm font-medium text-[#f5f1e8] hover:bg-[#bc7e3b]">
+        <button onClick={exportExcel} className="rounded-full bg-[#ff5625] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c]">
           ↓ Xuất Excel ({orders.length} đơn)
         </button>
       </div>
-      <p className="text-sm text-[#0e1525]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
+      <p className="text-sm text-[#e2e2e5]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
     </PortalShell>
   );
 }

@@ -9,9 +9,6 @@ import { PortalShell } from '@/components/portal/PortalShell';
 import { toast } from 'sonner';
 import type { Profile, ProductModel, ProfileRole } from '@/lib/portal-types';
 
-const display = { fontFamily: 'var(--font-display), Georgia, serif' };
-const numeric = { fontFamily: 'var(--font-numeric), monospace', fontFeatureSettings: '"tnum"' };
-
 export default function RegistrationsPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
@@ -48,25 +45,25 @@ export default function RegistrationsPage() {
       variant="admin"
       nav={
         <>
-          <Link href="/portal/admin" className="text-[#0e1525]/60 hover:text-[#0e1525]">Tổng quan</Link>
-          <Link href="/portal/admin/registrations" className="border-b-2 border-[#0e1525] pb-1 font-semibold">Đăng ký</Link>
+          <Link href="/portal/admin" className="text-[#e2e2e5]/60 hover:text-[#ff5625]">Tổng quan</Link>
+          <Link href="/portal/admin/registrations" className="border-b-2 border-[#ff5625] pb-1 font-semibold">Đăng ký</Link>
         </>
       }
     >
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#c46a5e]">Queue cần xử lý</p>
-        <h1 style={display} className="mt-2 text-4xl font-light italic">Đăng ký chờ duyệt</h1>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần xử lý</p>
+        <h1 className="mt-2 font-headline text-4xl">Đăng ký chờ duyệt</h1>
       </div>
       {fetching ? (
-        <p className="text-[#0e1525]/60">Đang tải…</p>
+        <p className="text-[#e2e2e5]/60">Đang tải…</p>
       ) : pending.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-[#0e1525]/15 p-12 text-center text-sm text-[#0e1525]/60">
+        <div className="rounded-2xl border-2 border-dashed border-white/15 p-12 text-center text-sm text-[#e2e2e5]/60">
           Không có đăng ký mới.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#0e1525]/15 bg-white/80 backdrop-blur">
+        <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022] backdrop-blur">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-[#0e1525]/15 bg-[#f5f1e8] text-[10px] uppercase tracking-wider text-[#0e1525]/60">
+            <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
               <tr>
                 <th className="px-4 py-3">Hồ sơ</th>
                 <th className="px-4 py-3">Role</th>
@@ -146,17 +143,17 @@ function RegistrationRow({
   };
 
   return (
-    <tr className="border-t border-[#0e1525]/10 hover:bg-[#f5f1e8]/50">
+    <tr className="border-t border-white/12 hover:bg-white/5">
       <td className="px-4 py-3">
         <p className="font-medium">{profile.full_name ?? '(chưa có tên)'}</p>
-        <p className="text-[11px] text-[#0e1525]/60">{profile.email ?? '—'}</p>
-        <p className="text-[11px] text-[#0e1525]/60" style={numeric}>{profile.phone ?? '—'}</p>
+        <p className="text-[11px] text-[#e2e2e5]/60">{profile.email ?? '—'}</p>
+        <p className="text-[11px] text-[#e2e2e5]/60 font-mono tabular-nums">{profile.phone ?? '—'}</p>
       </td>
       <td className="px-4 py-3">
         <select
           value={role}
           onChange={(e) => setRole(e.target.value as ProfileRole)}
-          className="rounded-md border border-[#0e1525]/15 bg-white px-2 py-1 text-xs"
+          className="rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs"
         >
           <option value="dealer">Dealer</option>
           <option value="supervisor">Supervisor</option>
@@ -168,7 +165,7 @@ function RegistrationRow({
           <select
             value={supervisorId}
             onChange={(e) => setSupervisorId(e.target.value)}
-            className="rounded-md border border-[#0e1525]/15 bg-white px-2 py-1 text-xs"
+            className="rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs"
           >
             <option value="">— Không gán —</option>
             {supervisors.map((s) => (
@@ -185,7 +182,7 @@ function RegistrationRow({
             <select
               value={commissionType}
               onChange={(e) => setCommissionType(e.target.value as 'fixed' | 'percent')}
-              className="rounded-md border border-[#0e1525]/15 bg-white px-1.5 py-1 text-[11px]"
+              className="rounded-md border border-white/12 bg-[#1e2022] px-1.5 py-1 text-[11px]"
             >
               <option value="percent">%</option>
               <option value="fixed">VND</option>
@@ -193,13 +190,12 @@ function RegistrationRow({
             <input
               value={rateValue}
               onChange={(e) => setRateValue(e.target.value)}
-              className="w-20 rounded-md border border-[#0e1525]/15 bg-white px-2 py-1 text-xs"
-              style={numeric}
+              className="w-20 rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs font-mono tabular-nums"
             />
             <select
               value={modelId}
               onChange={(e) => setModelId(e.target.value)}
-              className="rounded-md border border-[#0e1525]/15 bg-white px-1.5 py-1 text-[11px]"
+              className="rounded-md border border-white/12 bg-[#1e2022] px-1.5 py-1 text-[11px]"
             >
               <option value="">All</option>
               {models.map((m) => (
@@ -214,14 +210,14 @@ function RegistrationRow({
           <button
             onClick={approve}
             disabled={busy}
-            className="rounded-full bg-[#0e1525] px-3 py-1.5 text-xs font-medium text-[#f5f1e8] hover:bg-[#bc7e3b] disabled:opacity-50"
+            className="rounded-full bg-[#ff5625] px-3 py-1.5 text-xs font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
           >
             Duyệt
           </button>
           <button
             onClick={reject}
             disabled={busy}
-            className="rounded-full border border-[#0e1525]/30 px-3 py-1.5 text-xs font-medium text-[#0e1525] hover:bg-[#0e1525]/5 disabled:opacity-50"
+            className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-[#e2e2e5] hover:border-[#f87171] hover:text-[#f87171] disabled:opacity-50"
           >
             Từ chối
           </button>
