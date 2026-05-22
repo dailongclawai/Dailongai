@@ -73,14 +73,18 @@ export function AdminConsole() {
         </div>
         <div className="grid grid-cols-2 gap-3 md:col-span-7">
           {[
-            { label: 'Đã bán T05', value: f.units_month, tone: 'text-[#34d399]' },
-            { label: 'Đơn chờ duyệt', value: f.orders_pending, tone: 'text-[#ffb5a1]' },
-            { label: 'Đại lý active', value: f.active_dealers, tone: 'text-[#ffb5a1]' },
-            { label: 'Hoa hồng pending', value: fmtShortVnd(f.commission_pending), tone: 'text-[#fadcd5]' },
+            { label: 'Đã bán T05', value: f.units_month, icon: 'sell', chip: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', tone: 'text-emerald-400' },
+            { label: 'Đơn chờ duyệt', value: f.orders_pending, icon: 'pending_actions', chip: 'bg-amber-500/10 text-amber-400 border-amber-500/20', tone: 'text-amber-400' },
+            { label: 'Đại lý active', value: f.active_dealers, icon: 'groups', chip: 'bg-[#ffb5a1]/10 text-[#ffb5a1] border-[#ffb5a1]/20', tone: 'text-[#ffb5a1]' },
+            { label: 'Hoa hồng pending', value: fmtShortVnd(f.commission_pending), icon: 'payments', chip: 'bg-[#84cfff]/10 text-[#84cfff] border-[#84cfff]/20', tone: 'text-[#84cfff]' },
           ].map((k) => (
-            <div key={k.label} className="rounded-xl border border-[#5b4039]/40 bg-[#2c1c17] p-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[#fadcd5]/50">{k.label}</p>
-              <p className={`mt-2 font-mono tabular-nums text-3xl font-medium ${k.tone}`}>{k.value}</p>
+            <div key={k.label} className="group relative overflow-hidden rounded-xl border border-[#5b4039]/40 bg-[#2c1c17] p-4">
+              <div className="pointer-events-none absolute -bottom-4 -right-4 opacity-[0.03] transition-opacity group-hover:opacity-[0.08]">
+                <span className="material-symbols-outlined text-[96px]">{k.icon}</span>
+              </div>
+              <span className={`material-symbols-outlined rounded-lg border p-1.5 text-[20px] ${k.chip}`}>{k.icon}</span>
+              <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#fadcd5]/50">{k.label}</p>
+              <p className={`mt-1 font-mono tabular-nums text-3xl font-medium ${k.tone}`}>{k.value}</p>
             </div>
           ))}
         </div>
