@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
+import { AdminNav } from '@/components/portal/AdminNav';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
@@ -57,11 +59,16 @@ export default function ProfilePage() {
 
   if (loading || !session || !profile) return null;
 
+  const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
+  const nav = profile.role === 'admin'
+    ? <AdminNav />
+    : <Link href={dashHref} className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">← Bảng điều khiển</Link>;
+
   return (
-    <PortalShell variant={profile.role ?? 'dealer'}>
+    <PortalShell variant={profile.role ?? 'dealer'} nav={nav}>
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Hồ sơ</p>
-        <h1 className="mt-2 font-headline text-3xl">Tài khoản</h1>
+        <h1 className="mt-2 font-headline text-3xl">Thông tin tài khoản</h1>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
         <form onSubmit={saveProfile} className="space-y-4 rounded-2xl border border-white/12 bg-[#1e2022] p-6 backdrop-blur">
