@@ -12,12 +12,12 @@ const fmtShortVnd = (n: number) => {
 
 const tiers = [
   { id: 1, minUnits: 0, percent: 15 },
-  { id: 2, minUnits: 100, percent: 20 },
-  { id: 3, minUnits: 200, percent: 25 },
-  { id: 4, minUnits: 300, percent: 25 },
+  { id: 2, minUnits: 101, percent: 20 },
+  { id: 3, minUnits: 201, percent: 25 },
 ];
+const tierMax = 201;
 
-const compareUnits = [50, 150, 250, 350];
+const compareUnits = [50, 150, 250];
 const priceAvg = 50_000_000;
 
 export function AdminConsole() {
@@ -102,40 +102,42 @@ export function AdminConsole() {
       <section className="rounded-3xl border-2 border-white/15 bg-[#1e2022] p-8">
         <div className="mb-6 flex items-baseline justify-between border-b border-white/12 pb-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Quyết định Boss đã chốt</p>
-            <h2 className="mt-1 font-headline text-3xl">Phương án A — Tier</h2>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Cơ chế hoa hồng</p>
+            <h2 className="mt-1 font-headline text-3xl">Hai phương án</h2>
           </div>
           <p className="text-xs text-[#e2e2e5]/60">Áp dụng từ 2026-05-22</p>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
           <div className="rounded-2xl border-2 border-[#ff5625] bg-[#ff5625]/5 p-6">
             <div className="mb-4 flex items-baseline justify-between">
-              <h3 className="font-headline text-xl">Phương án A · Tier (đã chọn)</h3>
-              <span className="rounded-full bg-[#ff5625] px-2 py-0.5 text-[10px] font-medium uppercase text-white">Đang chạy</span>
+              <h3 className="font-headline text-xl">Phương án A · Tier</h3>
+              <span className="rounded-full bg-[#ff5625] px-2 py-0.5 text-[10px] font-medium uppercase text-white">Nâng cấp</span>
             </div>
             <div className="my-6">
               <div className="relative h-2 rounded-full bg-white/10">
-                {tiers.slice(0, 4).map((t) => (
+                {tiers.map((t) => (
                   <div
                     key={t.id}
                     className="absolute -translate-x-1/2"
-                    style={{ left: `${(t.minUnits / 300) * 100}%`, top: '-7px' }}
+                    style={{ left: `${Math.min((t.minUnits / tierMax) * 100, 100)}%`, top: '-7px' }}
                   >
                     <div className="h-4 w-4 rounded-full border-2 border-[#ff5625] bg-[#121416]" />
                   </div>
                 ))}
               </div>
-              <div className="mt-6 grid grid-cols-4 text-center">
-                {tiers.slice(0, 4).map((t) => (
+              <div className="mt-6 grid grid-cols-3 text-center">
+                {tiers.map((t, i) => (
                   <div key={t.id}>
-                    <p className="font-mono tabular-nums text-xs text-[#e2e2e5]/60">{t.minUnits}+</p>
+                    <p className="font-mono tabular-nums text-xs text-[#e2e2e5]/60">
+                      {t.minUnits}{i < tiers.length - 1 ? `–${tiers[i + 1].minUnits - 1}` : '+'} máy
+                    </p>
                     <p className="font-headline text-2xl text-[#ff5625]">{t.percent}%</p>
                   </div>
                 ))}
               </div>
             </div>
             <p className="text-xs leading-relaxed text-[#e2e2e5]/70">
-              Hoa hồng tăng dần theo số máy bán năm. Boss đã chốt phương án này để khuyến khích push tier.
+              Hoa hồng tăng dần theo số máy bán trong năm. Admin/supervisor nâng đại lý lên Tier để thưởng doanh số cao.
             </p>
             <div className="mt-5 space-y-1.5 rounded-xl bg-[#1e2022] p-4 text-xs">
               <p className="mb-2 text-[10px] uppercase tracking-wider text-[#e2e2e5]/50">Thu nhập đại lý YTD</p>
@@ -154,19 +156,20 @@ export function AdminConsole() {
               })}
             </div>
           </div>
-          <div className="rounded-2xl border-2 border-white/12 p-6 opacity-60">
+          <div className="rounded-2xl border-2 border-[#34d399] bg-[#34d399]/5 p-6">
             <div className="mb-4 flex items-baseline justify-between">
-              <h3 className="font-headline text-xl">Phương án B · Flat (defer)</h3>
+              <h3 className="font-headline text-xl">Phương án B · Flat</h3>
+              <span className="rounded-full bg-[#34d399] px-2 py-0.5 text-[10px] font-medium uppercase text-[#0e1525]">Mặc định</span>
             </div>
             <div className="my-6">
               <div className="relative h-2 rounded-full bg-[#34d399]" />
               <div className="mt-6 text-center">
-                <p className="font-headline text-6xl text-[#34d399]">20%</p>
+                <p className="font-headline text-6xl text-[#34d399]">15%</p>
                 <p className="text-[10px] uppercase tracking-wider text-[#e2e2e5]/50">mọi đơn · mọi đại lý</p>
               </div>
             </div>
             <p className="text-xs leading-relaxed text-[#e2e2e5]/70">
-              Phương án dự phòng nếu Tier overhead quá lớn. Có thể switch sau.
+              Mọi tài khoản đại lý mới đăng ký mặc định hưởng 15% trên mọi đơn. Admin/supervisor có thể nâng lên Tier A.
             </p>
           </div>
         </div>

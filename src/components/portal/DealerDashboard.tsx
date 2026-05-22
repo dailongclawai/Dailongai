@@ -13,9 +13,8 @@ const fmtShortVnd = (n: number) => {
 
 const tiers = [
   { id: 1, label: 'Tier 1', minUnits: 0, percent: 15 },
-  { id: 2, label: 'Tier 2', minUnits: 100, percent: 20 },
-  { id: 3, label: 'Tier 3', minUnits: 200, percent: 25 },
-  { id: 4, label: 'Tier 4', minUnits: 300, percent: 25 },
+  { id: 2, label: 'Tier 2', minUnits: 101, percent: 20 },
+  { id: 3, label: 'Tier 3', minUnits: 201, percent: 25 },
 ];
 
 export function DealerDashboard({ profile }: { profile: Profile }) {
@@ -38,7 +37,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
   const currentTier = tiers.slice().reverse().find((t) => unitsYtd >= t.minUnits)!;
   const nextTier = tiers.find((t) => t.minUnits > unitsYtd) ?? currentTier;
   const unitsToNext = Math.max(0, nextTier.minUnits - unitsYtd);
-  const ladderMax = 300;
+  const ladderMax = 201;
   const firstName = profile.full_name?.split(' ').slice(-1)[0] ?? 'Đại lý';
 
   return (
@@ -111,7 +110,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               className="absolute left-0 top-0 h-1 rounded-full bg-gradient-to-r from-[#ff5625] to-[#ff8a5c]"
               style={{ width: `${(unitsYtd / ladderMax) * 100}%` }}
             />
-            {tiers.slice(0, 4).map((t) => (
+            {tiers.map((t) => (
               <div
                 key={t.id}
                 className="absolute -translate-x-1/2"
@@ -125,8 +124,8 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               </div>
             ))}
           </div>
-          <div className="mt-12 grid grid-cols-4 text-sm">
-            {tiers.slice(0, 4).map((t) => (
+          <div className="mt-12 grid grid-cols-3 text-sm">
+            {tiers.map((t) => (
               <div key={t.id} className={t.id === currentTier.id ? 'opacity-100' : 'opacity-50'}>
                 <p className="text-[10px] uppercase tracking-[0.25em] text-[#e2e2e5]/50">{t.label}</p>
                 <p className="mt-1 font-mono text-lg font-medium tabular-nums">{t.minUnits}+ máy</p>
