@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { signOut } from '@/lib/supabase';
+import { getUnreadCount } from '@/lib/portal-queries';
 
 export function PortalShell({
   children,
@@ -16,7 +17,13 @@ export function PortalShell({
   variant?: 'dealer' | 'supervisor' | 'admin';
 }) {
   const router = useRouter();
-  const { profile } = useAuth();
+  const { session, profile } = useAuth();
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!session) return;
+    getUnreadCount().then(setUnread);
+  }, [session]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -39,8 +46,16 @@ export function PortalShell({
           <span className={`h-1 w-1 rounded-full ${variantTag.dot}`} />
           <p className="text-[10px] uppercase tracking-[0.3em] text-[#0e1525]/60">{variantTag.label}</p>
         </div>
-        <nav className="flex items-center gap-8 text-[13px]">
+        <nav className="flex items-center gap-6 text-[13px]">
           {nav}
+          <Link href="/portal/inbox" className="relative text-[#0e1525]/60 hover:text-[#0e1525]">
+            Hộp thư
+            {unread > 0 && (
+              <span className="absolute -right-3 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#c46a5e] text-[9px] font-bold text-white">
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </Link>
           {profile && (
             <button
               type="button"

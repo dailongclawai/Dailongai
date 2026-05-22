@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan } from './portal-types';
+import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, PortalMessage } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -142,5 +142,39 @@ export async function rejectOrder(orderId: string, reason: string): Promise<void
     .from('orders')
     .update({ status: 'rejected', rejection_reason: reason })
     .eq('id', orderId);
+  if (error) throw error;
+}
+
+export async function getInboxMessages(): Promise<PortalMessage[]> {
+  const { data } = await getSupabaseClient()
+    .from('portal_messages')
+    .select('*')
+    .order('created_at', { ascending: false });
+  return (data as PortalMessage[]) ?? [];
+}
+
+export async function getUnreadCount(): Promise<number> {
+  const { data: { session } } = await getSupabaseClient().auth.getSession();
+  if (!session) return 0;
+  const { count } = await getSupabaseClient()
+    .from('portal_messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('recipient_id', session.user.id)
+    .eq('is_read', false);
+  return count ?? 0;
+}
+
+export async function sendFeedback(subject: string, body: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('send_feedback', {
+    p_subject: subject,
+    p_body: body,
+  });
+  if (error) throw error;
+}
+
+export async function markMessageRead(messageId: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('mark_message_read', {
+    p_message_id: messageId,
+  });
   if (error) throw error;
 }

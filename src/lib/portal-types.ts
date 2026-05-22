@@ -83,6 +83,16 @@ export interface CommissionPlan {
   active: boolean;
 }
 
+export interface PortalMessage {
+  id: string;
+  sender_id: string | null;
+  recipient_id: string;
+  subject: string;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+}
+
 export interface FleetSummary {
   active_dealers: number;
   units_ytd: number;
