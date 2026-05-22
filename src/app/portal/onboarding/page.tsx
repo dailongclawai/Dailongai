@@ -15,7 +15,6 @@ export default function OnboardingPage() {
   const router = useRouter();
   const { session, profile, loading, refresh } = useAuth();
   const [phone, setPhone] = useState('');
-  const [requestedRole, setRequestedRole] = useState<'dealer' | 'supervisor'>('dealer');
   const [phoneError, setPhoneError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -36,10 +35,7 @@ export default function OnboardingPage() {
     setSubmitting(true);
     const { error } = await getSupabaseClient()
       .from('profiles')
-      .update({
-        phone,
-        business_name: requestedRole === 'supervisor' ? '[Mong muốn: Supervisor]' : '[Mong muốn: Dealer]',
-      })
+      .update({ phone })
       .eq('id', session!.user.id);
     setSubmitting(false);
     if (error) {
@@ -59,7 +55,7 @@ export default function OnboardingPage() {
         <div className="text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#bc7e3b]">Bước cuối</p>
           <h1 style={display} className="mt-3 text-3xl font-light italic">Hoàn tất hồ sơ</h1>
-          <p className="mt-2 text-sm text-[#0e1525]/60">Còn 2 thông tin tối thiểu</p>
+          <p className="mt-2 text-sm text-[#0e1525]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
         </div>
         <form onSubmit={submit} className="space-y-5">
           <div>
@@ -76,37 +72,9 @@ export default function OnboardingPage() {
             />
             {phoneError && <p className="mt-1 text-xs text-[#c46a5e]">{phoneError}</p>}
           </div>
-          <div>
-            <p className="mb-2 text-xs uppercase tracking-wider text-[#0e1525]/60">Loại tài khoản mong muốn</p>
-            <div className="space-y-2">
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#0e1525]/15 bg-white px-3 py-2 hover:border-[#0e1525]">
-                <input
-                  type="radio"
-                  name="role"
-                  checked={requestedRole === 'dealer'}
-                  onChange={() => setRequestedRole('dealer')}
-                  className="accent-[#bc7e3b]"
-                />
-                <div>
-                  <p className="text-sm font-medium">Đại lý phân phối</p>
-                  <p className="text-xs text-[#0e1525]/60">Bán máy laser, nhận hoa hồng theo tier</p>
-                </div>
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[#0e1525]/15 bg-white px-3 py-2 hover:border-[#0e1525]">
-                <input
-                  type="radio"
-                  name="role"
-                  checked={requestedRole === 'supervisor'}
-                  onChange={() => setRequestedRole('supervisor')}
-                  className="accent-[#bc7e3b]"
-                />
-                <div>
-                  <p className="text-sm font-medium">Supervisor</p>
-                  <p className="text-xs text-[#0e1525]/60">Quản lý nhiều đại lý, hưởng override</p>
-                </div>
-              </label>
-            </div>
-          </div>
+          <p className="rounded-lg bg-[#f5f1e8] px-4 py-3 text-xs text-[#0e1525]/60">
+            Loại tài khoản (đại lý / supervisor) sẽ do admin Đại Long gán khi duyệt hồ sơ.
+          </p>
           <button
             type="submit"
             disabled={submitting}

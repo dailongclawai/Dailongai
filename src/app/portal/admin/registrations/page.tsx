@@ -69,7 +69,6 @@ export default function RegistrationsPage() {
             <thead className="border-b border-[#0e1525]/15 bg-[#f5f1e8] text-[10px] uppercase tracking-wider text-[#0e1525]/60">
               <tr>
                 <th className="px-4 py-3">Hồ sơ</th>
-                <th className="px-4 py-3">Mong muốn</th>
                 <th className="px-4 py-3">Role</th>
                 <th className="px-4 py-3">Supervisor</th>
                 <th className="px-4 py-3">Commission</th>
@@ -152,9 +151,6 @@ function RegistrationRow({
         <p className="font-medium">{profile.full_name ?? '(chưa có tên)'}</p>
         <p className="text-[11px] text-[#0e1525]/60">{profile.email ?? '—'}</p>
         <p className="text-[11px] text-[#0e1525]/60" style={numeric}>{profile.phone ?? '—'}</p>
-      </td>
-      <td className="px-4 py-3">
-        <span className="text-xs italic text-[#0e1525]/50">{profile.business_name ?? '—'}</span>
       </td>
       <td className="px-4 py-3">
         <select
