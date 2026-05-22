@@ -38,11 +38,6 @@ const YM_CSS = `
   background:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,0) 42%),linear-gradient(#cc76cc 0%,#8b2a8b 45%,#681b68 100%);
   border-bottom:1px solid #4e174e;}
 .ymx-title{display:flex;align-items:center;gap:6px;padding-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ymx-controls{display:flex;height:18px;margin-right:3px;}
-.ymx-controls span{width:21px;text-align:center;font:12px/16px Tahoma,sans-serif;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:2px;margin-left:2px;background:rgba(255,255,255,.12);}
-.ymx-controls span.x{background:linear-gradient(#db6f6f,#a82d2d);}
-.ymx-menubar{height:22px;display:flex;align-items:center;gap:14px;padding:0 10px;color:#f3dff3;font-size:11px;
-  background:linear-gradient(#8a218a,#6d1b6d);border-bottom:1px solid #9d519d;}
 .ymx-body{display:flex;min-height:440px;}
 .ymx-list{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid #4e164e;background:#fff;}
 .ymx-profile{height:54px;display:flex;align-items:center;gap:8px;padding:6px 8px;color:#fff;
@@ -72,20 +67,11 @@ const YM_CSS = `
 .ymx-chat-head{height:24px;display:flex;align-items:center;gap:6px;padding:0 10px;color:#fff;font-size:12px;font-weight:600;
   background:linear-gradient(#9a479a,#742074);text-shadow:0 1px 1px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ymx-chat-head .s{width:8px;height:8px;flex-shrink:0;border-radius:50%;background:#ffc033;border:1px solid #b57900;}
-.ymx-tools{height:46px;display:flex;align-items:center;gap:18px;padding:0 12px;
-  background:radial-gradient(circle at 62% 25%,rgba(255,255,255,.18),transparent 18%),linear-gradient(#8b248b,#6e1d6e);}
-.ymx-tools button{border:0;background:transparent;color:#fff;font:10px Tahoma,sans-serif;text-shadow:0 1px 1px rgba(0,0,0,.45);cursor:default;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.ymx-tool{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b09cb0 45%,#6c546c);box-shadow:inset 0 1px rgba(255,255,255,.8),0 1px 2px rgba(0,0,0,.35);}
-.ymx-tool.v{border-radius:7px;background:linear-gradient(90deg,#333,#eee 35%,#8b8b8b 60%,#333);}
-.ymx-tool.p{border-radius:2px;background:linear-gradient(135deg,#d6b6d6 50%,#8d668d 50%);}
 .ymx-transcript{flex:1;margin:4px;padding:7px 9px;overflow-y:auto;background:#fff;border:1px solid #a977a9;min-height:150px;}
 .ymx-transcript .row{margin:0 0 9px;font-size:12px;line-height:1.4;color:#222;}
 .ymx-transcript .nm{font-weight:700;}
 .ymx-transcript .tm{color:#888;font-size:11px;}
 .ymx-empty{flex:1;display:flex;align-items:center;justify-content:center;color:#e7cce7;font-size:12px;text-align:center;padding:20px;}
-.ymx-ctools{height:26px;display:flex;align-items:center;gap:10px;padding:0 9px;color:#fff;
-  background:linear-gradient(#892b89,#711c71);border-top:1px solid #a869a8;}
-.ymx-ctools b,.ymx-ctools i,.ymx-ctools u{font-size:13px;width:14px;text-align:center;opacity:.85;text-shadow:0 1px rgba(0,0,0,.45);}
 .ymx-subin{margin:4px 4px 0;}
 .ymx-subin input{width:100%;height:24px;border:1px solid #b27ab2;padding:2px 6px;font:11px Tahoma,sans-serif;background:#fff;}
 .ymx-inrow{display:flex;gap:8px;padding:4px;background:#8a258a;}
@@ -206,9 +192,7 @@ export default function InboxPage() {
         <div className="ymx-window">
           <div className="ymx-titlebar">
             <span className="ymx-title">💬 Đại Long Messenger</span>
-            <span className="ymx-controls"><span>—</span><span>▢</span><span className="x">✕</span></span>
           </div>
-          <div className="ymx-menubar"><span>Hộp thư</span><span>Hành động</span><span>Trợ giúp</span></div>
 
           <div className="ymx-body">
             {/* Buddy-list = message list */}
@@ -243,7 +227,6 @@ export default function InboxPage() {
                   <div className="ymx-subin">
                     <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Tiêu đề…" />
                   </div>
-                  <div className="ymx-ctools"><b>B</b><i>I</i><u>U</u></div>
                   <div className="ymx-inrow">
                     <textarea value={body} onChange={(e) => setBody(e.target.value)} onKeyDown={(e) => onKey(e, submitFeedback)} placeholder="Nội dung… (Enter để gửi, Shift+Enter xuống dòng)" />
                     <button className="ymx-send" disabled={sending} onClick={submitFeedback}>{sending ? '…' : 'Gửi'}</button>
@@ -253,11 +236,6 @@ export default function InboxPage() {
               ) : selected ? (
                 <>
                   <div className="ymx-chat-head"><span className="s" /> {selected.subject}</div>
-                  <div className="ymx-tools">
-                    <button type="button"><span className="ymx-tool v" />Cuộc gọi</button>
-                    <button type="button"><span className="ymx-tool" />Hồ sơ</button>
-                    <button type="button"><span className="ymx-tool p" />Ảnh</button>
-                  </div>
                   <div className="ymx-transcript">
                     <p className="row">
                       <span className="nm" style={{ color: senderColor(selected) }}>({fmtTime(selected.created_at)}) {senderLabel(selected)}:</span>{' '}
@@ -266,7 +244,6 @@ export default function InboxPage() {
                   </div>
                   {isAdmin && selected.sender_id ? (
                     <>
-                      <div className="ymx-ctools"><b>B</b><i>I</i><u>U</u></div>
                       <div className="ymx-inrow">
                         <textarea value={reply} onChange={(e) => setReply(e.target.value)} onKeyDown={(e) => onKey(e, submitReply)} placeholder="Trả lời… (Enter để gửi)" />
                         <button className="ymx-send" disabled={replying} onClick={submitReply}>{replying ? '…' : 'Gửi'}</button>
