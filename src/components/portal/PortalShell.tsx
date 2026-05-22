@@ -57,14 +57,15 @@ export function PortalShell({
             )}
           </Link>
           {profile && (
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="text-[#0e1525]/60 hover:text-[#bc7e3b]"
-              title="Đăng xuất"
-            >
-              {profile.full_name?.split(' ').slice(-1)[0] ?? profile.email?.split('@')[0] ?? 'Tài khoản'} · Đăng xuất
-            </button>
+            <span className="flex items-center gap-1 text-[#0e1525]/60">
+              <Link href="/portal/profile" className="hover:text-[#bc7e3b]">
+                {profile.full_name?.split(' ').slice(-1)[0] ?? profile.email?.split('@')[0] ?? 'Tài khoản'}
+              </Link>
+              <span>·</span>
+              <button type="button" onClick={handleSignOut} className="hover:text-[#bc7e3b]">
+                Đăng xuất
+              </button>
+            </span>
           )}
         </nav>
       </header>

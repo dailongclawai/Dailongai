@@ -178,3 +178,11 @@ export async function markMessageRead(messageId: string): Promise<void> {
   });
   if (error) throw error;
 }
+
+export async function adminReply(messageId: string, body: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('admin_reply', {
+    p_message_id: messageId,
+    p_body: body,
+  });
+  if (error) throw error;
+}
