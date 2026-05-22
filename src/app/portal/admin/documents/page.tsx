@@ -69,50 +69,50 @@ export default function AdminDocumentsPage() {
     finally { setBusy(false); }
   };
 
-  const input = 'w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]';
+  const input = 'w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]';
 
   return (
     <PortalShell variant="admin" nav={<AdminNav />}>
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Hỗ trợ bán hàng</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Hỗ trợ bán hàng</p>
         <h1 className="mt-2 font-headline text-4xl">Tài liệu</h1>
-        <p className="mt-2 text-sm text-[#e2e2e5]/60">Catalog, mẫu hợp đồng, video, hướng dẫn cho đại lý &amp; supervisor.</p>
+        <p className="mt-2 text-sm text-[#fadcd5]/60">Catalog, mẫu hợp đồng, video, hướng dẫn cho đại lý &amp; supervisor.</p>
       </div>
 
-      <div className="mb-8 rounded-2xl border border-white/12 bg-[#1e2022] p-6">
+      <div className="mb-8 rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] p-6">
         <h2 className="mb-4 font-headline text-xl">Tải tài liệu mới</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">Tiêu đề</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/70">Tiêu đề</label>
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="VD: Catalog ZhiDun CEO 2026" className={input} />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">Loại</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/70">Loại</label>
             <select value={category} onChange={(e) => setCategory(e.target.value as DocCategory)} className={input}>
               {Object.entries(catLabel).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">Hiển thị cho</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/70">Hiển thị cho</label>
             <select value={visibility} onChange={(e) => setVisibility(e.target.value as DocVisibility)} className={input}>
               {Object.entries(visLabel).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
             </select>
           </div>
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">Tệp (PDF, ảnh, MP4 — tối đa 50MB)</label>
-            <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp,video/mp4" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-sm text-[#e2e2e5]/70 file:mr-3 file:rounded-full file:border-0 file:bg-[#ff5625] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#ff8a5c]" />
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/70">Tệp (PDF, ảnh, MP4 — tối đa 50MB)</label>
+            <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp,video/mp4" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-sm text-[#fadcd5]/70 file:mr-3 file:rounded-full file:border-0 file:bg-[#ff5626] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[#ffb5a1]" />
           </div>
         </div>
         <div className="mt-4">
-          <button onClick={upload} disabled={busy} className="rounded-full bg-[#ff5625] px-6 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50">
+          <button onClick={upload} disabled={busy} className="rounded-full bg-[#ff5626] px-6 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5626]/90 disabled:opacity-50">
             {busy ? 'Đang tải…' : 'Tải lên'}
           </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022]">
+      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
         <table className="w-full min-w-[560px] text-left text-sm">
-          <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+          <thead className="border-b border-[#5b4039]/40 bg-[#372621]/40 text-[10px] uppercase tracking-wider text-[#fadcd5]/60">
             <tr>
               <th className="px-4 py-3">Tiêu đề</th>
               <th className="px-4 py-3">Loại</th>
@@ -123,15 +123,15 @@ export default function AdminDocumentsPage() {
           </thead>
           <tbody>
             {docs.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-[#e2e2e5]/50">Chưa có tài liệu nào.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-[#fadcd5]/50">Chưa có tài liệu nào.</td></tr>
             ) : docs.map((d) => (
-              <tr key={d.id} className="border-t border-white/12 hover:bg-white/5">
+              <tr key={d.id} className="border-t border-[#5b4039]/40 hover:bg-[#372621]/40">
                 <td className="px-4 py-3 font-medium">{d.title}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]/70">{catLabel[d.category]}</td>
-                <td className="px-4 py-3"><span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase text-[#e2e2e5]/70">{visLabel[d.visible_to]}</span></td>
-                <td className="px-4 py-3 font-mono tabular-nums text-xs text-[#e2e2e5]/60">{new Date(d.created_at).toLocaleDateString('vi-VN')}</td>
+                <td className="px-4 py-3 text-[#fadcd5]/70">{catLabel[d.category]}</td>
+                <td className="px-4 py-3"><span className="rounded-full bg-[#372621] px-2 py-0.5 text-[10px] uppercase text-[#fadcd5]/70">{visLabel[d.visible_to]}</span></td>
+                <td className="px-4 py-3 font-mono tabular-nums text-xs text-[#fadcd5]/60">{new Date(d.created_at).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => open(d)} className="mr-3 text-xs text-[#ff5625] hover:underline">Mở</button>
+                  <button onClick={() => open(d)} className="mr-3 text-xs text-[#ffb5a1] hover:underline">Mở</button>
                   <button onClick={() => remove(d.id)} disabled={busy} className="text-xs text-[#f87171] hover:underline disabled:opacity-50">Xoá</button>
                 </td>
               </tr>

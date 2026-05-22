@@ -62,32 +62,32 @@ export default function AdminUpgradePage() {
       nav={<AdminNav />}
     >
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Phân quyền</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Phân quyền</p>
         <h1 className="mt-2 font-headline text-4xl">Nâng đại lý lên Supervisor</h1>
       </div>
 
       <div className="mb-8 flex items-end gap-3">
         <div className="flex-1">
-          <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">Account ID đại lý</label>
+          <label className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">Account ID đại lý</label>
           <input
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             placeholder="dán account ID (UUID)"
-            className="w-full rounded-lg border border-white/12 bg-[#1e2022] px-3 py-2 text-sm outline-none focus:border-[#ff5625] font-mono tabular-nums"
+            className="w-full rounded-lg border border-[#5b4039]/40 bg-[#2c1c17] px-3 py-2 text-sm outline-none focus:border-[#ffb5a1] font-mono tabular-nums"
           />
         </div>
         <button
           onClick={() => upgrade(userId)}
           disabled={busy}
-          className="rounded-full bg-[#ff5625] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
+          className="rounded-full bg-[#ff5626] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5626]/90 disabled:opacity-50"
         >
           Nâng lên Supervisor
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022]">
+      <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+          <thead className="border-b border-[#5b4039]/40 bg-[#372621]/40 text-[10px] uppercase tracking-wider text-[#fadcd5]/60">
             <tr>
               <th className="px-4 py-3">Tên</th>
               <th className="px-4 py-3">Account ID</th>
@@ -97,16 +97,16 @@ export default function AdminUpgradePage() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t border-white/12 hover:bg-white/5">
+              <tr key={r.id} className="border-t border-[#5b4039]/40 hover:bg-[#372621]/40">
                 <td className="px-4 py-3 font-medium">{r.full_name ?? r.email ?? '(không tên)'}</td>
-                <td className="px-4 py-3 text-[11px] text-[#e2e2e5]/60 font-mono tabular-nums">{r.id}</td>
-                <td className="px-4 py-3 text-xs uppercase tracking-wider text-[#ff5625]">{r.role ?? '—'}</td>
+                <td className="px-4 py-3 text-[11px] text-[#fadcd5]/60 font-mono tabular-nums">{r.id}</td>
+                <td className="px-4 py-3 text-xs uppercase tracking-wider text-[#ffb5a1]">{r.role ?? '—'}</td>
                 <td className="px-4 py-3 text-right">
                   {r.role === 'dealer' && (
                     <button
                       onClick={() => upgrade(r.id)}
                       disabled={busy}
-                      className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-[#e2e2e5] hover:border-[#ff5625] hover:text-[#ff5625] disabled:opacity-50"
+                      className="rounded-full border border-[#5b4039]/60 px-3 py-1.5 text-xs font-medium text-[#fadcd5] hover:border-[#ffb5a1] hover:text-[#ffb5a1] disabled:opacity-50"
                     >
                       Nâng lên Supervisor
                     </button>

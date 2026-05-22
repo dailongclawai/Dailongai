@@ -46,19 +46,19 @@ export default function RegistrationsPage() {
       nav={<AdminNav />}
     >
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần xử lý</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Queue cần xử lý</p>
         <h1 className="mt-2 font-headline text-4xl">Đăng ký chờ duyệt</h1>
       </div>
       {fetching ? (
-        <p className="text-[#e2e2e5]/60">Đang tải…</p>
+        <p className="text-[#fadcd5]/60">Đang tải…</p>
       ) : pending.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-white/15 p-12 text-center text-sm text-[#e2e2e5]/60">
+        <div className="rounded-2xl border-2 border-dashed border-[#5b4039]/50 p-12 text-center text-sm text-[#fadcd5]/60">
           Không có đăng ký mới.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022] backdrop-blur">
+        <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] backdrop-blur">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+            <thead className="border-b border-[#5b4039]/40 bg-[#372621]/40 text-[10px] uppercase tracking-wider text-[#fadcd5]/60">
               <tr>
                 <th className="px-4 py-3">Hồ sơ</th>
                 <th className="px-4 py-3">Role</th>
@@ -138,17 +138,17 @@ function RegistrationRow({
   };
 
   return (
-    <tr className="border-t border-white/12 hover:bg-white/5">
+    <tr className="border-t border-[#5b4039]/40 hover:bg-[#372621]/40">
       <td className="px-4 py-3">
         <p className="font-medium">{profile.full_name ?? '(chưa có tên)'}</p>
-        <p className="text-[11px] text-[#e2e2e5]/60">{profile.email ?? '—'}</p>
-        <p className="text-[11px] text-[#e2e2e5]/60 font-mono tabular-nums">{profile.phone ?? '—'}</p>
+        <p className="text-[11px] text-[#fadcd5]/60">{profile.email ?? '—'}</p>
+        <p className="text-[11px] text-[#fadcd5]/60 font-mono tabular-nums">{profile.phone ?? '—'}</p>
       </td>
       <td className="px-4 py-3">
         <select
           value={role}
           onChange={(e) => setRole(e.target.value as ProfileRole)}
-          className="rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs"
+          className="rounded-md border border-[#5b4039]/40 bg-[#2c1c17] px-2 py-1 text-xs"
         >
           <option value="dealer">Dealer</option>
           <option value="supervisor">Supervisor</option>
@@ -160,7 +160,7 @@ function RegistrationRow({
           <select
             value={supervisorId}
             onChange={(e) => setSupervisorId(e.target.value)}
-            className="rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs"
+            className="rounded-md border border-[#5b4039]/40 bg-[#2c1c17] px-2 py-1 text-xs"
           >
             <option value="">— Không gán —</option>
             {supervisors.map((s) => (
@@ -177,7 +177,7 @@ function RegistrationRow({
             <select
               value={commissionType}
               onChange={(e) => setCommissionType(e.target.value as 'fixed' | 'percent')}
-              className="rounded-md border border-white/12 bg-[#1e2022] px-1.5 py-1 text-[11px]"
+              className="rounded-md border border-[#5b4039]/40 bg-[#2c1c17] px-1.5 py-1 text-[11px]"
             >
               <option value="percent">%</option>
               <option value="fixed">VND</option>
@@ -185,12 +185,12 @@ function RegistrationRow({
             <input
               value={rateValue}
               onChange={(e) => setRateValue(e.target.value)}
-              className="w-20 rounded-md border border-white/12 bg-[#1e2022] px-2 py-1 text-xs font-mono tabular-nums"
+              className="w-20 rounded-md border border-[#5b4039]/40 bg-[#2c1c17] px-2 py-1 text-xs font-mono tabular-nums"
             />
             <select
               value={modelId}
               onChange={(e) => setModelId(e.target.value)}
-              className="rounded-md border border-white/12 bg-[#1e2022] px-1.5 py-1 text-[11px]"
+              className="rounded-md border border-[#5b4039]/40 bg-[#2c1c17] px-1.5 py-1 text-[11px]"
             >
               <option value="">All</option>
               {models.map((m) => (
@@ -205,14 +205,14 @@ function RegistrationRow({
           <button
             onClick={approve}
             disabled={busy}
-            className="rounded-full bg-[#ff5625] px-3 py-1.5 text-xs font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
+            className="rounded-full bg-[#ff5626] px-3 py-1.5 text-xs font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5626]/90 disabled:opacity-50"
           >
             Duyệt
           </button>
           <button
             onClick={reject}
             disabled={busy}
-            className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-medium text-[#e2e2e5] hover:border-[#f87171] hover:text-[#f87171] disabled:opacity-50"
+            className="rounded-full border border-[#5b4039]/60 px-3 py-1.5 text-xs font-medium text-[#fadcd5] hover:border-[#f87171] hover:text-[#f87171] disabled:opacity-50"
           >
             Từ chối
           </button>

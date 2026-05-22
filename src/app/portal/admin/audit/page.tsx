@@ -23,7 +23,7 @@ const actionLabel: Record<string, string> = {
 const actionColor = (a: string) =>
   a.includes('approve') || a.includes('paid') ? 'text-[#34d399]'
   : a.includes('reject') || a.includes('void') ? 'text-[#f87171]'
-  : 'text-[#ff5625]';
+  : 'text-[#ffb5a1]';
 
 export default function AdminAuditPage() {
   const router = useRouter();
@@ -45,14 +45,14 @@ export default function AdminAuditPage() {
   return (
     <PortalShell variant="admin" nav={<AdminNav />}>
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Bảo mật</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Bảo mật</p>
         <h1 className="mt-2 font-headline text-4xl">Nhật ký kiểm toán</h1>
-        <p className="mt-2 text-sm text-[#e2e2e5]/60">Mọi thay đổi quan trọng được ghi bất biến (immutable).</p>
+        <p className="mt-2 text-sm text-[#fadcd5]/60">Mọi thay đổi quan trọng được ghi bất biến (immutable).</p>
       </div>
 
-      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022]">
+      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+          <thead className="border-b border-[#5b4039]/40 bg-[#372621]/40 text-[10px] uppercase tracking-wider text-[#fadcd5]/60">
             <tr>
               <th className="px-4 py-3">Thời gian</th>
               <th className="px-4 py-3">Hành động</th>
@@ -63,26 +63,26 @@ export default function AdminAuditPage() {
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-[#e2e2e5]/50">Chưa có bản ghi nào.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-[#fadcd5]/50">Chưa có bản ghi nào.</td></tr>
             ) : rows.map((r) => (
               <Fragment key={r.id}>
-                <tr className="border-t border-white/12 hover:bg-white/5">
-                  <td className="px-4 py-3 font-mono tabular-nums text-xs text-[#e2e2e5]/60">{new Date(r.created_at).toLocaleString('vi-VN')}</td>
+                <tr className="border-t border-[#5b4039]/40 hover:bg-[#372621]/40">
+                  <td className="px-4 py-3 font-mono tabular-nums text-xs text-[#fadcd5]/60">{new Date(r.created_at).toLocaleString('vi-VN')}</td>
                   <td className={`px-4 py-3 text-xs font-medium uppercase tracking-wider ${actionColor(r.action)}`}>{actionLabel[r.action] ?? r.action}</td>
-                  <td className="px-4 py-3 font-mono text-xs text-[#e2e2e5]/70">{r.target_table}</td>
-                  <td className="px-4 py-3 font-mono text-[11px] text-[#e2e2e5]/50">{r.target_id?.slice(0, 8) ?? '—'}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-[#fadcd5]/70">{r.target_table}</td>
+                  <td className="px-4 py-3 font-mono text-[11px] text-[#fadcd5]/50">{r.target_id?.slice(0, 8) ?? '—'}</td>
                   <td className="px-4 py-3 text-right">
                     {(r.before || r.after) && (
-                      <button onClick={() => setOpen(open === r.id ? null : r.id)} className="text-xs text-[#ff5625] hover:underline">
+                      <button onClick={() => setOpen(open === r.id ? null : r.id)} className="text-xs text-[#ffb5a1] hover:underline">
                         {open === r.id ? 'Ẩn' : 'Chi tiết'}
                       </button>
                     )}
                   </td>
                 </tr>
                 {open === r.id && (
-                  <tr className="border-t border-white/12 bg-[#121416]">
+                  <tr className="border-t border-[#5b4039]/40 bg-[#1e100c]">
                     <td colSpan={5} className="px-4 py-3">
-                      <pre className="max-h-64 overflow-auto rounded-lg bg-black/40 p-3 text-[11px] text-[#e2e2e5]/70">
+                      <pre className="max-h-64 overflow-auto rounded-lg bg-black/40 p-3 text-[11px] text-[#fadcd5]/70">
 {JSON.stringify({ before: r.before, after: r.after }, null, 2)}
                       </pre>
                     </td>

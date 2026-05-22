@@ -51,14 +51,14 @@ export default function ReportsPage() {
     >
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Báo cáo</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Báo cáo</p>
           <h1 className="mt-2 font-headline text-4xl">Toàn bộ đơn hàng</h1>
         </div>
-        <button onClick={exportExcel} className="rounded-full bg-[#ff5625] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c]">
+        <button onClick={exportExcel} className="rounded-full bg-[#ff5626] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5626]/90">
           ↓ Xuất Excel ({orders.length} đơn)
         </button>
       </div>
-      <p className="text-sm text-[#e2e2e5]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
+      <p className="text-sm text-[#fadcd5]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
     </PortalShell>
   );
 }

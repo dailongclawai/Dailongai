@@ -36,17 +36,17 @@ export default function AdminOrdersPage() {
       nav={<AdminNav />}
     >
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần duyệt</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Queue cần duyệt</p>
         <h1 className="mt-2 font-headline text-4xl">Đơn chờ duyệt</h1>
       </div>
       {fetching ? (
-        <p className="text-[#e2e2e5]/60">Đang tải…</p>
+        <p className="text-[#fadcd5]/60">Đang tải…</p>
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border-2 border-dashed border-white/15 p-12 text-center text-sm text-[#e2e2e5]/60">Không có đơn chờ duyệt.</div>
+        <div className="rounded-2xl border-2 border-dashed border-[#5b4039]/50 p-12 text-center text-sm text-[#fadcd5]/60">Không có đơn chờ duyệt.</div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022]">
+        <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+            <thead className="border-b border-[#5b4039]/40 bg-[#372621]/40 text-[10px] uppercase tracking-wider text-[#fadcd5]/60">
               <tr>
                 <th className="px-4 py-3">Serial</th>
                 <th className="px-4 py-3">Khách</th>

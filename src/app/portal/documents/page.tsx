@@ -41,16 +41,16 @@ export default function DocumentsPage() {
   return (
     <PortalShell
       variant={variant}
-      nav={<Link href={dashHref} className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">← Bảng điều khiển</Link>}
+      nav={<Link href={dashHref} className="text-[#fadcd5]/60 transition-colors hover:text-[#ffb5a1]">← Bảng điều khiển</Link>}
     >
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Tài nguyên</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Tài nguyên</p>
         <h1 className="mt-2 font-headline text-4xl">Tài liệu bán hàng</h1>
-        <p className="mt-2 text-sm text-[#e2e2e5]/60">Catalog, mẫu hợp đồng, video và hướng dẫn dành cho bạn.</p>
+        <p className="mt-2 text-sm text-[#fadcd5]/60">Catalog, mẫu hợp đồng, video và hướng dẫn dành cho bạn.</p>
       </div>
 
       {docs.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-white/15 p-12 text-center text-sm text-[#e2e2e5]/60">
+        <div className="rounded-xl border-2 border-dashed border-[#5b4039]/50 p-12 text-center text-sm text-[#fadcd5]/60">
           Chưa có tài liệu nào được chia sẻ.
         </div>
       ) : (
@@ -59,12 +59,12 @@ export default function DocumentsPage() {
             <button
               key={d.id}
               onClick={() => open(d)}
-              className="group flex flex-col rounded-2xl border border-white/12 bg-[#1e2022] p-5 text-left transition-colors hover:border-[#ff5625]/50"
+              className="group flex flex-col rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] p-5 text-left transition-colors hover:border-[#ffb5a1]/50"
             >
               <span className="text-2xl">{catIcon[d.category]}</span>
-              <span className="mt-3 font-medium text-[#e2e2e5] group-hover:text-[#ff5625]">{d.title}</span>
-              <span className="mt-1 text-[11px] uppercase tracking-wider text-[#e2e2e5]/50">{catLabel[d.category]}</span>
-              <span className="mt-4 text-xs text-[#ff5625]">Mở tài liệu →</span>
+              <span className="mt-3 font-medium text-[#fadcd5] group-hover:text-[#ffb5a1]">{d.title}</span>
+              <span className="mt-1 text-[11px] uppercase tracking-wider text-[#fadcd5]/50">{catLabel[d.category]}</span>
+              <span className="mt-4 text-xs text-[#ffb5a1]">Mở tài liệu →</span>
             </button>
           ))}
         </div>

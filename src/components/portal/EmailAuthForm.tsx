@@ -77,7 +77,7 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
         </p>
       )}
       <div>
-        <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
+        <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">
           Email
         </label>
         <input
@@ -86,12 +86,12 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
+          className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]"
         />
         {errors.email && <p className="mt-1 text-xs text-[#f87171]">{errors.email}</p>}
       </div>
       <div>
-        <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
+        <label htmlFor="password" className="mb-1 block text-xs uppercase tracking-wider text-[#fadcd5]/60">
           Mật khẩu
         </label>
         <input
@@ -100,14 +100,14 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
+          className="w-full rounded-lg border border-[#5b4039]/50 bg-[#2c1c17] px-3 py-2 text-sm text-[#fadcd5] placeholder:text-[#fadcd5]/40 outline-none focus:border-[#ffb5a1]"
         />
         {errors.password && <p className="mt-1 text-xs text-[#f87171]">{errors.password}</p>}
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50"
+        className="w-full rounded-full bg-[#ff5626] py-3 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5626]/90 disabled:opacity-50"
       >
         {loading ? 'Đang xử lý…' : mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
       </button>
