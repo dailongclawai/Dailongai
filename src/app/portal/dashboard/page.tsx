@@ -17,11 +17,7 @@ export default function DashboardPage() {
       return;
     }
     if (!profile) return;
-    if (!profile.phone) {
-      router.replace('/portal/onboarding');
-      return;
-    }
-    if (profile.status !== 'active' || !profile.role) {
+    if (profile.status === 'suspended') {
       router.replace('/portal/pending');
       return;
     }
@@ -29,8 +25,7 @@ export default function DashboardPage() {
     if (profile.role === 'supervisor') { router.replace('/portal/supervisor'); return; }
   }, [loading, session, profile, router]);
 
-  if (loading || !session || !profile || profile.status !== 'active' || !profile.role) return null;
-  if (profile.role !== 'dealer') return null;
+  if (loading || !session || !profile || profile.role !== 'dealer') return null;
 
   return (
     <PortalShell variant={profile.role}>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { getSupabaseClient } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -15,6 +15,18 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
+  const [ref, setRef] = useState<string | null>(null);
+
+  // On the register page, capture the referring supervisor id from ?ref= and
+  // stash it so any signup method (incl. OAuth redirect) can attach the branch.
+  useEffect(() => {
+    if (mode !== 'register') return;
+    const r = new URLSearchParams(window.location.search).get('ref');
+    if (r) {
+      setRef(r);
+      localStorage.setItem('portal_ref', r);
+    }
+  }, [mode]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +49,10 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
         : await client.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/portal/auth/callback` },
+            options: {
+              emailRedirectTo: `${window.location.origin}/portal/auth/callback`,
+              data: ref ? { ref } : undefined,
+            },
           });
     setLoading(false);
     if (error) {
@@ -51,6 +66,11 @@ export function EmailAuthForm({ mode }: { mode: 'login' | 'register' }) {
 
   return (
     <form onSubmit={submit} className="space-y-3">
+      {mode === 'register' && ref && (
+        <p className="rounded-lg bg-[#5d8d6a]/10 px-3 py-2 text-xs text-[#5d8d6a]">
+          Bạn đang đăng ký qua lời mời của một quản lý — tài khoản sẽ thuộc nhánh của họ.
+        </p>
+      )}
       <div>
         <label htmlFor="email" className="mb-1 block text-xs uppercase tracking-wider text-[#0e1525]/60">
           Email
