@@ -25,12 +25,12 @@ export default function DashboardPage() {
       router.replace('/portal/pending');
       return;
     }
-    if (profile.role === 'admin') router.replace('/portal/admin');
+    if (profile.role === 'admin') { router.replace('/portal/admin'); return; }
+    if (profile.role === 'supervisor') { router.replace('/portal/supervisor'); return; }
   }, [loading, session, profile, router]);
 
   if (loading || !session || !profile || profile.status !== 'active' || !profile.role) return null;
-
-  if (profile.role === 'admin') return null;
+  if (profile.role !== 'dealer') return null;
 
   return (
     <PortalShell variant={profile.role}>
