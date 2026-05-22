@@ -13,6 +13,10 @@ export interface Profile {
   business_name: string | null;
   business_address: string | null;
   id_number: string | null;
+  bank_name: string | null;
+  bank_account_name: string | null;
+  bank_account_number: string | null;
+  province: string | null;
   approved_at: string | null;
   approved_by: string | null;
   created_at: string;
