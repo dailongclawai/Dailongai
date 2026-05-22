@@ -125,7 +125,10 @@ export default function InboxPage() {
   const convMsgs = messages.filter((m) => m.sender_id);
 
   const senderLabel = (m: PortalMessage) =>
-    !m.sender_id ? 'Đại Long' : m.sender_id === session.user.id ? 'Bạn' : 'Quản trị viên';
+    !m.sender_id ? 'Đại Long'
+    : m.sender_id === session.user.id ? 'Bạn'
+    : isAdmin ? 'Người gửi'
+    : 'Quản trị viên';
   const senderColor = (m: PortalMessage) =>
     !m.sender_id ? '#2a2872' : m.sender_id === session.user.id ? '#0e7a2e' : '#8b2a8b';
 
