@@ -282,6 +282,42 @@ export async function deleteSalesDocument(id: string): Promise<void> {
   if (error) throw error;
 }
 
+// ── Commission ledger (dealer) ──────────────────────────────────────────
+export interface LedgerCommission {
+  amount: string;
+  paid_at: string | null;
+  voided_at: string | null;
+  payment_proof_url: string | null;
+  recipient_role: 'dealer' | 'supervisor';
+}
+export interface LedgerRow {
+  id: string;
+  serial_number: string;
+  customer_name: string;
+  sale_price: number;
+  sale_date: string;
+  status: Order['status'];
+  commission: LedgerCommission | null;
+}
+
+export async function getDealerLedger(dealerId: string): Promise<LedgerRow[]> {
+  const { data } = await getSupabaseClient()
+    .from('orders')
+    .select('id, serial_number, customer_name, sale_price, sale_date, status, commission_payouts(amount, paid_at, voided_at, payment_proof_url, recipient_role)')
+    .eq('dealer_id', dealerId)
+    .order('sale_date', { ascending: false });
+  type Raw = Omit<LedgerRow, 'commission'> & { commission_payouts: LedgerCommission[] | null };
+  return ((data as Raw[] | null) ?? []).map((o) => ({
+    id: o.id,
+    serial_number: o.serial_number,
+    customer_name: o.customer_name,
+    sale_price: o.sale_price,
+    sale_date: o.sale_date,
+    status: o.status,
+    commission: (o.commission_payouts ?? []).find((p) => p.recipient_role === 'dealer') ?? null,
+  }));
+}
+
 // ── Supervisors (admin) ─────────────────────────────────────────────────
 export interface SupervisorRow {
   id: string;
