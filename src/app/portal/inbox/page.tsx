@@ -251,7 +251,17 @@ export default function InboxPage() {
                       <div className="ymx-hint">Trả lời sẽ xuất hiện trong hộp thư của người gửi.</div>
                     </>
                   ) : (
-                    <div className="ymx-hint" style={{ padding: '8px 9px' }}>Tin nhắn hệ thống — không thể trả lời.</div>
+                    <div className="ymx-hint" style={{ padding: '8px 9px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                      <span>Tin nhắn hệ thống.</span>
+                      {!isAdmin && (
+                        <Link
+                          href={profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dealer/commission'}
+                          style={{ color: '#ffd867', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                          → Xem hoa hồng &amp; chi trả
+                        </Link>
+                      )}
+                    </div>
                   )}
                 </>
               ) : (

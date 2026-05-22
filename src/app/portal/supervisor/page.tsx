@@ -91,28 +91,39 @@ export default function SupervisorDashboard() {
         </div>
       </div>
       <div className="overflow-x-auto overflow-hidden rounded-2xl border border-white/12 bg-[#1e2022]">
-        <table className="w-full min-w-[480px] text-left text-sm">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-white/12 bg-white/5 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
             <tr>
+              <th className="px-4 py-3 text-center">#</th>
               <th className="px-4 py-3">Đại lý</th>
+              <th className="px-4 py-3 text-center">Trạng thái</th>
               <th className="px-4 py-3 text-right">Doanh số tháng</th>
               <th className="px-4 py-3 text-right">Máy YTD</th>
-              <th className="px-4 py-3 text-right">Đơn chờ</th>
+              <th className="px-4 py-3 text-right">Pipeline (đơn chờ)</th>
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {team.map((t) => (
-              <tr key={t.dealer_id} className="border-t border-white/10 hover:bg-white/5">
-                <td className="px-4 py-3 font-medium">{t.dealer_name ?? '(không tên)'}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{fmtShortVnd(Number(t.month_sales))}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{t.units_ytd}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">{t.orders_pending}</td>
-                <td className="px-4 py-3 text-right">
-                  <Link href={`/portal/supervisor/team?dealer=${t.dealer_id}`} className="text-xs text-[#ff5625] hover:underline">Chi tiết →</Link>
-                </td>
-              </tr>
-            ))}
+            {[...team].sort((a, b) => Number(b.month_sales) - Number(a.month_sales)).map((t, i) => {
+              const act = Number(t.month_sales) > 0
+                ? { label: 'Hoạt động', cls: 'bg-[#34d399]/15 text-[#34d399]' }
+                : Number(t.orders_pending) > 0
+                  ? { label: 'Có đơn chờ', cls: 'bg-[#ff5625]/15 text-[#ff8a5c]' }
+                  : { label: 'Im ắng', cls: 'bg-white/10 text-[#e2e2e5]/50' };
+              return (
+                <tr key={t.dealer_id} className="border-t border-white/10 hover:bg-white/5">
+                  <td className="px-4 py-3 text-center font-mono tabular-nums text-[#e2e2e5]/50">{i + 1}</td>
+                  <td className="px-4 py-3 font-medium">{t.dealer_name ?? '(không tên)'}</td>
+                  <td className="px-4 py-3 text-center"><span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${act.cls}`}>{act.label}</span></td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">{fmtShortVnd(Number(t.month_sales))}</td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums">{t.units_ytd}</td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums text-[#ff5625]">{t.orders_pending}</td>
+                  <td className="px-4 py-3 text-right">
+                    <Link href={`/portal/supervisor/team?dealer=${t.dealer_id}`} className="text-xs text-[#ff5625] hover:underline">Chi tiết →</Link>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

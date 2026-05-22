@@ -19,6 +19,9 @@ export default function ProfilePage() {
   const [bankHolder, setBankHolder] = useState('');
   const [bankNumber, setBankNumber] = useState('');
   const [province, setProvince] = useState('');
+  const [bizName, setBizName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [bizAddress, setBizAddress] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -31,8 +34,23 @@ export default function ProfilePage() {
       setBankHolder(profile.bank_account_name ?? '');
       setBankNumber(profile.bank_account_number ?? '');
       setProvince(profile.province ?? '');
+      setBizName(profile.business_name ?? '');
+      setIdNumber(profile.id_number ?? '');
+      setBizAddress(profile.business_address ?? '');
     }
   }, [loading, session, profile, router]);
+
+  const saveCompliance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await getSupabaseClient()
+      .from('profiles')
+      .update({ business_name: bizName, id_number: idNumber, business_address: bizAddress })
+      .eq('id', session!.user.id);
+    setBusy(false);
+    if (error) toast.error(error.message);
+    else { toast.success('Đã lưu hồ sơ doanh nghiệp'); await refresh(); }
+  };
 
   const savePayout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,6 +187,29 @@ export default function ProfilePage() {
           </div>
           <button type="submit" disabled={busy} className="rounded-full bg-[#ff5625] px-5 py-2 text-sm font-medium text-white glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50">
             Lưu thông tin nhận hoa hồng
+          </button>
+        </form>
+        <form onSubmit={saveCompliance} className="space-y-4 rounded-2xl border border-white/12 bg-[#1e2022] p-6 backdrop-blur md:col-span-2">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-base font-semibold">Hồ sơ doanh nghiệp</h2>
+            <span className="text-[11px] text-[#e2e2e5]/40">Phục vụ hợp đồng &amp; pháp lý</span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">Tên doanh nghiệp / hộ kinh doanh</label>
+              <input value={bizName} onChange={(e) => setBizName(e.target.value)} placeholder="VD: Hộ KD Trần Thị A" className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 focus:border-[#ff5625] outline-none" />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">Mã số thuế / CCCD</label>
+              <input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="Mã số thuế hoặc CCCD" className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 focus:border-[#ff5625] outline-none font-mono tabular-nums" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">Địa chỉ kinh doanh</label>
+              <input value={bizAddress} onChange={(e) => setBizAddress(e.target.value)} placeholder="Địa chỉ" className="w-full rounded-lg border border-white/15 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 focus:border-[#ff5625] outline-none" />
+            </div>
+          </div>
+          <button type="submit" disabled={busy} className="rounded-full bg-[#ff5625] px-5 py-2 text-sm font-medium text-white glow-primary-hover hover:bg-[#ff8a5c] disabled:opacity-50">
+            Lưu hồ sơ doanh nghiệp
           </button>
         </form>
       </div>
