@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { getSupabaseClient } from './supabase';
 import type { Profile } from './portal-types';
@@ -23,8 +23,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionResolved, setSessionResolved] = useState(false);
 
-  const fetchProfile = async (uid: string | undefined) => {
+  const fetchProfile = useCallback(async (uid: string | undefined) => {
     if (!uid) {
       setProfile(null);
       return;
@@ -35,30 +36,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('id', uid)
       .single();
     setProfile((data as Profile) ?? null);
-  };
+  }, []);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const { data } = await getSupabaseClient().auth.getSession();
     setSession(data.session);
     await fetchProfile(data.session?.user.id);
-  };
+  }, [fetchProfile]);
 
+  // Initial session load + auth state subscription.
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      await refresh();
-      if (mounted) setLoading(false);
-    })();
-    const { data } = getSupabaseClient().auth.onAuthStateChange(async (_event, s) => {
+    getSupabaseClient()
+      .auth.getSession()
+      .then(({ data }) => {
+        if (mounted) setSession(data.session);
+      })
+      .finally(() => {
+        if (mounted) setSessionResolved(true);
+      });
+
+    // The auth-js callback runs while the internal auth lock is held; calling
+    // any awaited Supabase method (e.g. .from().select()) inside it deadlocks.
+    // Keep this callback synchronous and let the effect below fetch the profile.
+    const { data } = getSupabaseClient().auth.onAuthStateChange((_event, s) => {
       setSession(s);
-      await fetchProfile(s?.user.id);
     });
     return () => {
       mounted = false;
       data.subscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fetch profile whenever the authenticated user changes (outside the lock).
+  // loading stays true until the session is resolved AND the profile fetch settles,
+  // so consumers never redirect on a half-loaded auth state.
+  useEffect(() => {
+    if (!sessionResolved) return;
+    let active = true;
+    (async () => {
+      await fetchProfile(session?.user.id);
+      if (active) setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [sessionResolved, session?.user.id, fetchProfile]);
 
   return (
     <AuthContext.Provider value={{ session, profile, loading, refresh }}>
