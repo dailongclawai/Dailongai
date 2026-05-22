@@ -12,7 +12,6 @@ export default function LoginPage() {
         </div>
         <div className="space-y-3">
           <OAuthButton provider="google" />
-          <OAuthButton provider="facebook" />
           <Link
             href="/portal/phone-signup"
             className="flex w-full items-center justify-center gap-3 rounded-full border border-white/20 bg-[#1e2022] px-6 py-3 text-sm font-medium text-[#e2e2e5] hover:border-[#ff5625] hover:text-[#ff5625]"
