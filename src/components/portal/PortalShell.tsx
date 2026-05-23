@@ -29,6 +29,7 @@ const NAV: Record<Variant, NavItem[]> = {
   ],
   supervisor: [
     { href: '/portal/supervisor', label: 'Đội của tôi', icon: 'groups', exact: true },
+    { href: '/portal/supervisor/commission', label: 'Hoa hồng', icon: 'payments' },
     { href: '/portal/documents', label: 'Tài liệu', icon: 'description' },
   ],
 };

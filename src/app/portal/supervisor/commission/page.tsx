@@ -6,8 +6,8 @@ import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { getDealerLedger, createPayoutRequest, getMyPayoutRequests } from '@/lib/portal-queries';
-import type { LedgerRow, PayoutRequest } from '@/lib/portal-queries';
+import { getSupervisorLedger, createPayoutRequest, getMyPayoutRequests } from '@/lib/portal-queries';
+import type { SupervisorLedgerRow, LedgerRow, PayoutRequest } from '@/lib/portal-queries';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -24,20 +24,18 @@ function statusOf(r: LedgerRow): { label: string; cls: string; dot: string; buck
 
 const rateOf = (r: LedgerRow) =>
   r.commission && !r.commission.voided_at && Number(r.sale_price) > 0
-    ? Math.round((Number(r.commission.amount) / Number(r.sale_price)) * 100)
+    ? +(Number(r.commission.amount) / Number(r.sale_price) * 100).toFixed(2)
     : null;
 
-function planLabel(pct: number | null): { name: string; cls: string } {
+function overrideLabel(pct: number | null): { name: string; cls: string } {
   if (pct === null) return { name: 'Tạm tính', cls: 'bg-[#372621] text-[#e4beb4] border-[#5b4039]/40' };
-  if (pct >= 23) return { name: `Vàng ${pct}%`, cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20' };
-  if (pct >= 18) return { name: `Bạc ${pct}%`, cls: 'bg-[#9cefff]/10 text-[#9cefff] border-[#9cefff]/20' };
-  return { name: `Cơ bản ${pct}%`, cls: 'bg-[#ffb5a1]/10 text-[#ffb5a1] border-[#ffb5a1]/20' };
+  return { name: `Override ${pct}%`, cls: 'bg-[#84cfff]/10 text-[#84cfff] border-[#84cfff]/20' };
 }
 
-export default function DealerCommissionPage() {
+export default function SupervisorCommissionPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
-  const [rows, setRows] = useState<LedgerRow[]>([]);
+  const [rows, setRows] = useState<SupervisorLedgerRow[]>([]);
   const [filter, setFilter] = useState<Bucket>('all');
   const [q, setQ] = useState('');
   const [from, setFrom] = useState('');
@@ -52,25 +50,25 @@ export default function DealerCommissionPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) { router.replace('/portal/login'); return; }
-    if (profile?.role && profile.role !== 'dealer') { router.replace('/portal'); return; }
+    if (profile?.role && profile.role !== 'supervisor') { router.replace('/portal'); return; }
     if (profile) {
-      getDealerLedger(profile.id).then(setRows);
+      getSupervisorLedger(profile.id).then(setRows);
       getMyPayoutRequests().then(setMyRequests);
     }
   }, [loading, session, profile, router]);
 
   const stats = useMemo(() => {
-    let pendingCnt = 0, pendingVal = 0;        // chờ duyệt: order pending, no commission yet (estimated)
-    let waitingCnt = 0, waitingVal = 0;        // tạm tính: same orders, estimated commission at 15%
-    let approvedCnt = 0, approvedVal = 0;      // đã duyệt · chờ chi
-    let paidCnt = 0, paidVal = 0;              // đã thanh toán
+    let pendingCnt = 0, pendingVal = 0;
+    let waitingCnt = 0, waitingVal = 0;
+    let approvedCnt = 0, approvedVal = 0;
+    let paidCnt = 0, paidVal = 0;
     for (const r of rows) {
       const c = r.commission;
       if (c?.paid_at && !c.voided_at) { paidCnt++; paidVal += Number(c.amount); continue; }
       if (c && !c.voided_at) { approvedCnt++; approvedVal += Number(c.amount); continue; }
       if (r.status === 'pending') {
         pendingCnt++; pendingVal += Number(r.sale_price);
-        waitingCnt++; waitingVal += Math.round(Number(r.sale_price) * 0.15);
+        waitingCnt++; waitingVal += Math.round(Number(r.sale_price) * 0.025);
       }
     }
     return { pendingCnt, pendingVal, waitingCnt, waitingVal, approvedCnt, approvedVal, paidCnt, paidVal };
@@ -79,7 +77,8 @@ export default function DealerCommissionPage() {
   const filtered = useMemo(() => rows.filter((r) => {
     const b = statusOf(r).bucket;
     if (filter !== 'all' && b !== filter) return false;
-    if (q && !(`${r.serial_number} ${r.customer_name}`.toLowerCase().includes(q.toLowerCase()))) return false;
+    const haystack = `${r.serial_number} ${r.customer_name} ${r.dealer_name ?? ''}`.toLowerCase();
+    if (q && !haystack.includes(q.toLowerCase())) return false;
     if (from && r.sale_date < from) return false;
     if (to && r.sale_date > to) return false;
     return true;
@@ -94,9 +93,10 @@ export default function DealerCommissionPage() {
       const st = statusOf(r);
       return {
         'Số serial': r.serial_number,
+        'Đại lý': r.dealer_name ?? '',
         'Khách hàng': r.customer_name,
         'Giá bán (₫)': Number(r.sale_price),
-        'Phương án': planLabel(pct).name,
+        'Override': overrideLabel(pct).name,
         'Hoa hồng (₫)': r.commission && !r.commission.voided_at ? Number(r.commission.amount) : '',
         'Trạng thái': st.label,
         'Ngày đặt': r.sale_date,
@@ -105,8 +105,8 @@ export default function DealerCommissionPage() {
     });
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sổ hoa hồng');
-    XLSX.writeFile(wb, `hoa-hong-${profile.full_name || 'daily'}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, 'Hoa hồng SV');
+    XLSX.writeFile(wb, `hoa-hong-sv-${profile.full_name || 'supervisor'}-${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success(`Đã xuất ${filtered.length} đơn`);
   };
 
@@ -126,7 +126,7 @@ export default function DealerCommissionPage() {
     if (amt > stats.approvedVal) { toast.error('Vượt số dư đã duyệt chờ chi'); return; }
     setReqBusy(true);
     try {
-      await createPayoutRequest(amt, 'dealer', reqNotes.trim() || undefined);
+      await createPayoutRequest(amt, 'supervisor', reqNotes.trim() || undefined);
       toast.success('Đã gửi yêu cầu tất toán');
       setReqOpen(false);
       setMyRequests(await getMyPayoutRequests());
@@ -138,8 +138,8 @@ export default function DealerCommissionPage() {
   };
 
   const cards = [
-    { key: 'waiting', icon: 'pending_actions', label: 'Tạm tính', val: stats.waitingVal, cnt: stats.waitingCnt, cls: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
-    { key: 'pending', icon: 'hourglass_empty', label: 'Chờ duyệt', val: stats.pendingVal, cnt: stats.pendingCnt, cls: 'text-[#84cfff] bg-[#84cfff]/10 border-[#84cfff]/20' },
+    { key: 'waiting', icon: 'pending_actions', label: 'Override tạm tính', val: stats.waitingVal, cnt: stats.waitingCnt, cls: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+    { key: 'pending', icon: 'hourglass_empty', label: 'Đơn team đang chờ', val: stats.pendingVal, cnt: stats.pendingCnt, cls: 'text-[#84cfff] bg-[#84cfff]/10 border-[#84cfff]/20' },
     { key: 'approved', icon: 'verified', label: 'Đã duyệt · chờ chi', val: stats.approvedVal, cnt: stats.approvedCnt, cls: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
     { key: 'paid', icon: 'payments', label: 'Đã thanh toán', val: stats.paidVal, cnt: stats.paidCnt, cls: 'text-emerald-500 bg-emerald-600/10 border-emerald-600/20' },
   ];
@@ -154,12 +154,12 @@ export default function DealerCommissionPage() {
   };
 
   return (
-    <PortalShell variant="dealer">
+    <PortalShell variant="supervisor">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Minh bạch hoa hồng</p>
-          <h1 className="mt-1 font-headline text-3xl">Sổ hoa hồng</h1>
-          <p className="mt-1 text-sm text-[#e4beb4]">Chi tiết hoa hồng theo từng đơn máy và trạng thái thanh toán.</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Override hoa hồng từ đội</p>
+          <h1 className="mt-1 font-headline text-3xl">Sổ hoa hồng supervisor</h1>
+          <p className="mt-1 text-sm text-[#e4beb4]">Mọi đơn do đại lý trong nhánh chốt — kèm phần override bạn nhận.</p>
         </div>
         <div className="flex gap-3">
           <button onClick={exportExcel} className="flex items-center gap-2 rounded-lg border border-[#5b4039]/40 bg-[#372621] px-4 py-2 text-sm font-medium hover:border-[#ffb5a1]">
@@ -201,7 +201,7 @@ export default function DealerCommissionPage() {
           <label className="mb-1.5 ml-1 block text-[11px] uppercase tracking-wider text-[#e4beb4]">Tìm kiếm</label>
           <div className="relative">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] text-[#e4beb4]">search</span>
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm số serial / khách hàng…" className="w-full rounded-xl border border-[#5b4039]/40 bg-[#271814] py-2.5 pl-11 pr-4 text-sm text-[#fadcd5] placeholder:text-[#e4beb4]/40 focus:ring-1 focus:ring-[#ffb5a1] outline-none" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm serial / đại lý / khách hàng…" className="w-full rounded-xl border border-[#5b4039]/40 bg-[#271814] py-2.5 pl-11 pr-4 text-sm text-[#fadcd5] placeholder:text-[#e4beb4]/40 focus:ring-1 focus:ring-[#ffb5a1] outline-none" />
           </div>
         </div>
       </div>
@@ -224,13 +224,14 @@ export default function DealerCommissionPage() {
       {/* Table */}
       <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
         <div className="portal-scroll overflow-x-auto">
-          <table className="w-full min-w-[840px] text-left">
+          <table className="w-full min-w-[920px] text-left">
             <thead>
               <tr className="border-b border-[#5b4039]/40 bg-[#372621]/50 text-[11px] uppercase tracking-wider text-[#e4beb4]">
                 <th className="px-6 py-4">Số serial</th>
+                <th className="px-6 py-4">Đại lý</th>
                 <th className="px-6 py-4">Khách hàng</th>
                 <th className="px-6 py-4 text-right">Giá bán</th>
-                <th className="px-6 py-4">Phương án</th>
+                <th className="px-6 py-4">Override</th>
                 <th className="px-6 py-4 text-right">Hoa hồng</th>
                 <th className="px-6 py-4">Trạng thái</th>
                 <th className="w-10 px-6 py-4"></th>
@@ -238,20 +239,28 @@ export default function DealerCommissionPage() {
             </thead>
             <tbody className="divide-y divide-[#5b4039]/20">
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-[#e4beb4]/60">Không có đơn phù hợp.</td></tr>
+                <tr><td colSpan={8} className="px-6 py-12 text-center text-sm text-[#e4beb4]/60">Không có đơn phù hợp.</td></tr>
               ) : filtered.map((r) => {
                 const st = statusOf(r);
                 const pct = rateOf(r);
-                const plan = planLabel(pct);
+                const ovr = overrideLabel(pct);
                 const open = openId === r.id;
                 return (
                   <Fragment key={r.id}>
                     <tr onClick={() => setOpenId(open ? null : r.id)} className="group cursor-pointer transition-colors hover:bg-[#372621]">
                       <td className="px-6 py-5 font-mono text-sm text-[#ffb5a1]">{r.serial_number}</td>
-                      <td className="px-6 py-5 text-sm font-semibold">{r.customer_name}</td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ffb5a1]/15 text-[11px] font-bold text-[#ffb5a1]">
+                            {(r.dealer_name ?? '?').trim().slice(0, 2).toUpperCase()}
+                          </div>
+                          <span className="text-sm font-medium">{r.dealer_name ?? '—'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-sm">{r.customer_name}</td>
                       <td className="px-6 py-5 text-right font-mono text-sm tabular-nums">{fmtVnd(Number(r.sale_price))} ₫</td>
                       <td className="px-6 py-5">
-                        <span className={`rounded-md border px-2 py-1 text-[11px] font-bold uppercase ${plan.cls}`}>{plan.name}</span>
+                        <span className={`rounded-md border px-2 py-1 text-[11px] font-bold uppercase ${ovr.cls}`}>{ovr.name}</span>
                       </td>
                       <td className={`px-6 py-5 text-right font-mono text-sm font-bold tabular-nums ${r.commission?.paid_at ? 'text-emerald-400' : 'text-[#fadcd5]'}`}>
                         {r.commission && !r.commission.voided_at ? `${fmtVnd(Number(r.commission.amount))} ₫` : '—'}
@@ -267,15 +276,15 @@ export default function DealerCommissionPage() {
                     </tr>
                     {open && (
                       <tr className="bg-[#180b07]/50">
-                        <td colSpan={7} className="px-12 py-6">
+                        <td colSpan={8} className="px-12 py-6">
                           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
                             <div className="space-y-1">
                               <p className="text-[11px] uppercase text-[#e4beb4]">Ngày đặt đơn</p>
                               <p className="text-sm">{new Date(r.sale_date).toLocaleDateString('vi-VN')}</p>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-[11px] uppercase text-[#e4beb4]">Phương án</p>
-                              <p className="text-sm">{plan.name}</p>
+                              <p className="text-[11px] uppercase text-[#e4beb4]">Người phụ trách</p>
+                              <p className="text-sm">{r.dealer_name ?? '—'}</p>
                             </div>
                             <div className="space-y-1">
                               <p className="text-[11px] uppercase text-[#e4beb4]">Ngày thanh toán</p>
@@ -300,12 +309,11 @@ export default function DealerCommissionPage() {
         </div>
       </div>
 
-      {/* My payout requests */}
       {myRequests.length > 0 && (
         <div className="mt-10 overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
           <div className="border-b border-[#5b4039]/40 px-6 py-4">
             <h2 className="font-headline text-lg">Yêu cầu tất toán của tôi</h2>
-            <p className="text-xs text-[#e4beb4]/70">Lịch sử các lần yêu cầu rút hoa hồng đã duyệt.</p>
+            <p className="text-xs text-[#e4beb4]/70">Lịch sử các lần yêu cầu rút override.</p>
           </div>
           <table className="w-full text-left text-sm">
             <thead className="text-[11px] uppercase tracking-wider text-[#e4beb4]">
@@ -334,12 +342,11 @@ export default function DealerCommissionPage() {
         </div>
       )}
 
-      {/* Payout request modal */}
       {reqOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => !reqBusy && setReqOpen(false)}>
           <div className="w-full max-w-md rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17] p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-headline text-xl">Yêu cầu tất toán</h3>
-            <p className="mt-1 text-sm text-[#e4beb4]">Số dư đã duyệt chờ chi: <span className="font-mono font-bold text-emerald-400">{fmtVnd(stats.approvedVal)} ₫</span></p>
+            <p className="mt-1 text-sm text-[#e4beb4]">Số dư override đã duyệt: <span className="font-mono font-bold text-emerald-400">{fmtVnd(stats.approvedVal)} ₫</span></p>
             <div className="mt-4 space-y-3">
               <div>
                 <label className="mb-1 block text-[11px] uppercase tracking-wider text-[#e4beb4]">Số tiền yêu cầu (₫)</label>
@@ -347,7 +354,7 @@ export default function DealerCommissionPage() {
               </div>
               <div>
                 <label className="mb-1 block text-[11px] uppercase tracking-wider text-[#e4beb4]">Ghi chú (tuỳ chọn)</label>
-                <textarea value={reqNotes} onChange={(e) => setReqNotes(e.target.value)} rows={3} className="w-full resize-none rounded-lg border border-[#5b4039]/50 bg-[#271814] px-3 py-2 text-sm text-[#fadcd5] outline-none focus:border-[#ffb5a1]" placeholder="VD: Cần chi sớm để mua thiết bị" />
+                <textarea value={reqNotes} onChange={(e) => setReqNotes(e.target.value)} rows={3} className="w-full resize-none rounded-lg border border-[#5b4039]/50 bg-[#271814] px-3 py-2 text-sm text-[#fadcd5] outline-none focus:border-[#ffb5a1]" />
               </div>
             </div>
             <div className="mt-5 flex justify-end gap-3">

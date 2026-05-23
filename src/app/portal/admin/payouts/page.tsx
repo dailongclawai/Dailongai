@@ -6,8 +6,9 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
-import { getAdminPayoutQueue, adminProcessPayout } from '@/lib/portal-queries';
+import { getAdminPayoutQueue, adminProcessPayout, getAdminPayoutRequests, adminProcessPayoutRequest } from '@/lib/portal-queries';
 import type { AdminPayoutRow } from '@/lib/portal-types';
+import type { PayoutRequestWithRequester, PayoutRequest } from '@/lib/portal-queries';
 
 const fmtVnd = (n: number | string) =>
   new Intl.NumberFormat('vi-VN').format(Number(n)) + ' đ';
@@ -18,13 +19,41 @@ export default function PayoutsPage() {
   const [rows, setRows] = useState<AdminPayoutRow[]>([]);
   const [proofRefs, setProofRefs] = useState<Record<string, string>>({});
   const [processing, setProcessing] = useState<string | null>(null);
+  const [requests, setRequests] = useState<PayoutRequestWithRequester[]>([]);
+  const [reqProcessing, setReqProcessing] = useState<string | null>(null);
+  const [reqNotes, setReqNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (loading) return;
     if (!session) { router.replace('/portal/login'); return; }
     if (profile?.role !== 'admin') { router.replace('/portal/dashboard'); return; }
     getAdminPayoutQueue().then(setRows);
+    getAdminPayoutRequests().then(setRequests);
   }, [loading, session, profile, router]);
+
+  const processRequest = async (id: string, decision: 'approved' | 'rejected' | 'paid') => {
+    setReqProcessing(id);
+    try {
+      const updated = await adminProcessPayoutRequest(id, decision, reqNotes[id]?.trim() || undefined);
+      setRequests((rs) => rs.map((r) => (r.id === id ? { ...r, ...updated } as PayoutRequestWithRequester : r)));
+      setReqNotes((n) => ({ ...n, [id]: '' }));
+      toast.success(`Đã ${decision === 'approved' ? 'duyệt' : decision === 'rejected' ? 'từ chối' : 'đánh dấu đã chi'} yêu cầu`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Lỗi xử lý yêu cầu');
+    } finally {
+      setReqProcessing(null);
+    }
+  };
+
+  const reqStatusCls: Record<PayoutRequest['status'], string> = {
+    pending: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+    approved: 'text-[#84cfff] bg-[#84cfff]/10 border-[#84cfff]/20',
+    rejected: 'text-[#ffb4ab] bg-[#ffb4ab]/10 border-[#ffb4ab]/20',
+    paid: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  };
+  const reqStatusLabel: Record<PayoutRequest['status'], string> = {
+    pending: 'Chờ duyệt', approved: 'Đã duyệt · chờ chi', rejected: 'Từ chối', paid: 'Đã chi',
+  };
 
   if (loading || profile?.role !== 'admin') return null;
 
@@ -63,6 +92,100 @@ export default function PayoutsPage() {
         </p>
         <h1 className="mt-2 font-headline text-3xl">Quản lý hoa hồng</h1>
       </div>
+
+      {/* Payout requests (dealer / supervisor) */}
+      {requests.length > 0 && (
+        <section className="mb-10">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">
+            Yêu cầu tất toán ({requests.filter((r) => r.status === 'pending').length} chờ duyệt)
+          </p>
+          <div className="overflow-hidden rounded-2xl border border-[#5b4039]/40 bg-[#2c1c17]">
+            {requests.map((req, idx) => (
+              <div key={req.id}>
+                {idx > 0 && <div className="border-t border-[#5b4039]/40" />}
+                <div className="p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold ${reqStatusCls[req.status]}`}>
+                          {reqStatusLabel[req.status]}
+                        </span>
+                        <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider ${
+                          req.requester_role === 'supervisor'
+                            ? 'bg-[#34d399]/15 text-[#34d399]'
+                            : 'bg-[#ff5626]/15 text-[#ffb5a1]'
+                        }`}>
+                          {req.requester_role}
+                        </span>
+                        <p className="text-sm font-semibold text-[#fadcd5]">
+                          {req.requester?.full_name ?? req.requester?.email ?? req.requester_id.slice(0, 8)}
+                        </p>
+                      </div>
+                      <div className="mt-1 text-xs text-[#fadcd5]/60">
+                        Gửi: <span className="font-mono tabular-nums">{new Date(req.created_at).toLocaleString('vi-VN')}</span>
+                        {req.notes && <span className="ml-3">Ghi chú: <span className="text-[#e4beb4]">{req.notes}</span></span>}
+                        {req.processed_at && (
+                          <span className="ml-3">Xử lý: <span className="font-mono tabular-nums">{new Date(req.processed_at).toLocaleString('vi-VN')}</span>{req.processor_notes ? ` · ${req.processor_notes}` : ''}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-mono tabular-nums text-2xl font-semibold text-[#fadcd5]">{fmtVnd(req.amount)}</p>
+                      <p className="text-[10px] text-[#fadcd5]/40">yêu cầu</p>
+                    </div>
+                  </div>
+                  {req.status === 'pending' && (
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <input
+                        type="text"
+                        value={reqNotes[req.id] ?? ''}
+                        onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
+                        placeholder="Ghi chú xử lý (tuỳ chọn)"
+                        className="min-w-0 flex-1 rounded-lg border border-[#5b4039]/40 bg-[#2c1c17] px-3 py-2 text-sm outline-none focus:border-[#ffb5a1]"
+                      />
+                      <button
+                        type="button"
+                        disabled={reqProcessing === req.id}
+                        onClick={() => processRequest(req.id, 'rejected')}
+                        className="rounded-full border border-[#ffb4ab]/40 px-4 py-2 text-xs font-medium text-[#ffb4ab] hover:bg-[#ffb4ab]/10 disabled:opacity-50"
+                      >
+                        Từ chối
+                      </button>
+                      <button
+                        type="button"
+                        disabled={reqProcessing === req.id}
+                        onClick={() => processRequest(req.id, 'approved')}
+                        className="rounded-full bg-[#84cfff] px-5 py-2 text-xs font-bold text-[#1e100c] hover:bg-[#84cfff]/90 disabled:opacity-50"
+                      >
+                        {reqProcessing === req.id ? 'Đang xử lý…' : 'Duyệt yêu cầu'}
+                      </button>
+                    </div>
+                  )}
+                  {req.status === 'approved' && (
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <input
+                        type="text"
+                        value={reqNotes[req.id] ?? ''}
+                        onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
+                        placeholder="Mã giao dịch / ghi chú chi trả"
+                        className="min-w-0 flex-1 rounded-lg border border-[#5b4039]/40 bg-[#2c1c17] px-3 py-2 text-sm outline-none focus:border-[#ffb5a1]"
+                      />
+                      <button
+                        type="button"
+                        disabled={reqProcessing === req.id}
+                        onClick={() => processRequest(req.id, 'paid')}
+                        className="rounded-full bg-emerald-400 px-5 py-2 text-xs font-bold text-[#1e100c] hover:bg-emerald-400/90 disabled:opacity-50"
+                      >
+                        {reqProcessing === req.id ? 'Đang xử lý…' : 'Đánh dấu đã chi'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Pending payouts */}
       {pending.length === 0 ? (

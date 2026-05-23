@@ -340,6 +340,96 @@ export async function getAllTeamMembers(): Promise<TeamMember[]> {
   return (data as TeamMember[]) ?? [];
 }
 
+// ── Supervisor ledger (overrides earned across team dealers) ───────────
+export interface SupervisorLedgerRow extends LedgerRow {
+  dealer_name: string | null;
+}
+
+export async function getSupervisorLedger(_supervisorId: string): Promise<SupervisorLedgerRow[]> {
+  // RLS limits supervisor to orders belonging to their team (dealer.supervisor_id = auth.uid()).
+  const { data } = await getSupabaseClient()
+    .from('orders')
+    .select('id, serial_number, customer_name, sale_price, sale_date, status, dealer:profiles!orders_dealer_id_fkey(full_name), commission_payouts(amount, paid_at, voided_at, payment_proof_url, recipient_role)')
+    .order('sale_date', { ascending: false });
+  type Raw = Omit<LedgerRow, 'commission'> & {
+    dealer: { full_name: string | null } | null;
+    commission_payouts: LedgerCommission[] | null;
+  };
+  return ((data as Raw[] | null) ?? []).map((o) => ({
+    id: o.id,
+    serial_number: o.serial_number,
+    customer_name: o.customer_name,
+    sale_price: o.sale_price,
+    sale_date: o.sale_date,
+    status: o.status,
+    dealer_name: o.dealer?.full_name ?? null,
+    commission: (o.commission_payouts ?? []).find((p) => p.recipient_role === 'supervisor') ?? null,
+  }));
+}
+
+// ── Payout requests ────────────────────────────────────────────────────
+export interface PayoutRequest {
+  id: string;
+  requester_id: string;
+  requester_role: 'dealer' | 'supervisor';
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  notes: string | null;
+  created_at: string;
+  processed_at: string | null;
+  processed_by: string | null;
+  processor_notes: string | null;
+}
+
+export interface PayoutRequestWithRequester extends PayoutRequest {
+  requester: { full_name: string | null; email: string | null } | null;
+}
+
+export async function getMyPayoutRequests(): Promise<PayoutRequest[]> {
+  const { data } = await getSupabaseClient()
+    .from('payout_requests')
+    .select('*')
+    .order('created_at', { ascending: false });
+  return (data as PayoutRequest[]) ?? [];
+}
+
+export async function getAdminPayoutRequests(): Promise<PayoutRequestWithRequester[]> {
+  const { data } = await getSupabaseClient()
+    .from('payout_requests')
+    .select('*, requester:profiles!payout_requests_requester_id_fkey(full_name, email)')
+    .order('created_at', { ascending: false });
+  return (data as PayoutRequestWithRequester[]) ?? [];
+}
+
+export async function createPayoutRequest(
+  amount: number,
+  role: 'dealer' | 'supervisor',
+  notes?: string,
+): Promise<PayoutRequest> {
+  const sb = getSupabaseClient();
+  const { data: { user }, error: ue } = await sb.auth.getUser();
+  if (ue || !user) throw new Error(ue?.message ?? 'unauthenticated');
+  const { data, error } = await sb
+    .from('payout_requests')
+    .insert({ requester_id: user.id, requester_role: role, amount, notes: notes ?? null })
+    .select('*')
+    .single();
+  if (error) throw new Error(error.message);
+  return data as PayoutRequest;
+}
+
+export async function adminProcessPayoutRequest(
+  id: string,
+  decision: 'approved' | 'rejected' | 'paid',
+  processorNotes?: string,
+): Promise<PayoutRequest> {
+  const { data, error } = await getSupabaseClient()
+    .rpc('admin_process_payout_request', { p_request_id: id, p_decision: decision, p_processor_notes: processorNotes ?? null })
+    .single();
+  if (error) throw new Error(error.message);
+  return data as PayoutRequest;
+}
+
 // ── Audit log (admin) ───────────────────────────────────────────────────
 export async function getAuditLog(limit = 100): Promise<AuditEntry[]> {
   const { data } = await getSupabaseClient()
