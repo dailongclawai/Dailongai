@@ -8,7 +8,6 @@ const items = [
   { href: '/portal/admin/orders', label: 'Đơn hàng' },
   { href: '/portal/admin/payouts', label: 'Hoa hồng' },
   { href: '/portal/admin/products', label: 'Sản phẩm' },
-  { href: '/portal/admin/documents', label: 'Tài liệu' },
   { href: '/portal/admin/supervisors', label: 'Supervisor' },
   { href: '/portal/admin/upgrade', label: 'Nâng cấp' },
   { href: '/portal/admin/reports', label: 'Báo cáo' },

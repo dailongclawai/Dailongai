@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 const items = [
   { href: '/portal/dashboard', label: 'Tổng quan', exact: true },
   { href: '/portal/dealer/commission', label: 'Hoa hồng' },
-  { href: '/portal/documents', label: 'Tài liệu' },
 ];
 
 export function DealerNav() {

@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, PortalMessage, PayoutRow, AdminPayoutRow, SalesDocument, DocCategory, DocVisibility, AuditEntry } from './portal-types';
+import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -237,48 +237,6 @@ export async function createModel(input: ModelInput): Promise<void> {
 
 export async function updateModel(id: string, input: Partial<ModelInput>): Promise<void> {
   const { error } = await getSupabaseClient().from('product_models').update(input).eq('id', id);
-  if (error) throw error;
-}
-
-// ── Sales documents ─────────────────────────────────────────────────────
-export async function getSalesDocuments(): Promise<SalesDocument[]> {
-  const { data } = await getSupabaseClient()
-    .from('sales_documents')
-    .select('*')
-    .order('created_at', { ascending: false });
-  return (data as SalesDocument[]) ?? [];
-}
-
-export async function uploadSalesDoc(file: File): Promise<string> {
-  const ext = file.name.split('.').pop() ?? 'pdf';
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error } = await getSupabaseClient().storage.from('sales-docs').upload(path, file, { upsert: false });
-  if (error) throw error;
-  return path;
-}
-
-export async function getSalesDocUrl(path: string): Promise<string | null> {
-  const { data, error } = await getSupabaseClient().storage.from('sales-docs').createSignedUrl(path, 3600);
-  if (error) return null;
-  return data.signedUrl;
-}
-
-export async function createSalesDocument(input: {
-  title: string;
-  file_url: string;
-  category: DocCategory;
-  visible_to: DocVisibility;
-}): Promise<void> {
-  const { data: { session } } = await getSupabaseClient().auth.getSession();
-  if (!session) throw new Error('Not authenticated');
-  const { error } = await getSupabaseClient()
-    .from('sales_documents')
-    .insert({ ...input, uploaded_by: session.user.id });
-  if (error) throw error;
-}
-
-export async function deleteSalesDocument(id: string): Promise<void> {
-  const { error } = await getSupabaseClient().from('sales_documents').delete().eq('id', id);
   if (error) throw error;
 }
 

@@ -16,7 +16,6 @@ const NAV: Record<Variant, NavItem[]> = {
     { href: '/portal/admin/orders', label: 'Đơn hàng', icon: 'shopping_cart' },
     { href: '/portal/admin/payouts', label: 'Hoa hồng', icon: 'payments' },
     { href: '/portal/admin/products', label: 'Sản phẩm', icon: 'medical_services' },
-    { href: '/portal/admin/documents', label: 'Tài liệu', icon: 'description' },
     { href: '/portal/admin/supervisors', label: 'Supervisor', icon: 'groups' },
     { href: '/portal/admin/upgrade', label: 'Nâng cấp', icon: 'upgrade' },
     { href: '/portal/admin/reports', label: 'Báo cáo', icon: 'bar_chart' },
@@ -25,12 +24,10 @@ const NAV: Record<Variant, NavItem[]> = {
   dealer: [
     { href: '/portal/dashboard', label: 'Tổng quan', icon: 'dashboard', exact: true },
     { href: '/portal/dealer/commission', label: 'Hoa hồng', icon: 'payments' },
-    { href: '/portal/documents', label: 'Tài liệu', icon: 'description' },
   ],
   supervisor: [
     { href: '/portal/supervisor', label: 'Đội của tôi', icon: 'groups', exact: true },
     { href: '/portal/supervisor/commission', label: 'Hoa hồng', icon: 'payments' },
-    { href: '/portal/documents', label: 'Tài liệu', icon: 'description' },
   ],
 };
 

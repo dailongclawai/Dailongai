@@ -49,7 +49,7 @@ export default function SupervisorDashboard() {
   const totalUnits = team.reduce((s, t) => s + Number(t.units_ytd), 0);
 
   return (
-    <PortalShell variant="supervisor" nav={<Link href="/portal/documents" className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">Tài liệu</Link>}>
+    <PortalShell variant="supervisor">
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#34d399]">Toàn đội</p>
         <h1 className="mt-2 font-headline text-4xl">Đội của tôi</h1>
