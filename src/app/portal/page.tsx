@@ -47,7 +47,7 @@ export default function PortalIndex() {
   }, [loading, session, profile, router, refresh]);
 
   return (
-    <div className="flex h-screen items-center justify-center text-[#fadcd5]/50">
+    <div className="flex h-screen items-center justify-center text-[#e2e2e5]/50">
       Đang kiểm tra phiên đăng nhập…
     </div>
   );

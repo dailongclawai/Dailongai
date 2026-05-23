@@ -21,7 +21,7 @@ export default function NewOrderPage() {
   return (
     <PortalShell variant="dealer">
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Đơn mới</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Đơn mới</p>
         <h1 className="mt-2 font-headline text-3xl">Ghi nhận đơn bán máy</h1>
       </div>
       <OrderForm userId={session.user.id} />

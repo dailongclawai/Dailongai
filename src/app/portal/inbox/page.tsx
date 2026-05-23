@@ -42,7 +42,7 @@ const YM_CSS = `
 .ymx-list{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid #4e164e;background:#fff;}
 .ymx-profile{height:54px;display:flex;align-items:center;gap:8px;padding:6px 8px;color:#fff;
   background:radial-gradient(circle at 85% 28%,rgba(255,255,255,.22),transparent 25%),linear-gradient(#9e3a9e,#742074);border-bottom:1px solid #582058;}
-.ymx-avatar{width:40px;height:40px;border:1px solid #d5bad5;border-radius:3px;background:linear-gradient(135deg,#ffd9b0,#ffb5a1);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.ymx-avatar{width:40px;height:40px;border:1px solid #d5bad5;border-radius:3px;background:linear-gradient(135deg,#ffd9b0,#ff5625);display:flex;align-items:center;justify-content:center;font-size:20px;}
 .ymx-id{flex:1;min-width:0;}
 .ymx-id strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ymx-id em{display:block;font-style:normal;font-size:10px;color:#f0dff0;}
@@ -167,7 +167,7 @@ export default function InboxPage() {
   const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
   const nav = isAdmin
     ? <AdminNav />
-    : <Link href={dashHref} className="text-[#fadcd5]/60 transition-colors hover:text-[#ffb5a1]">← Bảng điều khiển</Link>;
+    : <Link href={dashHref} className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">← Bảng điều khiển</Link>;
 
   const Item = (m: PortalMessage) => {
     const isUnread = !m.is_read && m.recipient_id === session.user.id;
@@ -184,7 +184,7 @@ export default function InboxPage() {
     <PortalShell variant={isAdmin ? 'admin' : profile.role === 'supervisor' ? 'supervisor' : 'dealer'} nav={nav}>
       <style>{YM_CSS}</style>
       <div className="mb-5">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#fadcd5]/50">{unread > 0 ? `${unread} chưa đọc` : 'Tất cả đã đọc'}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">{unread > 0 ? `${unread} chưa đọc` : 'Tất cả đã đọc'}</p>
         <h1 className="mt-2 font-headline text-3xl">Hộp thư</h1>
       </div>
 

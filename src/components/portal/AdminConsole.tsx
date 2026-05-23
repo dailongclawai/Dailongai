@@ -32,18 +32,18 @@ export function AdminConsole() {
     <div className="space-y-12 py-4">
       <div className="flex items-baseline justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Số 05 / 2026 · Toàn fleet</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Số 05 / 2026 · Toàn fleet</p>
           <h1 className="mt-2 font-headline text-5xl leading-none tracking-tight">
             Bức tranh <span>tháng này</span>.
           </h1>
         </div>
         <div className="text-right">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#fadcd5]/50">Chế độ commission</p>
-          <div className="mt-2 inline-flex rounded-full border border-[#5b4039]/60 p-1">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#e2e2e5]/50">Chế độ commission</p>
+          <div className="mt-2 inline-flex rounded-full border border-[#3d3f41]/60 p-1">
             <button
               onClick={() => setScheme('tier')}
               className={`rounded-full px-4 py-1.5 text-xs font-medium ${
-                scheme === 'tier' ? 'bg-[#ff5626] text-white' : 'text-[#fadcd5]/60'
+                scheme === 'tier' ? 'bg-[#ff5625] text-white' : 'text-[#e2e2e5]/60'
               }`}
             >
               Tier A
@@ -51,7 +51,7 @@ export function AdminConsole() {
             <button
               onClick={() => setScheme('flat')}
               className={`rounded-full px-4 py-1.5 text-xs font-medium ${
-                scheme === 'flat' ? 'bg-[#ff5626] text-white' : 'text-[#fadcd5]/60'
+                scheme === 'flat' ? 'bg-[#ff5625] text-white' : 'text-[#e2e2e5]/60'
               }`}
             >
               Flat B
@@ -62,12 +62,12 @@ export function AdminConsole() {
 
       <section className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-8">
         <div className="md:col-span-5">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#fadcd5]/50">Tổng doanh thu YTD</p>
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#e2e2e5]/50">Tổng doanh thu YTD</p>
           <p className="mt-2 font-headline text-[64px] leading-[0.85] tracking-tighter md:text-[100px]">
             {fmtShortVnd(f.revenue_ytd).replace(/[^0-9.]/g, '') || '0'}
-            <span className="ml-2 align-top font-mono tabular-nums text-3xl text-[#ffb5a1]">tỷ ₫</span>
+            <span className="ml-2 align-top font-mono tabular-nums text-3xl text-[#ff5625]">tỷ ₫</span>
           </p>
-          <p className="mt-3 text-sm text-[#fadcd5]/60">
+          <p className="mt-3 text-sm text-[#e2e2e5]/60">
             <span className="font-mono tabular-nums">{f.units_ytd}</span> máy đã chốt · <span className="font-mono tabular-nums">{f.active_dealers}</span> đại lý active
           </p>
         </div>
@@ -75,76 +75,76 @@ export function AdminConsole() {
           {[
             { label: 'Đã bán T05', value: f.units_month, icon: 'sell', chip: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', tone: 'text-emerald-400' },
             { label: 'Đơn chờ duyệt', value: f.orders_pending, icon: 'pending_actions', chip: 'bg-amber-500/10 text-amber-400 border-amber-500/20', tone: 'text-amber-400' },
-            { label: 'Đại lý active', value: f.active_dealers, icon: 'groups', chip: 'bg-[#ffb5a1]/10 text-[#ffb5a1] border-[#ffb5a1]/20', tone: 'text-[#ffb5a1]' },
-            { label: 'Hoa hồng pending', value: fmtShortVnd(f.commission_pending), icon: 'payments', chip: 'bg-[#84cfff]/10 text-[#84cfff] border-[#84cfff]/20', tone: 'text-[#84cfff]' },
+            { label: 'Đại lý active', value: f.active_dealers, icon: 'groups', chip: 'bg-[#ff5625]/10 text-[#ff5625] border-[#ff5625]/20', tone: 'text-[#ff5625]' },
+            { label: 'Hoa hồng pending', value: fmtShortVnd(f.commission_pending), icon: 'payments', chip: 'bg-[#00daf3]/10 text-[#00daf3] border-[#00daf3]/20', tone: 'text-[#00daf3]' },
           ].map((k) => (
-            <div key={k.label} className="group relative overflow-hidden rounded-xl border border-[#5b4039]/40 bg-[#2c1c17] p-4">
+            <div key={k.label} className="group relative overflow-hidden rounded-xl border border-[#3d3f41]/40 bg-[#1e2022] p-4">
               <div className="pointer-events-none absolute -bottom-4 -right-4 opacity-[0.03] transition-opacity group-hover:opacity-[0.08]">
                 <span className="material-symbols-outlined text-[96px]">{k.icon}</span>
               </div>
               <span className={`material-symbols-outlined rounded-lg border p-1.5 text-[20px] ${k.chip}`}>{k.icon}</span>
-              <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#fadcd5]/50">{k.label}</p>
+              <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#e2e2e5]/50">{k.label}</p>
               <p className={`mt-1 font-mono tabular-nums text-3xl font-medium ${k.tone}`}>{k.value}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[#ffb5a1]/25 bg-gradient-to-br from-[#ff5626]/15 to-[#2c1c17] p-6 text-[#fadcd5]">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-[#ffb5a1]">Đợt chi tiếp theo</p>
+      <section className="rounded-3xl border border-[#ff5625]/25 bg-gradient-to-br from-[#ff5625]/15 to-[#1e2022] p-6 text-[#e2e2e5]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">Đợt chi tiếp theo</p>
         <p className="mt-3 font-headline text-4xl leading-none">
-          05<span className="text-[#ffb5a1]">–</span>10<span className="ml-2 text-lg text-[#fadcd5]/60">/06/26</span>
+          05<span className="text-[#ff5625]">–</span>10<span className="ml-2 text-lg text-[#e2e2e5]/60">/06/26</span>
         </p>
-        <p className="mt-3 text-sm text-[#fadcd5]/80">
+        <p className="mt-3 text-sm text-[#e2e2e5]/80">
           Tự động chi 5-10 hàng tháng cho mọi đơn approved trước 30/T trước
         </p>
-        <p className="mt-1 text-[11px] text-[#fadcd5]/60">
+        <p className="mt-1 text-[11px] text-[#e2e2e5]/60">
           Tổng dự kiến: <span className="font-mono tabular-nums">{fmtShortVnd(f.commission_pending)}</span> · cho <span className="font-mono tabular-nums">{f.active_dealers}</span> đại lý
         </p>
       </section>
 
-      <section className="rounded-3xl border-2 border-[#5b4039]/50 bg-[#2c1c17] p-8">
-        <div className="mb-6 flex items-baseline justify-between border-b border-[#5b4039]/40 pb-4">
+      <section className="rounded-3xl border-2 border-[#3d3f41]/50 bg-[#1e2022] p-8">
+        <div className="mb-6 flex items-baseline justify-between border-b border-[#3d3f41]/40 pb-4">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Cơ chế hoa hồng</p>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Cơ chế hoa hồng</p>
             <h2 className="mt-1 font-headline text-3xl">Hai phương án</h2>
           </div>
-          <p className="text-xs text-[#fadcd5]/60">Áp dụng từ 2026-05-22</p>
+          <p className="text-xs text-[#e2e2e5]/60">Áp dụng từ 2026-05-22</p>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
-          <div className="rounded-2xl border-2 border-[#ffb5a1] bg-[#ff5626]/5 p-6">
+          <div className="rounded-2xl border-2 border-[#ff5625] bg-[#ff5625]/5 p-6">
             <div className="mb-4 flex items-baseline justify-between">
               <h3 className="font-headline text-xl">Phương án A · Tier</h3>
-              <span className="rounded-full bg-[#ff5626] px-2 py-0.5 text-[10px] font-medium uppercase text-white">Nâng cấp</span>
+              <span className="rounded-full bg-[#ff5625] px-2 py-0.5 text-[10px] font-medium uppercase text-white">Nâng cấp</span>
             </div>
             <div className="my-6">
-              <div className="relative h-2 rounded-full bg-[#372621]">
+              <div className="relative h-2 rounded-full bg-[#282a2c]">
                 {tiers.map((t) => (
                   <div
                     key={t.id}
                     className="absolute -translate-x-1/2"
                     style={{ left: `${Math.min((t.minUnits / tierMax) * 100, 100)}%`, top: '-7px' }}
                   >
-                    <div className="h-4 w-4 rounded-full border-2 border-[#ffb5a1] bg-[#1e100c]" />
+                    <div className="h-4 w-4 rounded-full border-2 border-[#ff5625] bg-[#121416]" />
                   </div>
                 ))}
               </div>
               <div className="mt-6 grid grid-cols-3 text-center">
                 {tiers.map((t, i) => (
                   <div key={t.id}>
-                    <p className="font-mono tabular-nums text-xs text-[#fadcd5]/60">
+                    <p className="font-mono tabular-nums text-xs text-[#e2e2e5]/60">
                       {t.minUnits}{i < tiers.length - 1 ? `–${tiers[i + 1].minUnits - 1}` : '+'} máy
                     </p>
-                    <p className="font-headline text-2xl text-[#ffb5a1]">{t.percent}%</p>
+                    <p className="font-headline text-2xl text-[#ff5625]">{t.percent}%</p>
                   </div>
                 ))}
               </div>
             </div>
-            <p className="text-xs leading-relaxed text-[#fadcd5]/70">
+            <p className="text-xs leading-relaxed text-[#e2e2e5]/70">
               Hoa hồng tăng dần theo số máy bán trong năm. Admin/supervisor nâng đại lý lên Tier để thưởng doanh số cao.
             </p>
-            <div className="mt-5 space-y-1.5 rounded-xl bg-[#2c1c17] p-4 text-xs">
-              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#fadcd5]/50">Thu nhập đại lý YTD</p>
+            <div className="mt-5 space-y-1.5 rounded-xl bg-[#1e2022] p-4 text-xs">
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#e2e2e5]/50">Thu nhập đại lý YTD</p>
               {compareUnits.map((u) => {
                 const tier = tiers.slice().reverse().find((t) => u >= t.minUnits)!;
                 const earn = u * priceAvg * (tier.percent / 100);
@@ -152,7 +152,7 @@ export function AdminConsole() {
                   <div key={u} className="flex justify-between">
                     <span className="font-mono tabular-nums">{u} máy</span>
                     <span>
-                      <span className="text-[#ffb5a1]">@{tier.percent}%</span>{' '}
+                      <span className="text-[#ff5625]">@{tier.percent}%</span>{' '}
                       <span className="font-mono tabular-nums ml-2 font-medium">{fmtShortVnd(earn)}</span>
                     </span>
                   </div>
@@ -169,18 +169,18 @@ export function AdminConsole() {
               <div className="relative h-2 rounded-full bg-[#34d399]" />
               <div className="mt-6 text-center">
                 <p className="font-headline text-6xl text-[#34d399]">15%</p>
-                <p className="text-[10px] uppercase tracking-wider text-[#fadcd5]/50">mọi đơn · mọi đại lý</p>
+                <p className="text-[10px] uppercase tracking-wider text-[#e2e2e5]/50">mọi đơn · mọi đại lý</p>
               </div>
             </div>
-            <p className="text-xs leading-relaxed text-[#fadcd5]/70">
+            <p className="text-xs leading-relaxed text-[#e2e2e5]/70">
               Mọi tài khoản đại lý mới đăng ký mặc định hưởng 15% trên mọi đơn. Admin/supervisor có thể nâng lên Tier A.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="rounded-3xl border border-[#5b4039]/40 bg-[#2c1c17] p-8 backdrop-blur">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ffb5a1]">Chính sách chi trả</p>
+      <section className="rounded-3xl border border-[#3d3f41]/40 bg-[#1e2022] p-8 backdrop-blur">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Chính sách chi trả</p>
         <h2 className="mt-1 font-headline text-3xl">Tự động · ngày 5–10</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
           {[
@@ -188,10 +188,10 @@ export function AdminConsole() {
             { step: '02', label: 'Tính + duyệt', detail: 'Ngày 1–4: trigger tính commission_payouts, admin sanity check.' },
             { step: '03', label: 'Chi tự động', detail: 'Ngày 5–10: bank batch transfer + Zalo OA notify dealer + supervisor.' },
           ].map((s) => (
-            <div key={s.step} className="rounded-xl border border-[#5b4039]/40 bg-[#2c1c17] p-4">
-              <p className="font-mono tabular-nums text-3xl text-[#ffb5a1]">{s.step}</p>
+            <div key={s.step} className="rounded-xl border border-[#3d3f41]/40 bg-[#1e2022] p-4">
+              <p className="font-mono tabular-nums text-3xl text-[#ff5625]">{s.step}</p>
               <p className="mt-2 text-sm font-semibold">{s.label}</p>
-              <p className="mt-1 text-xs text-[#fadcd5]/60">{s.detail}</p>
+              <p className="mt-1 text-xs text-[#e2e2e5]/60">{s.detail}</p>
             </div>
           ))}
         </div>

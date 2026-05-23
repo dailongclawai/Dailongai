@@ -27,8 +27,8 @@ export function AdminNav() {
             href={it.href}
             className={
               active
-                ? 'border-b-2 border-[#ffb5a1] pb-1 font-semibold'
-                : 'text-[#fadcd5]/60 transition-colors hover:text-[#ffb5a1]'
+                ? 'border-b-2 border-[#ff5625] pb-1 font-semibold'
+                : 'text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]'
             }
           >
             {it.label}
