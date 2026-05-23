@@ -26,7 +26,7 @@ export default function PayoutsPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) { router.replace('/portal/login'); return; }
-    if (profile?.role !== 'admin') { router.replace('/portal/dashboard'); return; }
+    if (profile?.role !== 'admin') { router.replace('/portal/403'); return; }
     getAdminPayoutQueue().then(setRows);
     getAdminPayoutRequests().then(setRequests);
   }, [loading, session, profile, router]);
@@ -47,8 +47,8 @@ export default function PayoutsPage() {
 
   const reqStatusCls: Record<PayoutRequest['status'], string> = {
     pending: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
-    approved: 'text-[#00daf3] bg-[#00daf3]/10 border-[#00daf3]/20',
-    rejected: 'text-[#ffb4ab] bg-[#ffb4ab]/10 border-[#ffb4ab]/20',
+    approved: 'text-[#3b82f6] bg-[#3b82f6]/10 border-[#3b82f6]/20',
+    rejected: 'text-[#f87171] bg-[#f87171]/10 border-[#f87171]/20',
     paid: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
   };
   const reqStatusLabel: Record<PayoutRequest['status'], string> = {
@@ -99,10 +99,10 @@ export default function PayoutsPage() {
           <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
             Yêu cầu tất toán ({requests.filter((r) => r.status === 'pending').length} chờ duyệt)
           </p>
-          <div className="overflow-hidden rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022]">
+          <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
             {requests.map((req, idx) => (
               <div key={req.id}>
-                {idx > 0 && <div className="border-t border-[#3d3f41]/40" />}
+                {idx > 0 && <div className="border-t border-[#1f2937]/40" />}
                 <div className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="min-w-0 flex-1">
@@ -112,26 +112,26 @@ export default function PayoutsPage() {
                         </span>
                         <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider ${
                           req.requester_role === 'supervisor'
-                            ? 'bg-[#34d399]/15 text-[#34d399]'
+                            ? 'bg-[#10b981]/15 text-[#10b981]'
                             : 'bg-[#ff5625]/15 text-[#ff5625]'
                         }`}>
                           {req.requester_role}
                         </span>
-                        <p className="text-sm font-semibold text-[#e2e2e5]">
+                        <p className="text-sm font-semibold text-[#e7eaf0]">
                           {req.requester?.full_name ?? req.requester?.email ?? req.requester_id.slice(0, 8)}
                         </p>
                       </div>
-                      <div className="mt-1 text-xs text-[#e2e2e5]/60">
+                      <div className="mt-1 text-xs text-[#e7eaf0]/60">
                         Gửi: <span className="font-mono tabular-nums">{new Date(req.created_at).toLocaleString('vi-VN')}</span>
-                        {req.notes && <span className="ml-3">Ghi chú: <span className="text-[#a0a0a8]">{req.notes}</span></span>}
+                        {req.notes && <span className="ml-3">Ghi chú: <span className="text-[#9ca3af]">{req.notes}</span></span>}
                         {req.processed_at && (
                           <span className="ml-3">Xử lý: <span className="font-mono tabular-nums">{new Date(req.processed_at).toLocaleString('vi-VN')}</span>{req.processor_notes ? ` · ${req.processor_notes}` : ''}</span>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-mono tabular-nums text-2xl font-semibold text-[#e2e2e5]">{fmtVnd(req.amount)}</p>
-                      <p className="text-[10px] text-[#e2e2e5]/40">yêu cầu</p>
+                      <p className="font-mono tabular-nums text-2xl font-semibold text-[#e7eaf0]">{fmtVnd(req.amount)}</p>
+                      <p className="text-[10px] text-[#e7eaf0]/40">yêu cầu</p>
                     </div>
                   </div>
                   {req.status === 'pending' && (
@@ -141,13 +141,13 @@ export default function PayoutsPage() {
                         value={reqNotes[req.id] ?? ''}
                         onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
                         placeholder="Ghi chú xử lý (tuỳ chọn)"
-                        className="min-w-0 flex-1 rounded-lg border border-[#3d3f41]/40 bg-[#1e2022] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
+                        className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                       />
                       <button
                         type="button"
                         disabled={reqProcessing === req.id}
                         onClick={() => processRequest(req.id, 'rejected')}
-                        className="rounded-full border border-[#ffb4ab]/40 px-4 py-2 text-xs font-medium text-[#ffb4ab] hover:bg-[#ffb4ab]/10 disabled:opacity-50"
+                        className="rounded-full border border-[#f87171]/40 px-4 py-2 text-xs font-medium text-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-50"
                       >
                         Từ chối
                       </button>
@@ -155,7 +155,7 @@ export default function PayoutsPage() {
                         type="button"
                         disabled={reqProcessing === req.id}
                         onClick={() => processRequest(req.id, 'approved')}
-                        className="rounded-full bg-[#00daf3] px-5 py-2 text-xs font-bold text-[#121416] hover:bg-[#00daf3]/90 disabled:opacity-50"
+                        className="rounded-full bg-[#3b82f6] px-5 py-2 text-xs font-bold text-[#121416] hover:bg-[#3b82f6]/90 disabled:opacity-50"
                       >
                         {reqProcessing === req.id ? 'Đang xử lý…' : 'Duyệt yêu cầu'}
                       </button>
@@ -168,7 +168,7 @@ export default function PayoutsPage() {
                         value={reqNotes[req.id] ?? ''}
                         onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
                         placeholder="Mã giao dịch / ghi chú chi trả"
-                        className="min-w-0 flex-1 rounded-lg border border-[#3d3f41]/40 bg-[#1e2022] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
+                        className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                       />
                       <button
                         type="button"
@@ -189,30 +189,30 @@ export default function PayoutsPage() {
 
       {/* Pending payouts */}
       {pending.length === 0 ? (
-        <div className="mb-10 rounded-2xl border-2 border-dashed border-[#3d3f41]/50 p-10 text-center text-sm text-[#e2e2e5]/40">
+        <div className="mb-10 rounded-2xl border-2 border-dashed border-[#1f2937]/50 p-10 text-center text-sm text-[#e7eaf0]/40">
           Không có khoản hoa hồng nào chờ chi trả
         </div>
       ) : (
-        <div className="mb-10 overflow-hidden rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022]">
+        <div className="mb-10 overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
           {pending.map((row, idx) => (
             <div key={row.id}>
-              {idx > 0 && <div className="border-t border-[#3d3f41]/40" />}
+              {idx > 0 && <div className="border-t border-[#1f2937]/40" />}
               <div className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider ${
                         row.recipient_role === 'supervisor'
-                          ? 'bg-[#34d399]/15 text-[#34d399]'
+                          ? 'bg-[#10b981]/15 text-[#10b981]'
                           : 'bg-[#ff5625]/15 text-[#ff5625]'
                       }`}>
                         {row.recipient_role}
                       </span>
-                      <p className="text-sm font-semibold text-[#e2e2e5]">
+                      <p className="text-sm font-semibold text-[#e7eaf0]">
                         {row.recipient_name ?? row.recipient_email}
                       </p>
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#e2e2e5]/60">
+                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#e7eaf0]/60">
                       <span>SN: <span className="font-mono tabular-nums">{row.serial_number}</span></span>
                       <span>KH: {row.customer_name}</span>
                       <span>Ngày bán: <span className="font-mono tabular-nums">{row.sale_date}</span></span>
@@ -220,10 +220,10 @@ export default function PayoutsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-mono tabular-nums text-2xl font-semibold text-[#e2e2e5]">
+                    <p className="font-mono tabular-nums text-2xl font-semibold text-[#e7eaf0]">
                       {fmtVnd(row.amount)}
                     </p>
-                    <p className="text-[10px] text-[#e2e2e5]/40">hoa hồng</p>
+                    <p className="text-[10px] text-[#e7eaf0]/40">hoa hồng</p>
                   </div>
                 </div>
 
@@ -233,13 +233,13 @@ export default function PayoutsPage() {
                     value={proofRefs[row.id] ?? ''}
                     onChange={(e) => setProofRefs((p) => ({ ...p, [row.id]: e.target.value }))}
                     placeholder="Mã tham chiếu chuyển khoản (tuỳ chọn)"
-                    className="min-w-0 flex-1 rounded-lg border border-[#3d3f41]/40 bg-[#1e2022] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
+                    className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                   />
                   <button
                     type="button"
                     disabled={processing === row.id}
                     onClick={() => process(row)}
-                    className="shrink-0 rounded-full bg-[#34d399] px-5 py-2 text-xs font-medium text-[#121416] transition-colors hover:bg-[#34d399]/80 disabled:opacity-50"
+                    className="shrink-0 rounded-full bg-[#10b981] px-5 py-2 text-xs font-medium text-[#121416] transition-colors hover:bg-[#10b981]/80 disabled:opacity-50"
                   >
                     {processing === row.id ? 'Đang xử lý…' : 'Xác nhận đã chi trả'}
                   </button>
@@ -253,31 +253,31 @@ export default function PayoutsPage() {
       {/* Paid history */}
       {paid.length > 0 && (
         <section>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">Đã chi trả ({paid.length})</p>
-          <div className="overflow-hidden rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022]">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">Đã chi trả ({paid.length})</p>
+          <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
             {paid.map((row, idx) => (
               <div key={row.id}>
-                {idx > 0 && <div className="border-t border-[#3d3f41]/40" />}
+                {idx > 0 && <div className="border-t border-[#1f2937]/40" />}
                 <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
                   <div className="flex items-center gap-3 min-w-0">
                     <span className={`shrink-0 inline-block rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider ${
                       row.recipient_role === 'supervisor'
-                        ? 'bg-[#34d399]/15 text-[#34d399]'
+                        ? 'bg-[#10b981]/15 text-[#10b981]'
                         : 'bg-[#ff5625]/15 text-[#ff5625]'
                     }`}>
                       {row.recipient_role}
                     </span>
-                    <span className="font-medium text-[#e2e2e5]/80">{row.recipient_name ?? row.recipient_email}</span>
-                    <span className="text-xs text-[#e2e2e5]/40 font-mono tabular-nums">{row.serial_number}</span>
+                    <span className="font-medium text-[#e7eaf0]/80">{row.recipient_name ?? row.recipient_email}</span>
+                    <span className="text-xs text-[#e7eaf0]/40 font-mono tabular-nums">{row.serial_number}</span>
                     {row.payment_proof_url && (
-                      <span className="text-xs text-[#e2e2e5]/40">Ref: {row.payment_proof_url}</span>
+                      <span className="text-xs text-[#e7eaf0]/40">Ref: {row.payment_proof_url}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-[#34d399]">
+                    <span className="text-xs text-[#10b981]">
                       {row.paid_at ? new Date(row.paid_at).toLocaleDateString('vi-VN') : ''}
                     </span>
-                    <span className="font-mono tabular-nums font-semibold text-[#e2e2e5]/70">{fmtVnd(row.amount)}</span>
+                    <span className="font-mono tabular-nums font-semibold text-[#e7eaf0]/70">{fmtVnd(row.amount)}</span>
                   </div>
                 </div>
               </div>

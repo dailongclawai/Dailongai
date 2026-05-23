@@ -9,7 +9,7 @@ import { getAllSupervisors, getAllTeamMembers } from '@/lib/portal-queries';
 import type { SupervisorRow } from '@/lib/portal-queries';
 import type { TeamMember } from '@/lib/portal-types';
 
-const fmtVnd = (n: number) => (n >= 1_000_000 ? (n / 1_000_000).toFixed(1).replace('.0', '') + 'tr' : new Intl.NumberFormat('vi-VN').format(n));
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 export default function AdminSupervisorsPage() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function AdminSupervisorsPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) router.replace('/portal/login');
-    else if (profile?.role !== 'admin') router.replace('/portal/dashboard');
+    else if (profile?.role !== 'admin') router.replace('/portal/403');
     else void refresh();
   }, [loading, session, profile, router, refresh]);
 
@@ -53,7 +53,7 @@ export default function AdminSupervisorsPage() {
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Đội ngũ</p>
         <h1 className="mt-2 font-headline text-4xl">Supervisor</h1>
-        <p className="mt-2 text-sm text-[#e2e2e5]/60">Quản lý &amp; xem số liệu từng supervisor và đội của họ.</p>
+        <p className="mt-2 text-sm text-[#e7eaf0]/60">Quản lý &amp; xem số liệu từng supervisor và đội của họ.</p>
       </div>
 
       {/* Overall */}
@@ -64,17 +64,17 @@ export default function AdminSupervisorsPage() {
           { label: 'Doanh số tháng (đội)', value: fmtVnd(totalMonth) },
           { label: 'Máy YTD (đội)', value: totalUnits },
         ].map((k) => (
-          <div key={k.label} className="rounded-xl border border-[#3d3f41]/40 bg-[#1e2022] p-5">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[#e2e2e5]/50">{k.label}</p>
+          <div key={k.label} className="rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[#e7eaf0]/50">{k.label}</p>
             <p className="mt-2 font-mono text-3xl font-medium tabular-nums">{k.value}</p>
           </div>
         ))}
       </div>
 
       {/* Supervisor list */}
-      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022]">
+      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
         <table className="w-full min-w-[640px] text-left text-sm">
-          <thead className="border-b border-[#3d3f41]/40 bg-[#282a2c]/40 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
+          <thead className="border-b border-[#1f2937]/40 bg-[#1a1f26]/40 text-[10px] uppercase tracking-wider text-[#e7eaf0]/60">
             <tr>
               <th className="px-4 py-3">Supervisor</th>
               <th className="px-4 py-3 text-right">Đại lý</th>
@@ -86,16 +86,16 @@ export default function AdminSupervisorsPage() {
           </thead>
           <tbody>
             {supervisors.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-[#e2e2e5]/50">Chưa có supervisor nào. Nâng cấp đại lý ở mục “Nâng cấp”.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-[#e7eaf0]/50">Chưa có supervisor nào. Nâng cấp đại lý ở mục “Nâng cấp”.</td></tr>
             ) : supervisors.map((sv) => {
               const a = agg(sv.id);
               const open = openId === sv.id;
               return (
                 <Fragment key={sv.id}>
-                  <tr className="border-t border-[#3d3f41]/40 hover:bg-[#282a2c]/40">
+                  <tr className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
                     <td className="px-4 py-3">
                       <p className="font-medium">{sv.full_name ?? '(không tên)'}</p>
-                      <p className="text-[11px] text-[#e2e2e5]/50">{sv.email}</p>
+                      <p className="text-[11px] text-[#e7eaf0]/50">{sv.email}</p>
                     </td>
                     <td className="px-4 py-3 text-right font-mono tabular-nums">{a.dealers}</td>
                     <td className="px-4 py-3 text-right font-mono tabular-nums">{fmtVnd(a.month)}</td>
@@ -108,13 +108,13 @@ export default function AdminSupervisorsPage() {
                     </td>
                   </tr>
                   {open && (
-                    <tr className="border-t border-[#3d3f41]/40 bg-[#121416]">
+                    <tr className="border-t border-[#1f2937]/40 bg-[#0a0c0f]">
                       <td colSpan={6} className="px-4 py-4">
                         {a.dealers === 0 ? (
-                          <p className="text-center text-xs text-[#e2e2e5]/50">Supervisor này chưa có đại lý nào trong nhánh.</p>
+                          <p className="text-center text-xs text-[#e7eaf0]/50">Supervisor này chưa có đại lý nào trong nhánh.</p>
                         ) : (
                           <table className="w-full text-left text-xs">
-                            <thead className="text-[10px] uppercase tracking-wider text-[#e2e2e5]/40">
+                            <thead className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">
                               <tr>
                                 <th className="px-3 py-2">Đại lý</th>
                                 <th className="px-3 py-2 text-right">Doanh số tháng</th>
@@ -124,7 +124,7 @@ export default function AdminSupervisorsPage() {
                             </thead>
                             <tbody>
                               {teamOf(sv.id).map((t) => (
-                                <tr key={t.dealer_id} className="border-t border-[#3d3f41]/40">
+                                <tr key={t.dealer_id} className="border-t border-[#1f2937]/40">
                                   <td className="px-3 py-2">{t.dealer_name ?? '(không tên)'}</td>
                                   <td className="px-3 py-2 text-right font-mono tabular-nums">{fmtVnd(Number(t.month_sales))}</td>
                                   <td className="px-3 py-2 text-right font-mono tabular-nums">{t.units_ytd}</td>

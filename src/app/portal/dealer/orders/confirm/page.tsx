@@ -40,7 +40,7 @@ export default function OrderConfirmPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) router.replace('/portal/login');
-    else if (profile && profile.role !== 'dealer') router.replace('/portal/dashboard');
+    else if (profile && profile.role !== 'dealer') router.replace('/portal/403');
   }, [loading, session, profile, router]);
 
   if (loading || !session || !profile || profile.role !== 'dealer') return null;
@@ -50,7 +50,7 @@ export default function OrderConfirmPage() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#34d399]/15">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#10b981]/15">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
               <path
                 d="M5 13l4 4L19 7"
@@ -61,13 +61,13 @@ export default function OrderConfirmPage() {
               />
             </svg>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#34d399]">Đặt hàng thành công</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">Đặt hàng thành công</p>
           <h1 className="mt-2 font-headline text-3xl">
             Chờ admin duyệt đơn
           </h1>
-          <p className="mt-2 text-sm text-[#e2e2e5]/60">
+          <p className="mt-2 text-sm text-[#e7eaf0]/60">
             {count} máy · tổng giá trị{' '}
-            <span className="font-mono font-semibold tabular-nums text-[#e2e2e5]">
+            <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">
               {fmtVnd(total)} đ
             </span>
           </p>
@@ -80,48 +80,48 @@ export default function OrderConfirmPage() {
             <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
               Thanh toán ngay
             </p>
-            <p className="mb-5 text-sm text-[#e2e2e5]/60">
+            <p className="mb-5 text-sm text-[#e7eaf0]/60">
               Chuyển khoản đúng số tiền và ghi rõ nội dung để đơn được xử lý nhanh nhất.
             </p>
             <div className="space-y-0 divide-y divide-[#3d3f41]/30 text-sm">
               <div className="flex justify-between py-3">
-                <span className="text-[#e2e2e5]/50">Ngân hàng</span>
+                <span className="text-[#e7eaf0]/50">Ngân hàng</span>
                 <span className="font-medium">{BANK_NAME}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e2e2e5]/50">Số tài khoản</span>
+                <span className="text-[#e7eaf0]/50">Số tài khoản</span>
                 <span className="font-mono font-semibold tracking-wider tabular-nums">
                   {BANK_ACCOUNT}
                 </span>
               </div>
               <div className="flex items-start justify-between gap-4 py-3">
-                <span className="shrink-0 text-[#e2e2e5]/50">Chủ tài khoản</span>
+                <span className="shrink-0 text-[#e7eaf0]/50">Chủ tài khoản</span>
                 <span className="text-right text-xs font-medium leading-relaxed">{BANK_OWNER}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e2e2e5]/50">Số tiền</span>
+                <span className="text-[#e7eaf0]/50">Số tiền</span>
                 <span className="font-mono font-semibold tabular-nums text-[#ff5625]">
                   {fmtVnd(total)} đ
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-[#282a2c]/40 px-3 py-3">
-                <span className="text-[#e2e2e5]/50">Nội dung CK</span>
-                <span className="font-mono font-bold tracking-widest tabular-nums text-[#e2e2e5]">
+              <div className="flex items-center justify-between rounded-xl bg-[#1a1f26]/40 px-3 py-3">
+                <span className="text-[#e7eaf0]/50">Nội dung CK</span>
+                <span className="font-mono font-bold tracking-widest tabular-nums text-[#e7eaf0]">
                   {note}
                 </span>
               </div>
             </div>
             <Link
               href="/portal/dashboard"
-              className="mt-6 block text-center text-xs text-[#e2e2e5]/40 hover:text-[#ff5625]"
+              className="mt-6 block text-center text-xs text-[#e7eaf0]/40 hover:text-[#ff5625]"
             >
               ← Về dashboard
             </Link>
           </div>
 
           {/* Right: VietQR */}
-          <div className="flex flex-col items-center rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022] p-6">
-            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">
+          <div className="flex flex-col items-center rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-6">
+            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">
               Đại Long Bank QR
             </p>
             {total > 0 ? (
@@ -132,9 +132,9 @@ export default function OrderConfirmPage() {
                 className="w-full max-w-[300px] rounded-xl"
               />
             ) : (
-              <div className="h-64 w-64 animate-pulse rounded-xl bg-[#282a2c]/40" />
+              <div className="h-64 w-64 animate-pulse rounded-xl bg-[#1a1f26]/40" />
             )}
-            <p className="mt-5 text-center text-xs text-[#e2e2e5]/40">
+            <p className="mt-5 text-center text-xs text-[#e7eaf0]/40">
               Mở app ngân hàng → Quét mã → Kiểm tra thông tin → Thanh toán
             </p>
           </div>

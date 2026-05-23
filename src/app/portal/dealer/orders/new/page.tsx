@@ -13,7 +13,7 @@ export default function NewOrderPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) router.replace('/portal/login');
-    else if (profile && profile.role !== 'dealer') router.replace('/portal/dashboard');
+    else if (profile && profile.role !== 'dealer') router.replace('/portal/403');
   }, [loading, session, profile, router]);
 
   if (loading || !session || !profile || profile.role !== 'dealer') return null;

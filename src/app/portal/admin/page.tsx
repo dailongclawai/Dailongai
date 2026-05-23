@@ -19,7 +19,7 @@ export default function AdminHome() {
     }
     if (!profile) return;
     if (profile.role !== 'admin') {
-      router.replace('/portal/dashboard');
+      router.replace('/portal/403');
     }
   }, [loading, session, profile, router]);
 

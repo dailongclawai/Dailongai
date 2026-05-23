@@ -18,7 +18,7 @@ export default function ReportsPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) router.replace('/portal/login');
-    else if (profile?.role !== 'admin') router.replace('/portal/dashboard');
+    else if (profile?.role !== 'admin') router.replace('/portal/403');
     else {
       getSupabaseClient().from('orders').select('*').order('sale_date', { ascending: false })
         .then(({ data }) => setOrders((data as Order[]) ?? []));
@@ -54,11 +54,11 @@ export default function ReportsPage() {
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Báo cáo</p>
           <h1 className="mt-2 font-headline text-4xl">Toàn bộ đơn hàng</h1>
         </div>
-        <button onClick={exportExcel} className="rounded-full bg-[#ff5625] px-5 py-2.5 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5625]/90">
+        <button onClick={exportExcel} className="rounded-full bg-[#ff5625] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#ff5625]/90">
           ↓ Xuất Excel ({orders.length} đơn)
         </button>
       </div>
-      <p className="text-sm text-[#e2e2e5]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
+      <p className="text-sm text-[#e7eaf0]/60">Tổng <span className="font-semibold">{orders.length}</span> đơn trong hệ thống. Bấm &quot;Xuất Excel&quot; để tải file .xlsx.</p>
     </PortalShell>
   );
 }
