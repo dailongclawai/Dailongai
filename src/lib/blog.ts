@@ -64,6 +64,21 @@ export function getNonFeaturedArticles(): BlogArticle[] {
   return getAllArticles().filter(a => !a.featured)
 }
 
+export function getRelatedArticles(slug: string, limit = 6): BlogArticle[] {
+  const all = getAllArticles().filter(a => a.slug !== slug && !/-\d{10,}$/.test(a.slug))
+  const current = getArticleBySlug(slug)
+  const sameCategory = current
+    ? all.filter(a => a.category === current.category)
+    : []
+  const seen = new Set<string>()
+  const ordered = [...sameCategory, ...all].filter(a => {
+    if (seen.has(a.slug)) return false
+    seen.add(a.slug)
+    return true
+  })
+  return ordered.slice(0, limit)
+}
+
 export function toBlogCard(article: BlogArticle): BlogArticleCard {
   return {
     id: article.slug,

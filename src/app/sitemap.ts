@@ -17,7 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
   ];
 
-  const articles = getAllArticles();
+  // Loại slug auto-gen đuôi timestamp (bản trùng của slug sạch) khỏi sitemap
+  const articles = getAllArticles().filter((a) => !/-\d{10,}$/.test(a.slug));
   const blogPages: MetadataRoute.Sitemap = articles.map((a) => ({
     url: `${baseUrl}/blog/${a.slug}`,
     lastModified: new Date(a.date),

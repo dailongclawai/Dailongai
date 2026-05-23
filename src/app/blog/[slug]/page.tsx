@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ZaloButton from "@/components/ZaloButton";
-import { getAllSlugs, getArticleBySlug } from "@/lib/blog";
+import { getAllSlugs, getArticleBySlug, getRelatedArticles } from "@/lib/blog";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { notFound } from "next/navigation";
 import { contactInfo } from "@/data/siteData";
@@ -45,8 +45,37 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     year: "numeric", month: "long", day: "numeric",
   });
 
+  const isoDate = new Date(article.date).toISOString();
+  const canonicalUrl = `https://dailongai.com/blog/${article.slug}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: article.title,
+    description: article.meta_description,
+    image: article.featured_image ? [article.featured_image] : undefined,
+    datePublished: isoDate,
+    dateModified: isoDate,
+    inLanguage: "vi-VN",
+    mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+    author: { "@type": "Organization", name: article.author || "Đại Long", url: "https://dailongai.com" },
+    publisher: {
+      "@type": "Organization",
+      name: "Đại Long - công nghệ chăm sóc sức khoẻ",
+      url: "https://dailongai.com",
+      logo: { "@type": "ImageObject", url: "https://dailongai.com/images/logo.webp" },
+    },
+    articleSection: article.category,
+    wordCount: article.word_count,
+  };
+
+  const related = getRelatedArticles(article.slug, 6);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Header />
       <ZaloButton />
       <main className="pt-28 sm:pt-36 pb-20 sm:pb-32 bg-background min-h-screen">
@@ -129,6 +158,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <p className="text-xs text-secondary">{formattedDate}</p>
             </div>
           </div>
+
+          {/* Bài viết liên quan — internal linking */}
+          {related.length > 0 && (
+            <nav aria-label="Bài viết liên quan" className="mt-12 pt-8 border-t border-white/5">
+              <h2 className="text-xl font-headline font-bold text-on-surface mb-5">Bài viết liên quan</h2>
+              <ul className="grid sm:grid-cols-2 gap-3">
+                {related.map((r) => (
+                  <li key={r.slug}>
+                    <a
+                      href={`/blog/${r.slug}`}
+                      className="block p-4 rounded-xl bg-surface-low border border-white/5 hover:border-primary/30 transition-colors"
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{r.category}</span>
+                      <span className="block text-sm font-bold text-on-surface mt-1 leading-snug">{r.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
         </article>
       </main>
       <Footer />

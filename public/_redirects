@@ -5,3 +5,15 @@
 /health-status /thuc-trang-suc-khoe 301
 /ai / 301
 /ai/* / 301
+
+# Blog duplicate-cluster consolidation (SEO de-cannibalization)
+/blog/laser-tri-lieu-giam-mo-mau /blog/giam-mo-mau-bang-laser 301
+/blog/laser-tri-lieu-giam-mo-mau/ /blog/giam-mo-mau-bang-laser 301
+/blog/laser-tri-lieu-giam-mo-mau-1777737521272 /blog/giam-mo-mau-bang-laser 301
+/blog/laser-tri-lieu-giam-mo-mau-1778367757855 /blog/giam-mo-mau-bang-laser 301
+/blog/laser-tri-lieu-cai-thien-giac-ngu-1778108575235 /blog/laser-tri-lieu-cai-thien-giac-ngu 301
+/blog/cong-dung-laser-650nm /blog/buoc-song-650nm-la-gi-ung-dung-co-che-tac-dong-va-luu-y-khi-chon-thiet-bi-laser-y-te 301
+/blog/laser-tri-lieu-buoc-song-650nm /blog/buoc-song-650nm-la-gi-ung-dung-co-che-tac-dong-va-luu-y-khi-chon-thiet-bi-laser-y-te 301
+/blog/phong-dot-quy-nam-2026 /blog/cach-phong-dot-quy-tai-nha-2026 301
+/blog/phong-dot-quy-nam-2026-7-giai-phap-thuc-te /blog/cach-phong-dot-quy-tai-nha-2026 301
+/blog/huong-dan-laser-cong-suat-thap-cong-nghe-ai-dieu-tri-y-te /blog/laser-cong-suat-thap-tri-lieu 301
