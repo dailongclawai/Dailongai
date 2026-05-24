@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -24,26 +24,6 @@ export async function clearDealerFixedCommission(dealerId: string): Promise<void
     p_dealer_id: dealerId,
   });
   if (error) throw error;
-}
-
-export interface SupervisorGoal {
-  year_month: string;
-  target_revenue: number;
-  current_revenue: number;
-  progress_pct: number;
-  days_left: number;
-  days_in_month: number;
-  on_pace_pct: number;
-  note: string | null;
-}
-
-export async function getSupervisorCurrentGoal(supervisorId?: string): Promise<SupervisorGoal | null> {
-  const { data, error } = await getSupabaseClient().rpc('get_supervisor_current_goal', {
-    p_supervisor_id: supervisorId ?? null,
-  });
-  if (error) throw error;
-  const rows = (data as SupervisorGoal[]) ?? [];
-  return rows[0] ?? null;
 }
 
 export interface LeaderboardRow {
@@ -156,6 +136,13 @@ export async function getPublicActiveModels(): Promise<PublicActiveModel[]> {
   }));
 }
 
+export interface OrderInvoiceInput {
+  invoice_required?: boolean;
+  invoice_company_name?: string | null;
+  invoice_tax_code?: string | null;
+  invoice_email?: string | null;
+}
+
 export async function recordDealerOrder(input: {
   model_id: string;
   quantity: number;
@@ -163,7 +150,7 @@ export async function recordDealerOrder(input: {
   customer_phone: string;
   shipping_address: string;
   sale_date?: string;
-}): Promise<string> {
+} & OrderInvoiceInput): Promise<string> {
   const { data, error } = await getSupabaseClient().rpc('record_dealer_order', {
     p_model_id: input.model_id,
     p_quantity: input.quantity,
@@ -171,6 +158,10 @@ export async function recordDealerOrder(input: {
     p_customer_phone: input.customer_phone,
     p_shipping_address: input.shipping_address,
     p_sale_date: input.sale_date,
+    p_invoice_required: input.invoice_required ?? false,
+    p_invoice_company_name: input.invoice_company_name ?? null,
+    p_invoice_tax_code: input.invoice_tax_code ?? null,
+    p_invoice_email: input.invoice_email ?? null,
   });
   if (error) throw new Error(error.message);
   return data as string;
@@ -183,7 +174,7 @@ export async function submitPublicOrder(input: {
   customer_name: string;
   customer_phone: string;
   shipping_address: string;
-}): Promise<string> {
+} & OrderInvoiceInput): Promise<string> {
   const { data, error } = await getSupabaseClient().rpc('submit_public_order', {
     p_slug: input.slug,
     p_model_id: input.model_id,
@@ -191,6 +182,10 @@ export async function submitPublicOrder(input: {
     p_customer_name: input.customer_name,
     p_customer_phone: input.customer_phone,
     p_shipping_address: input.shipping_address,
+    p_invoice_required: input.invoice_required ?? false,
+    p_invoice_company_name: input.invoice_company_name ?? null,
+    p_invoice_tax_code: input.invoice_tax_code ?? null,
+    p_invoice_email: input.invoice_email ?? null,
   });
   if (error) throw new Error(error.message);
   return data as string;
@@ -507,6 +502,11 @@ export async function getAllSupervisors(): Promise<SupervisorRow[]> {
 export async function getAllTeamMembers(): Promise<TeamMember[]> {
   const { data } = await getSupabaseClient().from('supervisor_team_summary').select('*');
   return (data as TeamMember[]) ?? [];
+}
+
+export async function getUnassignedDealers(): Promise<UnassignedDealer[]> {
+  const { data } = await getSupabaseClient().from('unassigned_dealers_summary').select('*');
+  return (data as UnassignedDealer[]) ?? [];
 }
 
 // ── Supervisor ledger (overrides earned across team dealers) ───────────

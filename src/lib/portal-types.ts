@@ -17,6 +17,9 @@ export interface Profile {
   bank_name: string | null;
   bank_account_name: string | null;
   bank_account_number: string | null;
+  zalo_phone: string | null;
+  payout_qr_path: string | null;
+  payout_verified_at: string | null;
   province: string | null;
   approved_at: string | null;
   approved_by: string | null;
@@ -58,6 +61,10 @@ export interface Order {
   status: 'pending' | 'approved' | 'rejected' | 'paid' | 'voided';
   receipt_image_url: string | null;
   rejection_reason: string | null;
+  invoice_required: boolean;
+  invoice_company_name: string | null;
+  invoice_tax_code: string | null;
+  invoice_email: string | null;
   created_at: string;
 }
 
@@ -77,6 +84,15 @@ export interface TeamMember {
   dealer_id: string;
   dealer_account_no: number | null;
   dealer_name: string | null;
+  orders_pending: number;
+  units_ytd: number;
+  month_sales: number;
+}
+
+export interface UnassignedDealer {
+  dealer_id: string;
+  dealer_name: string | null;
+  dealer_account_no: number | null;
   orders_pending: number;
   units_ytd: number;
   month_sales: number;
