@@ -7,9 +7,11 @@ import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
+import { AccountIdBadge } from '@/components/portal/AccountIdBadge';
 
 interface Row {
   id: string;
+  account_no: number | null;
   full_name: string | null;
   email: string | null;
   role: string | null;
@@ -25,7 +27,7 @@ export default function AdminUpgradePage() {
   const refresh = useCallback(async () => {
     const { data } = await getSupabaseClient()
       .from('profiles')
-      .select('id, full_name, email, role')
+      .select('id, account_no, full_name, email, role')
       .order('role');
     setRows((data as Row[]) ?? []);
   }, []);
@@ -85,12 +87,12 @@ export default function AdminUpgradePage() {
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
-        <table className="w-full text-left text-sm">
+      <div className="overflow-x-auto portal-scroll rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
+        <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-[#1f2937]/40 bg-[#1a1f26]/40 text-[10px] uppercase tracking-wider text-[#e7eaf0]/60">
             <tr>
-              <th className="px-4 py-3">Tên</th>
-              <th className="px-4 py-3">Account ID</th>
+              <th className="px-4 py-3">Tên · Account ID</th>
+              <th className="px-4 py-3">Email</th>
               <th className="px-4 py-3">Vai trò</th>
               <th className="px-4 py-3 text-right"></th>
             </tr>
@@ -98,8 +100,11 @@ export default function AdminUpgradePage() {
           <tbody>
             {rows.map((r) => (
               <tr key={r.id} className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
-                <td className="px-4 py-3 font-medium">{r.full_name ?? r.email ?? '(không tên)'}</td>
-                <td className="px-4 py-3 text-[11px] text-[#e7eaf0]/60 font-mono tabular-nums">{r.id}</td>
+                <td className="px-4 py-3">
+                  <p className="font-medium">{r.full_name ?? r.email ?? '(không tên)'}</p>
+                  <div className="mt-0.5"><AccountIdBadge accountNo={r.account_no} id={r.id} /></div>
+                </td>
+                <td className="px-4 py-3 text-[11px] text-[#e7eaf0]/60">{r.email ?? '—'}</td>
                 <td className="px-4 py-3 text-xs uppercase tracking-wider text-[#ff5625]">{r.role ?? '—'}</td>
                 <td className="px-4 py-3 text-right">
                   {r.role === 'dealer' && (

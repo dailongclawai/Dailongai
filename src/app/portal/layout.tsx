@@ -15,7 +15,7 @@ const PORTAL_CSS = `
 
 export default function PortalLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="portal-scroll portal-grid min-h-screen bg-[#121416] font-body antialiased text-[#e2e2e5]">
+    <div className="portal-scroll portal-grid min-h-screen bg-[#0a0c0f] font-body antialiased text-[#e7eaf0]">
       <style>{PORTAL_CSS}</style>
       <AuthProvider>{children}</AuthProvider>
       <Toaster position="top-right" theme="dark" richColors />

@@ -1,283 +1,210 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { toast } from 'sonner';
-import { getActiveModels, recordOrderBatch } from '@/lib/portal-queries';
-
-import type { BatchItem } from '@/lib/portal-queries';
+import { getActiveModels, recordDealerOrder } from '@/lib/portal-queries';
 import type { ProductModel } from '@/lib/portal-types';
+import { AddressPicker, emptyAddress, fullAddress, type AddressValue } from '@/components/portal/AddressPicker';
+import { PaymentQRCard } from '@/components/portal/PaymentQRCard';
+import { orderMemo } from '@/lib/vietqr';
 
-const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
-
-interface CartItem {
-  key: number;
-  model: ProductModel;
-  serial: string;
-}
-
-let _seq = 0;
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
+const fmtDateTime = (d: Date) => d.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
 
 export function OrderForm({ userId: _userId }: { userId: string }) {
-  const router = useRouter();
   const [models, setModels] = useState<ProductModel[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [customer, setCustomer] = useState({
-    name: '',
-    phone: '',
-    address: '',
-    saleDate: new Date().toISOString().slice(0, 10),
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [modelId, setModelId] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [customer, setCustomer] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState<AddressValue>(emptyAddress);
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<{ orderId: string; amount: number; customer: string; createdAt: Date } | null>(null);
 
   useEffect(() => {
-    getActiveModels().then(setModels);
+    getActiveModels().then((ms) => {
+      setModels(ms);
+      if (ms[0]) setModelId(ms[0].id);
+    });
   }, []);
 
-  const addToCart = (model: ProductModel) => {
-    setCart((c) => [...c, { key: ++_seq, model, serial: '' }]);
-  };
+  const selectedModel = useMemo(() => models.find((m) => m.id === modelId) ?? null, [models, modelId]);
+  const unitPrice = Number(selectedModel?.base_price ?? 0);
+  const totalPrice = unitPrice * quantity;
 
-  const removeFromCart = (key: number) => {
-    setCart((c) => c.filter((i) => i.key !== key));
-  };
-
-  const updateSerial = (key: number, serial: string) => {
-    setCart((c) => c.map((i) => (i.key === key ? { ...i, serial } : i)));
-  };
-
-  const setC = (k: keyof typeof customer, v: string) =>
-    setCustomer((c) => ({ ...c, [k]: v }));
-
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (cart.length === 0) e.cart = 'Thêm ít nhất 1 máy vào đơn';
-    cart.forEach((item) => {
-      if (item.serial.trim().length < 3)
-        e[`serial_${item.key}`] = 'Serial tối thiểu 3 ký tự';
-    });
-    if (customer.name.trim().length < 2) e.name = 'Nhập tên khách';
-    if (!/^0\d{9,10}$/.test(customer.phone)) e.phone = 'SĐT không hợp lệ';
-    if (!customer.saleDate) e.saleDate = 'Chọn ngày bán';
-    return e;
-  };
-
-  const checkout = async () => {
-    const e = validate();
-    setErrors(e);
-    if (Object.keys(e).length > 0) return;
-
+  const submit = async () => {
+    if (!modelId) { toast.error('Chọn sản phẩm'); return; }
+    if (quantity < 1) { toast.error('Số lượng phải ≥ 1'); return; }
+    if (!address.province_code || !address.ward_code || !address.detail.trim()) {
+      toast.error('Nhập đủ tỉnh, phường và địa chỉ chi tiết'); return;
+    }
     setBusy(true);
     try {
-      const items: BatchItem[] = cart.map((i) => ({
-        model_id: i.model.id,
-        serial_number: i.serial.trim(),
-        sale_price: Number(i.model.base_price),
-      }));
-      const count = await recordOrderBatch({
-        customerName: customer.name.trim(),
-        customerPhone: customer.phone.trim(),
-        customerAddress: customer.address.trim() || null,
-        saleDate: customer.saleDate,
-        receiptImageUrl: null,
-        items,
+      const orderId = await recordDealerOrder({
+        model_id: modelId,
+        quantity,
+        customer_name: customer,
+        customer_phone: phone,
+        shipping_address: fullAddress(address),
       });
-      const dateStr = customer.saleDate.replace(/-/g, '');
-      router.replace(
-        `/portal/dealer/orders/confirm?count=${count}&total=${total}&date=${dateStr}`,
-      );
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi ghi nhận đơn');
-      setBusy(false);
-    }
+      toast.success('Đã ghi nhận đơn — gửi QR thanh toán cho khách');
+      setDone({ orderId, amount: totalPrice, customer, createdAt: new Date() });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Lỗi ghi đơn');
+    } finally { setBusy(false); }
   };
 
-  const total = cart.reduce((s, i) => s + Number(i.model.base_price), 0);
-
-  return (
-    <div className="space-y-8">
-      {/* Product catalog */}
-      <section>
-        <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Sản phẩm</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {models.map((m) => (
-            <div
-              key={m.id}
-              className="flex flex-col justify-between rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022] p-5"
-            >
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#e2e2e5]/50">{m.code}</p>
-                <p className="mt-1 font-medium text-[#e2e2e5]">{m.name}</p>
-                <p className="mt-2 font-mono text-lg font-semibold tabular-nums text-[#ff5625]">
-                  {fmtVnd(Number(m.base_price))} đ
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => addToCart(m)}
-                className="mt-4 rounded-full border border-[#3d3f41]/60 px-4 py-2 text-xs font-medium text-[#e2e2e5] transition-colors hover:border-[#ff5625] hover:text-[#ff5625]"
-              >
-                + Thêm vào đơn
-              </button>
-            </div>
-          ))}
+  if (done) {
+    const memo = orderMemo(done.orderId);
+    return (
+      <div className="mx-auto max-w-2xl space-y-5">
+        <div className="rounded-2xl border border-emerald-500/30 bg-[#11151a] p-5 text-center">
+          <span className="material-symbols-outlined text-emerald-400 text-[40px]">check_circle</span>
+          <h2 className="mt-2 font-headline text-2xl">Đã ghi nhận đơn cho {done.customer}</h2>
+          <p className="mt-1 text-xs text-[#9ca3af]">Gửi QR bên dưới cho khách để thanh toán</p>
         </div>
-        {errors.cart && <p className="mt-2 text-xs text-[#f87171]">{errors.cart}</p>}
-      </section>
 
-      {/* Cart */}
-      {cart.length > 0 && (
-        <section>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#34d399]">
-            Đơn hàng — {cart.length} máy
-          </p>
-          <div className="overflow-hidden rounded-2xl border border-[#3d3f41]/40 bg-[#1e2022]">
-            <table className="w-full text-sm">
-              <thead className="border-b border-[#3d3f41]/40 bg-[#282a2c]/40 text-[10px] uppercase tracking-wider text-[#e2e2e5]/60">
-                <tr>
-                  <th className="px-4 py-3 text-left">Model</th>
-                  <th className="px-4 py-3 text-left">Số serial</th>
-                  <th className="px-4 py-3 text-right">Đơn giá</th>
-                  <th className="px-4 py-3" />
-                </tr>
-              </thead>
-              <tbody>
-                {cart.map((item) => (
-                  <tr key={item.key} className="border-t border-[#3d3f41]/40">
-                    <td className="px-4 py-3 text-xs text-[#e2e2e5]/70">
-                      {item.model.code}
-                    </td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        placeholder="VD: ZD-A-0001"
-                        value={item.serial}
-                        onChange={(e) => updateSerial(item.key, e.target.value)}
-                        className="w-40 rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-1.5 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
-                      />
-                      {errors[`serial_${item.key}`] && (
-                        <p className="mt-1 text-xs text-[#f87171]">
-                          {errors[`serial_${item.key}`]}
-                        </p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono tabular-nums">
-                      {fmtVnd(Number(item.model.base_price))} đ
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => removeFromCart(item.key)}
-                        className="text-lg leading-none text-[#f87171] hover:text-[#ef4444]"
-                        aria-label="Xoá"
-                      >
-                        ×
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot className="border-t-2 border-[#3d3f41]/40 bg-[#282a2c]/40">
-                <tr>
-                  <td
-                    colSpan={2}
-                    className="px-4 py-3 text-xs font-medium uppercase tracking-wider text-[#e2e2e5]/60"
-                  >
-                    Tổng cộng
-                  </td>
-                  <td
-                    className="px-4 py-3 text-right font-mono font-semibold tabular-nums text-[#ff5625]"
-                  >
-                    {fmtVnd(total)} đ
-                  </td>
-                  <td />
-                </tr>
-              </tfoot>
-            </table>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-[#1f2937] bg-[#11151a] px-4 py-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Mã đơn</p>
+            <p className="mt-0.5 font-mono text-lg font-bold tabular-nums text-[#ff5625]">{memo}</p>
           </div>
-        </section>
-      )}
+          <div className="rounded-xl border border-[#1f2937] bg-[#11151a] px-4 py-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Tạo lúc</p>
+            <p className="mt-0.5 font-mono text-sm tabular-nums text-[#e7eaf0]">{fmtDateTime(done.createdAt)}</p>
+          </div>
+        </div>
 
-      {/* Customer info */}
-      {cart.length > 0 && (
-        <section>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/60">
-            Thông tin khách hàng
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">
-                Tên khách *
-              </label>
-              <input
-                type="text"
-                value={customer.name}
-                onChange={(e) => setC('name', e.target.value)}
-                className="w-full rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
-              />
-              {errors.name && <p className="mt-1 text-xs text-[#f87171]">{errors.name}</p>}
-            </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">
-                SĐT khách *
-              </label>
-              <input
-                type="tel"
-                value={customer.phone}
-                onChange={(e) => setC('phone', e.target.value)}
-                className="w-full rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
-              />
-              {errors.phone && <p className="mt-1 text-xs text-[#f87171]">{errors.phone}</p>}
-            </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">
-                Ngày bán *
-              </label>
-              <input
-                type="date"
-                value={customer.saleDate}
-                onChange={(e) => setC('saleDate', e.target.value)}
-                className="w-full rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
-              />
-              {errors.saleDate && (
-                <p className="mt-1 text-xs text-[#f87171]">{errors.saleDate}</p>
-              )}
-            </div>
-            <div>
-              <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/70">
-                Địa chỉ (tuỳ chọn)
-              </label>
-              <input
-                type="text"
-                value={customer.address}
-                onChange={(e) => setC('address', e.target.value)}
-                className="w-full rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
-              />
-            </div>
-          </div>
-        </section>
-      )}
+        <PaymentQRCard orderId={done.orderId} amount={done.amount} />
 
-      {/* Order summary + checkout */}
-      {cart.length > 0 && (
-        <div className="flex items-center gap-4 rounded-2xl border border-[#ff5625]/30 bg-[#ff5625]/5 px-6 py-5">
-          <div className="flex-1">
-            <p className="text-xs text-[#e2e2e5]/60">{cart.length} máy · tổng giá trị</p>
-            <p className="mt-1 font-mono text-2xl font-semibold tabular-nums text-[#ff5625]">
-              {fmtVnd(total)} đ
-            </p>
-          </div>
+        <div className="flex gap-3">
           <button
             type="button"
-            onClick={checkout}
-            disabled={busy}
-            className="rounded-full bg-[#ff5625] px-8 py-3 text-sm font-medium text-white transition-colors glow-primary-hover hover:bg-[#ff5625]/90 disabled:opacity-50"
+            onClick={() => { setDone(null); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); }}
+            className="flex-1 rounded-lg border border-[#1f2937] bg-[#11151a] py-3 text-sm font-bold text-[#e7eaf0] hover:bg-[#1a1f26]"
           >
-            {busy ? 'Đang gửi…' : 'Đặt hàng'}
+            Ghi đơn khác
           </button>
+          <Link
+            href="/portal/dealer/commission"
+            className="flex flex-1 items-center justify-center rounded-lg bg-[#ff5625] py-3 text-sm font-bold text-white hover:bg-[#ff5625]/90"
+          >
+            Xem sổ hoa hồng
+          </Link>
         </div>
-      )}
-    </div>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={(e) => { e.preventDefault(); submit(); }}
+      className="mx-auto max-w-2xl space-y-5 rounded-2xl border border-[#1f2937]/40 bg-[#1a1c1e] p-6"
+    >
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label className="block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5">Sản phẩm</label>
+          <select
+            value={modelId}
+            onChange={(e) => setModelId(e.target.value)}
+            required
+            className="w-full rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]"
+          >
+            {models.map((m) => (
+              <option key={m.id} value={m.id}>{m.name} · {m.code}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5">Số lượng</label>
+          <div className="flex items-stretch overflow-hidden rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f]">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="flex w-12 items-center justify-center text-lg font-bold text-[#9ca3af] hover:bg-[#1a1f26] hover:text-[#ff5625]"
+              aria-label="Giảm"
+            >−</button>
+            <input
+              type="number"
+              min={1}
+              max={1000}
+              value={quantity}
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                if (Number.isFinite(v)) setQuantity(Math.min(1000, Math.max(1, Math.floor(v))));
+              }}
+              required
+              className="w-full bg-transparent text-center text-base font-bold tabular-nums outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.min(1000, q + 1))}
+              className="flex w-12 items-center justify-center text-lg font-bold text-[#9ca3af] hover:bg-[#1a1f26] hover:text-[#ff5625]"
+              aria-label="Tăng"
+            >+</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label className="block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5">Tên khách hàng</label>
+          <input
+            type="text"
+            value={customer}
+            onChange={(e) => setCustomer(e.target.value)}
+            required
+            placeholder="Họ tên khách"
+            className="w-full rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]"
+          />
+        </div>
+        <div>
+          <label className="block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5">Số điện thoại</label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+            placeholder="VD: 0903 123 456"
+            className="w-full rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-sm font-mono outline-none focus:border-[#ff5625]"
+          />
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-[#1f2937]/30 bg-[#0f1113] p-4">
+        <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#ff5625] font-bold">Địa chỉ giao hàng</p>
+        <AddressPicker value={address} onChange={setAddress} />
+      </div>
+
+      <div className="flex items-center gap-2 rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-xs text-[#9ca3af]">
+        <span className="material-symbols-outlined text-[16px] text-[#10b981]">schedule</span>
+        Ngày bán + mã đơn được hệ thống tự ghi nhận khi gửi
+      </div>
+
+      <div className="rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] p-4">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-[#9ca3af]">Đơn giá công bố</span>
+          <span className="font-mono tabular-nums text-[#e7eaf0]">{fmtVnd(unitPrice)} ₫</span>
+        </div>
+        <div className="mt-1 flex items-center justify-between text-sm">
+          <span className="text-[#9ca3af]">Số lượng</span>
+          <span className="font-mono tabular-nums text-[#e7eaf0]">× {quantity}</span>
+        </div>
+        <div className="mt-3 flex items-center justify-between border-t border-[#1f2937]/30 pt-3">
+          <span className="text-[11px] uppercase tracking-wider text-[#9ca3af]">Thành tiền</span>
+          <span className="font-headline text-2xl text-[#ff5625] tabular-nums">{fmtVnd(totalPrice)} ₫</span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={busy}
+        className="w-full rounded-lg bg-[#ff5625] py-3 font-bold text-white shadow-lg  transition-all hover:bg-[#ff5625]/90 active:scale-95 disabled:opacity-50"
+      >
+        {busy ? 'Đang gửi…' : 'Ghi nhận đơn'}
+      </button>
+    </form>
   );
 }

@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
+import { AccountIdBadge } from '@/components/portal/AccountIdBadge';
 import { toast } from 'sonner';
 import type { Profile, ProductModel, ProfileRole } from '@/lib/portal-types';
 
@@ -56,8 +57,8 @@ export default function RegistrationsPage() {
           Không có đăng ký mới.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a] backdrop-blur">
-          <table className="w-full text-left text-sm">
+        <div className="overflow-x-auto portal-scroll rounded-2xl border border-[#1f2937]/40 bg-[#11151a] backdrop-blur">
+          <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-[#1f2937]/40 bg-[#1a1f26]/40 text-[10px] uppercase tracking-wider text-[#e7eaf0]/60">
               <tr>
                 <th className="px-4 py-3">Hồ sơ</th>
@@ -141,7 +142,10 @@ function RegistrationRow({
     <tr className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
       <td className="px-4 py-3">
         <p className="font-medium">{profile.full_name ?? '(chưa có tên)'}</p>
-        <p className="text-[11px] text-[#e7eaf0]/60">{profile.email ?? '—'}</p>
+        <div className="mt-0.5">
+          <AccountIdBadge accountNo={profile.account_no} id={profile.id} />
+        </div>
+        <p className="mt-1 text-[11px] text-[#e7eaf0]/60">{profile.email ?? '—'}</p>
         <p className="text-[11px] text-[#e7eaf0]/60 font-mono tabular-nums">{profile.phone ?? '—'}</p>
       </td>
       <td className="px-4 py-3">

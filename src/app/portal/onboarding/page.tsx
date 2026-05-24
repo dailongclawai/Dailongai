@@ -49,15 +49,15 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#3d3f41]/40 p-10">
+      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#1f2937]/40 p-10">
         <div className="text-center">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Bước cuối</p>
           <h1 className="mt-3 font-headline text-3xl">Hoàn tất hồ sơ</h1>
-          <p className="mt-2 text-sm text-[#e2e2e5]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
+          <p className="mt-2 text-sm text-[#e7eaf0]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
         </div>
         <form onSubmit={submit} className="space-y-5">
           <div>
-            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e5]/60">
+            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">
               Số điện thoại
             </label>
             <input
@@ -66,17 +66,17 @@ export default function OnboardingPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="0901234567"
-              className="w-full rounded-lg border border-[#3d3f41]/50 bg-[#1e2022] px-3 py-2 text-sm text-[#e2e2e5] placeholder:text-[#e2e2e5]/40 outline-none focus:border-[#ff5625]"
+              className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 outline-none focus:border-[#ff5625]"
             />
             {phoneError && <p className="mt-1 text-xs text-[#f87171]">{phoneError}</p>}
           </div>
-          <p className="rounded-lg bg-[#1e2022] px-4 py-3 text-xs text-[#e2e2e5]/60">
+          <p className="rounded-lg bg-[#11151a] px-4 py-3 text-xs text-[#e7eaf0]/60">
             Loại tài khoản (đại lý / supervisor) sẽ do admin Đại Long gán khi duyệt hồ sơ.
           </p>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white glow-primary-hover hover:bg-[#ff5625]/90 disabled:opacity-50"
+            className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white hover:bg-[#ff5625]/90 disabled:opacity-50"
           >
             {submitting ? 'Đang gửi…' : 'Hoàn tất'}
           </button>

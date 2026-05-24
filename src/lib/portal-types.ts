@@ -3,6 +3,7 @@ export type ProfileStatus = 'pending' | 'active' | 'suspended';
 
 export interface Profile {
   id: string;
+  account_no: number | null;
   full_name: string | null;
   phone: string | null;
   email: string | null;
@@ -19,6 +20,7 @@ export interface Profile {
   province: string | null;
   approved_at: string | null;
   approved_by: string | null;
+  order_slug: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -73,6 +75,7 @@ export interface DealerSummary {
 export interface TeamMember {
   supervisor_id: string;
   dealer_id: string;
+  dealer_account_no: number | null;
   dealer_name: string | null;
   orders_pending: number;
   units_ytd: number;
@@ -87,6 +90,22 @@ export interface CommissionPlan {
   active: boolean;
 }
 
+export interface DealerCurrentCommission {
+  dealer_id: string;
+  override_type: 'fixed' | 'percent' | null;
+  override_amount: number | null;
+  override_from: string | null;
+  tier_no: number;
+  tier_label: string;
+  tier_percent: number;
+  units_ytd: number;
+  rate_display: string;
+  source: 'fixed' | 'tier_auto';
+}
+
+export type NotificationCategory = 'order' | 'commission' | 'payout' | 'legal' | 'policy' | 'system' | 'general';
+export type NotificationSeverity = 'info' | 'success' | 'warning' | 'critical';
+
 export interface PortalMessage {
   id: string;
   sender_id: string | null;
@@ -95,6 +114,10 @@ export interface PortalMessage {
   body: string;
   is_read: boolean;
   created_at: string;
+  category: NotificationCategory;
+  severity: NotificationSeverity;
+  action_url: string | null;
+  action_label: string | null;
 }
 
 export interface PayoutRow {

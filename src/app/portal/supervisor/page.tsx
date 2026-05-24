@@ -3,16 +3,16 @@
 import { useEffect, useMemo, useState, Fragment, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import QRCode from 'qrcode';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
+import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { DailyOrdersChart } from '@/components/portal/DailyOrdersChart';
 import { SupervisorIncomeSummary } from '@/components/portal/SupervisorIncomeSummary';
-import { TierCard } from '@/components/portal/TierCard';
 import { MonthlyGoalCard } from '@/components/portal/MonthlyGoalCard';
 import { PodiumLeaderboard } from '@/components/portal/PodiumLeaderboard';
+import { AccountIdBadge } from '@/components/portal/AccountIdBadge';
 import { SupervisorFunnelCard } from '@/components/portal/FunnelChart';
 import {
   getSupervisorTeam, getMyPayouts, getDealerCurrentCommissions,
@@ -24,7 +24,7 @@ import type { TeamMember, PayoutRow, DealerCurrentCommission } from '@/lib/porta
 import type { SupervisorLedgerRow, LedgerRow, PayoutRequest, SupervisorGoal, LeaderboardRow } from '@/lib/portal-queries';
 
 const MIN_FIXED = 4500000;
-const MAX_FIXED = 12000000;
+const MAX_FIXED = 7500000;
 const STEP_FIXED = 500000;
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -69,13 +69,12 @@ function SupervisorDashboard() {
 
   // Team tab state
   const [team, setTeam] = useState<TeamMember[]>([]);
-  const [refLink, setRefLink] = useState('');
-  const [qr, setQr] = useState('');
   const [currentByDealer, setCurrentByDealer] = useState<Record<string, DealerCurrentCommission>>({});
   const [goal, setGoal] = useState<SupervisorGoal | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [editingDealer, setEditingDealer] = useState<TeamMember | null>(null);
   const [editAmount, setEditAmount] = useState(6000000);
+  const [editMode, setEditMode] = useState<'tier' | 'fixed'>('tier');
   const [savingPlan, setSavingPlan] = useState(false);
 
   // Commission tab state
@@ -108,13 +107,43 @@ function SupervisorDashboard() {
     getTeamLeaderboard().then(setLeaderboard).catch(() => setLeaderboard([]));
   }, [loading, session, profile, router]);
 
+  // Live sync: refetch team commission state when any team-dealer rule changes
+  // (RLS + supabase_realtime publication ensure supervisor only gets events for own team)
   useEffect(() => {
-    if (!session) return;
-    const base = process.env.NEXT_PUBLIC_PORTAL_URL || window.location.origin;
-    const link = `${base}/portal/register?ref=${session.user.id}`;
-    setRefLink(link);
-    QRCode.toDataURL(link, { width: 512, margin: 2, color: { dark: '#0c0e10', light: '#ffffff' } }).then(setQr).catch(() => setQr(''));
-  }, [session]);
+    if (!session || profile?.role !== 'supervisor' || team.length === 0) return;
+    const supabase = getSupabaseClient();
+    const teamIds = team.map((t) => t.dealer_id);
+
+    const refresh = async () => {
+      try {
+        const fresh = await getDealerCurrentCommissions(teamIds);
+        setCurrentByDealer(fresh);
+      } catch {
+        // silent
+      }
+    };
+
+    const channel = supabase
+      .channel(`supervisor-team-commission-${session.user.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'dealer_commissions' },
+        (payload) => {
+          const row = (payload.new as { dealer_id?: string } | null) ?? (payload.old as { dealer_id?: string } | null);
+          if (row?.dealer_id && teamIds.includes(row.dealer_id)) void refresh();
+        },
+      )
+      .subscribe();
+
+    const onFocus = () => { void refresh(); };
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener('focus', onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user.id, team.length]);
 
   const stats = useMemo(() => {
     let pendingCnt = 0, pendingVal = 0;
@@ -142,18 +171,18 @@ function SupervisorDashboard() {
   if (loading || profile?.role !== 'supervisor') return null;
 
   // ── Team handlers ──
-  const copyLink = async () => { await navigator.clipboard.writeText(refLink); toast.success('Đã copy link mời đại lý'); };
-  const downloadQR = () => {
-    if (!qr) return;
-    const a = document.createElement('a');
-    a.href = qr;
-    a.download = `dai-long-moi-dai-ly-${(profile?.full_name || 'supervisor').toLowerCase().replace(/\s+/g, '-')}.png`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    toast.success('Đã tải QR mời đại lý');
-  };
-  const openCommissionEditor = (t: TeamMember) => {
-    const curr = currentByDealer[t.dealer_id];
+  const openCommissionEditor = async (t: TeamMember) => {
+    // Refetch fresh state before opening modal — avoid stale cache mismatch
+    let curr = currentByDealer[t.dealer_id];
+    try {
+      const fresh = await getDealerCurrentCommissions([t.dealer_id]);
+      setCurrentByDealer((prev) => ({ ...prev, ...fresh }));
+      curr = fresh[t.dealer_id] ?? curr;
+    } catch {
+      // fall back to cached
+    }
     setEditAmount(curr?.override_amount ? Number(curr.override_amount) : 6000000);
+    setEditMode(curr?.source === 'fixed' ? 'fixed' : 'tier');
     setEditingDealer(t);
   };
 
@@ -271,10 +300,10 @@ function SupervisorDashboard() {
   return (
     <PortalShell variant="supervisor">
       {/* Header + Tab nav */}
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">Supervisor</p>
-          <h1 className="mt-2 font-headline text-4xl">{profile.full_name || 'Supervisor'} · điều phối nhánh</h1>
+          <h1 className="mt-2 font-headline text-3xl md:text-4xl">{profile.full_name || 'Supervisor'} · điều phối nhánh</h1>
         </div>
         <div className="inline-flex gap-1 rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-1">
           {tabBtn('team', 'Đội ngũ', 'groups')}
@@ -282,11 +311,151 @@ function SupervisorDashboard() {
         </div>
       </div>
 
+      {/* Hoa hồng đang chờ chi — top emphasis (same as dealer dashboard) */}
+      <section className="relative mb-6 overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.10] via-[#10b981]/[0.04] to-[#11151a] p-6 md:p-8">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[#10b981]/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-12 h-48 w-48 rounded-full bg-[#10b981]/10 blur-3xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[22px] text-[#10b981]">account_balance_wallet</span>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#10b981]">
+                Hoa hồng đang chờ chi
+              </p>
+            </div>
+            <p className="mt-3 font-headline text-[44px] font-bold leading-none tracking-tight tabular-nums text-[#10b981] md:text-[64px]">
+              {fmtVnd(stats.approvedVal)}
+              <span className="ml-2 align-top font-mono text-2xl tabular-nums text-[#10b981]/70">₫</span>
+            </p>
+            <p className="mt-3 text-xs text-[#9ca3af]">
+              Tự động chi 05–10 hàng tháng cho mọi đơn override đã duyệt
+            </p>
+          </div>
+          <div className="grid shrink-0 grid-cols-1 gap-3 sm:text-right">
+            <div className="rounded-xl border border-[#1f2937] bg-[#0a0c0f]/60 px-4 py-2.5">
+              <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Đã nhận tổng cộng</p>
+              <p className="mt-0.5 font-mono text-base font-semibold tabular-nums text-[#e7eaf0]">
+                {fmtVnd(stats.paidVal)} ₫
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={openRequest}
+              disabled={stats.approvedVal <= 0}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-[#10b981]/40 bg-[#10b981]/10 px-4 py-2.5 text-xs font-semibold text-[#10b981] transition-colors hover:border-[#10b981] hover:bg-[#10b981] hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              title={stats.approvedVal <= 0 ? 'Chưa có hoa hồng đã duyệt để rút' : 'Yêu cầu tất toán'}
+            >
+              <span className="material-symbols-outlined text-[14px]">account_balance_wallet</span>
+              Yêu cầu tất toán
+            </button>
+          </div>
+        </div>
+      </section>
+
       {tab === 'team' && (
         <>
-          {/* Tier supervisor + Mục tiêu tháng (side by side) */}
+          {/* Cài đặt hoa hồng đại lý + Mục tiêu tháng (side by side) */}
           <div className="mb-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
-            <TierCard profileId={profile.id} audience="supervisor" />
+            <div className="flex flex-col overflow-hidden rounded-2xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.05] to-[#11151a]">
+              <div className="flex items-center justify-between gap-3 border-b border-[#10b981]/20 bg-[#10b981]/[0.04] px-5 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[22px] text-[#10b981]">tune</span>
+                  <div>
+                    <p className="text-sm font-bold text-[#e7eaf0]">Cài đặt hoa hồng đại lý</p>
+                    <p className="text-[10px] text-[#9ca3af]">Chạm vào đại lý để chỉnh tỉ lệ / cố định</p>
+                  </div>
+                </div>
+                {team.length > 0 && (
+                  <p className="font-mono text-[11px] tabular-nums text-[#9ca3af]">
+                    <span className="font-semibold text-[#10b981]">{team.length}</span> đại lý
+                  </p>
+                )}
+              </div>
+              {team.length === 0 ? (
+                <div className="flex flex-1 items-center justify-center p-6 text-center text-xs text-[#9ca3af]">
+                  Chưa có đại lý trong đội. Mời qua QR ở mục bên trái.
+                </div>
+              ) : (
+                <ul className="max-h-[320px] divide-y divide-[#1f2937]/60 overflow-y-auto portal-scroll">
+                  {[...team]
+                    .sort((a, b) => Number(b.month_sales) - Number(a.month_sales))
+                    .map((t) => {
+                      const comm = currentByDealer[t.dealer_id];
+                      const isFixed = comm?.source === 'fixed';
+                      const name = t.dealer_name ?? '(không tên)';
+                      const initials = name.trim().split(/\s+/).slice(-2).map((w) => w[0] ?? '').join('').toUpperCase() || '?';
+                      const hash = Array.from(t.dealer_id).reduce((s, c) => (s * 31 + c.charCodeAt(0)) >>> 0, 0);
+                      const gradients = [
+                        'from-[#ff5625] to-[#f59e0b]',
+                        'from-[#3b82f6] to-[#06b6d4]',
+                        'from-[#10b981] to-[#84cc16]',
+                        'from-[#a855f7] to-[#ec4899]',
+                        'from-[#f59e0b] to-[#ef4444]',
+                        'from-[#06b6d4] to-[#8b5cf6]',
+                        'from-[#84cc16] to-[#22d3ee]',
+                        'from-[#ec4899] to-[#fb7185]',
+                      ];
+                      const gradient = gradients[hash % gradients.length];
+                      const act = Number(t.month_sales) > 0
+                        ? { label: 'Hoạt động', cls: 'bg-[#10b981]/15 text-[#10b981]' }
+                        : Number(t.orders_pending) > 0
+                          ? { label: 'Có đơn chờ', cls: 'bg-[#ff5625]/15 text-[#ff5625]' }
+                          : { label: 'Im ắng', cls: 'bg-[#1a1f26] text-[#9ca3af]' };
+                      return (
+                        <li key={t.dealer_id}>
+                          <button
+                            type="button"
+                            onClick={() => openCommissionEditor(t)}
+                            className="group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#10b981]/[0.06] active:bg-[#10b981]/15"
+                          >
+                            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradient} text-xs font-bold text-white`}>
+                              {initials}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="truncate text-sm font-semibold text-[#e7eaf0]">{name}</p>
+                                <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium uppercase ${act.cls}`}>
+                                  {act.label}
+                                </span>
+                              </div>
+                              <div className="mt-0.5">
+                                <AccountIdBadge accountNo={t.dealer_account_no} id={t.dealer_id} />
+                              </div>
+                              <p className="mt-1 text-[11px] text-[#9ca3af]">
+                                <span className="font-mono tabular-nums text-[#e7eaf0]">{fmtVnd(Number(t.month_sales))} ₫</span>
+                                {' · '}
+                                <span className="font-mono tabular-nums">{t.units_ytd}</span> máy tháng
+                                {Number(t.orders_pending) > 0 && (
+                                  <>
+                                    {' · '}
+                                    <span className="font-mono tabular-nums text-[#ff5625]">{t.orders_pending}</span> chờ
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex shrink-0 flex-col items-end gap-1">
+                              <div className="flex items-center gap-1.5">
+                                <span className={`font-mono text-base font-bold tabular-nums ${isFixed ? 'text-[#ff5625]' : 'text-[#10b981]'}`}>
+                                  {comm?.rate_display ?? '15%'}
+                                </span>
+                                {isFixed && (
+                                  <span className="rounded-sm bg-[#ff5625]/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#ff5625]">
+                                    Cố định
+                                  </span>
+                                )}
+                              </div>
+                              <span className="inline-flex items-center gap-1 rounded-full border border-[#10b981]/40 bg-[#10b981]/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#10b981] transition-colors group-hover:border-[#10b981] group-hover:bg-[#10b981] group-hover:text-white">
+                                <span className="material-symbols-outlined text-[12px]">edit</span>
+                                Cài đặt
+                              </span>
+                            </div>
+                          </button>
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
             <MonthlyGoalCard goal={goal} />
           </div>
 
@@ -312,50 +481,6 @@ function SupervisorDashboard() {
             </div>
           </div>
 
-          {/* QR invite */}
-          <div className="relative mb-8 overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.08] via-[#1e2022] to-[#1e2022] p-6 sm:p-8">
-            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#10b981]/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#ff5625]/5 blur-3xl" />
-            <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
-              <div className="shrink-0">
-                <div className="rounded-2xl border border-[#10b981]/30 bg-gradient-to-br from-white to-[#f5fdf8] p-3 shadow-[0_8px_32px_-8px_rgba(52,211,153,0.4)]">
-                  {qr ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={qr} alt="QR mời đại lý" className="h-40 w-40 rounded-lg sm:h-44 sm:w-44" />
-                  ) : (
-                    <div className="h-40 w-40 animate-pulse rounded-lg bg-[#11151a]/10 sm:h-44 sm:w-44" />
-                  )}
-                </div>
-                <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#10b981]/70">{profile?.full_name || 'Supervisor'}</p>
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-[#10b981]">share</span>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#10b981]">Mời đại lý vào nhánh</p>
-                </div>
-                <h2 className="mt-2 font-headline text-2xl leading-tight sm:text-3xl">QR riêng của <span className="text-[#10b981]">bạn</span></h2>
-                <p className="mt-2 text-sm leading-relaxed text-[#e7eaf0]/70">
-                  Gửi QR hoặc link này cho đại lý. Khi họ đăng ký qua đó, tài khoản sẽ tự động thuộc nhánh của bạn và bạn thấy được toàn bộ số liệu kinh doanh.
-                </p>
-                <div className="mt-4 flex items-center gap-2 rounded-xl border border-[#1f2937]/50 bg-[#11151a]/80 px-3 py-2 backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-[16px] text-[#e7eaf0]/40">link</span>
-                  <input readOnly value={refLink} className="min-w-0 flex-1 truncate bg-transparent text-xs text-[#e7eaf0]/80 outline-none" />
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button onClick={copyLink} className="flex items-center gap-2 rounded-full bg-[#ff5625] px-5 py-2.5 text-xs font-semibold text-white shadow-lg  transition-all hover:bg-[#ff5625]/90 hover: active:scale-[0.98]">
-                    <span className="material-symbols-outlined text-[16px]">content_copy</span> Copy link
-                  </button>
-                  <button onClick={downloadQR} disabled={!qr} className="flex items-center gap-2 rounded-full border border-[#10b981]/40 bg-[#10b981]/10 px-5 py-2.5 text-xs font-semibold text-[#10b981] transition-all hover:bg-[#10b981]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50">
-                    <span className="material-symbols-outlined text-[16px]">download</span> Tải QR
-                  </button>
-                </div>
-                <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#e7eaf0]/45">
-                  <span className="material-symbols-outlined text-[14px] text-[#e7eaf0]/45">tips_and_updates</span>
-                  In QR ra để dán tại điểm bán, hoặc gửi Zalo/email cho đại lý mới.
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Unified dealer card grid (mobile stack, desktop 2/3 cols) */}
           {team.length === 0 ? (
@@ -370,7 +495,6 @@ function SupervisorDashboard() {
                   : Number(t.orders_pending) > 0
                     ? { label: 'Có đơn chờ', cls: 'bg-[#ff5625]/15 text-[#ff5625]' }
                     : { label: 'Im ắng', cls: 'bg-[#1a1f26] text-[#9ca3af]' };
-                const comm = currentByDealer[t.dealer_id];
                 const name = t.dealer_name ?? '(không tên)';
                 const initials = name.trim().split(/\s+/).slice(-2).map((w) => w[0] ?? '').join('').toUpperCase() || '?';
                 const hash = Array.from(t.dealer_id).reduce((s, c) => (s * 31 + c.charCodeAt(0)) >>> 0, 0);
@@ -396,9 +520,12 @@ function SupervisorDashboard() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-semibold text-[#e7eaf0]">{name}</p>
-                        <span className={`mt-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${act.cls}`}>
-                          {act.label}
-                        </span>
+                        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${act.cls}`}>
+                            {act.label}
+                          </span>
+                          <AccountIdBadge accountNo={t.dealer_account_no} id={t.dealer_id} />
+                        </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2 px-4 py-3 text-center">
@@ -407,7 +534,7 @@ function SupervisorDashboard() {
                         <p className="mt-1 font-mono text-sm font-semibold tabular-nums">{fmtVnd(Number(t.month_sales))}</p>
                       </div>
                       <div className="border-x border-[#1f2937]">
-                        <p className="text-[9px] uppercase tracking-wider text-[#9ca3af]">Máy YTD</p>
+                        <p className="text-[9px] uppercase tracking-wider text-[#9ca3af]">Máy tháng</p>
                         <p className="mt-1 font-mono text-sm font-semibold tabular-nums">{t.units_ytd}</p>
                       </div>
                       <div>
@@ -415,22 +542,6 @@ function SupervisorDashboard() {
                         <p className="mt-1 font-mono text-sm font-semibold tabular-nums text-[#ff5625]">{t.orders_pending}</p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => openCommissionEditor(t)}
-                      className="flex items-center justify-between gap-3 border-t border-[#1f2937] bg-[#0a0c0f] px-4 py-3 text-left transition-colors hover:bg-[#10b981]/10 active:bg-[#10b981]/20"
-                    >
-                      <span className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[20px] text-[#10b981]">payments</span>
-                        <span className="text-sm font-medium">Hoa hồng</span>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-bold tabular-nums">{comm?.rate_display ?? '15%'}</span>
-                        {comm?.source === 'fixed' && (
-                          <span className="rounded-sm bg-[#ff5625]/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#ff5625]">Cố định</span>
-                        )}
-                        <span className="material-symbols-outlined text-[18px] text-[#9ca3af]">chevron_right</span>
-                      </span>
-                    </button>
                     <Link
                       href={`/portal/supervisor/team?dealer=${t.dealer_id}`}
                       className="border-t border-[#1f2937] px-4 py-2.5 text-center text-xs text-[#ff5625] transition-colors hover:bg-[#1a1f26]"
@@ -651,87 +762,144 @@ function SupervisorDashboard() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
-            {/* Tier auto info */}
-            <div className="border-b border-[#1f2937]/40 px-5 py-4">
-              <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/45">Tier tự động (theo số máy năm nay)</p>
-              <div className="mt-2 flex items-center justify-between rounded-xl border border-[#1f2937]/40 bg-[#1a1f26]/30 px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold">{curr?.tier_label ?? 'Tier 1 · Cơ bản'}</p>
-                  <p className="mt-0.5 text-[11px] text-[#e7eaf0]/50">
-                    Đã chốt <span className="font-mono tabular-nums text-[#e7eaf0]/80">{curr?.units_ytd ?? 0}</span> máy năm nay
+            {/* 2-option switcher */}
+            <div className="grid grid-cols-2 gap-2 border-b border-[#1f2937]/40 bg-[#0a0c0f] p-3">
+              <button
+                type="button"
+                onClick={() => !savingPlan && setEditMode('tier')}
+                disabled={savingPlan}
+                className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-colors disabled:cursor-not-allowed ${
+                  editMode === 'tier'
+                    ? 'border-[#10b981]/60 bg-[#10b981]/10'
+                    : 'border-[#1f2937] bg-[#11151a] hover:border-[#10b981]/30'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className={`material-symbols-outlined text-[18px] ${editMode === 'tier' ? 'text-[#10b981]' : 'text-[#9ca3af]'}`}>auto_awesome</span>
+                  <span className={`text-sm font-bold ${editMode === 'tier' ? 'text-[#10b981]' : 'text-[#e7eaf0]'}`}>Tier tự động</span>
+                  {!isOverride && <span className="ml-auto rounded-sm bg-[#10b981]/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#10b981]">Đang dùng</span>}
+                </span>
+                <span className="text-[10px] text-[#9ca3af]">%/đơn theo số máy năm</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => !savingPlan && setEditMode('fixed')}
+                disabled={savingPlan}
+                className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-colors disabled:cursor-not-allowed ${
+                  editMode === 'fixed'
+                    ? 'border-[#ff5625]/60 bg-[#ff5625]/10'
+                    : 'border-[#1f2937] bg-[#11151a] hover:border-[#ff5625]/30'
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <span className={`material-symbols-outlined text-[18px] ${editMode === 'fixed' ? 'text-[#ff5625]' : 'text-[#9ca3af]'}`}>price_change</span>
+                  <span className={`text-sm font-bold ${editMode === 'fixed' ? 'text-[#ff5625]' : 'text-[#e7eaf0]'}`}>Cố định / máy</span>
+                  {isOverride && <span className="ml-auto rounded-sm bg-[#ff5625]/20 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#ff5625]">Đang dùng</span>}
+                </span>
+                <span className="text-[10px] text-[#9ca3af]">Số tiền cố định × số máy</span>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-5 py-5">
+              {editMode === 'tier' ? (
+                <>
+                  <p className="mb-3 text-[11px] leading-relaxed text-[#9ca3af]">
+                    Hoa hồng = <span className="text-[#e7eaf0]">tier % × giá bán</span> mỗi đơn.
+                    Tier tự động cập nhật theo số máy đã chốt trong năm — đại lý càng bán nhiều, % càng cao.
                   </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-mono text-2xl font-bold tabular-nums text-[#10b981]">{Number(curr?.tier_percent ?? 15)}%</p>
-                  <p className="text-[10px] text-[#e7eaf0]/40">trên giá bán</p>
-                </div>
-              </div>
-              <p className="mt-2 text-[10px] text-[#e7eaf0]/40">
-                Lên 101 máy → 20%. Lên 201 máy → 25%. Tự động cập nhật theo doanh số.
-              </p>
-            </div>
-
-            {/* Fixed override */}
-            <div className="px-5 py-5">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/45">Override cố định / máy</p>
-                {isOverride && (
-                  <span className="rounded-full bg-[#ff5625]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#ff5625]">Đang áp dụng</span>
-                )}
-              </div>
-              <p className="mb-4 text-[11px] text-[#e7eaf0]/50">
-                Khi set fixed, mọi đơn của đại lý này = <span className="text-[#e7eaf0]/80">amount × số máy</span> (bỏ qua tier %).
-              </p>
-
-              <div className="rounded-xl border border-[#1f2937]/50 bg-[#06080a]/40 p-4">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-[11px] text-[#e7eaf0]/45">Số tiền / máy</span>
-                  <span className="font-mono text-2xl font-bold tabular-nums text-[#ff5625]">
-                    {editAmount.toLocaleString('vi-VN')} <span className="text-base text-[#e7eaf0]/50">₫</span>
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={MIN_FIXED}
-                  max={MAX_FIXED}
-                  step={STEP_FIXED}
-                  value={editAmount}
-                  onChange={(e) => setEditAmount(Number(e.target.value))}
-                  className="mt-3 w-full accent-[#ff5625]"
-                />
-                <div className="mt-1 flex justify-between font-mono text-[10px] tabular-nums text-[#e7eaf0]/40">
-                  <span>{MIN_FIXED.toLocaleString('vi-VN')} ₫</span>
-                  <span>{MAX_FIXED.toLocaleString('vi-VN')} ₫</span>
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="text-[11px] text-[#e7eaf0]/50">Nhập trực tiếp:</span>
-                  <input
-                    type="number"
-                    min={MIN_FIXED}
-                    max={MAX_FIXED}
-                    step={100000}
-                    value={editAmount}
-                    onChange={(e) => setEditAmount(Number(e.target.value))}
-                    className="flex-1 rounded-lg border border-[#1f2937]/50 bg-[#1a1c1e] px-3 py-1.5 font-mono text-sm tabular-nums text-[#e7eaf0] outline-none focus:border-[#ff5625]"
-                  />
-                </div>
-              </div>
-            </div>
-
-            </div>
-            <div className="flex flex-wrap gap-2 border-t border-[#1f2937]/40 bg-[#1a1f26]/20 px-5 py-4">
-              {isOverride && (
-                <button
-                  onClick={clearFixedAmount}
-                  disabled={savingPlan}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#1f2937]/50 px-3 py-2 text-xs font-medium text-[#e7eaf0]/70 hover:border-[#10b981]/40 hover:text-[#10b981] disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-[16px]">backspace</span>
-                  Bỏ override, dùng tier auto
-                </button>
+                  <div className="rounded-xl border border-[#10b981]/30 bg-[#10b981]/[0.06] p-4">
+                    <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Tier hiện tại</p>
+                    <div className="mt-2 flex items-end justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-[#e7eaf0]">{curr?.tier_label ?? 'Tier 1 · Cơ bản'}</p>
+                        <p className="mt-0.5 text-[11px] text-[#9ca3af]">
+                          Đã chốt <span className="font-mono tabular-nums text-[#e7eaf0]">{curr?.units_ytd ?? 0}</span> máy tháng này
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-mono text-3xl font-bold tabular-nums text-[#10b981]">{Number(curr?.tier_percent ?? 15)}%</p>
+                        <p className="text-[10px] text-[#9ca3af]">trên giá bán</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                    {[
+                      { label: 'Tier 1', units: '1–200', pct: '15%' },
+                      { label: 'Tier 2', units: '201–300', pct: '20%' },
+                      { label: 'Tier 3', units: '301+', pct: '25%' },
+                    ].map((t) => {
+                      const active = Number(curr?.tier_percent ?? 15) === Number(t.pct.replace('%', ''));
+                      return (
+                        <div
+                          key={t.label}
+                          className={`rounded-lg border p-2.5 ${active ? 'border-[#10b981]/50 bg-[#10b981]/[0.06]' : 'border-[#1f2937] bg-[#0a0c0f] opacity-60'}`}
+                        >
+                          <p className="text-[9px] uppercase tracking-wider text-[#9ca3af]">{t.label}</p>
+                          <p className="mt-0.5 font-mono text-[11px] tabular-nums text-[#e7eaf0]">{t.units} máy</p>
+                          <p className={`font-headline text-base ${active ? 'text-[#10b981]' : 'text-[#9ca3af]'}`}>{t.pct}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {isOverride && (
+                    <p className="mt-4 flex items-start gap-1.5 rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/[0.06] p-3 text-[11px] text-[#f59e0b]">
+                      <span className="material-symbols-outlined text-[14px]">swap_horiz</span>
+                      Đại lý đang dùng "Cố định / máy". Bấm <span className="font-semibold">Áp dụng tier tự động</span> bên dưới để chuyển.
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="mb-3 text-[11px] leading-relaxed text-[#9ca3af]">
+                    Mọi đơn của đại lý = <span className="text-[#e7eaf0]">số tiền cố định × số máy</span> — không phụ thuộc tier năm.
+                    Phù hợp khi muốn neo chi phí trên 1 đơn vị máy.
+                  </p>
+                  <div className="rounded-xl border border-[#ff5625]/30 bg-[#ff5625]/[0.06] p-4">
+                    <div className="flex items-baseline justify-between">
+                      <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Số tiền / máy</span>
+                      <span className="font-mono text-2xl font-bold tabular-nums text-[#ff5625]">
+                        {editAmount.toLocaleString('vi-VN')} <span className="text-base text-[#9ca3af]">₫</span>
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={MIN_FIXED}
+                      max={MAX_FIXED}
+                      step={STEP_FIXED}
+                      value={editAmount}
+                      onChange={(e) => setEditAmount(Number(e.target.value))}
+                      disabled={savingPlan}
+                      className="mt-3 w-full accent-[#ff5625]"
+                    />
+                    <div className="mt-1 flex justify-between font-mono text-[10px] tabular-nums text-[#9ca3af]">
+                      <span>{MIN_FIXED.toLocaleString('vi-VN')} ₫</span>
+                      <span>{MAX_FIXED.toLocaleString('vi-VN')} ₫</span>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <label className="text-[11px] text-[#9ca3af]">Nhập trực tiếp:</label>
+                      <input
+                        type="number"
+                        min={MIN_FIXED}
+                        max={MAX_FIXED}
+                        step={100000}
+                        value={editAmount}
+                        onChange={(e) => setEditAmount(Number(e.target.value))}
+                        disabled={savingPlan}
+                        className="flex-1 rounded-lg border border-[#1f2937] bg-[#0a0c0f] px-3 py-1.5 font-mono text-sm tabular-nums text-[#e7eaf0] outline-none focus:border-[#ff5625]"
+                      />
+                    </div>
+                  </div>
+                  {!isOverride && (
+                    <p className="mt-4 flex items-start gap-1.5 rounded-lg border border-[#10b981]/30 bg-[#10b981]/[0.06] p-3 text-[11px] text-[#10b981]">
+                      <span className="material-symbols-outlined text-[14px]">swap_horiz</span>
+                      Đại lý đang dùng "Tier tự động". Bấm <span className="font-semibold">Áp dụng cố định</span> bên dưới để chuyển.
+                    </p>
+                  )}
+                </>
               )}
-              <div className="flex-1" />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 border-t border-[#1f2937]/40 bg-[#1a1f26]/20 px-5 py-4">
               <button
                 onClick={() => !savingPlan && setEditingDealer(null)}
                 disabled={savingPlan}
@@ -739,13 +907,26 @@ function SupervisorDashboard() {
               >
                 Huỷ
               </button>
-              <button
-                onClick={saveFixedAmount}
-                disabled={savingPlan || editAmount < MIN_FIXED || editAmount > MAX_FIXED}
-                className="rounded-lg bg-[#ff5625] px-5 py-2 text-sm font-bold text-white shadow-lg  hover:bg-[#ff5625]/90 disabled:opacity-50"
-              >
-                {savingPlan ? 'Đang lưu…' : 'Lưu fixed'}
-              </button>
+              {editMode === 'tier' ? (
+                <button
+                  onClick={clearFixedAmount}
+                  disabled={savingPlan || !isOverride}
+                  title={!isOverride ? 'Đại lý đã dùng tier tự động' : 'Áp dụng tier tự động'}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#10b981] px-5 py-2 text-sm font-bold text-white hover:bg-[#0ea271] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[16px]">auto_awesome</span>
+                  {savingPlan ? 'Đang lưu…' : (isOverride ? 'Áp dụng tier tự động' : 'Đang dùng tier')}
+                </button>
+              ) : (
+                <button
+                  onClick={saveFixedAmount}
+                  disabled={savingPlan || editAmount < MIN_FIXED || editAmount > MAX_FIXED}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#ff5625] px-5 py-2 text-sm font-bold text-white hover:bg-[#ff5625]/90 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[16px]">price_change</span>
+                  {savingPlan ? 'Đang lưu…' : 'Áp dụng cố định'}
+                </button>
+              )}
             </div>
           </div>
         </div>

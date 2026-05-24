@@ -62,7 +62,8 @@ export default function AdminSupervisorsPage() {
           { label: 'Supervisor', value: supervisors.length },
           { label: 'Đại lý có nhánh', value: totalDealers },
           { label: 'Doanh số tháng (đội)', value: fmtVnd(totalMonth) },
-          { label: 'Máy YTD (đội)', value: totalUnits },
+          { label: 'Máy tháng (đội)', value: totalUnits },
+
         ].map((k) => (
           <div key={k.label} className="rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-5">
             <p className="text-[10px] uppercase tracking-[0.2em] text-[#e7eaf0]/50">{k.label}</p>
@@ -79,7 +80,7 @@ export default function AdminSupervisorsPage() {
               <th className="px-4 py-3">Supervisor</th>
               <th className="px-4 py-3 text-right">Đại lý</th>
               <th className="px-4 py-3 text-right">Doanh số tháng</th>
-              <th className="px-4 py-3 text-right">Máy YTD</th>
+              <th className="px-4 py-3 text-right">Máy tháng</th>
               <th className="px-4 py-3 text-right">Đơn chờ</th>
               <th className="px-4 py-3"></th>
             </tr>
@@ -118,7 +119,7 @@ export default function AdminSupervisorsPage() {
                               <tr>
                                 <th className="px-3 py-2">Đại lý</th>
                                 <th className="px-3 py-2 text-right">Doanh số tháng</th>
-                                <th className="px-3 py-2 text-right">Máy YTD</th>
+                                <th className="px-3 py-2 text-right">Máy tháng</th>
                                 <th className="px-3 py-2 text-right">Đơn chờ</th>
                               </tr>
                             </thead>

@@ -11,6 +11,10 @@ export default function AuthCallback() {
   useEffect(() => {
     (async () => {
       const client = getSupabaseClient();
+      const params = new URLSearchParams(window.location.search);
+      const isRecovery = params.get('type') === 'recovery';
+      const dest = isRecovery ? '/portal/reset-password' : '/portal';
+
       const { data, error } = await client.auth.getSession();
       if (error) {
         toast.error(error.message);
@@ -18,10 +22,10 @@ export default function AuthCallback() {
         return;
       }
       if (data.session) {
-        router.replace('/portal');
+        router.replace(dest);
         return;
       }
-      const code = new URLSearchParams(window.location.search).get('code');
+      const code = params.get('code');
       if (code) {
         const { error: exchErr } = await client.auth.exchangeCodeForSession(code);
         if (exchErr) {
@@ -29,7 +33,7 @@ export default function AuthCallback() {
           router.replace('/portal/login');
           return;
         }
-        router.replace('/portal');
+        router.replace(dest);
       } else {
         router.replace('/portal/login');
       }
@@ -37,7 +41,7 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="flex h-screen items-center justify-center text-[#e2e2e5]/50">
+    <div className="flex h-screen items-center justify-center text-[#e7eaf0]/50">
       Đang hoàn tất đăng nhập…
     </div>
   );

@@ -60,7 +60,7 @@ export function RadialTierDonut({
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ff5625]">{tierLabel}</span>
           <span className="font-mono text-2xl font-semibold tabular-nums text-[#e7eaf0]">{unitsYtd}</span>
-          <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]">máy YTD</span>
+          <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]">máy tháng này</span>
         </div>
       </div>
 

@@ -1,100 +1,56 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import {
   getInboxMessages,
   markMessageRead,
-  sendFeedback,
-  adminReply,
+  markAllMessagesRead,
 } from '@/lib/portal-queries';
-import type { PortalMessage } from '@/lib/portal-types';
+import type { PortalMessage, NotificationCategory, NotificationSeverity } from '@/lib/portal-types';
 
-function fmtTime(iso: string) {
-  return new Date(iso).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-}
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return 'vừa xong';
-  if (m < 60) return `${m}p`;
+  if (m < 60) return `${m} phút trước`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h`;
-  return `${Math.floor(h / 24)}d`;
+  if (h < 24) return `${h} giờ trước`;
+  const d = Math.floor(h / 24);
+  if (d === 1) return 'hôm qua';
+  if (d < 7) return `${d} ngày trước`;
+  return new Date(iso).toLocaleDateString('vi-VN');
 }
 
-const YM_CSS = `
-.ymx-wrap{font-family:Tahoma,"Segoe UI",Arial,sans-serif;display:flex;justify-content:center;}
-.ymx-window{width:100%;max-width:860px;overflow:hidden;border:1px solid #3d87d7;border-radius:4px;
-  box-shadow:0 0 0 1px rgba(255,255,255,.55) inset,0 0 0 2px rgba(100,168,240,.42),0 8px 28px rgba(0,0,0,.5);
-  background:#702070;}
-.ymx-titlebar{height:26px;display:flex;align-items:center;justify-content:space-between;color:#fff;
-  text-shadow:0 1px 1px rgba(0,0,0,.65);font-weight:600;font-size:12px;
-  background:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,0) 42%),linear-gradient(#cc76cc 0%,#8b2a8b 45%,#681b68 100%);
-  border-bottom:1px solid #4e174e;}
-.ymx-title{display:flex;align-items:center;gap:6px;padding-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ymx-body{display:flex;min-height:440px;}
-.ymx-list{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid #4e164e;background:#fff;}
-.ymx-profile{height:54px;display:flex;align-items:center;gap:8px;padding:6px 8px;color:#fff;
-  background:radial-gradient(circle at 85% 28%,rgba(255,255,255,.22),transparent 25%),linear-gradient(#9e3a9e,#742074);border-bottom:1px solid #582058;}
-.ymx-avatar{width:40px;height:40px;border:1px solid #d5bad5;border-radius:3px;background:linear-gradient(135deg,#ffd9b0,#ff5625);display:flex;align-items:center;justify-content:center;font-size:20px;}
-.ymx-id{flex:1;min-width:0;}
-.ymx-id strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ymx-id em{display:block;font-style:normal;font-size:10px;color:#f0dff0;}
-.ymx-id em b{color:#8fff9f;}
-.ymx-compose{margin:6px;padding:6px;border:1px solid #ca9b25;border-radius:3px;cursor:pointer;
-  background:linear-gradient(#ffe68b,#ffc83b);color:#5b3a00;font:bold 11px Tahoma,sans-serif;}
-.ymx-compose:hover{background:linear-gradient(#ffeda0,#ffce55);}
-.ymx-scroll{flex:1;overflow-y:auto;}
-.ymx-section{height:24px;display:flex;align-items:center;gap:6px;padding:0 9px;font-weight:700;font-size:11px;color:#4b334b;
-  background:linear-gradient(#eee6ee,#cf9fcf);border-top:1px solid #f7f0f7;border-bottom:1px solid #b47cb4;}
-.ymx-item{width:100%;display:flex;align-items:center;gap:7px;padding:5px 9px 5px 12px;border:0;text-align:left;cursor:pointer;
-  background:#fff;border-bottom:1px solid #f0eaf0;font:11px Tahoma,sans-serif;}
-.ymx-item:hover{background:#eef4fd;}
-.ymx-item.sel{background:linear-gradient(#dceafe,#c4dbfb);}
-.ymx-dot{width:9px;height:9px;flex-shrink:0;border-radius:50%;border:1px solid #b57900;background:#ffc033;}
-.ymx-dot.read{background:#cdcdcd;border-color:#9a9a9a;}
-.ymx-item-sub{flex:1;min-width:0;color:#222;}
-.ymx-item.unread .ymx-item-sub{font-weight:700;}
-.ymx-item-sub span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ymx-item-time{flex-shrink:0;font-size:10px;color:#888;}
-.ymx-chat{flex:1;display:flex;flex-direction:column;min-width:0;background:#702070;}
-.ymx-chat-head{height:24px;display:flex;align-items:center;gap:6px;padding:0 10px;color:#fff;font-size:12px;font-weight:600;
-  background:linear-gradient(#9a479a,#742074);text-shadow:0 1px 1px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ymx-chat-head .s{width:8px;height:8px;flex-shrink:0;border-radius:50%;background:#ffc033;border:1px solid #b57900;}
-.ymx-transcript{flex:1;margin:4px;padding:7px 9px;overflow-y:auto;background:#fff;border:1px solid #a977a9;min-height:150px;}
-.ymx-transcript .row{margin:0 0 9px;font-size:12px;line-height:1.4;color:#222;}
-.ymx-transcript .nm{font-weight:700;}
-.ymx-transcript .tm{color:#888;font-size:11px;}
-.ymx-empty{flex:1;display:flex;align-items:center;justify-content:center;color:#e7cce7;font-size:12px;text-align:center;padding:20px;}
-.ymx-subin{margin:4px 4px 0;}
-.ymx-subin input{width:100%;height:24px;border:1px solid #b27ab2;padding:2px 6px;font:11px Tahoma,sans-serif;background:#fff;}
-.ymx-inrow{display:flex;gap:8px;padding:4px;background:#8a258a;}
-.ymx-inrow textarea{flex:1;height:46px;resize:none;border:1px solid #b27ab2;padding:4px 6px;font:12px Tahoma,sans-serif;background:#fff;}
-.ymx-send{width:62px;align-self:stretch;border:1px solid #ca9b25;border-radius:3px;cursor:pointer;
-  background:linear-gradient(#ffe68b,#ffc83b);color:#5b3a00;font:bold 12px Tahoma,sans-serif;}
-.ymx-send:hover{background:linear-gradient(#ffeda0,#ffce55);}
-.ymx-send:disabled{opacity:.5;cursor:default;}
-.ymx-hint{padding:2px 6px 5px;font-size:10px;color:#e7cce7;background:#8a258a;}
-@media(max-width:640px){.ymx-body{flex-direction:column;}.ymx-list{width:100%;max-height:240px;border-right:0;border-bottom:1px solid #4e164e;}}
-`;
+type Filter = 'all' | 'unread' | NotificationCategory;
+
+const CATEGORY_META: Record<NotificationCategory, { label: string; icon: string }> = {
+  order:      { label: 'Đơn hàng',      icon: 'shopping_bag' },
+  commission: { label: 'Hoa hồng',      icon: 'payments' },
+  payout:     { label: 'Thanh toán',    icon: 'account_balance_wallet' },
+  legal:      { label: 'Hồ sơ pháp lý', icon: 'gavel' },
+  policy:     { label: 'Chính sách',    icon: 'policy' },
+  system:     { label: 'Hệ thống',      icon: 'dns' },
+  general:    { label: 'Thông báo',     icon: 'campaign' },
+};
+
+const SEVERITY_META: Record<NotificationSeverity, { stripe: string; icon: string; iconBg: string; iconBorder: string }> = {
+  info:     { stripe: '#01daf3', icon: 'info',         iconBg: 'bg-[#01daf3]/10',  iconBorder: 'border-[#01daf3]/30' },
+  success:  { stripe: '#22c55e', icon: 'check_circle', iconBg: 'bg-emerald-500/10', iconBorder: 'border-emerald-500/30' },
+  warning:  { stripe: '#ff5625', icon: 'warning',      iconBg: 'bg-[#ff5625]/10',  iconBorder: 'border-[#ff5625]/30' },
+  critical: { stripe: '#ffb4ab', icon: 'error',        iconBg: 'bg-[#f87171]/10',  iconBorder: 'border-[#f87171]/30' },
+};
 
 export default function InboxPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
   const [messages, setMessages] = useState<PortalMessage[]>([]);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [composing, setComposing] = useState(false);
-  const [reply, setReply] = useState('');
-  const [replying, setReplying] = useState(false);
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
-  const [sending, setSending] = useState(false);
+  const [filter, setFilter] = useState<Filter>('all');
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -102,173 +58,183 @@ export default function InboxPage() {
     getInboxMessages().then(setMessages);
   }, [loading, session, router]);
 
+  const myMessages = useMemo(
+    () => messages.filter((m) => m.recipient_id === session?.user.id),
+    [messages, session?.user.id],
+  );
+
+  const counts = useMemo(() => {
+    const c: Record<Filter, number> = {
+      all: myMessages.length,
+      unread: myMessages.filter((m) => !m.is_read).length,
+      order: 0, commission: 0, payout: 0, legal: 0, policy: 0, system: 0, general: 0,
+    };
+    for (const m of myMessages) c[m.category] = (c[m.category] ?? 0) + 1;
+    return c;
+  }, [myMessages]);
+
+  const filtered = useMemo(() => {
+    if (filter === 'all') return myMessages;
+    if (filter === 'unread') return myMessages.filter((m) => !m.is_read);
+    return myMessages.filter((m) => m.category === filter);
+  }, [myMessages, filter]);
+
   if (loading || !session || !profile) return null;
 
-  const isAdmin = profile.role === 'admin';
-  const selected = messages.find((m) => m.id === openId) ?? null;
-  const unread = messages.filter((m) => !m.is_read && m.recipient_id === session.user.id).length;
-  const sysMsgs = messages.filter((m) => !m.sender_id);
-  const convMsgs = messages.filter((m) => m.sender_id);
-
-  const senderLabel = (m: PortalMessage) =>
-    !m.sender_id ? 'Đại Long'
-    : m.sender_id === session.user.id ? 'Bạn'
-    : isAdmin ? 'Người gửi'
-    : 'Quản trị viên';
-  const senderColor = (m: PortalMessage) =>
-    !m.sender_id ? '#2a2872' : m.sender_id === session.user.id ? '#0e7a2e' : '#8b2a8b';
-
-  const open = async (msg: PortalMessage) => {
-    setComposing(false);
-    setOpenId(msg.id);
-    if (!msg.is_read && msg.recipient_id === session.user.id) {
-      await markMessageRead(msg.id);
-      setMessages((ms) => ms.map((m) => (m.id === msg.id ? { ...m, is_read: true } : m)));
-    }
+  const markRead = async (id: string) => {
+    await markMessageRead(id);
+    setMessages((ms) => ms.map((x) => x.id === id ? { ...x, is_read: true } : x));
   };
 
-  const submitReply = async () => {
-    if (!selected) return;
-    const b = reply.trim();
-    if (!b) { toast.error('Nhập nội dung trả lời'); return; }
-    setReplying(true);
+  const onCardClick = async (m: PortalMessage) => {
+    if (!m.is_read) await markRead(m.id);
+    if (m.action_url) router.push(m.action_url);
+  };
+
+  const onMarkAllRead = async () => {
+    setBusy(true);
     try {
-      await adminReply(selected.id, b);
-      toast.success('Đã gửi trả lời');
-      setReply('');
-      setMessages(await getInboxMessages());
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi gửi trả lời');
-    } finally {
-      setReplying(false);
-    }
+      const n = await markAllMessagesRead();
+      if (n > 0) {
+        toast.success(`Đã đánh dấu ${n} thông báo là đã đọc`);
+        setMessages(await getInboxMessages());
+      } else {
+        toast.info('Không có thông báo chưa đọc');
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Lỗi');
+    } finally { setBusy(false); }
   };
 
-  const submitFeedback = async () => {
-    if (!subject.trim() || !body.trim()) { toast.error('Nhập tiêu đề và nội dung'); return; }
-    setSending(true);
-    try {
-      await sendFeedback(subject.trim(), body.trim());
-      toast.success('Đã gửi góp ý đến ban quản trị');
-      setSubject(''); setBody(''); setComposing(false);
-      setMessages(await getInboxMessages());
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi gửi góp ý');
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const onKey = (e: React.KeyboardEvent, fn: () => void) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); fn(); }
-  };
-
-  const firstName = profile.full_name?.split(' ').slice(-1)[0] ?? profile.email?.split('@')[0] ?? 'Tài khoản';
-  const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
-  const nav = isAdmin
-    ? <AdminNav />
-    : <Link href={dashHref} className="text-[#e2e2e5]/60 transition-colors hover:text-[#ff5625]">← Bảng điều khiển</Link>;
-
-  const Item = (m: PortalMessage) => {
-    const isUnread = !m.is_read && m.recipient_id === session.user.id;
-    return (
-      <button key={m.id} className={`ymx-item ${m.id === openId ? 'sel' : ''} ${isUnread ? 'unread' : ''}`} onClick={() => open(m)}>
-        <span className={`ymx-dot ${isUnread ? '' : 'read'}`} />
-        <span className="ymx-item-sub"><span>{m.subject}</span></span>
-        <span className="ymx-item-time">{timeAgo(m.created_at)}</span>
-      </button>
-    );
-  };
+  const filterButtons: { key: Filter; label: string; icon: string }[] = [
+    { key: 'all',        label: 'Tất cả',                       icon: 'inbox' },
+    { key: 'unread',     label: 'Chưa đọc',                     icon: 'pending_actions' },
+    { key: 'order',      label: CATEGORY_META.order.label,      icon: CATEGORY_META.order.icon },
+    { key: 'commission', label: CATEGORY_META.commission.label, icon: CATEGORY_META.commission.icon },
+    { key: 'payout',     label: CATEGORY_META.payout.label,     icon: CATEGORY_META.payout.icon },
+  ];
 
   return (
-    <PortalShell variant={isAdmin ? 'admin' : profile.role === 'supervisor' ? 'supervisor' : 'dealer'} nav={nav}>
-      <style>{YM_CSS}</style>
-      <div className="mb-5">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#e2e2e5]/50">{unread > 0 ? `${unread} chưa đọc` : 'Tất cả đã đọc'}</p>
-        <h1 className="mt-2 font-headline text-3xl">Hộp thư</h1>
+    <PortalShell variant={profile.role === 'admin' ? 'admin' : profile.role === 'supervisor' ? 'supervisor' : 'dealer'}>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">Hệ thống / Trung tâm thông báo</p>
+          <h1 className="mt-2 font-headline text-3xl">Trung tâm thông báo</h1>
+        </div>
+        <button
+          onClick={onMarkAllRead}
+          disabled={busy || counts.unread === 0}
+          className="flex items-center gap-2 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-5 py-2.5 text-sm font-medium text-[#9ca3af] transition-colors hover:bg-[#1a1f26] hover:text-[#e7eaf0] disabled:opacity-50"
+        >
+          <span className="material-symbols-outlined text-[18px]">done_all</span>
+          Đánh dấu đã đọc tất cả
+        </button>
       </div>
 
-      <div className="ymx-wrap">
-        <div className="ymx-window">
-          <div className="ymx-titlebar">
-            <span className="ymx-title">💬 Đại Long Messenger</span>
-          </div>
-
-          <div className="ymx-body">
-            {/* Buddy-list = message list */}
-            <aside className="ymx-list">
-              <div className="ymx-profile">
-                <div className="ymx-avatar">😺</div>
-                <div className="ymx-id">
-                  <strong>{firstName}</strong>
-                  <em><b>●</b> Trực tuyến</em>
-                </div>
-              </div>
-              {!isAdmin && (
-                <button className="ymx-compose" onClick={() => { setComposing(true); setOpenId(null); }}>✎ Soạn góp ý mới</button>
-              )}
-              <div className="ymx-scroll">
-                {messages.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#999', fontSize: 11 }}>Hộp thư trống</div>}
-                {sysMsgs.length > 0 && <div className="ymx-section">📢 Thông báo ({sysMsgs.length})</div>}
-                {sysMsgs.map(Item)}
-                {convMsgs.length > 0 && <div className="ymx-section">💬 Tin nhắn ({convMsgs.length})</div>}
-                {convMsgs.map(Item)}
-              </div>
-            </aside>
-
-            {/* Chat window */}
-            <main className="ymx-chat">
-              {composing ? (
-                <>
-                  <div className="ymx-chat-head"><span className="s" /> Soạn góp ý đến ban quản trị</div>
-                  <div className="ymx-transcript">
-                    <p className="row" style={{ color: '#888' }}>Góp ý của bạn sẽ được gửi tới toàn bộ quản trị viên. Họ có thể trả lời ngay trong hộp thư này.</p>
-                  </div>
-                  <div className="ymx-subin">
-                    <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Tiêu đề…" />
-                  </div>
-                  <div className="ymx-inrow">
-                    <textarea value={body} onChange={(e) => setBody(e.target.value)} onKeyDown={(e) => onKey(e, submitFeedback)} placeholder="Nội dung… (Enter để gửi, Shift+Enter xuống dòng)" />
-                    <button className="ymx-send" disabled={sending} onClick={submitFeedback}>{sending ? '…' : 'Gửi'}</button>
-                  </div>
-                  <div className="ymx-hint">Enter để gửi · Shift+Enter xuống dòng</div>
-                </>
-              ) : selected ? (
-                <>
-                  <div className="ymx-chat-head"><span className="s" /> {selected.subject}</div>
-                  <div className="ymx-transcript">
-                    <p className="row">
-                      <span className="nm" style={{ color: senderColor(selected) }}>({fmtTime(selected.created_at)}) {senderLabel(selected)}:</span>{' '}
-                      <span style={{ whiteSpace: 'pre-wrap' }}>{selected.body}</span>
-                    </p>
-                  </div>
-                  {isAdmin && selected.sender_id ? (
-                    <>
-                      <div className="ymx-inrow">
-                        <textarea value={reply} onChange={(e) => setReply(e.target.value)} onKeyDown={(e) => onKey(e, submitReply)} placeholder="Trả lời… (Enter để gửi)" />
-                        <button className="ymx-send" disabled={replying} onClick={submitReply}>{replying ? '…' : 'Gửi'}</button>
-                      </div>
-                      <div className="ymx-hint">Trả lời sẽ xuất hiện trong hộp thư của người gửi.</div>
-                    </>
-                  ) : (
-                    <div className="ymx-hint" style={{ padding: '8px 9px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                      <span>Tin nhắn hệ thống.</span>
-                      {!isAdmin && (
-                        <Link
-                          href={profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dealer/commission'}
-                          style={{ color: '#ffd867', fontWeight: 700, textDecoration: 'none' }}
-                        >
-                          → Xem hoa hồng &amp; chi trả
-                        </Link>
-                      )}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <aside className="lg:col-span-3">
+          <div className="lg:sticky lg:top-24 overflow-hidden rounded-xl border border-[#1f2937]/40 bg-[#1a1c1e]">
+            <div className="border-b border-[#1f2937]/20 bg-[#1a1f26]/50 px-4 py-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#ff5625]">Bộ lọc thông báo</span>
+            </div>
+            <div className="space-y-1 p-2">
+              {filterButtons.map((b) => {
+                const active = filter === b.key;
+                const n = counts[b.key];
+                return (
+                  <button
+                    key={b.key}
+                    onClick={() => setFilter(b.key)}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                      active
+                        ? 'border-l-2 border-[#ff5625] bg-[#ff5625]/10 text-[#ff5625]'
+                        : 'text-[#9ca3af] hover:bg-[#1a1f26] hover:text-[#e7eaf0]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-[20px]">{b.icon}</span>
+                      <span>{b.label}</span>
                     </div>
-                  )}
-                </>
-              ) : (
-                <div className="ymx-empty">Chọn một tin nhắn bên trái để xem nội dung.<br />{!isAdmin && 'Hoặc bấm “Soạn góp ý mới”.'}</div>
-              )}
-            </main>
+                    {n > 0 && (
+                      <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        active ? 'bg-[#ff5625]/20 text-[#ff5625]' : 'bg-[#3d3f41]/40 text-[#9ca3af]'
+                      }`}>
+                        {n}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
+        </aside>
+
+        <div className="space-y-3 lg:col-span-9">
+          {filtered.length === 0 ? (
+            <div className="rounded-xl border border-[#1f2937]/30 bg-[#1a1c1e] py-16 text-center opacity-60">
+              <span className="material-symbols-outlined text-[48px] text-[#9ca3af]">inbox</span>
+              <p className="mt-3 text-sm text-[#9ca3af]">Không có thông báo</p>
+            </div>
+          ) : filtered.map((m) => {
+            const sev = SEVERITY_META[m.severity] ?? SEVERITY_META.info;
+            const cat = CATEGORY_META[m.category] ?? CATEGORY_META.general;
+            const unread = !m.is_read;
+            return (
+              <div
+                key={m.id}
+                onClick={() => onCardClick(m)}
+                className={`group relative flex cursor-pointer items-start gap-4 overflow-hidden rounded-xl border p-5 transition-all hover:bg-[#11151a] ${
+                  unread ? 'border-[#1f2937]/40 bg-[#1a1c1e]' : 'border-[#1f2937]/20 bg-[#1a1c1e]/50 opacity-80'
+                }`}
+              >
+                {unread && (
+                  <span
+                    className="absolute left-0 top-0 bottom-0 w-1"
+                    style={{ background: sev.stripe, boxShadow: `0 0 10px ${sev.stripe}` }}
+                  />
+                )}
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border ${
+                  unread ? `${sev.iconBg} ${sev.iconBorder}` : 'border-[#1f2937]/30 bg-[#1a1f26]'
+                }`}>
+                  <span className="material-symbols-outlined text-[24px]" style={{ color: unread ? sev.stripe : '#a0a0a8' }}>
+                    {sev.icon}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-3">
+                    <h3 className={`truncate font-headline text-base ${unread ? 'text-[#e7eaf0]' : 'text-[#9ca3af]'}`}>{m.subject}</h3>
+                    {unread && <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#ff5625]" />}
+                  </div>
+                  <p className={`mb-3 line-clamp-3 text-sm leading-relaxed ${unread ? 'text-[#9ca3af]' : 'text-[#9ca3af]/70'}`}>{m.body}</p>
+                  <div className="flex items-center gap-5 text-[11px] text-[#9ca3af]/80">
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[14px]">schedule</span>
+                      {timeAgo(m.created_at)}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[14px]">{cat.icon}</span>
+                      {cat.label}
+                    </span>
+                  </div>
+                </div>
+                {m.action_url && m.action_label && (
+                  <div className="shrink-0 pt-1" onClick={(e) => e.stopPropagation()}>
+                    <Link
+                      href={m.action_url}
+                      onClick={() => { if (unread) void markRead(m.id); }}
+                      className={`inline-block rounded-lg px-4 py-2 text-sm font-bold transition-all active:scale-95 ${
+                        unread
+                          ? 'bg-[#ff5625] text-white shadow-lg  hover:bg-[#ff5625]/90'
+                          : 'border border-[#1f2937]/40 bg-[#1a1f26] text-[#9ca3af] hover:bg-[#3d3f41]'
+                      }`}
+                    >
+                      {m.action_label}
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </PortalShell>

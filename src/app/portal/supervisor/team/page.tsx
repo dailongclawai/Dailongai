@@ -85,7 +85,7 @@ export default function TeamDealerDetail() {
       <h1 className="mt-3 font-headline text-3xl">Chi tiết đại lý</h1>
       <div className="mt-6 grid grid-cols-4 gap-4">
         <div className="rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#e7eaf0]/50">Máy YTD</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#e7eaf0]/50">Máy tháng</p>
           <p className="mt-2 font-mono text-2xl font-medium tabular-nums">{summary?.units_ytd ?? 0}</p>
         </div>
         <div className="rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-4">
@@ -109,7 +109,7 @@ export default function TeamDealerDetail() {
             <div>
               <p className="font-headline text-xl">{currentCommission?.tier_label ?? 'Tier 1 · Cơ bản'}</p>
               <p className="mt-1 text-[11px] text-[#e7eaf0]/50">
-                Đã chốt <span className="font-mono tabular-nums text-[#e7eaf0]/80">{currentCommission?.units_ytd ?? 0}</span> máy năm nay
+                Đã chốt <span className="font-mono tabular-nums text-[#e7eaf0]/80">{currentCommission?.units_ytd ?? 0}</span> máy tháng này
               </p>
             </div>
             <div className="text-right">
