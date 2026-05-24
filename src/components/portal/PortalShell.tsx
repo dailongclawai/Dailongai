@@ -6,34 +6,12 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { signOut } from '@/lib/supabase';
 import { getUnreadCount } from '@/lib/portal-queries';
+import { useI18n } from '@/lib/i18n';
+import LanguageSwitcher from '../LanguageSwitcher';
 import { AccountIdBadge } from './AccountIdBadge';
 
 type Variant = 'dealer' | 'supervisor' | 'admin';
 interface NavItem { href: string; label: string; icon: string; exact?: boolean }
-
-const NAV: Record<Variant, NavItem[]> = {
-  admin: [
-    { href: '/portal/admin', label: 'Tổng quan', icon: 'dashboard', exact: true },
-    { href: '/portal/admin/orders', label: 'Đơn hàng', icon: 'shopping_cart' },
-    { href: '/portal/admin/payouts', label: 'Hoa hồng', icon: 'payments' },
-    { href: '/portal/admin/products', label: 'Sản phẩm', icon: 'medical_services' },
-    { href: '/portal/admin/supervisors', label: 'Supervisor', icon: 'groups' },
-    { href: '/portal/admin/upgrade', label: 'Nâng cấp', icon: 'upgrade' },
-    { href: '/portal/admin/reports', label: 'Báo cáo', icon: 'bar_chart' },
-    { href: '/portal/admin/audit', label: 'Nhật ký', icon: 'history' },
-  ],
-  dealer: [
-    { href: '/portal/dashboard', label: 'Tổng quan', icon: 'dashboard', exact: true },
-    { href: '/portal/dealer/commission', label: 'Hoa hồng', icon: 'payments' },
-    { href: '/portal/dealer/qr', label: 'Mã QR đặt đơn', icon: 'qr_code_2' },
-    { href: '/portal/payout-info', label: 'Tài khoản nhận tiền', icon: 'account_balance' },
-  ],
-  supervisor: [
-    { href: '/portal/supervisor', label: 'Đội của tôi', icon: 'groups', exact: true },
-    { href: '/portal/supervisor/qr', label: 'QR mời đại lý', icon: 'qr_code_2' },
-    { href: '/portal/payout-info', label: 'Tài khoản nhận tiền', icon: 'account_balance' },
-  ],
-};
 
 export function PortalShell({
   children,
@@ -46,6 +24,7 @@ export function PortalShell({
   const router = useRouter();
   const pathname = usePathname();
   const { session, profile } = useAuth();
+  const { t } = useI18n();
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
 
@@ -55,10 +34,39 @@ export function PortalShell({
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  const NAV: Record<Variant, NavItem[]> = {
+    admin: [
+      { href: '/portal/admin', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
+      { href: '/portal/admin/orders', label: t('portal.shell.nav.orders'), icon: 'shopping_cart' },
+      { href: '/portal/admin/payouts', label: t('portal.shell.nav.commission'), icon: 'payments' },
+      { href: '/portal/admin/products', label: t('portal.shell.nav.products'), icon: 'medical_services' },
+      { href: '/portal/admin/supervisors', label: t('portal.shell.nav.supervisors'), icon: 'groups' },
+      { href: '/portal/admin/upgrade', label: t('portal.shell.nav.upgrade'), icon: 'upgrade' },
+      { href: '/portal/admin/reports', label: t('portal.shell.nav.reports'), icon: 'bar_chart' },
+      { href: '/portal/admin/audit', label: t('portal.shell.nav.audit'), icon: 'history' },
+    ],
+    dealer: [
+      { href: '/portal/dashboard', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
+      { href: '/portal/dealer/commission', label: t('portal.shell.nav.commission'), icon: 'payments' },
+      { href: '/portal/dealer/qr', label: t('portal.shell.nav.qr_orders'), icon: 'qr_code_2' },
+      { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
+    ],
+    supervisor: [
+      { href: '/portal/supervisor', label: t('portal.shell.nav.team'), icon: 'groups', exact: true },
+      { href: '/portal/supervisor/commission', label: t('portal.shell.nav.commission_stats'), icon: 'payments' },
+      { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
+    ],
+  };
   const items = NAV[variant];
-  const initials = (profile?.full_name ?? profile?.email ?? 'DL')
-    .split(' ').slice(-2).map((s) => s[0]).join('').slice(0, 2).toUpperCase();
-  const roleLabel = variant === 'admin' ? 'Quản trị viên' : variant === 'supervisor' ? 'Supervisor' : 'Đại lý';
+  const initials = (() => {
+    const tokens = (profile?.full_name ?? profile?.email ?? 'DL')
+      .split(/\s+/)
+      .filter((s) => s && !/^\d+$/.test(s));
+    if (!tokens.length) return 'DL';
+    if (tokens.length === 1) return tokens[0].slice(0, 2).toUpperCase();
+    return (tokens[0][0] + tokens[tokens.length - 1][0]).toUpperCase();
+  })();
+  const roleLabel = variant === 'admin' ? t('portal.shell.role.admin') : variant === 'supervisor' ? t('portal.shell.role.supervisor') : t('portal.shell.role.dealer');
 
   const handleSignOut = async () => { await signOut(); router.replace('/portal/login'); };
 
@@ -89,13 +97,13 @@ export function PortalShell({
   const Sidebar = (
     <div className="flex h-full flex-col bg-[#06080a] py-6">
       <Link href="/portal" className="mb-8 block px-6">
-        <h1 className="font-headline text-[22px] font-bold leading-tight text-[#ff5625]">Đại Long Medical</h1>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#9ca3af]/70">Affiliate Portal</p>
+        <h1 className="font-headline text-[22px] font-bold leading-tight text-[#ff5625]">{t('portal.shell.brand')}</h1>
+        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#9ca3af]/70">{t('portal.shell.tagline')}</p>
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto portal-scroll">
         {items.map(navLink)}
-        {navLink({ href: '/portal/inbox', label: 'Thông báo', icon: 'notifications' })}
-        {navLink({ href: '/portal/profile', label: 'Tài khoản', icon: 'settings' })}
+        {navLink({ href: '/portal/inbox', label: t('portal.shell.nav.inbox'), icon: 'notifications' })}
+        {navLink({ href: '/portal/profile', label: t('portal.shell.nav.profile'), icon: 'settings' })}
       </nav>
       <div
         className="mt-auto space-y-1 px-4 pt-4"
@@ -103,12 +111,12 @@ export function PortalShell({
       >
         {variant === 'dealer' && (
           <Link href="/portal/dealer/orders/new" className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3 font-bold text-white transition-transform active:scale-[0.98]">
-            <span className="material-symbols-outlined text-[20px]">add_circle</span> Đơn mới
+            <span className="material-symbols-outlined text-[20px]">add_circle</span> {t('portal.shell.cta.new_order')}
           </Link>
         )}
         <button onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-lg px-6 py-3 text-[#f87171]/80 transition-colors hover:bg-[#f87171]/10">
           <span className="material-symbols-outlined text-[20px]">logout</span>
-          <span className="text-[14px]">Thoát tài khoản</span>
+          <span className="text-[14px]">{t('portal.shell.signout')}</span>
         </button>
       </div>
     </div>
@@ -127,21 +135,31 @@ export function PortalShell({
       <header className="fixed top-0 right-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#1f2937]/40 bg-[#0a0c0f] px-4 lg:left-[280px] lg:w-[calc(100%-280px)] lg:px-8">
         <button
           onClick={() => setOpen(true)}
-          aria-label="Mở menu điều hướng"
+          aria-label={t('portal.shell.menu.aria')}
           className="inline-flex items-center gap-2 rounded-xl border border-[#ff5625]/40 bg-[#ff5625]/10 px-3 py-2 text-sm font-semibold text-[#ff5625] transition-colors hover:border-[#ff5625] hover:bg-[#ff5625] hover:text-white active:scale-[0.98] lg:hidden"
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
-          <span className="text-xs">Menu</span>
+          <span className="text-xs">{t('portal.shell.menu.label')}</span>
         </button>
         <div className="hidden flex-1 lg:block" />
-        <div className="flex items-center gap-4">
-          <Link href="/portal/profile" className="group flex items-center gap-3">
-            <div className="flex flex-col items-end gap-0.5">
-              <p className="text-[13px] font-bold leading-tight text-[#e7eaf0]">{profile?.full_name ?? 'Tài khoản'}</p>
-              <p className="text-[11px] text-[#9ca3af]/70">{roleLabel}</p>
-              {profile?.id && <AccountIdBadge accountNo={profile.account_no} id={profile.id} />}
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <span aria-hidden className="hidden h-6 w-px bg-[#1f2937] sm:block" />
+          <Link href="/portal/profile" className="group flex items-center gap-2.5">
+            {/* Profile chip: name + role · ID — hidden on mobile to save header space */}
+            <div className="hidden flex-col items-end gap-1 rounded-xl border border-[#1f2937]/60 bg-[#0f1318]/60 px-3 py-1.5 transition-colors group-hover:border-[#ff5625]/40 sm:flex">
+              <p className="text-[13px] font-semibold leading-none text-[#e7eaf0]">{profile?.full_name ?? t('portal.shell.nav.profile')}</p>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] uppercase tracking-[0.15em] text-[#9ca3af]/70">{roleLabel}</span>
+                {profile?.id && (
+                  <>
+                    <span aria-hidden className="text-[10px] leading-none text-[#9ca3af]/40">·</span>
+                    <AccountIdBadge accountNo={profile.account_no} id={profile.id} />
+                  </>
+                )}
+              </div>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff5625]/20 bg-[#1a1f26] text-xs font-bold text-[#ff5625] group-hover:border-[#ff5625]">{initials}</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff5625]/30 bg-[#1a1f26] text-xs font-bold text-[#ff5625] transition-colors group-hover:border-[#ff5625]">{initials}</span>
           </Link>
         </div>
       </header>

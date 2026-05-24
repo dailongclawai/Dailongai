@@ -269,11 +269,6 @@ export default function ProductPage() {
                 </div>
               </div>
 
-              <a href={`tel:${contactInfo.hotline.replace(/\s/g, "")}`}
-                className="block w-full py-4 sm:py-5 bg-primary-container text-on-primary font-headline font-black tracking-widest text-xs sm:text-sm text-center uppercase glow-primary-hover hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                {t('product.order_now')} — {contactInfo.hotline}
-              </a>
-
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <a href={contactInfo.zalo} target="_blank" rel="noopener noreferrer"
                   className="flex-1 py-3 border border-[#0068ff]/30 text-[#4da6ff] font-headline font-bold tracking-widest text-[10px] sm:text-xs text-center uppercase hover:bg-[#0068ff]/10 transition-all">
@@ -531,11 +526,6 @@ export default function ProductPage() {
                   <p className="text-xs sm:text-sm text-secondary">{t('product.stat_investment')}</p>
                 </div>
               </div>
-              <a href="/#contact"
-                className="inline-flex items-center gap-2 bg-primary-container text-on-primary px-8 py-4 font-headline font-black text-xs tracking-[0.15em] uppercase hover:scale-[1.02] active:scale-[0.98] transition-all">
-                {t('product.consult_now')} — {contactInfo.hotline}
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-              </a>
             </div>
 
           </div>

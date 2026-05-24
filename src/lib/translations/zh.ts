@@ -36,7 +36,7 @@ const zh: Record<string, string> = {
       '应用650nm波长低功率半导体激光技术——辅助血液循环、微循环，改善睡眠和整体健康。',
     'about.feat3_title': '专业咨询团队',
     'about.feat3_desc':
-      '通过Zalo一对一咨询，热线电话0935 999 922，以及河内、胡志明市展厅现场咨询。服务时间：周一至周五9:00-18:00。',
+      '通过Zalo一对一咨询，以及河内、胡志明市展厅现场咨询。服务时间：周一至周五9:00-18:00。',
     'about.feat4_title': '5年质保',
     'about.feat4_desc':
       '承诺5年官方质保，7天内如有生产缺陷可退换。全国快速技术支持。',
@@ -78,7 +78,7 @@ const zh: Record<string, string> = {
       '为医生、私人诊所和省级医院科室提供深度咨询服务。提供设备使用培训和部署支持。',
     'solutions.s4_title': '技术支持与质保',
     'solutions.s4_desc':
-      '5年官方质保，7天内如有生产缺陷可退换。技术支持热线0935 999 922 — AI 助理 24/7 接待，人工技术支持周一至周五 9:00-18:00。',
+      '5年官方质保，7天内如有生产缺陷可退换。AI 助理 24/7 接待，人工技术支持周一至周五 9:00-18:00。',
     'solutions.main_product': '完整产品套装',
     'solutions.handheld': '手持设备',
     'solutions.h1_1': '650nm低功率半导体激光',
@@ -344,7 +344,7 @@ const zh: Record<string, string> = {
     'product.spec3_title': '现代技术',
     'product.spec3_desc': '安全便捷，随时随地轻松使用。智能设计，无痛，无副作用。',
     'product.spec4_title': '5年质保',
-    'product.spec4_desc': '承诺5年官方质保——市场最长。生产缺陷7天退换。服务热线0935 999 922。',
+    'product.spec4_desc': '承诺5年官方质保——市场最长。生产缺陷7天退换。',
     'product.spec5_title': '210项专利',
     'product.spec5_desc': '210项专利。由中国广州通过ISO 13485、ISO 9001认证的工厂生产。',
     'product.spec6_title': '一对一咨询',
@@ -586,6 +586,9 @@ const zh: Record<string, string> = {
     'team.about.heading': '关于团队',
     'team.about.body': '大龙 AI 团队由 15 个公开的 Sen 代理和 10 个内部工作者组成 — 全天候 24/7 运行,负责接收问题、查询产品保修信息、记录客户需求,并协调 Zalo · 脸书 · 官网 · 电话各渠道。所有重要信息在送达客户前都由大龙团队审核。AI 处理重复工作 — 医生与专家把 100% 精力留给真正的健康关怀。',
     'team.about.cta_button': '联系大龙',
+    'team.cta.heading': '准备与 ĐẠI LONG 对话吗？',
+    'team.cta.body': 'Đại Long 健康科技 Sen AI 团队 24/7 在线，通过 Zalo 或官网回答产品咨询、半导体激光设备建议和演示预约。秒级回复，无需等待工作时间。',
+    'team.cta.button': '立即联系',
 
     'team.contact.short': '联系',
 

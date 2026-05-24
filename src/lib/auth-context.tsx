@@ -83,6 +83,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [sessionResolved, session?.user.id, fetchProfile]);
 
+  // Realtime: react instantly when an admin changes my role/status (upgrade/downgrade/suspend)
+  // so the UI flips without a manual reload.
+  useEffect(() => {
+    const uid = session?.user.id;
+    if (!uid) return;
+    const sb = getSupabaseClient();
+    const channel = sb
+      .channel(`profile:${uid}`)
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${uid}` },
+        () => { void fetchProfile(uid); }
+      )
+      .subscribe();
+    return () => { void sb.removeChannel(channel); };
+  }, [session?.user.id, fetchProfile]);
+
   return (
     <AuthContext.Provider value={{ session, profile, loading, refresh }}>
       {children}

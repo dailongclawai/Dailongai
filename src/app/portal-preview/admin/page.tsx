@@ -326,12 +326,12 @@ export default function AdminConsolePage() {
             </div>
 
             <p className="text-xs leading-relaxed text-[#0e1525]/70">
-              Hoa hồng tăng dần theo số máy bán trong năm. Đại lý có động lực push doanh số. Admin chỉ chỉnh tier threshold + override exception.
+              Hoa hồng tăng dần theo số máy bán trong tháng (reset đầu mỗi tháng). Đại lý có động lực push doanh số. Admin chỉ chỉnh tier threshold + override exception.
             </p>
 
             {/* Earnings example */}
             <div className="mt-5 space-y-1.5 rounded-xl bg-[#f5f1e8] p-4 text-xs">
-              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#0e1525]/50">Ví dụ thu nhập đại lý YTD</p>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#0e1525]/50">Ví dụ thu nhập đại lý trong tháng</p>
               {compareUnits.map((u) => {
                 const tier = tierScheme.tiers.slice().reverse().find((t) => u >= t.minUnits)!;
                 const earn = u * priceAvg * (tier.percent / 100);
@@ -372,7 +372,7 @@ export default function AdminConsolePage() {
 
             {/* Earnings example */}
             <div className="mt-5 space-y-1.5 rounded-xl bg-[#f5f1e8] p-4 text-xs">
-              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#0e1525]/50">Ví dụ thu nhập đại lý YTD</p>
+              <p className="mb-2 text-[10px] uppercase tracking-wider text-[#0e1525]/50">Ví dụ thu nhập đại lý trong tháng</p>
               {compareUnits.map((u) => {
                 const earn = u * priceAvg * (flatScheme.rate / 100);
                 return (

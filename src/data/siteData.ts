@@ -222,7 +222,7 @@ export const contactInfo = {
   company: "Công ty TNHH Công nghệ và Y tế Đại Long",
   address: "165,171 Yên Lãng, Phường Đống Đa, Hà Nội",
   hotline: "0935 999 922",
-  email: "admin@dailong.ai",
+  email: "dongoclong@dailongai.com",
   website: "dailong.ai",
   showroom: "165,171 Yên Lãng, Đống Đa, Hà Nội",
   showroomHCM: "Đường D12 Empire City Thủ Thiêm, tháp Tilia, phường An Khánh, TP. Hồ Chí Minh",

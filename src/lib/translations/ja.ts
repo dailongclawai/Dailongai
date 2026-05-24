@@ -36,7 +36,7 @@ const ja: Record<string, string> = {
       '650nm波長の低出力半導体レーザー技術を応用——血液循環・微小循環をサポートし、睡眠と全体的な健康を改善。',
     'about.feat3_title': '専門コンサルティングチーム',
     'about.feat3_desc':
-      'Zaloによる1対1相談、ホットライン0935 999 922、ハノイ・ホーチミン市のショールームでの対面相談。月〜金曜9:00〜18:00対応。',
+      'Zaloによる1対1相談、ハノイ・ホーチミン市のショールームでの対面相談。月〜金曜9:00〜18:00対応。',
     'about.feat4_title': '5年保証',
     'about.feat4_desc':
       '5年間の正規保証、製造不良の場合は7日以内の返品交換。全国対応の迅速な技術サポート。',
@@ -78,7 +78,7 @@ const ja: Record<string, string> = {
       '医師、プライベートクリニック、省立病院向けの専門コンサルティングサービス。機器の使用トレーニングと導入サポート。',
     'solutions.s4_title': '技術サポート＆保証',
     'solutions.s4_desc':
-      '5年間の正規保証、製造不良の場合は7日以内の返品交換。技術サポートホットライン0935 999 922、毎日8:00〜21:00対応。',
+      '5年間の正規保証、製造不良の場合は7日以内の返品交換。技術サポート、毎日8:00〜21:00対応。',
     'solutions.main_product': 'フルセット',
     'solutions.handheld': 'ハンドヘルド機器',
     'solutions.h1_1': '650nm低出力半導体レーザー',
@@ -344,7 +344,7 @@ const ja: Record<string, string> = {
     'product.spec3_title': '最新技術',
     'product.spec3_desc': '安全で便利、いつでもどこでも簡単に使用可能。スマートデザイン、無痛、副作用なし。',
     'product.spec4_title': '5年保証',
-    'product.spec4_desc': '5年間正規保証——業界最長。製造不良7日間返品可。サポートホットライン0935 999 922。',
+    'product.spec4_desc': '5年間正規保証——業界最長。製造不良7日間返品可。',
     'product.spec5_title': '210件の特許',
     'product.spec5_desc': '210件の特許。中国広州のISO 13485、ISO 9001認証工場で製造。',
     'product.spec6_title': '1対1相談',
@@ -587,6 +587,9 @@ const ja: Record<string, string> = {
     'team.about.heading': 'チームについて',
     'team.about.body': 'Đại Long AI チームは 15 名の公開 Sen エージェントと 10 名の内部ワーカーで構成 — 24/7 で稼働し、質問対応、製品・保証情報の照会、顧客ニーズの記録、Zalo · Facebook · ウェブサイト · 電話の各チャネルを連携します。重要な情報は Đại Long チームによってお客様に届く前にレビューされます。AI が反復作業を担い — 医師と専門家は本当の意味でのヘルスケアに 100% の集中を向けます。',
     'team.about.cta_button': 'Đại Long へ連絡',
+    'team.cta.heading': 'ĐẠI LONG とお話しする準備はできましたか？',
+    'team.cta.body': 'Đại Long ヘルスケア テクノロジーの Sen AI チームが Zalo またはウェブサイトで製品のお問い合わせ、半導体レーザー機器のご相談、デモのご予約を24時間365日承ります。営業時間を待たずに即座にご返信。',
+    'team.cta.button': '今すぐお問い合わせ',
 
     'team.contact.short': '連絡',
 

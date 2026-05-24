@@ -1,5 +1,7 @@
 'use client';
 
+import { useI18n } from '@/lib/i18n';
+
 interface SparklineBarProps {
   data: number[];
   width?: number;
@@ -17,6 +19,7 @@ export function SparklineBar({
   gap = 1,
   minBarHeight = 1,
 }: SparklineBarProps) {
+  const { t } = useI18n();
   if (!data || data.length === 0) {
     return (
       <div
@@ -36,7 +39,7 @@ export function SparklineBar({
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       role="img"
-      aria-label="Biểu đồ doanh số 30 ngày"
+      aria-label={t('portal.components.sparklineBar.aria_chart_30d')}
     >
       {data.map((v, i) => {
         const h = v > 0 ? Math.max(minBarHeight, (v / max) * height) : minBarHeight;

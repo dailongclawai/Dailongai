@@ -63,7 +63,7 @@ export const statusLabel: Record<OrderStatus, { vi: string; tone: string }> = {
 
 // ─── Tier commission scheme ───────────────────────────────────────────────
 export const tierScheme = {
-  name: 'Phương án A — Tier theo số máy năm',
+  name: 'Phương án A — Tier theo số máy bán trong tháng',
   tiers: [
     { id: 1, label: 'Tier 1', minUnits: 0, percent: 15 },
     { id: 2, label: 'Tier 2', minUnits: 100, percent: 20 },

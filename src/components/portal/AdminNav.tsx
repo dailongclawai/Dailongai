@@ -2,20 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const items = [
-  { href: '/portal/admin', label: 'Tổng quan', exact: true },
-  { href: '/portal/admin/orders', label: 'Đơn hàng' },
-  { href: '/portal/admin/payouts', label: 'Hoa hồng' },
-  { href: '/portal/admin/products', label: 'Sản phẩm' },
-  { href: '/portal/admin/supervisors', label: 'Supervisor' },
-  { href: '/portal/admin/upgrade', label: 'Nâng cấp' },
-  { href: '/portal/admin/reports', label: 'Báo cáo' },
-  { href: '/portal/admin/audit', label: 'Nhật ký' },
-];
+import { useI18n } from '@/lib/i18n';
 
 export function AdminNav() {
+  const { t } = useI18n();
   const pathname = usePathname();
+  const items = [
+    { href: '/portal/admin', label: t('portal.shell.nav.dashboard'), exact: true },
+    { href: '/portal/admin/orders', label: t('portal.shell.nav.orders') },
+    { href: '/portal/admin/payouts', label: t('portal.shell.nav.commission') },
+    { href: '/portal/admin/products', label: t('portal.shell.nav.products') },
+    { href: '/portal/admin/supervisors', label: t('portal.shell.nav.supervisors') },
+    { href: '/portal/admin/upgrade', label: t('portal.shell.nav.upgrade') },
+    { href: '/portal/admin/reports', label: t('portal.shell.nav.reports') },
+    { href: '/portal/admin/audit', label: t('portal.shell.nav.audit') },
+  ];
   return (
     <>
       {items.map((it) => {

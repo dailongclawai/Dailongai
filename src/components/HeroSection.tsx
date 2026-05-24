@@ -1,6 +1,6 @@
 "use client";
 
-import { product, contactInfo } from "@/data/siteData";
+import { product } from "@/data/siteData";
 import { useI18n } from "@/lib/i18n";
 
 export default function HeroSection() {
@@ -62,10 +62,6 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-wrap gap-3 sm:gap-4 justify-center">
-            <a href="/#contact" className="bg-primary-container text-on-primary px-6 sm:px-8 py-3.5 sm:py-4 font-headline font-black text-[10px] sm:text-xs tracking-[0.15em] uppercase transition-all flex items-center gap-2">
-              {t('hero.order')} — {contactInfo.hotline}
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </a>
             <a href="/san-pham" className="border border-outline-variant text-on-surface px-6 sm:px-8 py-3.5 sm:py-4 font-headline font-bold text-[10px] sm:text-xs tracking-[0.15em] uppercase hover:bg-surface-high transition-all">
               {t('hero.details')}
             </a>

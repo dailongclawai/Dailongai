@@ -4,9 +4,11 @@ import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
+import { useI18n } from '@/lib/i18n';
 
 export default function PortalIndex() {
   const router = useRouter();
+  const { t } = useI18n();
   const { session, profile, loading, refresh } = useAuth();
   const claiming = useRef(false);
 
@@ -48,7 +50,7 @@ export default function PortalIndex() {
 
   return (
     <div className="flex h-screen items-center justify-center text-[#e7eaf0]/50">
-      Đang kiểm tra phiên đăng nhập…
+      {t('portal.auth.index.checking_session')}
     </div>
   );
 }

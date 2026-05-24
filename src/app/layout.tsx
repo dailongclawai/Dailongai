@@ -128,7 +128,7 @@ export default function RootLayout({
                   name: "Đại Long — Showroom Hà Nội",
                   image: `${siteUrl}/images/logo.webp`,
                   telephone: "+84-935-999-922",
-                  email: "admin@dailong.ai",
+                  email: "dongoclong@dailongai.com",
                   address: {
                     "@type": "PostalAddress",
                     streetAddress: "165,171 Yên Lãng",

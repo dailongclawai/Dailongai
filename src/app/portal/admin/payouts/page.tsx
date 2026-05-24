@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
+import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
 import { getAdminPayoutQueue, adminProcessPayout, getAdminPayoutRequests, adminProcessPayoutRequest } from '@/lib/portal-queries';
@@ -15,6 +16,7 @@ const fmtVnd = (n: number | string) =>
 
 export default function PayoutsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<AdminPayoutRow[]>([]);
   const [proofRefs, setProofRefs] = useState<Record<string, string>>({});
@@ -37,9 +39,15 @@ export default function PayoutsPage() {
       const updated = await adminProcessPayoutRequest(id, decision, reqNotes[id]?.trim() || undefined);
       setRequests((rs) => rs.map((r) => (r.id === id ? { ...r, ...updated } as PayoutRequestWithRequester : r)));
       setReqNotes((n) => ({ ...n, [id]: '' }));
-      toast.success(`Đã ${decision === 'approved' ? 'duyệt' : decision === 'rejected' ? 'từ chối' : 'đánh dấu đã chi'} yêu cầu`);
+      const verb =
+        decision === 'approved'
+          ? t('portal.admin.payouts.toast.request.approved')
+          : decision === 'rejected'
+            ? t('portal.admin.payouts.toast.request.rejected')
+            : t('portal.admin.payouts.toast.request.paid');
+      toast.success(verb);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi xử lý yêu cầu');
+      toast.error(err instanceof Error ? err.message : t('portal.admin.payouts.toast.request.error'));
     } finally {
       setReqProcessing(null);
     }
@@ -52,7 +60,10 @@ export default function PayoutsPage() {
     paid: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
   };
   const reqStatusLabel: Record<PayoutRequest['status'], string> = {
-    pending: 'Chờ duyệt', approved: 'Đã duyệt · chờ chi', rejected: 'Từ chối', paid: 'Đã chi',
+    pending: t('portal.admin.payouts.status.pending'),
+    approved: t('portal.admin.payouts.status.approved'),
+    rejected: t('portal.admin.payouts.status.rejected'),
+    paid: t('portal.admin.payouts.status.paid'),
   };
 
   if (loading || profile?.role !== 'admin') return null;
@@ -65,7 +76,7 @@ export default function PayoutsPage() {
     setProcessing(row.id);
     try {
       await adminProcessPayout(row.id, proofRefs[row.id] ?? '');
-      toast.success(`Đã xác nhận chi trả cho ${row.recipient_name ?? row.recipient_email}`);
+      toast.success(`${t('portal.admin.payouts.toast.paid_prefix')} ${row.recipient_name ?? row.recipient_email}`);
       setRows((rs) =>
         rs.map((r) =>
           r.id === row.id
@@ -75,7 +86,7 @@ export default function PayoutsPage() {
       );
       setProofRefs((p) => ({ ...p, [row.id]: '' }));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Lỗi xử lý chi trả');
+      toast.error(err instanceof Error ? err.message : t('portal.admin.payouts.toast.paid.error'));
     } finally {
       setProcessing(null);
     }
@@ -88,16 +99,16 @@ export default function PayoutsPage() {
     >
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
-          {pending.length} khoản chờ chi trả · Tổng {fmtVnd(pendingTotal)}
+          {pending.length} {t('portal.admin.payouts.eyebrow.pending')} · {t('portal.admin.payouts.eyebrow.total')} {fmtVnd(pendingTotal)}
         </p>
-        <h1 className="mt-2 font-headline text-3xl">Quản lý hoa hồng</h1>
+        <h1 className="mt-2 font-headline text-3xl">{t('portal.admin.payouts.title')}</h1>
       </div>
 
       {/* Payout requests (dealer / supervisor) */}
       {requests.length > 0 && (
         <section className="mb-10">
           <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
-            Yêu cầu tất toán ({requests.filter((r) => r.status === 'pending').length} chờ duyệt)
+            {t('portal.admin.payouts.requests.heading')} ({requests.filter((r) => r.status === 'pending').length} {t('portal.admin.payouts.requests.pending_suffix')})
           </p>
           <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
             {requests.map((req, idx) => (
@@ -122,16 +133,16 @@ export default function PayoutsPage() {
                         </p>
                       </div>
                       <div className="mt-1 text-xs text-[#e7eaf0]/60">
-                        Gửi: <span className="font-mono tabular-nums">{new Date(req.created_at).toLocaleString('vi-VN')}</span>
-                        {req.notes && <span className="ml-3">Ghi chú: <span className="text-[#9ca3af]">{req.notes}</span></span>}
+                        {t('portal.admin.payouts.request.submitted')}: <span className="font-mono tabular-nums">{new Date(req.created_at).toLocaleString('vi-VN')}</span>
+                        {req.notes && <span className="ml-3">{t('portal.admin.payouts.request.notes')}: <span className="text-[#9ca3af]">{req.notes}</span></span>}
                         {req.processed_at && (
-                          <span className="ml-3">Xử lý: <span className="font-mono tabular-nums">{new Date(req.processed_at).toLocaleString('vi-VN')}</span>{req.processor_notes ? ` · ${req.processor_notes}` : ''}</span>
+                          <span className="ml-3">{t('portal.admin.payouts.request.processed')}: <span className="font-mono tabular-nums">{new Date(req.processed_at).toLocaleString('vi-VN')}</span>{req.processor_notes ? ` · ${req.processor_notes}` : ''}</span>
                         )}
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-mono tabular-nums text-2xl font-semibold text-[#e7eaf0]">{fmtVnd(req.amount)}</p>
-                      <p className="text-[10px] text-[#e7eaf0]/40">yêu cầu</p>
+                      <p className="text-[10px] text-[#e7eaf0]/40">{t('portal.admin.payouts.request.amount_label')}</p>
                     </div>
                   </div>
                   {req.status === 'pending' && (
@@ -140,7 +151,7 @@ export default function PayoutsPage() {
                         type="text"
                         value={reqNotes[req.id] ?? ''}
                         onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
-                        placeholder="Ghi chú xử lý (tuỳ chọn)"
+                        placeholder={t('portal.admin.payouts.request.notes_placeholder')}
                         className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                       />
                       <button
@@ -149,7 +160,7 @@ export default function PayoutsPage() {
                         onClick={() => processRequest(req.id, 'rejected')}
                         className="rounded-full border border-[#f87171]/40 px-4 py-2 text-xs font-medium text-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-50"
                       >
-                        Từ chối
+                        {t('portal.admin.payouts.action.reject')}
                       </button>
                       <button
                         type="button"
@@ -157,7 +168,7 @@ export default function PayoutsPage() {
                         onClick={() => processRequest(req.id, 'approved')}
                         className="rounded-full bg-[#3b82f6] px-5 py-2 text-xs font-bold text-[#121416] hover:bg-[#3b82f6]/90 disabled:opacity-50"
                       >
-                        {reqProcessing === req.id ? 'Đang xử lý…' : 'Duyệt yêu cầu'}
+                        {reqProcessing === req.id ? t('portal.admin.payouts.action.processing') : t('portal.admin.payouts.action.approve_request')}
                       </button>
                     </div>
                   )}
@@ -167,7 +178,7 @@ export default function PayoutsPage() {
                         type="text"
                         value={reqNotes[req.id] ?? ''}
                         onChange={(e) => setReqNotes((n) => ({ ...n, [req.id]: e.target.value }))}
-                        placeholder="Mã giao dịch / ghi chú chi trả"
+                        placeholder={t('portal.admin.payouts.request.txn_placeholder')}
                         className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                       />
                       <button
@@ -176,7 +187,7 @@ export default function PayoutsPage() {
                         onClick={() => processRequest(req.id, 'paid')}
                         className="rounded-full bg-emerald-400 px-5 py-2 text-xs font-bold text-[#121416] hover:bg-emerald-400/90 disabled:opacity-50"
                       >
-                        {reqProcessing === req.id ? 'Đang xử lý…' : 'Đánh dấu đã chi'}
+                        {reqProcessing === req.id ? t('portal.admin.payouts.action.processing') : t('portal.admin.payouts.action.mark_paid')}
                       </button>
                     </div>
                   )}
@@ -190,7 +201,7 @@ export default function PayoutsPage() {
       {/* Pending payouts */}
       {pending.length === 0 ? (
         <div className="mb-10 rounded-2xl border-2 border-dashed border-[#1f2937]/50 p-10 text-center text-sm text-[#e7eaf0]/40">
-          Không có khoản hoa hồng nào chờ chi trả
+          {t('portal.admin.payouts.empty.pending')}
         </div>
       ) : (
         <div className="mb-10 overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
@@ -213,17 +224,17 @@ export default function PayoutsPage() {
                       </p>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#e7eaf0]/60">
-                      <span>SN: <span className="font-mono tabular-nums">{row.serial_number}</span></span>
-                      <span>KH: {row.customer_name}</span>
-                      <span>Ngày bán: <span className="font-mono tabular-nums">{row.sale_date}</span></span>
-                      <span>Doanh số: <span className="font-mono tabular-nums">{fmtVnd(row.sale_price)}</span></span>
+                      <span>{t('portal.admin.payouts.row.serial')}: <span className="font-mono tabular-nums">{row.serial_number}</span></span>
+                      <span>{t('portal.admin.payouts.row.customer')}: {row.customer_name}</span>
+                      <span>{t('portal.admin.payouts.row.sale_date')}: <span className="font-mono tabular-nums">{row.sale_date}</span></span>
+                      <span>{t('portal.admin.payouts.row.sale_amount')}: <span className="font-mono tabular-nums">{fmtVnd(row.sale_price)}</span></span>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-mono tabular-nums text-2xl font-semibold text-[#e7eaf0]">
                       {fmtVnd(row.amount)}
                     </p>
-                    <p className="text-[10px] text-[#e7eaf0]/40">hoa hồng</p>
+                    <p className="text-[10px] text-[#e7eaf0]/40">{t('portal.admin.payouts.row.commission_label')}</p>
                   </div>
                 </div>
 
@@ -232,7 +243,7 @@ export default function PayoutsPage() {
                     type="text"
                     value={proofRefs[row.id] ?? ''}
                     onChange={(e) => setProofRefs((p) => ({ ...p, [row.id]: e.target.value }))}
-                    placeholder="Mã tham chiếu chuyển khoản (tuỳ chọn)"
+                    placeholder={t('portal.admin.payouts.row.proof_placeholder')}
                     className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
                   />
                   <button
@@ -241,7 +252,7 @@ export default function PayoutsPage() {
                     onClick={() => process(row)}
                     className="shrink-0 rounded-full bg-[#10b981] px-5 py-2 text-xs font-medium text-[#121416] transition-colors hover:bg-[#10b981]/80 disabled:opacity-50"
                   >
-                    {processing === row.id ? 'Đang xử lý…' : 'Xác nhận đã chi trả'}
+                    {processing === row.id ? t('portal.admin.payouts.action.processing') : t('portal.admin.payouts.action.confirm_paid')}
                   </button>
                 </div>
               </div>
@@ -253,7 +264,7 @@ export default function PayoutsPage() {
       {/* Paid history */}
       {paid.length > 0 && (
         <section>
-          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">Đã chi trả ({paid.length})</p>
+          <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">{t('portal.admin.payouts.history.heading')} ({paid.length})</p>
           <div className="overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
             {paid.map((row, idx) => (
               <div key={row.id}>
@@ -270,7 +281,7 @@ export default function PayoutsPage() {
                     <span className="font-medium text-[#e7eaf0]/80">{row.recipient_name ?? row.recipient_email}</span>
                     <span className="text-xs text-[#e7eaf0]/40 font-mono tabular-nums">{row.serial_number}</span>
                     {row.payment_proof_url && (
-                      <span className="text-xs text-[#e7eaf0]/40">Ref: {row.payment_proof_url}</span>
+                      <span className="text-xs text-[#e7eaf0]/40">{t('portal.admin.payouts.history.ref')}: {row.payment_proof_url}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-4">

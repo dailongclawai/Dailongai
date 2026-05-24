@@ -10,6 +10,7 @@ import { SparklineBar } from './SparklineBar';
 import { RadialTierDonut } from './RadialTierDonut';
 import { PortalSkeleton } from './PortalSkeleton';
 import { ActivityFeed } from './ActivityFeed';
+import { useI18n } from '@/lib/i18n';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -37,6 +38,7 @@ function buildSparkline(orders: Order[], days = 30): number[] {
 }
 
 export function DealerDashboard({ profile }: { profile: Profile }) {
+  const { t } = useI18n();
   const [summary, setSummary] = useState<DealerSummary | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [payouts, setPayouts] = useState<PayoutRow[]>([]);
@@ -80,8 +82,8 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
       // Only toast on REAL transitions — first fetch establishes baseline silently
       if (next && hasBaseline && (next.source !== seenSource || nextAmt !== seenAmount)) {
         const label = next.source === 'fixed'
-          ? `Hoa hồng đã chuyển sang cố định ${new Intl.NumberFormat('vi-VN').format(Number(next.override_amount ?? 0))} ₫/máy`
-          : `Hoa hồng đã chuyển về tier tự động (${next.tier_label})`;
+          ? `${t('portal.components.dealerDashboard.toast_fixed_prefix')} ${new Intl.NumberFormat('vi-VN').format(Number(next.override_amount ?? 0))} ${t('portal.components.dealerDashboard.toast_fixed_suffix')}`
+          : `${t('portal.components.dealerDashboard.toast_tier_prefix')} (${next.tier_label})`;
         toast.info(label);
       }
       if (next) {
@@ -129,7 +131,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
   const progressPct = nextTier.id === currentTier.id
     ? 100
     : Math.min(100, ((unitsYtd - currentTier.minUnits) / Math.max(1, nextTier.minUnits - currentTier.minUnits)) * 100);
-  const firstName = profile.full_name ?? 'Đại lý';
+  const firstName = profile.full_name ?? t('portal.components.dealerDashboard.dealer_fallback_name');
   // Build label manually: vi-VN locale prepends "tháng" → would double up with our "tháng" label
   const now = new Date();
   const monthLabel = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
@@ -139,9 +141,9 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-8 py-4">
       <header>
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Báo cáo tháng {monthLabel}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.dealerDashboard.monthly_report')} {monthLabel}</p>
         <h1 className="mt-2 font-headline text-3xl leading-tight tracking-tight md:text-4xl">
-          Chào <span className="text-gradient">{firstName}</span>.
+          {t('portal.components.dealerDashboard.greeting')} <span className="text-gradient">{firstName}</span>.
         </h1>
       </header>
 
@@ -154,7 +156,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[22px] text-[#10b981]">account_balance_wallet</span>
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#10b981]">
-                Hoa hồng đang chờ chi
+                {t('portal.components.dealerDashboard.commission_pending')}
               </p>
             </div>
             <p className="mt-3 font-headline text-[44px] font-bold leading-none tracking-tight tabular-nums text-[#10b981] md:text-[64px]">
@@ -162,14 +164,14 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               <span className="ml-2 align-top font-mono text-2xl tabular-nums text-[#10b981]/70">₫</span>
             </p>
             <p className="mt-3 text-xs text-[#9ca3af]">
-              Tự động chi 05–10 hàng tháng · Đã nhận tổng cộng <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">{fmtVnd(summary?.commission_paid ?? 0)} ₫</span>
+              {t('portal.components.dealerDashboard.auto_payout_note')} <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">{fmtVnd(summary?.commission_paid ?? 0)} ₫</span>
             </p>
           </div>
           <Link
             href="/portal/dealer/commission"
             className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-[#10b981]/40 bg-[#10b981]/10 px-4 py-2.5 text-xs font-semibold text-[#10b981] transition-colors hover:border-[#10b981] hover:bg-[#10b981] hover:text-white"
           >
-            Sổ hoa hồng
+            {t('portal.components.dealerDashboard.commission_book')}
             <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
           </Link>
         </div>
@@ -182,34 +184,34 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
           className="group flex items-center justify-center gap-2 rounded-xl bg-[#ff5625] px-3 py-3 text-xs font-bold text-white shadow-[0_4px_14px_-4px_rgba(255,86,37,0.6)] transition-colors hover:bg-[#ff6a3d] active:scale-[0.98]"
         >
           <span className="material-symbols-outlined text-[18px]">add_circle</span>
-          Tạo đơn mới
+          {t('portal.shell.cta.new_order')}
         </Link>
         <Link
           href="/portal/dealer/qr"
           className="flex items-center justify-center gap-2 rounded-xl border border-[#1f2937] bg-[#11151a] px-3 py-3 text-xs font-semibold text-[#e7eaf0] transition-colors hover:border-[#ff5625] hover:text-[#ff5625]"
         >
           <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
-          QR code tạo đơn
+          {t('portal.components.dealerDashboard.action_qr_order')}
         </Link>
         <Link
           href="/portal/dealer/commission"
           className="flex items-center justify-center gap-2 rounded-xl border border-[#1f2937] bg-[#11151a] px-3 py-3 text-xs font-semibold text-[#e7eaf0] transition-colors hover:border-[#ff5625] hover:text-[#ff5625]"
         >
           <span className="material-symbols-outlined text-[18px]">payments</span>
-          Sổ hoa hồng
+          {t('portal.components.dealerDashboard.commission_book')}
         </Link>
         <Link
           href="/portal/payout-info"
           className="flex items-center justify-center gap-2 rounded-xl border border-[#1f2937] bg-[#11151a] px-3 py-3 text-xs font-semibold text-[#e7eaf0] transition-colors hover:border-[#ff5625] hover:text-[#ff5625]"
         >
           <span className="material-symbols-outlined text-[18px]">account_balance</span>
-          Tài khoản
+          {t('portal.components.dealerDashboard.action_account')}
         </Link>
       </section>
 
       {/* Doanh số — secondary, smaller than hero commission. Single row metric replaces duplicate tiles. */}
       <section className="rounded-3xl border border-[#1f2937] bg-[#11151a] p-6 md:p-8">
-        <p className="text-xs uppercase tracking-[0.25em] text-[#9ca3af]">Doanh số tháng này</p>
+        <p className="text-xs uppercase tracking-[0.25em] text-[#9ca3af]">{t('portal.components.dealerDashboard.month_sales')}</p>
         <p className="mt-2 font-headline text-[36px] font-medium leading-[0.95] tracking-tight tabular-nums md:text-[44px]">
           {fmtVnd(monthSales)}
           <span className="ml-2 align-top font-mono text-xl tabular-nums text-[#ff5625]">₫</span>
@@ -220,17 +222,17 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[#1f2937] pt-4 text-sm">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-[#10b981]" />
-            <span className="text-[#9ca3af]">Đã chốt</span>
+            <span className="text-[#9ca3af]">{t('portal.components.dealerDashboard.status_closed')}</span>
             <span className="font-mono font-bold tabular-nums text-[#10b981]">{ordersDone}</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-[#f59e0b]" />
-            <span className="text-[#9ca3af]">Chờ duyệt</span>
+            <span className="text-[#9ca3af]">{t('portal.components.dealerDashboard.status_pending')}</span>
             <span className="font-mono font-bold tabular-nums text-[#f59e0b]">{ordersPending}</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-[#3b82f6]" />
-            <span className="text-[#9ca3af]">Đã thanh toán</span>
+            <span className="text-[#9ca3af]">{t('portal.components.dealerDashboard.status_paid')}</span>
             <span className="font-mono font-bold tabular-nums text-[#3b82f6]">{summary?.orders_paid ?? 0}</span>
           </span>
         </div>
@@ -241,36 +243,36 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[22px] text-[#ff5625]">workspace_premium</span>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Phương án hoa hồng riêng</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.dealerDashboard.custom_plan_label')}</p>
             </div>
             <span className="rounded-full bg-[#ff5625]/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#ff5625]">
-              Cố định
+              {t('portal.components.dealerDashboard.custom_plan_badge')}
             </span>
           </div>
 
           <div className="mt-6 flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
             <div>
-              <p className="text-xs uppercase tracking-wider text-[#9ca3af]">Hoa hồng / mỗi máy</p>
+              <p className="text-xs uppercase tracking-wider text-[#9ca3af]">{t('portal.components.dealerDashboard.commission_per_unit')}</p>
               <p className="mt-1 font-headline text-[44px] font-bold leading-none tabular-nums text-[#ff5625] md:text-[56px]">
                 {fmtVnd(Number(commission.override_amount ?? 0))}
                 <span className="ml-2 align-top font-mono text-2xl tabular-nums text-[#ff5625]/70">₫</span>
               </p>
               <p className="mt-2 text-xs text-[#9ca3af]">
-                Áp dụng cho mọi đơn — không phụ thuộc tier năm
+                {t('portal.components.dealerDashboard.fixed_plan_note')}
               </p>
             </div>
             <div className="mt-4 rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-4 py-3 sm:mt-0">
-              <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Đã chốt năm nay</p>
+              <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">{t('portal.components.dealerDashboard.units_ytd')}</p>
               <p className="mt-0.5 font-mono text-2xl font-semibold tabular-nums text-[#e7eaf0]">
                 {commission.units_ytd ?? unitsYtd}
-                <span className="ml-1 text-xs text-[#9ca3af]">máy</span>
+                <span className="ml-1 text-xs text-[#9ca3af]">{t('portal.components.dealerDashboard.unit_short')}</span>
               </p>
             </div>
           </div>
 
           <p className="mt-6 flex items-start gap-1.5 rounded-xl border border-[#1f2937] bg-[#0a0c0f]/60 p-3 text-[11px] text-[#9ca3af]">
             <span className="material-symbols-outlined text-[14px] text-[#9ca3af]">info</span>
-            Supervisor đã thiết lập mức hoa hồng cố định cho bạn. Mỗi đơn được duyệt = số tiền trên × số máy.
+            {t('portal.components.dealerDashboard.supervisor_fixed_note')}
           </p>
         </section>
       ) : (
@@ -280,7 +282,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
           {/* Header row */}
           <div className="relative flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Bậc hoa hồng tháng {monthLabel}</p>
+              <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.dealerDashboard.tier_month_label')} {monthLabel}</p>
               <h2 className="mt-1 flex items-baseline gap-2 font-headline text-2xl text-[#e7eaf0] md:text-3xl">
                 {currentTier.label}
                 <span className="rounded-md bg-[#ff5625]/15 px-2 py-0.5 font-mono text-base tabular-nums text-[#ff5625]">{currentTier.percent}%</span>
@@ -288,7 +290,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             </div>
             <div className="inline-flex items-center gap-1.5 rounded-full border border-[#1f2937] bg-[#0a0c0f]/60 px-3 py-1 text-[10px] uppercase tracking-wider text-[#9ca3af]">
               <span className="material-symbols-outlined text-[14px] text-[#f59e0b]">timer</span>
-              Reset trong <span className="font-mono font-bold tabular-nums text-[#e7eaf0]">{daysToReset}</span> ngày
+              {t('portal.components.dealerDashboard.reset_in_prefix')} <span className="font-mono font-bold tabular-nums text-[#e7eaf0]">{daysToReset}</span> {t('portal.components.dealerDashboard.days_suffix')}
             </div>
           </div>
 
@@ -306,23 +308,23 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
             <div className="min-w-0 flex-1 self-center text-center sm:text-left">
               {nextTier.id !== currentTier.id ? (
                 <>
-                  <p className="text-[11px] uppercase tracking-wider text-[#9ca3af]">Còn lại để lên tier kế</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#9ca3af]">{t('portal.components.dealerDashboard.units_to_next_label')}</p>
                   <p className="mt-1 font-headline text-4xl font-bold tabular-nums text-[#e7eaf0] md:text-5xl">
-                    {unitsToNext}<span className="ml-1 text-xl text-[#9ca3af]">máy</span>
+                    {unitsToNext}<span className="ml-1 text-xl text-[#9ca3af]">{t('portal.components.dealerDashboard.unit_short')}</span>
                   </p>
                   <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#10b981]/10 px-3 py-1 text-xs text-[#10b981]">
                     <span aria-hidden="true">▲</span>
-                    Unlock <span className="font-bold">{nextTier.label} · {nextTier.percent}%</span>
+                    {t('portal.components.dealerDashboard.unlock_label')} <span className="font-bold">{nextTier.label} · {nextTier.percent}%</span>
                     {' '}(+{nextTier.percent - currentTier.percent}%)
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-[11px] uppercase tracking-wider text-[#10b981]">Tier cao nhất</p>
+                  <p className="text-[11px] uppercase tracking-wider text-[#10b981]">{t('portal.components.dealerDashboard.top_tier_label')}</p>
                   <p className="mt-1 font-headline text-3xl font-bold text-[#10b981] md:text-4xl">
-                    🏆 Vàng · 25%
+                    {t('portal.components.dealerDashboard.top_tier_value')}
                   </p>
-                  <p className="mt-2 text-xs text-[#9ca3af]">Giữ phong độ — tháng sau reset, leo lại từ Tier 1</p>
+                  <p className="mt-2 text-xs text-[#9ca3af]">{t('portal.components.dealerDashboard.top_tier_note')}</p>
                 </>
               )}
             </div>
@@ -330,16 +332,16 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
 
           {/* Stair ladder — 3 segments showing progression */}
           <div className="relative mt-7 grid grid-cols-3 gap-1">
-            {tiers.map((t, i) => {
+            {tiers.map((tier, i) => {
               const next = tiers[i + 1];
-              const range = next ? `${Math.max(1, t.minUnits)}–${next.minUnits - 1}` : `${t.minUnits}+`;
-              const isCurrent = t.id === currentTier.id;
-              const reached = unitsYtd >= t.minUnits;
+              const range = next ? `${Math.max(1, tier.minUnits)}–${next.minUnits - 1}` : `${tier.minUnits}+`;
+              const isCurrent = tier.id === currentTier.id;
+              const reached = unitsYtd >= tier.minUnits;
               const heightClass = i === 0 ? 'h-14' : i === 1 ? 'h-20' : 'h-28';
               return (
-                <div key={t.id} className="flex flex-col-reverse items-center">
+                <div key={tier.id} className="flex flex-col-reverse items-center">
                   <p className={`mt-1 text-center font-mono text-[10px] tabular-nums ${isCurrent ? 'font-bold text-[#ff5625]' : 'text-[#9ca3af]'}`}>
-                    {range} máy
+                    {range} {t('portal.components.dealerDashboard.unit_short')}
                   </p>
                   <div
                     className={`relative flex w-full items-center justify-center rounded-t-lg transition-colors ${heightClass} ${
@@ -351,7 +353,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
                     }`}
                   >
                     <span className={`font-headline text-xl font-bold ${isCurrent ? 'text-white' : reached ? 'text-[#ff5625]' : 'text-[#9ca3af]'}`}>
-                      {t.percent}%
+                      {tier.percent}%
                     </span>
                     {isCurrent && (
                       <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#ff5625] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase text-white">
@@ -360,7 +362,7 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
                     )}
                   </div>
                   <p className={`text-center text-[10px] uppercase tracking-wider ${isCurrent ? 'font-bold text-[#e7eaf0]' : 'text-[#9ca3af]'}`}>
-                    {t.label.replace('Tier ', 'T')}
+                    {tier.label.replace('Tier ', 'T')}
                   </p>
                 </div>
               );
@@ -376,8 +378,8 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
         <section>
           <div className="flex items-baseline justify-between border-b border-[#1f2937] pb-2">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-[#10b981]">Lịch sử</p>
-              <h2 className="mt-1 font-headline text-2xl md:text-3xl">Hoa hồng</h2>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.components.dealerDashboard.history_label')}</p>
+              <h2 className="mt-1 font-headline text-2xl md:text-3xl">{t('portal.components.dealerDashboard.commission_label')}</h2>
             </div>
           </div>
           <div className="mt-6 divide-y divide-[#1f2937]">
@@ -389,14 +391,14 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
                     {new Date(p.calculated_at).toLocaleDateString('vi-VN')}
                   </span>
                   {p.payment_proof_url && (
-                    <span className="text-[10px] text-[#9ca3af]">Ref: {p.payment_proof_url}</span>
+                    <span className="text-[10px] text-[#9ca3af]">{t('portal.components.dealerDashboard.ref_label')}: {p.payment_proof_url}</span>
                   )}
                 </div>
                 <div className="text-right">
                   <p className={`font-mono font-semibold tabular-nums ${p.paid_at ? 'text-[#10b981]' : 'text-[#ff5625]'}`}>
                     {new Intl.NumberFormat('vi-VN').format(Number(p.amount))} đ
                   </p>
-                  <p className="text-[10px] text-[#9ca3af]">{p.paid_at ? 'Đã nhận' : 'Chờ chi trả'}</p>
+                  <p className="text-[10px] text-[#9ca3af]">{p.paid_at ? t('portal.components.dealerDashboard.payout_received') : t('portal.components.dealerDashboard.payout_waiting')}</p>
                 </div>
               </div>
             ))}

@@ -79,11 +79,6 @@ export default function ContactForm() {
   return (
     <section ref={sectionRef} id="contact" className="pt-24 sm:pt-32 pb-24 sm:pb-32 px-5 sm:px-8 lg:px-12 2xl:px-20 bg-surface-low laser-grid border-t border-white/5">
       <div className="max-w-screen-2xl mx-auto">
-        <div className="contact-head text-center max-w-4xl mx-auto mb-14 sm:mb-16">
-          <h2 className="text-primary font-headline font-bold tracking-[0.3em] text-[10px] uppercase mb-3 opacity-0">{t('contact.subtitle')}</h2>
-          <h3 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline tracking-tighter uppercase opacity-0">{t('contact.heading')}<span className="text-primary italic"> — 0935 999 922</span></h3>
-        </div>
-
         <div className="contact-body grid lg:grid-cols-2 gap-8 sm:gap-10 opacity-0">
           <div className="space-y-4 sm:space-y-6">
             <p className="text-secondary text-xs sm:text-sm leading-relaxed">

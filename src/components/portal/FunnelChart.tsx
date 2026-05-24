@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSupervisorFunnel, getDealerQrFunnel, type SupervisorFunnel, type DealerQrFunnel } from '@/lib/portal-queries';
+import { useI18n } from '@/lib/i18n';
 
 const numFmt = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
@@ -12,6 +13,7 @@ interface Stage {
 }
 
 function FunnelBars({ stages, conversion }: { stages: Stage[]; conversion: string }) {
+  const { t } = useI18n();
   return (
     <div>
       <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-2">
@@ -58,7 +60,7 @@ function FunnelBars({ stages, conversion }: { stages: Stage[]; conversion: strin
         })}
       </div>
       <p className="mt-3 text-right text-[11px] text-[#9ca3af]">
-        Conversion: <span className="font-mono font-semibold tabular-nums text-[#10b981]">{conversion}</span>
+        {t('portal.components.funnelChart.conversion_label')}: <span className="font-mono font-semibold tabular-nums text-[#10b981]">{conversion}</span>
       </p>
     </div>
   );
@@ -69,6 +71,7 @@ interface SupervisorFunnelProps {
 }
 
 export function SupervisorFunnelCard({ supervisorId }: SupervisorFunnelProps) {
+  const { t } = useI18n();
   const [days, setDays] = useState<7 | 30 | 90>(30);
   const [data, setData] = useState<SupervisorFunnel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,9 +85,9 @@ export function SupervisorFunnelCard({ supervisorId }: SupervisorFunnelProps) {
   }, [days, supervisorId]);
 
   const stages: Stage[] = [
-    { label: 'Visitor (unique)', value: data?.unique_visitors ?? 0, color: '#3b82f6' },
-    { label: 'Đăng ký', value: data?.signups ?? 0, color: '#ff5625' },
-    { label: 'Đơn đầu tiên', value: data?.first_orders ?? 0, color: '#10b981' },
+    { label: t('portal.components.funnelChart.supervisor_stage_visitor'), value: data?.unique_visitors ?? 0, color: '#3b82f6' },
+    { label: t('portal.components.funnelChart.supervisor_stage_signup'), value: data?.signups ?? 0, color: '#ff5625' },
+    { label: t('portal.components.funnelChart.supervisor_stage_first_order'), value: data?.first_orders ?? 0, color: '#10b981' },
   ];
 
   return (
@@ -92,7 +95,7 @@ export function SupervisorFunnelCard({ supervisorId }: SupervisorFunnelProps) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#3b82f6]">filter_alt</span>
-          <p className="text-sm font-semibold">Funnel tuyển đại lý</p>
+          <p className="text-sm font-semibold">{t('portal.components.funnelChart.supervisor_title')}</p>
         </div>
         <div className="inline-flex gap-1 rounded-lg border border-[#1f2937]/40 bg-[#06080a]/40 p-0.5 text-[10px]">
           {([7, 30, 90] as const).map((d) => (
@@ -113,23 +116,23 @@ export function SupervisorFunnelCard({ supervisorId }: SupervisorFunnelProps) {
       ) : (data?.unique_visitors ?? 0) === 0 && (data?.signups ?? 0) === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[#1f2937]/40 bg-[#06080a]/30 p-6 text-center text-xs text-[#e7eaf0]/40">
           <span className="material-symbols-outlined text-[28px] text-[#e7eaf0]/30">qr_code_scanner</span>
-          <p>Chưa có ai mở QR mời đại lý của bạn trong {days} ngày qua.</p>
-          <p>Gửi QR ra Zalo/Facebook hoặc dán tại điểm bán.</p>
+          <p>{t('portal.components.funnelChart.supervisor_empty_prefix')} {days} {t('portal.components.funnelChart.empty_days_suffix')}</p>
+          <p>{t('portal.components.funnelChart.supervisor_empty_hint')}</p>
         </div>
       ) : (
         <>
-          <FunnelBars stages={stages} conversion={`${data?.view_to_order_pct ?? 0}% xem → đơn đầu`} />
+          <FunnelBars stages={stages} conversion={`${data?.view_to_order_pct ?? 0}% ${t('portal.components.funnelChart.supervisor_view_to_first_order')}`} />
           <div className="mt-4 grid grid-cols-3 gap-2 border-t border-[#1f2937]/30 pt-3 text-center text-[10px]">
             <div>
-              <p className="uppercase tracking-wider text-[#e7eaf0]/40">Lượt xem</p>
+              <p className="uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.funnelChart.views_label')}</p>
               <p className="mt-0.5 font-mono text-sm font-bold tabular-nums">{numFmt(data?.views ?? 0)}</p>
             </div>
             <div className="border-x border-[#1f2937]/30">
-              <p className="uppercase tracking-wider text-[#e7eaf0]/40">Xem → ĐK</p>
+              <p className="uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.funnelChart.view_to_signup')}</p>
               <p className="mt-0.5 font-mono text-sm font-bold tabular-nums text-[#ff5625]">{data?.view_to_signup_pct ?? 0}%</p>
             </div>
             <div>
-              <p className="uppercase tracking-wider text-[#e7eaf0]/40">ĐK → Đơn</p>
+              <p className="uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.funnelChart.signup_to_order')}</p>
               <p className="mt-0.5 font-mono text-sm font-bold tabular-nums text-[#10b981]">{data?.signup_to_order_pct ?? 0}%</p>
             </div>
           </div>
@@ -144,6 +147,7 @@ interface DealerFunnelProps {
 }
 
 export function DealerQrFunnelCard({ dealerId }: DealerFunnelProps) {
+  const { t } = useI18n();
   const [days, setDays] = useState<7 | 30 | 90>(30);
   const [data, setData] = useState<DealerQrFunnel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -157,8 +161,8 @@ export function DealerQrFunnelCard({ dealerId }: DealerFunnelProps) {
   }, [days, dealerId]);
 
   const stages: Stage[] = [
-    { label: 'Visitor QR (unique)', value: data?.unique_visitors ?? 0, color: '#3b82f6' },
-    { label: 'Đơn qua QR', value: data?.orders_via_qr ?? 0, color: '#10b981' },
+    { label: t('portal.components.funnelChart.dealer_stage_visitor'), value: data?.unique_visitors ?? 0, color: '#3b82f6' },
+    { label: t('portal.components.funnelChart.dealer_stage_order'), value: data?.orders_via_qr ?? 0, color: '#10b981' },
   ];
 
   return (
@@ -166,7 +170,7 @@ export function DealerQrFunnelCard({ dealerId }: DealerFunnelProps) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#3b82f6]">qr_code_scanner</span>
-          <p className="text-sm font-semibold">Funnel QR đại lý</p>
+          <p className="text-sm font-semibold">{t('portal.components.funnelChart.dealer_title')}</p>
         </div>
         <div className="inline-flex gap-1 rounded-lg border border-[#1f2937]/40 bg-[#06080a]/40 p-0.5 text-[10px]">
           {([7, 30, 90] as const).map((d) => (
@@ -187,19 +191,19 @@ export function DealerQrFunnelCard({ dealerId }: DealerFunnelProps) {
       ) : (data?.unique_visitors ?? 0) === 0 && (data?.orders_via_qr ?? 0) === 0 ? (
         <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-[#1f2937]/40 bg-[#06080a]/30 p-6 text-center text-xs text-[#e7eaf0]/40">
           <span className="material-symbols-outlined text-[28px] text-[#e7eaf0]/30">qr_code_scanner</span>
-          <p>Chưa có ai mở QR đặt đơn trong {days} ngày qua.</p>
-          <p>Chia sẻ QR /dat-don ra mạng xã hội hoặc in dán điểm bán.</p>
+          <p>{t('portal.components.funnelChart.dealer_empty_prefix')} {days} {t('portal.components.funnelChart.empty_days_suffix')}</p>
+          <p>{t('portal.components.funnelChart.dealer_empty_hint')}</p>
         </div>
       ) : (
         <>
-          <FunnelBars stages={stages} conversion={`${data?.conversion_pct ?? 0}% xem → đơn`} />
+          <FunnelBars stages={stages} conversion={`${data?.conversion_pct ?? 0}% ${t('portal.components.funnelChart.dealer_view_to_order')}`} />
           <div className="mt-4 grid grid-cols-2 gap-2 border-t border-[#1f2937]/30 pt-3 text-center text-[10px]">
             <div>
-              <p className="uppercase tracking-wider text-[#e7eaf0]/40">Lượt xem</p>
+              <p className="uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.funnelChart.views_label')}</p>
               <p className="mt-0.5 font-mono text-sm font-bold tabular-nums">{numFmt(data?.views ?? 0)}</p>
             </div>
             <div className="border-l border-[#1f2937]/30">
-              <p className="uppercase tracking-wider text-[#e7eaf0]/40">Conversion</p>
+              <p className="uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.funnelChart.conversion_label')}</p>
               <p className="mt-0.5 font-mono text-sm font-bold tabular-nums text-[#10b981]">{data?.conversion_pct ?? 0}%</p>
             </div>
           </div>

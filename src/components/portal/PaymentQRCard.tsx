@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useI18n } from '@/lib/i18n';
 import {
   PAYMENT_BANK_CODE,
   PAYMENT_ACCOUNT,
@@ -19,7 +20,7 @@ interface Props {
   dealerName?: string | null;
 }
 
-async function downloadQR(url: string, filename: string) {
+async function downloadQR(url: string, filename: string, labels: { shareTitle: string; toastSuccess: string; toastFallback: string }) {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -31,7 +32,7 @@ async function downloadQR(url: string, filename: string) {
     const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
     if (nav.canShare && nav.canShare({ files: [file] })) {
       try {
-        await nav.share({ files: [file], title: 'QR thanh toán Đại Long', text: filename });
+        await nav.share({ files: [file], title: labels.shareTitle, text: filename });
         return;
       } catch (e) {
         // User cancelled OR share failed — fall through to download
@@ -48,15 +49,16 @@ async function downloadQR(url: string, filename: string) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(objectUrl);
-    toast.success('Đã tải QR — gửi cho khách qua Zalo / email');
+    toast.success(labels.toastSuccess);
   } catch {
     // Last-resort fallback: open in new tab so user can long-press / right-click save
     window.open(url, '_blank', 'noopener,noreferrer');
-    toast.info('Mở QR ở tab mới — nhấn giữ ảnh để lưu vào Ảnh');
+    toast.info(labels.toastFallback);
   }
 }
 
 export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
+  const { t } = useI18n();
   const [fullscreen, setFullscreen] = useState(false);
 
   // Close modal on Escape
@@ -70,29 +72,29 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
   if (!PAYMENT_ENABLED) {
     return (
       <div className="rounded-2xl border border-[#1f2937] bg-[#11151a] p-5 text-center text-sm text-[#9ca3af]">
-        Đại lý sẽ liên hệ trong giờ hành chính để xác nhận đơn và hướng dẫn thanh toán.
+        {t('portal.components.paymentQR.payment_disabled')}
       </div>
     );
   }
 
   const memo = orderMemo(orderId);
   const qrSrc = vietqrUrl(amount, memo);
-  const copyMemo = () => { void navigator.clipboard.writeText(memo); toast.success('Đã copy nội dung CK'); };
+  const copyMemo = () => { void navigator.clipboard.writeText(memo); toast.success(t('portal.components.paymentQR.toast_memo_copied')); };
 
   return (
     <>
       <div className="rounded-2xl border-2 border-[#ff5625]/40 bg-[#11151a] p-6">
         <p className="text-center text-[11px] font-bold uppercase tracking-[0.3em] text-[#ff5625]">
-          Chuyển khoản thanh toán
+          {t('portal.components.paymentQR.transfer_title')}
         </p>
         <p className="mt-1 text-center text-xs text-[#9ca3af]">
-          Quét QR bằng app ngân hàng — auto-điền số tiền + nội dung
+          {t('portal.components.paymentQR.scan_hint')}
         </p>
 
         <button
           type="button"
           onClick={() => setFullscreen(true)}
-          aria-label="Phóng to QR để khách quét"
+          aria-label={t('portal.components.paymentQR.aria_zoom')}
           className="group mx-auto mt-5 block w-full max-w-[280px] cursor-zoom-in rounded-xl bg-white p-3 transition-transform hover:scale-[1.02]"
           style={{ aspectRatio: '540 / 630' }}
         >
@@ -107,14 +109,14 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
             className="h-full w-full object-contain"
           />
         </button>
-        <p className="mt-1 text-center text-[10px] text-[#9ca3af]">Bấm vào QR để phóng to</p>
+        <p className="mt-1 text-center text-[10px] text-[#9ca3af]">{t('portal.components.paymentQR.tap_to_zoom')}</p>
 
         <div className="mt-5 space-y-2 rounded-lg border border-[#1f2937] bg-[#0a0c0f] p-4 text-sm">
-          <div className="flex justify-between"><span className="text-[#9ca3af]">Ngân hàng</span><span className="font-semibold">{PAYMENT_BANK_CODE}</span></div>
-          <div className="flex justify-between"><span className="text-[#9ca3af]">Số tài khoản</span><span className="font-mono tabular-nums font-bold text-[#ff5625]">{PAYMENT_ACCOUNT}</span></div>
-          <div className="flex justify-between"><span className="text-[#9ca3af]">Chủ tài khoản</span><span className="text-right text-xs font-semibold">{PAYMENT_NAME}</span></div>
-          <div className="flex justify-between border-t border-[#1f2937] pt-2 mt-1"><span className="text-[#9ca3af]">Số tiền</span><span className="font-mono tabular-nums font-bold text-[#ff5625]">{fmtVnd(amount)} ₫</span></div>
-          <div className="flex justify-between"><span className="text-[#9ca3af]">Nội dung CK</span><span className="font-mono tabular-nums font-bold">{memo}</span></div>
+          <div className="flex justify-between"><span className="text-[#9ca3af]">{t('portal.components.paymentQR.bank')}</span><span className="font-semibold">{PAYMENT_BANK_CODE}</span></div>
+          <div className="flex justify-between"><span className="text-[#9ca3af]">{t('portal.components.paymentQR.account_no')}</span><span className="font-mono tabular-nums font-bold text-[#ff5625]">{PAYMENT_ACCOUNT}</span></div>
+          <div className="flex justify-between"><span className="text-[#9ca3af]">{t('portal.components.paymentQR.account_name')}</span><span className="text-right text-xs font-semibold">{PAYMENT_NAME}</span></div>
+          <div className="flex justify-between border-t border-[#1f2937] pt-2 mt-1"><span className="text-[#9ca3af]">{t('portal.components.paymentQR.amount')}</span><span className="font-mono tabular-nums font-bold text-[#ff5625]">{fmtVnd(amount)} ₫</span></div>
+          <div className="flex justify-between"><span className="text-[#9ca3af]">{t('portal.components.paymentQR.memo')}</span><span className="font-mono tabular-nums font-bold">{memo}</span></div>
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -124,15 +126,19 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
             className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#ff5625] py-2.5 text-xs font-bold uppercase text-white hover:bg-[#ff6a3d] active:scale-[0.98]"
           >
             <span className="material-symbols-outlined text-[16px]">qr_code_2</span>
-            Phóng to QR
+            {t('portal.components.paymentQR.zoom_button')}
           </button>
           <button
             type="button"
-            onClick={() => void downloadQR(qrSrc, `${memo}-thanh-toan.png`)}
+            onClick={() => void downloadQR(qrSrc, `${memo}-thanh-toan.png`, {
+              shareTitle: t('portal.components.paymentQR.share_title'),
+              toastSuccess: t('portal.components.paymentQR.toast_download_success'),
+              toastFallback: t('portal.components.paymentQR.toast_download_fallback'),
+            })}
             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#10b981]/40 bg-[#10b981]/10 py-2.5 text-xs font-bold uppercase text-[#10b981] hover:bg-[#10b981] hover:text-white"
           >
             <span className="material-symbols-outlined text-[16px]">photo_library</span>
-            Lưu vào Ảnh
+            {t('portal.components.paymentQR.save_to_photos')}
           </button>
           <button
             type="button"
@@ -140,13 +146,13 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
             className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#1f2937] bg-[#0a0c0f] py-2.5 text-xs font-bold uppercase text-[#e7eaf0] hover:bg-[#1a1f26]"
           >
             <span className="material-symbols-outlined text-[16px]">content_copy</span>
-            Copy CK
+            {t('portal.components.paymentQR.copy_memo')}
           </button>
         </div>
 
         {dealerName && (
           <p className="mt-4 text-center text-[11px] leading-relaxed text-[#9ca3af]">
-            Sau khi chuyển khoản, hệ thống tự xác nhận. Mọi câu hỏi liên hệ đại lý{' '}
+            {t('portal.components.paymentQR.after_transfer_prefix')}{' '}
             <span className="font-semibold text-[#e7eaf0]">{dealerName}</span>.
           </p>
         )}
@@ -163,16 +169,16 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
           <button
             type="button"
             onClick={() => setFullscreen(false)}
-            aria-label="Đóng"
+            aria-label={t('portal.components.paymentQR.aria_close')}
             className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
 
           <div className="mb-3 text-center text-white">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">Chuyển khoản</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.paymentQR.transfer_label')}</p>
             <p className="mt-1 font-headline text-3xl tabular-nums">{fmtVnd(amount)} ₫</p>
-            <p className="mt-1 font-mono text-sm tabular-nums text-[#9ca3af]">Nội dung: {memo}</p>
+            <p className="mt-1 font-mono text-sm tabular-nums text-[#9ca3af]">{t('portal.components.paymentQR.memo')}: {memo}</p>
           </div>
 
           <div
@@ -192,7 +198,7 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
           </div>
 
           <p className="mt-4 max-w-xs text-center text-xs text-white/70">
-            Mở app ngân hàng — quét mã VietQR — tự động fill số tiền + nội dung
+            {t('portal.components.paymentQR.fullscreen_hint')}
           </p>
         </div>
       )}

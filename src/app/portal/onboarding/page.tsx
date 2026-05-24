@@ -6,11 +6,12 @@ import { z } from 'zod';
 import { useAuth } from '@/lib/auth-context';
 import { getSupabaseClient } from '@/lib/supabase';
 import { toast } from 'sonner';
-
-const phoneSchema = z.string().regex(/^0\d{9,10}$/, 'SĐT không hợp lệ (ví dụ: 0901234567)');
+import { useI18n } from '@/lib/i18n';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { t } = useI18n();
+  const phoneSchema = z.string().regex(/^0\d{9,10}$/, t('portal.auth.onboarding.error_phone_invalid'));
   const { session, profile, loading, refresh } = useAuth();
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -26,7 +27,7 @@ export default function OnboardingPage() {
     e.preventDefault();
     const parsed = phoneSchema.safeParse(phone);
     if (!parsed.success) {
-      setPhoneError(parsed.error.issues[0]?.message ?? 'SĐT không hợp lệ');
+      setPhoneError(parsed.error.issues[0]?.message ?? t('portal.auth.onboarding.error_phone_invalid_short'));
       return;
     }
     setPhoneError('');
@@ -40,7 +41,7 @@ export default function OnboardingPage() {
       toast.error(error.message);
       return;
     }
-    toast.success('Đã ghi nhận, đang chờ admin duyệt');
+    toast.success(t('portal.auth.onboarding.toast_success'));
     await refresh();
     router.replace('/portal/pending');
   };
@@ -51,14 +52,14 @@ export default function OnboardingPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#1f2937]/40 p-10">
         <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Bước cuối</p>
-          <h1 className="mt-3 font-headline text-3xl">Hoàn tất hồ sơ</h1>
-          <p className="mt-2 text-sm text-[#e7eaf0]/60">Chỉ cần số điện thoại để admin liên hệ xác minh</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.auth.onboarding.badge')}</p>
+          <h1 className="mt-3 font-headline text-3xl">{t('portal.auth.onboarding.title')}</h1>
+          <p className="mt-2 text-sm text-[#e7eaf0]/60">{t('portal.auth.onboarding.subtitle')}</p>
         </div>
         <form onSubmit={submit} className="space-y-5">
           <div>
             <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">
-              Số điện thoại
+              {t('portal.auth.onboarding.phone_label')}
             </label>
             <input
               id="phone"
@@ -71,14 +72,14 @@ export default function OnboardingPage() {
             {phoneError && <p className="mt-1 text-xs text-[#f87171]">{phoneError}</p>}
           </div>
           <p className="rounded-lg bg-[#11151a] px-4 py-3 text-xs text-[#e7eaf0]/60">
-            Loại tài khoản (đại lý / supervisor) sẽ do admin Đại Long gán khi duyệt hồ sơ.
+            {t('portal.auth.onboarding.role_note')}
           </p>
           <button
             type="submit"
             disabled={submitting}
             className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white hover:bg-[#ff5625]/90 disabled:opacity-50"
           >
-            {submitting ? 'Đang gửi…' : 'Hoàn tất'}
+            {submitting ? t('portal.auth.onboarding.submitting') : t('portal.auth.onboarding.submit')}
           </button>
         </form>
       </div>

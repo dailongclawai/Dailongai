@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   /** Override base input styling — defaults match auth pages */
@@ -11,7 +12,11 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
   { className = '', ...rest },
   ref,
 ) {
+  const { t } = useI18n();
   const [visible, setVisible] = useState(false);
+  const toggleLabel = visible
+    ? t('portal.components.passwordInput.hide')
+    : t('portal.components.passwordInput.show');
 
   return (
     <div className="relative">
@@ -25,8 +30,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-        title={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+        aria-label={toggleLabel}
+        title={toggleLabel}
         className="absolute right-1 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg text-[#9ca3af] transition-colors hover:bg-[#1f2937] hover:text-[#ff5625]"
         tabIndex={-1}
       >

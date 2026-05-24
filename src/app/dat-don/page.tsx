@@ -10,6 +10,8 @@ import {
   type PublicActiveModel,
 } from '@/lib/portal-queries';
 import { AddressPicker, emptyAddress, fullAddress, type AddressValue } from '@/components/portal/AddressPicker';
+import { InvoiceFieldsSection, emptyInvoice, validateInvoice, type InvoiceInfo } from '@/components/portal/InvoiceFieldsSection';
+import { useI18n } from '@/lib/i18n';
 import { PaymentQRCard } from '@/components/portal/PaymentQRCard';
 import { trackReferral } from '@/lib/referral-tracker';
 
@@ -25,6 +27,7 @@ export default function PublicOrderPage() {
 
 function PublicOrderForm() {
   const params = useSearchParams();
+  const { t } = useI18n();
   const slug = params.get('d') ?? '';
 
   const [dealerName, setDealerName] = useState<string | null>(null);
@@ -38,6 +41,7 @@ function PublicOrderForm() {
   const [customer, setCustomer] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState<AddressValue>(emptyAddress);
+  const [invoice, setInvoice] = useState<InvoiceInfo>(emptyInvoice);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [orderId, setOrderId] = useState<string>('');
@@ -69,6 +73,8 @@ function PublicOrderForm() {
     if (!address.province_code || !address.ward_code || !address.detail.trim()) {
       toast.error('Nhập đủ tỉnh, phường và địa chỉ chi tiết'); return;
     }
+    const invoiceErr = validateInvoice(invoice);
+    if (invoiceErr) { toast.error(t(invoiceErr)); return; }
     setBusy(true);
     try {
       const newOrderId = await submitPublicOrder({
@@ -78,6 +84,10 @@ function PublicOrderForm() {
         customer_name: customer,
         customer_phone: phone,
         shipping_address: fullAddress(address),
+        invoice_required: invoice.required,
+        invoice_company_name: invoice.company_name,
+        invoice_tax_code: invoice.tax_code,
+        invoice_email: invoice.email || null,
       });
       setOrderId(newOrderId);
       setPaidAmount(totalPrice);
@@ -122,7 +132,7 @@ function PublicOrderForm() {
           <PaymentQRCard orderId={orderId} amount={paidAmount} dealerName={dealerName} />
 
           <button
-            onClick={() => { setDone(false); setOrderId(''); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); }}
+            onClick={() => { setDone(false); setOrderId(''); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); setInvoice(emptyInvoice); }}
             className="mt-6 w-full rounded-lg border border-[#3d3f41]/40 bg-[#1a1c1e] py-2 text-xs text-[#a0a0a8] hover:text-[#e2e2e5]"
           >
             Gửi đơn khác
@@ -224,6 +234,8 @@ function PublicOrderForm() {
             <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#ff5625] font-bold">Địa chỉ giao hàng</p>
             <AddressPicker value={address} onChange={setAddress} />
           </div>
+
+          <InvoiceFieldsSection value={invoice} onChange={setInvoice} />
 
           {/* Price summary */}
           <div className="rounded-lg border border-[#3d3f41]/40 bg-[#121416] p-4">
