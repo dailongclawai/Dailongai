@@ -356,7 +356,7 @@ export default function PayoutInfoPage() {
                         <span>{decodeError}</span>
                       </p>
                     )}
-                    <div className="mt-4 flex items-center gap-3">
+                    <div className="my-5 flex items-center gap-3">
                       <div className="h-px flex-1 bg-[#1f2937]" />
                       <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]/60">{t('portal.payout.step1_or')}</span>
                       <div className="h-px flex-1 bg-[#1f2937]" />
@@ -367,10 +367,18 @@ export default function PayoutInfoPage() {
                         if (!zaloPhone && profile?.zalo_phone) setZaloPhone(profile.zalo_phone);
                         setStep('form');
                       }}
-                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#ff5625] hover:underline"
+                      className="group flex w-full items-center justify-between gap-3 rounded-xl border border-[#ff5625]/40 bg-[#ff5625]/[0.06] px-5 py-4 text-left transition-all hover:border-[#ff5625] hover:bg-[#ff5625]/[0.12]"
                     >
-                      <span className="material-symbols-outlined text-[16px]">edit</span>
-                      {t('portal.payout.step1_manual')}
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ff5625]/15 transition-colors group-hover:bg-[#ff5625]/25">
+                          <span className="material-symbols-outlined text-[22px] text-[#ff5625]">keyboard</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-[#e7eaf0]">{t('portal.payout.step1_manual')}</p>
+                          <p className="mt-0.5 text-[11px] text-[#9ca3af]">{t('portal.payout.step1_manual_desc')}</p>
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined text-[20px] text-[#ff5625] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                     </button>
                   </div>
                 )}

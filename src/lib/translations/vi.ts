@@ -848,6 +848,7 @@ const vi: Record<string, string> = {
     'portal.payout.step1_format': 'PNG / JPG / WEBP, tối đa 2MB',
     'portal.payout.step1_or': 'hoặc',
     'portal.payout.step1_manual': 'Tự nhập tài khoản ngân hàng',
+    'portal.payout.step1_manual_desc': 'Không có QR? Điền trực tiếp tên ngân hàng, số TK, chủ TK.',
     'portal.payout.step1_decoding': 'Đang đọc QR…',
     'portal.payout.step1_decoded': 'Đọc QR thành công',
     'portal.payout.step1_failed': 'Không đọc được QR. Vui lòng chụp rõ nét và thử lại.',
