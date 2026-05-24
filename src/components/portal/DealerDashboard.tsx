@@ -167,13 +167,6 @@ export function DealerDashboard({ profile }: { profile: Profile }) {
               {t('portal.components.dealerDashboard.auto_payout_note')} <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">{fmtVnd(summary?.commission_paid ?? 0)} ₫</span>
             </p>
           </div>
-          <Link
-            href="/portal/dealer/commission"
-            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-[#10b981]/40 bg-[#10b981]/10 px-4 py-2.5 text-xs font-semibold text-[#10b981] transition-colors hover:border-[#10b981] hover:bg-[#10b981] hover:text-white"
-          >
-            {t('portal.components.dealerDashboard.commission_book')}
-            <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-          </Link>
         </div>
       </section>
 
