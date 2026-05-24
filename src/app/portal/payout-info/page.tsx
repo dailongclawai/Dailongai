@@ -356,6 +356,22 @@ export default function PayoutInfoPage() {
                         <span>{decodeError}</span>
                       </p>
                     )}
+                    <div className="mt-4 flex items-center gap-3">
+                      <div className="h-px flex-1 bg-[#1f2937]" />
+                      <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]/60">{t('portal.payout.step1_or')}</span>
+                      <div className="h-px flex-1 bg-[#1f2937]" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!zaloPhone && profile?.zalo_phone) setZaloPhone(profile.zalo_phone);
+                        setStep('form');
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[#ff5625] hover:underline"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">edit</span>
+                      {t('portal.payout.step1_manual')}
+                    </button>
                   </div>
                 )}
 

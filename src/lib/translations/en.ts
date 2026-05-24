@@ -843,6 +843,8 @@ const en: Record<string, string> = {
     'portal.payout.step1_choose': 'Choose QR image',
     'portal.payout.step1_drag': 'or drop it here',
     'portal.payout.step1_format': 'PNG / JPG / WEBP, max 2MB',
+    'portal.payout.step1_or': 'or',
+    'portal.payout.step1_manual': 'Enter bank account manually',
     'portal.payout.step1_decoding': 'Decoding QR…',
     'portal.payout.step1_decoded': 'QR decoded successfully',
     'portal.payout.step1_failed': 'Could not decode QR. Please take a sharper photo and retry.',
