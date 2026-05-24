@@ -1,6 +1,12 @@
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 
+// Default Supabase env so tests using getSupabaseClient don't blow up when
+// .env.local isn't loaded (e.g. CI). Real values get overridden by the test
+// runner when present.
+process.env.NEXT_PUBLIC_SUPABASE_URL ??= "http://127.0.0.1:54321";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??= "test-anon-key";
+
 // Node.js 25 ships a built-in (but non-functional) global.localStorage stub.
 // vitest's populateGlobal skips keys that already exist in the Node global unless
 // they are in its KEYS allowlist — so jsdom's Storage never replaces the Node stub.

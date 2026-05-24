@@ -41,9 +41,8 @@ yarn-error.log*
 next-env.d.ts
 .dev.vars
 
-# local-only tooling and plans (not for public repo)
+# local-only tooling
 .superpowers/
-docs/superpowers/
 .claude/
 .lighthouseci/
 playwright-report/

@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
 import BackgroundMusic from "@/components/BackgroundMusic";
 import Observability from "@/components/Observability";
 import { I18nProvider } from "@/lib/i18n";
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-headline",
-  subsets: ["latin", "vietnamese"],
-  weight: ["700"],
-  display: "swap",
-});
+import { cn } from "@/lib/utils";
 
 const inter = Inter({
   variable: "--font-body",
   subsets: ["latin", "vietnamese"],
-  weight: ["400"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const interHeadline = Inter({
+  variable: "--font-headline",
+  subsets: ["latin", "vietnamese"],
+  weight: ["700", "800"],
   display: "swap",
 });
 
@@ -65,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${spaceGrotesk.variable} ${inter.variable} dark antialiased`}>
+    <html lang="vi" className={cn("dark", "antialiased", interHeadline.variable, inter.variable, "font-body")}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />
