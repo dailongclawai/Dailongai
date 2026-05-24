@@ -36,7 +36,7 @@ const ko: Record<string, string> = {
       '650nm 파장의 저출력 반도체 레이저 기술 적용——혈액 순환·미세 순환을 지원하고 수면과 전반적인 건강을 개선합니다.',
     'about.feat3_title': '전문 상담팀',
     'about.feat3_desc':
-      'Zalo를 통한 1:1 상담, 핫라인 0935 999 922, 하노이·호치민시 쇼룸에서 대면 상담. 월~금 9:00~18:00 운영.',
+      'Zalo를 통한 1:1 상담,, 하노이·호치민시 쇼룸에서 대면 상담. 월~금 9:00~18:00 운영.',
     'about.feat4_title': '5년 보증',
     'about.feat4_desc':
       '5년 정품 보증, 제조 결함 시 7일 이내 교환·반품. 전국 신속 기술 지원.',
@@ -78,7 +78,7 @@ const ko: Record<string, string> = {
       '의사, 개인 클리닉, 지방 병원 부서를 위한 심층 컨설팅 서비스. 기기 사용 교육 및 도입 지원.',
     'solutions.s4_title': '기술 지원 및 보증',
     'solutions.s4_desc':
-      '5년 정품 보증, 제조 결함 시 7일 교환·반품. 기술 지원 핫라인 0935 999 922, 매일 8:00~21:00.',
+      '5년 정품 보증, 제조 결함 시 7일 교환·반품. 기술 지원, 매일 8:00~21:00.',
     'solutions.main_product': '풀 세트',
     'solutions.handheld': '핸드헬드 기기',
     'solutions.h1_1': '650nm 저출력 반도체 레이저',
@@ -344,7 +344,7 @@ const ko: Record<string, string> = {
     'product.spec3_title': '최신 기술',
     'product.spec3_desc': '안전하고 편리하며, 언제 어디서나 쉽게 사용 가능. 스마트 디자인, 무통, 부작용 없음.',
     'product.spec4_title': '5년 보증',
-    'product.spec4_desc': '5년 정품 보증——업계 최장. 제조 결함 시 7일 교환·반품. 지원 핫라인 0935 999 922.',
+    'product.spec4_desc': '5년 정품 보증——업계 최장. 제조 결함 시 7일 교환·반품.',
     'product.spec5_title': '210건의 특허',
     'product.spec5_desc': '210건의 특허. 중국 광저우의 ISO 13485, ISO 9001 인증 공장에서 제조.',
     'product.spec6_title': '1:1 상담',
@@ -587,6 +587,9 @@ const ko: Record<string, string> = {
     'team.about.heading': '팀 소개',
     'team.about.body': 'Đại Long AI 팀은 15명의 공개 Sen 에이전트와 10명의 내부 워커로 구성됩니다 — 24/7로 운영되며 문의 접수, 제품 및 보증 정보 조회, 고객 니즈 기록, Zalo · Facebook · 웹사이트 · 전화 채널 조율을 담당합니다. 중요한 정보는 Đại Long 팀이 고객에게 전달되기 전에 검토합니다. AI는 반복 업무를 처리하고 — 의사와 전문가는 100%의 집중을 진정한 헬스케어에 쏟습니다.',
     'team.about.cta_button': 'Đại Long 연락하기',
+    'team.cta.heading': 'ĐẠI LONG과 대화할 준비가 되셨나요?',
+    'team.cta.body': 'Đại Long 헬스케어 테크놀로지 Sen AI 팀이 Zalo 또는 웹사이트를 통해 제품 문의, 반도체 레이저 장비 상담, 데모 예약을 24/7 응대합니다. 영업시간을 기다리지 않고 즉시 답변드립니다.',
+    'team.cta.button': '지금 문의하기',
 
     'team.contact.short': '연락',
 
