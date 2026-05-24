@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
           border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '8px', padding: '6px 10px',
           cursor: 'pointer', fontSize: '12px', color: '#c8c6c5',
-          fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700,
+          fontFamily: "'Inter',sans-serif", fontWeight: 700,
         }}
       >
         <img src={flagUrls[locale]} alt="" width={20} height={14} loading="lazy" decoding="async" fetchPriority="low" style={{ borderRadius: '2px', objectFit: 'cover' }} />
@@ -68,7 +68,7 @@ export default function LanguageSwitcher() {
                 border: 'none', cursor: 'pointer',
                 color: l === locale ? '#ff5625' : '#c8c6c5',
                 fontSize: '13px', fontWeight: 600,
-                fontFamily: "'Space Grotesk',sans-serif",
+                fontFamily: "'Inter',sans-serif",
                 textAlign: 'left',
               }}
             >

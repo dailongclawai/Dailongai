@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const AUDIO_SRC = "/audio/lofi-chill.mp3";
 const VOLUME = 0.85;
@@ -10,6 +11,8 @@ export default function BackgroundMusic() {
   const [started, setStarted] = useState(false);
   const [muted, setMuted] = useState(false);
   const pausedByChat = useRef(false);
+  const pathname = usePathname();
+  const isPortal = pathname?.startsWith("/portal") ?? false;
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -78,7 +81,9 @@ export default function BackgroundMusic() {
     if (!next && audio.paused && started) audio.play().catch(() => {});
   };
 
-  const showButton = started;
+  const showButton = started && !isPortal;
+
+  if (isPortal) return null;
 
   return (
     <>
