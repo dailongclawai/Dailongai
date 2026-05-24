@@ -174,7 +174,7 @@ export function VariantD() {
             </h2>
           </div>
           <p className="text-xs text-[#0e1525]/60">
-            Tính theo số máy bán năm 2026 (YTD: <span style={numeric}>{mockDealerYtd.unitsYtd}</span> máy)
+            Tính theo số máy bán trong tháng (reset đầu tháng · hiện: <span style={numeric}>{mockDealerYtd.unitsYtd}</span> máy)
           </p>
         </div>
 

@@ -23,7 +23,6 @@ export default function Footer() {
           <div className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-normal text-secondary max-w-sm space-y-1">
             <p>{contactInfo.company}</p>
             <p>{contactInfo.address}</p>
-            <p>Hotline: {contactInfo.hotline}</p>
           </div>
           <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-normal text-secondary/70">
             © {new Date().getFullYear()} Đại Long. {t('footer.rights')}

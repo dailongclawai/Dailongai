@@ -31,51 +31,51 @@ export default function LanguageSwitcher() {
   }, [open]);
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="relative">
+      {/* Touch-friendly trigger — 44px min-height on mobile */}
       <button
         onClick={() => setOpen(!open)}
-        style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '8px', padding: '6px 10px',
-          cursor: 'pointer', fontSize: '12px', color: '#c8c6c5',
-          fontFamily: "'Inter',sans-serif", fontWeight: 700,
-        }}
+        aria-label="Switch language"
+        aria-expanded={open}
+        className="flex h-9 items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.06] px-2.5 text-[#c8c6c5] transition-colors hover:border-white/20 hover:bg-white/10 active:scale-[0.97] sm:px-3"
       >
-        <img src={flagUrls[locale]} alt="" width={20} height={14} loading="lazy" decoding="async" fetchPriority="low" style={{ borderRadius: '2px', objectFit: 'cover' }} />
-        <span className="hidden sm:inline">{localeNames[locale]}</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <img
+          src={flagUrls[locale]}
+          alt=""
+          width={22}
+          height={15}
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          className="rounded-[2px] object-cover"
+        />
+        <span className="hidden font-semibold text-xs sm:inline">{localeNames[locale]}</span>
+        <svg
+          width="10" height="10" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2.5"
+          className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
 
+      {/* Dropdown — right-aligned, safe on narrow screens */}
       {open && (
-        <div style={{
-          position: 'absolute', top: '100%', right: 0, marginTop: '6px',
-          background: '#1a1c1e', border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '12px', overflow: 'hidden', zIndex: 200,
-          minWidth: '160px', boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-        }}>
+        <div className="absolute right-0 top-[calc(100%+6px)] z-[200] w-44 max-h-[min(340px,80dvh)] overflow-y-auto rounded-xl border border-white/10 bg-[#1a1c1e] shadow-[0_8px_32px_rgba(0,0,0,0.5)] overscroll-contain">
           {locales.map((l) => (
             <button
               key={l}
               onClick={() => { startTransition(() => setLocale(l)); setOpen(false); }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                width: '100%', padding: '10px 14px',
-                background: l === locale ? 'rgba(255,86,37,0.1)' : 'transparent',
-                border: 'none', cursor: 'pointer',
-                color: l === locale ? '#ff5625' : '#c8c6c5',
-                fontSize: '13px', fontWeight: 600,
-                fontFamily: "'Inter',sans-serif",
-                textAlign: 'left',
-              }}
+              className={`flex w-full items-center gap-3 px-3.5 py-3 text-left text-[13px] font-semibold transition-colors ${
+                l === locale
+                  ? 'bg-[#ff5625]/10 text-[#ff5625]'
+                  : 'text-[#c8c6c5] hover:bg-white/[0.05]'
+              }`}
             >
-              <img src={flagUrls[l]} alt="" width={22} height={15} loading="lazy" decoding="async" style={{ borderRadius: '2px', objectFit: 'cover' }} />
-              <span>{localeNames[l]}</span>
+              <img src={flagUrls[l]} alt="" width={22} height={15} loading="lazy" decoding="async" className="rounded-[2px] object-cover" />
+              <span className="flex-1">{localeNames[l]}</span>
               {l === locale && (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5625" strokeWidth="2.5" style={{ marginLeft: 'auto' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff5625" strokeWidth="2.5">
                   <path d="M5 12l5 5L20 7" />
                 </svg>
               )}

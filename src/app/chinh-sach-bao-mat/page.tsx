@@ -122,8 +122,8 @@ export default function PrivacyPolicyPage() {
           <ul>
             <li>
               <strong>Email:</strong>{" "}
-              <a href="mailto:admin@dailong.ai?subject=%5BXOA%20DU%20LIEU%5D">
-                admin@dailong.ai
+              <a href="mailto:dongoclong@dailongai.com?subject=%5BXOA%20DU%20LIEU%5D">
+                dongoclong@dailongai.com
               </a>{" "}
               với tiêu đề <code>[XOA DU LIEU]</code>.
             </li>
@@ -203,7 +203,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>Địa chỉ: 165, 171 Yên Lãng, Đống Đa, Hà Nội</li>
             <li>Hotline: 0935 999 922</li>
-            <li>Email: <a href="mailto:admin@dailong.ai">admin@dailong.ai</a></li>
+            <li>Email: <a href="mailto:dongoclong@dailongai.com">dongoclong@dailongai.com</a></li>
           </ul>
         </article>
       </main>
