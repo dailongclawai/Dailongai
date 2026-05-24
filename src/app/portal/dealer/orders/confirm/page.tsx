@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -25,6 +26,7 @@ function vietqrUrl(amount: number, info: string) {
 export default function OrderConfirmPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
+  const { t } = useI18n();
   const [count, setCount] = useState(0);
   const [total, setTotal] = useState(0);
   const [note, setNote] = useState('');
@@ -61,12 +63,12 @@ export default function OrderConfirmPage() {
               />
             </svg>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">Đặt hàng thành công</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.dealer.orders.confirm_eyebrow')}</p>
           <h1 className="mt-2 font-headline text-3xl">
-            Chờ admin duyệt đơn
+            {t('portal.dealer.orders.confirm_title')}
           </h1>
           <p className="mt-2 text-sm text-[#e7eaf0]/60">
-            {count} máy · tổng giá trị{' '}
+            {count} {t('portal.dealer.orders.units_word')} · {t('portal.dealer.orders.total_word')}{' '}
             <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">
               {fmtVnd(total)} đ
             </span>
@@ -78,34 +80,34 @@ export default function OrderConfirmPage() {
           {/* Left: payment details */}
           <div className="rounded-2xl border border-[#ff5625]/30 bg-[#ff5625]/5 p-6">
             <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
-              Thanh toán ngay
+              {t('portal.dealer.orders.pay_now')}
             </p>
             <p className="mb-5 text-sm text-[#e7eaf0]/60">
-              Chuyển khoản đúng số tiền và ghi rõ nội dung để đơn được xử lý nhanh nhất.
+              {t('portal.dealer.orders.pay_instructions')}
             </p>
             <div className="space-y-0 divide-y divide-[#3d3f41]/30 text-sm">
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">Ngân hàng</span>
+                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.bank')}</span>
                 <span className="font-medium">{BANK_NAME}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">Số tài khoản</span>
+                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.account_number')}</span>
                 <span className="font-mono font-semibold tracking-wider tabular-nums">
                   {BANK_ACCOUNT}
                 </span>
               </div>
               <div className="flex items-start justify-between gap-4 py-3">
-                <span className="shrink-0 text-[#e7eaf0]/50">Chủ tài khoản</span>
+                <span className="shrink-0 text-[#e7eaf0]/50">{t('portal.dealer.orders.account_holder')}</span>
                 <span className="text-right text-xs font-medium leading-relaxed">{BANK_OWNER}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">Số tiền</span>
+                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.amount')}</span>
                 <span className="font-mono font-semibold tabular-nums text-[#ff5625]">
                   {fmtVnd(total)} đ
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-[#1a1f26]/40 px-3 py-3">
-                <span className="text-[#e7eaf0]/50">Nội dung CK</span>
+                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.transfer_memo')}</span>
                 <span className="font-mono font-bold tracking-widest tabular-nums text-[#e7eaf0]">
                   {note}
                 </span>
@@ -115,27 +117,27 @@ export default function OrderConfirmPage() {
               href="/portal/dashboard"
               className="mt-6 block text-center text-xs text-[#e7eaf0]/40 hover:text-[#ff5625]"
             >
-              ← Về dashboard
+              {t('portal.dealer.orders.back_to_dashboard')}
             </Link>
           </div>
 
           {/* Right: VietQR */}
           <div className="flex flex-col items-center rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-6">
             <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">
-              Đại Long Bank QR
+              {t('portal.dealer.orders.bank_qr_title')}
             </p>
             {total > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={vietqrUrl(total, note)}
-                alt="QR thanh toán Đại Long"
+                alt={t('portal.dealer.orders.qr_alt')}
                 className="w-full max-w-[300px] rounded-xl"
               />
             ) : (
               <div className="h-64 w-64 animate-pulse rounded-xl bg-[#1a1f26]/40" />
             )}
             <p className="mt-5 text-center text-xs text-[#e7eaf0]/40">
-              Mở app ngân hàng → Quét mã → Kiểm tra thông tin → Thanh toán
+              {t('portal.dealer.orders.qr_steps')}
             </p>
           </div>
         </div>

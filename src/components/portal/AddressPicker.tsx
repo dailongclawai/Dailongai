@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 export interface AddressValue {
   province_code: string;
@@ -40,6 +41,7 @@ export function AddressPicker({
   inputClass?: string;
   labelClass?: string;
 }) {
+  const { t } = useI18n();
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loadingWards, setLoadingWards] = useState(false);
@@ -86,14 +88,14 @@ export function AddressPicker({
   return (
     <div className="space-y-3">
       <div>
-        <label className={labelClass}>Tỉnh / Thành phố</label>
+        <label className={labelClass}>{t('portal.components.addressPicker.province_label')}</label>
         <select
           value={value.province_code}
           onChange={(e) => onProvince(e.target.value)}
           required={required}
           className={inputClass}
         >
-          <option value="">— Chọn tỉnh/thành —</option>
+          <option value="">{t('portal.components.addressPicker.province_placeholder')}</option>
           {provinces.map((p) => (
             <option key={p.code} value={p.code}>{p.name}</option>
           ))}
@@ -101,7 +103,7 @@ export function AddressPicker({
       </div>
 
       <div>
-        <label className={labelClass}>Phường / Xã</label>
+        <label className={labelClass}>{t('portal.components.addressPicker.ward_label')}</label>
         <select
           value={value.ward_code}
           onChange={(e) => onWard(e.target.value)}
@@ -110,7 +112,11 @@ export function AddressPicker({
           className={`${inputClass} disabled:opacity-50`}
         >
           <option value="">
-            {!value.province_code ? '— Chọn tỉnh trước —' : loadingWards ? 'Đang tải…' : '— Chọn phường/xã —'}
+            {!value.province_code
+              ? t('portal.components.addressPicker.ward_needs_province')
+              : loadingWards
+                ? t('portal.components.addressPicker.ward_loading')
+                : t('portal.components.addressPicker.ward_placeholder')}
           </option>
           {wards.map((w) => (
             <option key={w.code} value={w.code}>
@@ -121,13 +127,13 @@ export function AddressPicker({
       </div>
 
       <div>
-        <label className={labelClass}>Số nhà, đường</label>
+        <label className={labelClass}>{t('portal.components.addressPicker.detail_label')}</label>
         <input
           type="text"
           value={value.detail}
           onChange={(e) => onChange({ ...value, detail: e.target.value })}
           required={required}
-          placeholder="VD: 123 Lê Lợi"
+          placeholder={t('portal.components.addressPicker.detail_placeholder')}
           className={inputClass}
         />
       </div>

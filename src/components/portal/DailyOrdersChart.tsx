@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 interface Row {
   sale_date: string;
@@ -23,8 +24,10 @@ function isSuccess(r: Row): boolean {
   return r.status === 'approved' || r.status === 'paid';
 }
 
-export function DailyOrdersChart({ rows, days = 30, title = 'Doanh số đội theo ngày', subtitle }: Props) {
+export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
+  const { t } = useI18n();
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const resolvedTitle = title ?? t('portal.components.dailyOrdersChart.default_title');
 
   const buckets = useMemo(() => {
     const today = new Date();
@@ -66,30 +69,30 @@ export function DailyOrdersChart({ rows, days = 30, title = 'Doanh số đội t
 
       <div className="relative flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{title}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{resolvedTitle}</p>
           <h3 className="mt-1 font-headline text-2xl leading-tight">
             {fmtVnd(stats.totalRev)}<span className="ml-1 text-base text-[#e7eaf0]/50">₫</span>
             <span className="ml-3 font-mono text-base font-normal text-[#10b981]">
-              · {stats.totalCnt} đơn
+              · {stats.totalCnt} {t('portal.components.dailyOrdersChart.orders_short')}
             </span>
           </h3>
           <p className="mt-1 text-[11px] text-[#e7eaf0]/50">
-            {subtitle ?? `${days} ngày gần nhất · chỉ đơn đã thành công`}
+            {subtitle ?? `${days} ${t('portal.components.dailyOrdersChart.default_subtitle_suffix')}`}
           </p>
         </div>
         <div className="flex gap-6 text-right">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">TB / ngày bán</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.dailyOrdersChart.avg_per_day')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">{fmtVnd(stats.avgDaily)} ₫</p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">Ngày có đơn</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.dailyOrdersChart.active_days')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">
               {stats.activeDays}<span className="text-[#e7eaf0]/40">/{days}</span>
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">Hôm nay</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.dailyOrdersChart.today')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">
               {stats.lastDay.count > 0 ? (
                 <span className="text-[#10b981]">{stats.lastDay.count} · {fmtVnd(stats.lastDay.revenue)}₫</span>
@@ -110,7 +113,7 @@ export function DailyOrdersChart({ rows, days = 30, title = 'Doanh số đội t
                 {hovered.date.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' })}
               </span>
               <span className="font-mono font-semibold text-[#ff5625] tabular-nums">{fmtVnd(hovered.revenue)} ₫</span>
-              <span className="font-mono tabular-nums text-[#10b981]">{hovered.count} đơn</span>
+              <span className="font-mono tabular-nums text-[#10b981]">{hovered.count} {t('portal.components.dailyOrdersChart.orders_short')}</span>
             </div>
           )}
         </div>

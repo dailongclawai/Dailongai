@@ -2,18 +2,19 @@
 
 import { Fragment, useMemo, useState } from 'react';
 import type { AuditEntry } from '@/lib/portal-types';
+import { useI18n } from '@/lib/i18n';
 
-const ACTION_LABEL: Record<string, string> = {
-  approve_order: 'Duyệt đơn',
-  reject_order: 'Từ chối đơn',
-  void_order: 'Huỷ đơn',
-  mark_paid: 'Đánh dấu đã trả',
-  update_profile: 'Cập nhật hồ sơ',
-  reject_registration: 'Từ chối đăng ký',
-  insert_dealer_commissions: 'Gán hoa hồng đại lý',
-  update_dealer_commissions: 'Sửa hoa hồng đại lý',
-  insert_supervisor_overrides: 'Gán override supervisor',
-};
+const ACTION_KEYS = [
+  'approve_order',
+  'reject_order',
+  'void_order',
+  'mark_paid',
+  'update_profile',
+  'reject_registration',
+  'insert_dealer_commissions',
+  'update_dealer_commissions',
+  'insert_supervisor_overrides',
+] as const;
 
 interface IconMeta {
   symbol: string;
@@ -41,16 +42,17 @@ function dayKey(iso: string): string {
   return iso.slice(0, 10);
 }
 
-function dayLabel(iso: string): string {
+function dayLabel(iso: string, t: (k: string) => string, locale: string): string {
   const d = new Date(iso);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const that = new Date(d);
   that.setHours(0, 0, 0, 0);
   const diff = Math.round((today.getTime() - that.getTime()) / 86_400_000);
-  if (diff === 0) return 'Hôm nay';
-  if (diff === 1) return 'Hôm qua';
-  return d.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (diff === 0) return t('portal.components.auditTimeline.today');
+  if (diff === 1) return t('portal.components.auditTimeline.yesterday');
+  const intlLocale = locale === 'vi' ? 'vi-VN' : locale;
+  return d.toLocaleDateString(intlLocale, { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 function timeLabel(iso: string): string {
@@ -63,7 +65,11 @@ interface Props {
 }
 
 export function AuditTimeline({ rows }: Props) {
+  const { t, locale } = useI18n();
   const [openId, setOpenId] = useState<string | null>(null);
+  const actionLabels: Record<string, string> = Object.fromEntries(
+    ACTION_KEYS.map((k) => [k, t(`portal.components.auditTimeline.action.${k}`)]),
+  );
 
   const grouped = useMemo(() => {
     const map = new Map<string, AuditEntry[]>();
@@ -78,7 +84,7 @@ export function AuditTimeline({ rows }: Props) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-[#1f2937] bg-[#11151a] p-10 text-center text-sm text-[#9ca3af]">
-        Chưa có bản ghi nào.
+        {t('portal.components.auditTimeline.empty')}
       </div>
     );
   }
@@ -88,12 +94,12 @@ export function AuditTimeline({ rows }: Props) {
       {grouped.map(([day, items]) => (
         <section key={day}>
           <h3 className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
-            {dayLabel(items[0].created_at)} · <span className="text-[#9ca3af]">{day}</span>
+            {dayLabel(items[0].created_at, t, locale)} · <span className="text-[#9ca3af]">{day}</span>
           </h3>
           <ol className="relative ml-3 border-l-2 border-[#1f2937]">
             {items.map((r) => {
               const icon = iconFor(r.action);
-              const label = ACTION_LABEL[r.action] ?? r.action;
+              const label = actionLabels[r.action] ?? r.action;
               const isOpen = openId === r.id;
               const hasDiff = !!(r.before || r.after);
               return (

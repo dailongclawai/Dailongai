@@ -2,15 +2,16 @@
 
 import { useMemo, useState } from 'react';
 import type { LeaderboardRow } from '@/lib/portal-queries';
+import { useI18n } from '@/lib/i18n';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 type SortKey = 'month_sales' | 'month_units' | 'sales_7d';
 
-const LABELS: Record<SortKey, string> = {
-  month_sales: 'Doanh số tháng',
-  month_units: 'Số máy tháng',
-  sales_7d: '7 ngày',
+const LABEL_KEYS: Record<SortKey, string> = {
+  month_sales: 'portal.components.podiumLeaderboard.sort_month_sales',
+  month_units: 'portal.components.podiumLeaderboard.sort_month_units',
+  sales_7d: 'portal.components.podiumLeaderboard.sort_7d',
 };
 
 const PODIUM_META = {
@@ -19,15 +20,15 @@ const PODIUM_META = {
   3: { medal: '🥉', height: 'h-14', bar: 'bg-gradient-to-t from-[#cd7f32] to-[#f0b97a]', label: 'text-[#cd7f32]' },
 } as const;
 
-function shortName(name: string | null): string {
-  if (!name) return '(không tên)';
+function shortName(name: string | null, fallback: string): string {
+  if (!name) return fallback;
   const trimmed = name.trim();
   if (trimmed.length <= 14) return trimmed;
   return trimmed.slice(0, 12) + '…';
 }
 
-function renderValue(r: LeaderboardRow, key: SortKey): string {
-  if (key === 'month_units') return `${r.month_units} máy`;
+function renderValue(r: LeaderboardRow, key: SortKey, unitLabel: string): string {
+  if (key === 'month_units') return `${r.month_units} ${unitLabel}`;
   return `${fmtVnd(Number(r[key]))} ₫`;
 }
 
@@ -36,7 +37,10 @@ interface Props {
 }
 
 export function PodiumLeaderboard({ rows }: Props) {
+  const { t } = useI18n();
   const [sortBy, setSortBy] = useState<SortKey>('month_sales');
+  const noNameLabel = t('portal.components.podiumLeaderboard.no_name');
+  const unitLabel = t('portal.components.podiumLeaderboard.unit_short');
 
   const ranked = useMemo(
     () => [...rows].sort((a, b) => Number(b[sortBy]) - Number(a[sortBy])).slice(0, 5),
@@ -46,7 +50,7 @@ export function PodiumLeaderboard({ rows }: Props) {
   if (rows.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-[#1f2937] bg-[#11151a] p-6 text-center text-sm text-[#9ca3af]">
-        Chưa có đại lý nào trong đội để xếp hạng.
+        {t('portal.components.podiumLeaderboard.empty')}
       </div>
     );
   }
@@ -61,10 +65,10 @@ export function PodiumLeaderboard({ rows }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1f2937] px-5 py-3">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#f59e0b]">leaderboard</span>
-          <p className="text-sm font-semibold">Xếp hạng đại lý</p>
+          <p className="text-sm font-semibold">{t('portal.components.podiumLeaderboard.title')}</p>
         </div>
         <div className="inline-flex gap-1 rounded-lg border border-[#1f2937] bg-[#0a0c0f] p-0.5 text-[11px]">
-          {(Object.keys(LABELS) as SortKey[]).map((k) => (
+          {(Object.keys(LABEL_KEYS) as SortKey[]).map((k) => (
             <button
               key={k}
               type="button"
@@ -73,7 +77,7 @@ export function PodiumLeaderboard({ rows }: Props) {
                 sortBy === k ? 'bg-[#ff5625] text-white' : 'text-[#9ca3af] hover:text-[#e7eaf0]'
               }`}
             >
-              {LABELS[k]}
+              {t(LABEL_KEYS[k])}
             </button>
           ))}
         </div>
@@ -87,10 +91,10 @@ export function PodiumLeaderboard({ rows }: Props) {
             <div key={r.dealer_id} className="flex w-20 flex-col items-center sm:w-24">
               <span className="text-2xl">{meta.medal}</span>
               <p className="mt-1 max-w-full truncate text-center text-[11px] font-semibold text-[#e7eaf0]">
-                {shortName(r.dealer_name)}
+                {shortName(r.dealer_name, noNameLabel)}
               </p>
               <p className={`mt-0.5 text-center font-mono text-[10px] font-semibold tabular-nums ${meta.label}`}>
-                {renderValue(r, sortBy)}
+                {renderValue(r, sortBy, unitLabel)}
               </p>
               <div
                 className={`mt-2 w-full rounded-t-md ${meta.bar} ${meta.height}`}
@@ -112,9 +116,9 @@ export function PodiumLeaderboard({ rows }: Props) {
               <span className="w-8 shrink-0 font-mono text-xs font-bold tabular-nums text-[#9ca3af]">
                 #{i + 4}
               </span>
-              <p className="min-w-0 flex-1 truncate text-sm text-[#e7eaf0]">{r.dealer_name ?? '(không tên)'}</p>
+              <p className="min-w-0 flex-1 truncate text-sm text-[#e7eaf0]">{r.dealer_name ?? noNameLabel}</p>
               <p className="shrink-0 font-mono text-xs font-semibold tabular-nums text-[#ff5625]">
-                {renderValue(r, sortBy)}
+                {renderValue(r, sortBy, unitLabel)}
               </p>
             </li>
           ))}

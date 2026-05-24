@@ -5,11 +5,13 @@ import { useRouter } from 'next/navigation';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
+import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { PortalSkeleton } from '@/components/portal/PortalSkeleton';
 
 export default function SupervisorQRPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [refLink, setRefLink] = useState('');
   const [qr, setQr] = useState('');
@@ -41,7 +43,7 @@ export default function SupervisorQRPage() {
   const copyLink = async () => {
     if (!refLink) return;
     await navigator.clipboard.writeText(refLink);
-    toast.success('Đã copy link mời đại lý');
+    toast.success(t('portal.supervisor.qr.toast.copied'));
   };
 
   const downloadQR = () => {
@@ -52,16 +54,16 @@ export default function SupervisorQRPage() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    toast.success('Đã tải QR');
+    toast.success(t('portal.supervisor.qr.toast.downloaded'));
   };
 
   return (
     <PortalShell variant="supervisor">
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">Mời đại lý vào nhánh</p>
-        <h1 className="mt-2 font-headline text-3xl md:text-4xl">QR riêng của bạn</h1>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.supervisor.qr.eyebrow')}</p>
+        <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.supervisor.qr.heading')}</h1>
         <p className="mt-2 text-sm text-[#9ca3af]">
-          Khi đại lý đăng ký qua QR/link này, tài khoản tự động thuộc nhánh của bạn — bạn xem được toàn bộ số liệu kinh doanh.
+          {t('portal.supervisor.qr.subhead')}
         </p>
       </div>
 
@@ -78,14 +80,14 @@ export default function SupervisorQRPage() {
               {qr ? (
                 <span className="absolute inset-3 block">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={qr} alt="QR mời đại lý" className="h-full w-full rounded-lg" />
+                  <img src={qr} alt={t('portal.supervisor.qr.image_alt')} className="h-full w-full rounded-lg" />
                 </span>
               ) : (
                 <div className="absolute inset-3 animate-pulse rounded-lg bg-[#11151a]/10" />
               )}
             </div>
             <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#10b981]/70">
-              {profile?.full_name || 'Supervisor'}
+              {profile?.full_name || t('portal.shell.role.supervisor')}
             </p>
           </div>
 
@@ -93,7 +95,7 @@ export default function SupervisorQRPage() {
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[18px] text-[#10b981]">share</span>
               <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#10b981]">
-                Link mời riêng
+                {t('portal.supervisor.qr.invite_link_label')}
               </p>
             </div>
 
@@ -112,7 +114,7 @@ export default function SupervisorQRPage() {
                 className="flex items-center justify-center gap-2 rounded-full bg-[#ff5625] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#ff5625]/90 active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                Copy link
+                {t('portal.supervisor.qr.copy_link')}
               </button>
               <button
                 onClick={downloadQR}
@@ -120,13 +122,13 @@ export default function SupervisorQRPage() {
                 className="flex items-center justify-center gap-2 rounded-full border border-[#10b981]/40 bg-[#10b981]/10 px-5 py-2.5 text-xs font-semibold text-[#10b981] transition-all hover:bg-[#10b981]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[16px]">download</span>
-                Tải QR
+                {t('portal.supervisor.qr.download_qr')}
               </button>
             </div>
 
             <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#9ca3af]">
               <span className="material-symbols-outlined text-[14px] text-[#9ca3af]">tips_and_updates</span>
-              In QR ra dán tại điểm bán, hoặc gửi Zalo/email cho đại lý mới.
+              {t('portal.supervisor.qr.tip')}
             </p>
           </div>
         </div>

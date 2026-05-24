@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useI18n } from '@/lib/i18n';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
@@ -12,6 +13,7 @@ import type { Profile, ProductModel, ProfileRole } from '@/lib/portal-types';
 
 export default function RegistrationsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [pending, setPending] = useState<Profile[]>([]);
   const [supervisors, setSupervisors] = useState<Profile[]>([]);
@@ -47,25 +49,25 @@ export default function RegistrationsPage() {
       nav={<AdminNav />}
     >
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">Queue cần xử lý</p>
-        <h1 className="mt-2 font-headline text-4xl">Đăng ký chờ duyệt</h1>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.registrations.eyebrow')}</p>
+        <h1 className="mt-2 font-headline text-4xl">{t('portal.admin.registrations.title')}</h1>
       </div>
       {fetching ? (
-        <p className="text-[#e7eaf0]/60">Đang tải…</p>
+        <p className="text-[#e7eaf0]/60">{t('portal.admin.registrations.loading')}</p>
       ) : pending.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-[#1f2937]/50 p-12 text-center text-sm text-[#e7eaf0]/60">
-          Không có đăng ký mới.
+          {t('portal.admin.registrations.empty')}
         </div>
       ) : (
         <div className="overflow-x-auto portal-scroll rounded-2xl border border-[#1f2937]/40 bg-[#11151a] backdrop-blur">
           <table className="w-full min-w-[820px] text-left text-sm">
             <thead className="border-b border-[#1f2937]/40 bg-[#1a1f26]/40 text-[10px] uppercase tracking-wider text-[#e7eaf0]/60">
               <tr>
-                <th className="px-4 py-3">Hồ sơ</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Supervisor</th>
-                <th className="px-4 py-3">Commission</th>
-                <th className="px-4 py-3 text-right">Hành động</th>
+                <th className="px-4 py-3">{t('portal.admin.registrations.table.profile')}</th>
+                <th className="px-4 py-3">{t('portal.admin.registrations.table.role')}</th>
+                <th className="px-4 py-3">{t('portal.admin.registrations.table.supervisor')}</th>
+                <th className="px-4 py-3">{t('portal.admin.registrations.table.commission')}</th>
+                <th className="px-4 py-3 text-right">{t('portal.admin.registrations.table.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -97,6 +99,7 @@ function RegistrationRow({
   models: ProductModel[];
   onResolved: () => void;
 }) {
+  const { t } = useI18n();
   const [role, setRole] = useState<ProfileRole>('dealer');
   const [supervisorId, setSupervisorId] = useState('');
   const [commissionType, setCommissionType] = useState<'fixed' | 'percent'>('percent');
@@ -117,13 +120,13 @@ function RegistrationRow({
     setBusy(false);
     if (error) toast.error(error.message);
     else {
-      toast.success(`Đã duyệt ${profile.email ?? profile.full_name ?? 'hồ sơ'}`);
+      toast.success(`${t('portal.admin.registrations.toast.approved_prefix')} ${profile.email ?? profile.full_name ?? t('portal.admin.registrations.toast.approved_fallback')}`);
       onResolved();
     }
   };
 
   const reject = async () => {
-    const reason = window.prompt('Lý do từ chối?');
+    const reason = window.prompt(t('portal.admin.registrations.prompt.reject_reason'));
     if (!reason) return;
     setBusy(true);
     const { error } = await getSupabaseClient().rpc('admin_reject_registration', {
@@ -133,7 +136,7 @@ function RegistrationRow({
     setBusy(false);
     if (error) toast.error(error.message);
     else {
-      toast.success('Đã từ chối');
+      toast.success(t('portal.admin.registrations.toast.rejected'));
       onResolved();
     }
   };
@@ -141,7 +144,7 @@ function RegistrationRow({
   return (
     <tr className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
       <td className="px-4 py-3">
-        <p className="font-medium">{profile.full_name ?? '(chưa có tên)'}</p>
+        <p className="font-medium">{profile.full_name ?? t('portal.admin.registrations.row.no_name')}</p>
         <div className="mt-0.5">
           <AccountIdBadge accountNo={profile.account_no} id={profile.id} />
         </div>
@@ -154,9 +157,9 @@ function RegistrationRow({
           onChange={(e) => setRole(e.target.value as ProfileRole)}
           className="rounded-md border border-[#1f2937]/40 bg-[#11151a] px-2 py-1 text-xs"
         >
-          <option value="dealer">Dealer</option>
-          <option value="supervisor">Supervisor</option>
-          <option value="admin">Admin</option>
+          <option value="dealer">{t('portal.admin.registrations.role.dealer')}</option>
+          <option value="supervisor">{t('portal.admin.registrations.role.supervisor')}</option>
+          <option value="admin">{t('portal.admin.registrations.role.admin')}</option>
         </select>
       </td>
       <td className="px-4 py-3">
@@ -166,7 +169,7 @@ function RegistrationRow({
             onChange={(e) => setSupervisorId(e.target.value)}
             className="rounded-md border border-[#1f2937]/40 bg-[#11151a] px-2 py-1 text-xs"
           >
-            <option value="">— Không gán —</option>
+            <option value="">{t('portal.admin.registrations.supervisor.unassigned')}</option>
             {supervisors.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.full_name ?? s.email}
@@ -196,7 +199,7 @@ function RegistrationRow({
               onChange={(e) => setModelId(e.target.value)}
               className="rounded-md border border-[#1f2937]/40 bg-[#11151a] px-1.5 py-1 text-[11px]"
             >
-              <option value="">All</option>
+              <option value="">{t('portal.admin.registrations.commission.all_models')}</option>
               {models.map((m) => (
                 <option key={m.id} value={m.id}>{m.code}</option>
               ))}
@@ -211,14 +214,14 @@ function RegistrationRow({
             disabled={busy}
             className="rounded-full bg-[#ff5625] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#ff5625]/90 disabled:opacity-50"
           >
-            Duyệt
+            {t('portal.admin.registrations.action.approve')}
           </button>
           <button
             onClick={reject}
             disabled={busy}
             className="rounded-full border border-[#1f2937]/60 px-3 py-1.5 text-xs font-medium text-[#e7eaf0] hover:border-[#f87171] hover:text-[#f87171] disabled:opacity-50"
           >
-            Từ chối
+            {t('portal.admin.registrations.action.reject')}
           </button>
         </div>
       </td>

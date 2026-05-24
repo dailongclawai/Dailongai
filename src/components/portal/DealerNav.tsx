@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const items = [
-  { href: '/portal/dashboard', label: 'Tổng quan', exact: true },
-  { href: '/portal/dealer/commission', label: 'Hoa hồng' },
-];
+import { useI18n } from '@/lib/i18n';
 
 export function DealerNav() {
+  const { t } = useI18n();
   const pathname = usePathname();
+  const items = [
+    { href: '/portal/dashboard', label: t('portal.shell.nav.dashboard'), exact: true },
+    { href: '/portal/dealer/commission', label: t('portal.shell.nav.commission') },
+  ];
   return (
     <>
       {items.map((it) => {

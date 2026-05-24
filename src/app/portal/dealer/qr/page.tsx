@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { OrderQRCard } from '@/components/portal/OrderQRCard';
 import { DealerQrFunnelCard } from '@/components/portal/FunnelChart';
@@ -10,6 +11,7 @@ import { DealerQrFunnelCard } from '@/components/portal/FunnelChart';
 export default function DealerQRPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (loading) return;
@@ -22,11 +24,10 @@ export default function DealerQRPage() {
   return (
     <PortalShell variant="dealer">
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">Đại lý / Mã QR</p>
-        <h1 className="mt-2 font-headline text-3xl">Mã QR đặt đơn</h1>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">{t('portal.dealer.qr.eyebrow')}</p>
+        <h1 className="mt-2 font-headline text-3xl">{t('portal.dealer.qr.title')}</h1>
         <p className="mt-2 max-w-xl text-sm text-[#9ca3af]">
-          Mỗi đại lý có một mã QR riêng. Khách hàng quét mã sẽ vào form đặt đơn rút gọn,
-          đơn sẽ được tự động ghi nhận cho đại lý.
+          {t('portal.dealer.qr.subtitle')}
         </p>
       </div>
 

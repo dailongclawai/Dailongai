@@ -2,12 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-
-const ROLE_LABEL: Record<string, string> = {
-  dealer: 'Đại lý',
-  supervisor: 'Giám sát',
-  admin: 'Quản trị',
-};
+import { useI18n } from '@/lib/i18n';
 
 function homePathFor(role?: string | null): string {
   if (role === 'admin') return '/portal/admin';
@@ -17,10 +12,16 @@ function homePathFor(role?: string | null): string {
 }
 
 export default function Forbidden403Page() {
+  const { t } = useI18n();
   const { profile } = useAuth();
   const role = profile?.role ?? null;
   const home = homePathFor(role);
-  const roleLabel = role ? (ROLE_LABEL[role] ?? role) : 'Chưa xác định';
+  const roleLabelMap: Record<string, string> = {
+    dealer: t('portal.shell.role.dealer'),
+    supervisor: t('portal.shell.role.supervisor'),
+    admin: t('portal.shell.role.admin'),
+  };
+  const roleLabel = role ? (roleLabelMap[role] ?? role) : t('portal.auth.403.role_unknown');
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
@@ -33,13 +34,13 @@ export default function Forbidden403Page() {
         </div>
 
         <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.4em] text-[#f87171]">403</p>
-        <h1 className="mt-2 font-headline text-3xl text-[#e7eaf0]">Không có quyền truy cập</h1>
+        <h1 className="mt-2 font-headline text-3xl text-[#e7eaf0]">{t('portal.auth.403.title')}</h1>
         <p className="mt-3 text-sm leading-relaxed text-[#9ca3af]">
-          Tài khoản hiện tại không có quyền xem trang vừa truy cập. Liên hệ quản trị nếu cần được cấp quyền.
+          {t('portal.auth.403.body')}
         </p>
 
         <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#1f2937] bg-[#0a0c0f] px-4 py-1.5 text-xs">
-          <span className="text-[#9ca3af]">Vai trò:</span>
+          <span className="text-[#9ca3af]">{t('portal.auth.403.role_label')}</span>
           <span className="font-medium text-[#e7eaf0]">{roleLabel}</span>
         </div>
 
@@ -48,7 +49,7 @@ export default function Forbidden403Page() {
             href={home}
             className="flex h-11 items-center justify-center rounded-xl bg-[#ff5625] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#ff6a3d] active:scale-[0.98]"
           >
-            ← Về trang chủ
+            {t('portal.auth.403.home')}
           </Link>
           <a
             href="https://zalo.me/0357008100"
@@ -56,7 +57,7 @@ export default function Forbidden403Page() {
             rel="noreferrer"
             className="flex h-11 items-center justify-center rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-5 text-sm font-medium text-[#e7eaf0] transition-colors hover:bg-[#1a1f26]"
           >
-            Liên hệ Admin
+            {t('portal.auth.403.contact_admin')}
           </a>
         </div>
       </div>

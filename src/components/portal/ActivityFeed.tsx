@@ -3,15 +3,16 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { Order } from '@/lib/portal-types';
+import { useI18n } from '@/lib/i18n';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
-const STATUS_META: Record<Order['status'], { label: string; dot: string; pill: string }> = {
-  approved: { label: 'Đã duyệt',    dot: 'bg-[#10b981]', pill: 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' },
-  paid:     { label: 'Đã thanh toán', dot: 'bg-[#10b981]', pill: 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' },
-  pending:  { label: 'Chờ duyệt',   dot: 'bg-[#f59e0b]', pill: 'text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20' },
-  rejected: { label: 'Từ chối',     dot: 'bg-[#f87171]', pill: 'text-[#f87171] bg-[#f87171]/10 border-[#f87171]/20' },
-  voided:   { label: 'Đã hủy',      dot: 'bg-[#9ca3af]', pill: 'text-[#9ca3af] bg-[#9ca3af]/10 border-[#9ca3af]/20' },
+const STATUS_META: Record<Order['status'], { labelKey: string; dot: string; pill: string }> = {
+  approved: { labelKey: 'portal.components.activityFeed.status_approved',    dot: 'bg-[#10b981]', pill: 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' },
+  paid:     { labelKey: 'portal.components.activityFeed.status_paid',        dot: 'bg-[#10b981]', pill: 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' },
+  pending:  { labelKey: 'portal.components.activityFeed.status_pending',     dot: 'bg-[#f59e0b]', pill: 'text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20' },
+  rejected: { labelKey: 'portal.components.activityFeed.status_rejected',    dot: 'bg-[#f87171]', pill: 'text-[#f87171] bg-[#f87171]/10 border-[#f87171]/20' },
+  voided:   { labelKey: 'portal.components.activityFeed.status_voided',      dot: 'bg-[#9ca3af]', pill: 'text-[#9ca3af] bg-[#9ca3af]/10 border-[#9ca3af]/20' },
 };
 
 const MAX_DAYS = 5;          // tối đa số ngày hiển thị
@@ -21,15 +22,15 @@ function dayKey(iso: string): string {
   return iso.slice(0, 10); // YYYY-MM-DD
 }
 
-function dayLabel(key: string): string {
+function dayLabel(key: string, labels: { today: string; yesterday: string; daysAgoSuffix: string }): string {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const d = new Date(key);
   d.setHours(0, 0, 0, 0);
   const diff = Math.round((today.getTime() - d.getTime()) / 86_400_000);
-  if (diff === 0) return 'Hôm nay';
-  if (diff === 1) return 'Hôm qua';
-  if (diff < 7) return `${diff} ngày trước`;
+  if (diff === 0) return labels.today;
+  if (diff === 1) return labels.yesterday;
+  if (diff < 7) return `${diff} ${labels.daysAgoSuffix}`;
   return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
@@ -48,7 +49,13 @@ interface DayGroup {
 }
 
 export function ActivityFeed({ orders }: { orders: Order[] }) {
+  const { t } = useI18n();
   const groups = useMemo<DayGroup[]>(() => {
+    const dayLabels = {
+      today: t('portal.components.activityFeed.today'),
+      yesterday: t('portal.components.activityFeed.yesterday'),
+      daysAgoSuffix: t('portal.components.activityFeed.days_ago_suffix'),
+    };
     const map = new Map<string, Order[]>();
     for (const o of orders) {
       const k = dayKey(o.created_at || o.sale_date);
@@ -61,13 +68,13 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
       .slice(0, MAX_DAYS)
       .map(([key, items]) => ({
         key,
-        label: dayLabel(key),
+        label: dayLabel(key, dayLabels),
         count: items.length,
         total: items.reduce((s, o) => s + Number(o.sale_price), 0),
         pending: items.filter((o) => o.status === 'pending').length,
         orders: items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
       }));
-  }, [orders]);
+  }, [orders, t]);
 
   const [expanded, setExpanded] = useState<Set<string>>(
     () => new Set(groups.slice(0, DEFAULT_EXPANDED).map((g) => g.key)),
@@ -86,11 +93,11 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
     <section>
       <div className="flex items-baseline justify-between border-b border-[#1f2937] pb-2">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">Hoạt động</p>
-          <h2 className="mt-1 font-headline text-2xl md:text-3xl">Đơn gần đây</h2>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.activityFeed.eyebrow')}</p>
+          <h2 className="mt-1 font-headline text-2xl md:text-3xl">{t('portal.components.activityFeed.title')}</h2>
         </div>
         <Link href="/portal/dealer/commission" className="text-xs text-[#9ca3af] hover:text-[#ff5625]">
-          Xem tất cả →
+          {t('portal.components.activityFeed.view_all')}
         </Link>
       </div>
 
@@ -111,12 +118,12 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
                 </div>
                 <div className="flex items-center gap-3 text-xs">
                   <span className="font-mono tabular-nums text-[#9ca3af]">
-                    <span className="font-semibold text-[#e7eaf0]">{g.count}</span> đơn
+                    <span className="font-semibold text-[#e7eaf0]">{g.count}</span> {t('portal.components.activityFeed.orders_short')}
                   </span>
                   <span className="font-mono font-semibold tabular-nums text-[#ff5625]">{fmtVnd(g.total)} ₫</span>
                   {g.pending > 0 && (
                     <span className="rounded-full bg-[#f59e0b]/15 px-2 py-0.5 text-[10px] font-bold uppercase text-[#f59e0b]">
-                      {g.pending} chờ
+                      {g.pending} {t('portal.components.activityFeed.pending_short')}
                     </span>
                   )}
                   <span className="material-symbols-outlined text-[18px] text-[#9ca3af]" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
@@ -152,7 +159,7 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
                             </p>
                           </div>
                           <span className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[10px] ${meta.pill}`}>
-                            {meta.label}
+                            {t(meta.labelKey)}
                           </span>
                         </div>
                       </li>
@@ -167,9 +174,9 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
 
       {orders.length > groups.reduce((s, g) => s + g.count, 0) && (
         <p className="mt-3 text-center text-[11px] text-[#9ca3af]">
-          Hiển thị {MAX_DAYS} ngày gần nhất.{' '}
+          {t('portal.components.activityFeed.showing_recent_prefix')} {MAX_DAYS} {t('portal.components.activityFeed.showing_recent_suffix')}{' '}
           <Link href="/portal/dealer/commission" className="font-semibold text-[#ff5625] hover:underline">
-            Xem toàn bộ lịch sử →
+            {t('portal.components.activityFeed.full_history')}
           </Link>
         </p>
       )}

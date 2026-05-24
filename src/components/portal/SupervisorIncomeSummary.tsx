@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import type { PayoutRow } from '@/lib/portal-types';
+import { useI18n } from '@/lib/i18n';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 const monthLabel = (key: string) => {
@@ -19,6 +20,7 @@ interface MonthBucket {
 }
 
 export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
+  const { t } = useI18n();
   const months = useMemo(() => {
     const map = new Map<string, MonthBucket>();
     const now = new Date();
@@ -62,9 +64,9 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
 
       <div className="relative flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">Thu nhập của tôi</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.components.supervisorIncomeSummary.kicker')}</p>
           <h2 className="mt-1 font-headline text-2xl leading-tight sm:text-3xl">
-            Tháng <span className="text-[#10b981]">{currentMonth.label}</span>
+            {t('portal.components.supervisorIncomeSummary.month_prefix')} <span className="text-[#10b981]">{currentMonth.label}</span>
           </h2>
           <p className="mt-2 flex items-baseline gap-3 font-headline">
             <span className="text-4xl font-semibold tabular-nums sm:text-5xl">{fmtVnd(currentMonth.total)}</span>
@@ -85,25 +87,25 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
             )}
           </p>
           <p className="mt-1 text-[11px] text-[#e7eaf0]/50">
-            Số liệu do kế toán ghi nhận · so với tháng trước
+            {t('portal.components.supervisorIncomeSummary.disclaimer')}
           </p>
         </div>
 
         <div className="flex gap-4 text-right sm:gap-6">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">Đã nhận 6 tháng</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.supervisorIncomeSummary.paid_6m')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#10b981]">
               {fmtVnd(totals.paid)} ₫
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">Đang chờ chi</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.supervisorIncomeSummary.pending')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#ff5625]">
               {fmtVnd(totals.pending)} ₫
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">Tổng 6 tháng</p>
+            <p className="text-[10px] uppercase tracking-wider text-[#e7eaf0]/40">{t('portal.components.supervisorIncomeSummary.total_6m')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">
               {fmtVnd(totals.ytd)} ₫
             </p>
@@ -154,10 +156,10 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
       {/* Legend */}
       <div className="relative mt-5 flex items-center justify-end gap-4 text-[10px] text-[#e7eaf0]/45">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#10b981] to-[#10b981]/70" /> Đã nhận
+          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#10b981] to-[#10b981]/70" /> {t('portal.components.supervisorIncomeSummary.legend_paid')}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#ff5625]/60 to-[#ff5625]/30" /> Chờ chi
+          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#ff5625]/60 to-[#ff5625]/30" /> {t('portal.components.supervisorIncomeSummary.legend_pending')}
         </span>
       </div>
     </div>

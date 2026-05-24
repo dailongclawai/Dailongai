@@ -4,9 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { toast } from 'sonner';
+import { useI18n } from '@/lib/i18n';
 
 export default function AuthCallback() {
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     (async () => {
@@ -42,7 +44,7 @@ export default function AuthCallback() {
 
   return (
     <div className="flex h-screen items-center justify-center text-[#e7eaf0]/50">
-      Đang hoàn tất đăng nhập…
+      {t('portal.auth.callback.finishing')}
     </div>
   );
 }
