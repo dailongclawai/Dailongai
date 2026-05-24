@@ -13,18 +13,22 @@ const sb = createClient(
 
 interface MessageRow {
   id: string;
-  recipient_user_id: string;
-  title: string | null;
+  recipient_id: string;       // portal_messages.recipient_id
+  sender_id: string | null;
+  subject: string | null;
   body: string | null;
-  type: string;
-  data: Record<string, unknown> | null;
+  category: string | null;    // 'order' | 'commission' | 'payout' | 'legal' | 'policy' | 'system' | 'general'
+  severity: string | null;
+  action_url: string | null;
+  is_read: boolean | null;
+  created_at: string;
 }
 
 async function deliver(row: MessageRow) {
   const { data: tokens, error } = await sb
     .from("device_tokens")
     .select("expo_token")
-    .eq("user_id", row.recipient_user_id)
+    .eq("user_id", row.recipient_id)
     .eq("platform", "ios")
     .gte("last_active_at", new Date(Date.now() - 60 * 86400 * 1000).toISOString());
 
@@ -36,12 +40,13 @@ async function deliver(row: MessageRow) {
     .map((t) => ({
       to: t.expo_token,
       sound: "default",
-      title: row.title ?? "Đại Long Portal",
+      title: row.subject ?? "Đại Long Portal",
       body: row.body ?? "",
       data: {
-        type: row.type,
+        category: row.category ?? "general",
+        severity: row.severity,
         message_id: row.id,
-        ...(row.data ?? {}),
+        action_url: row.action_url,
       },
     }));
 
@@ -74,7 +79,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     // Database webhook sends: { type, table, schema, record, old_record }
     const row = (body.record ?? body) as MessageRow;
-    if (!row.recipient_user_id) {
+    if (!row.recipient_id) {
       return new Response(JSON.stringify({ ok: true, skipped: "no recipient" }), {
         headers: { "content-type": "application/json" },
       });
