@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 
 const loadMeoChat = () => import('./MeoChatPanel');
@@ -11,8 +10,6 @@ const MeoChatPanel = dynamic(loadMeoChat, { ssr: false });
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const { t } = useI18n();
-  const pathname = usePathname();
-  const isPortal = pathname?.startsWith('/portal') ?? false;
 
   useEffect(() => {
     window.dispatchEvent(new Event(open ? 'meo-chat:open' : 'meo-chat:close'));
@@ -38,8 +35,6 @@ export default function ChatWidget() {
       if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
     };
   }, []);
-
-  if (isPortal) return null;
 
   return (
     <>
