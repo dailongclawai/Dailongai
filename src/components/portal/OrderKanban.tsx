@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { approveOrder, rejectOrder } from '@/lib/portal-queries';
+import { markOrderPaid, voidOrder } from '@/lib/portal-queries';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Spinner } from './Spinner';
 import { useI18n } from '@/lib/i18n';
@@ -10,11 +10,12 @@ import type { Order } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
-type ColumnKey = 'pending' | 'approved' | 'paid' | 'closed';
+type ColumnKey = 'awaiting' | 'paid' | 'closed';
 
+// Payment-first workflow (Casso webhook auto-confirms): pending → paid (auto) → admin only handles refund/void.
+// 'approved' is a transient state from Casso webhook (pending → approved → paid in ~1s) — bucket it with awaiting just in case it stalls.
 const COLUMNS: { key: ColumnKey; labelKey: string; tone: string; statuses: Order['status'][] }[] = [
-  { key: 'pending', labelKey: 'portal.components.orderKanban.col_pending', tone: 'text-[#f59e0b] border-[#f59e0b]/40', statuses: ['pending'] },
-  { key: 'approved', labelKey: 'portal.components.orderKanban.col_approved', tone: 'text-[#3b82f6] border-[#3b82f6]/40', statuses: ['approved'] },
+  { key: 'awaiting', labelKey: 'portal.components.orderKanban.col_awaiting', tone: 'text-[#f59e0b] border-[#f59e0b]/40', statuses: ['pending', 'approved'] },
   { key: 'paid', labelKey: 'portal.components.orderKanban.col_paid', tone: 'text-[#10b981] border-[#10b981]/40', statuses: ['paid'] },
   { key: 'closed', labelKey: 'portal.components.orderKanban.col_closed', tone: 'text-[#9ca3af] border-[#9ca3af]/40', statuses: ['rejected', 'voided'] },
 ];
@@ -31,7 +32,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const buckets = useMemo(() => {
-    const m: Record<ColumnKey, Order[]> = { pending: [], approved: [], paid: [], closed: [] };
+    const m: Record<ColumnKey, Order[]> = { awaiting: [], paid: [], closed: [] };
     for (const o of orders) {
       const col = COLUMNS.find((c) => c.statuses.includes(o.status));
       if (col) m[col.key].push(o);
@@ -48,11 +49,13 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
-  const approve = async (id: string) => {
+  // Manual override when Casso webhook misses (rare — only used if admin verified TT manually)
+  const manualMarkPaid = async (id: string) => {
+    if (!window.confirm(t('portal.components.orderKanban.confirm_manual_paid'))) return;
     setBusyId(id);
     try {
-      await approveOrder(id, adminId);
-      toast.success(t('portal.components.orderKanban.toast_approved'));
+      await markOrderPaid(id, adminId);
+      toast.success(t('portal.components.orderKanban.toast_marked_paid'));
       onResolved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('portal.components.orderKanban.toast_error'));
@@ -61,13 +64,14 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
     }
   };
 
-  const reject = async (id: string) => {
-    const reason = window.prompt(t('portal.components.orderKanban.prompt_reject_reason'));
+  // Void: cancels order + cascades to commission_payouts. Used for refund / customer cancel / fraud.
+  const voidIt = async (id: string) => {
+    const reason = window.prompt(t('portal.components.orderKanban.prompt_void_reason'));
     if (!reason) return;
     setBusyId(id);
     try {
-      await rejectOrder(id, reason);
-      toast.success(t('portal.components.orderKanban.toast_rejected'));
+      await voidOrder(id, adminId, reason);
+      toast.success(t('portal.components.orderKanban.toast_voided'));
       onResolved();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('portal.components.orderKanban.toast_error'));
@@ -78,7 +82,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
 
   return (
     <div className="-mx-2 overflow-x-auto pb-3 md:mx-0 md:overflow-visible">
-      <div className="flex snap-x snap-mandatory gap-3 px-2 md:grid md:snap-none md:grid-cols-4 md:gap-4 md:px-0">
+      <div className="flex snap-x snap-mandatory gap-3 px-2 md:grid md:snap-none md:grid-cols-3 md:gap-4 md:px-0">
         {COLUMNS.map((col) => {
           const items = buckets[col.key];
           const total = items.reduce((s, o) => s + Number(o.sale_price), 0);
@@ -106,7 +110,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
                   </li>
                 ) : items.slice(0, 30).map((o) => {
                   const dealerName = dealerNames?.[o.dealer_id];
-                  const isPending = col.key === 'pending';
+                  const isAwaiting = col.key === 'awaiting'; const isPaid = col.key === 'paid';
                   const isBusy = busyId === o.id;
                   return (
                     <li key={o.id} className="rounded-xl border border-[#1f2937] bg-[#11151a] p-3 text-sm">
@@ -144,24 +148,43 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
                           {t('portal.components.orderKanban.view_receipt')}
                         </button>
                       )}
-                      {isPending && (
-                        <div className="mt-3 flex gap-2">
+                      {isAwaiting && (
+                        <div className="mt-3 space-y-2">
+                          <p className="rounded-md border border-[#1f2937] bg-[#0a0c0f] px-2 py-1.5 text-[10px] leading-relaxed text-[#9ca3af]">
+                            <span className="material-symbols-outlined align-middle text-[12px] text-[#3b82f6]">sync</span>
+                            {' '}{t('portal.components.orderKanban.awaiting_hint')}
+                          </p>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => manualMarkPaid(o.id)}
+                              disabled={isBusy}
+                              className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#10b981]/40 px-2 py-1.5 text-xs font-medium text-[#10b981] hover:bg-[#10b981]/10 disabled:opacity-50"
+                            >
+                              {isBusy ? <Spinner size={12} /> : <span>✓</span>}
+                              {t('portal.components.orderKanban.mark_paid_button')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => voidIt(o.id)}
+                              disabled={isBusy}
+                              className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#f87171]/40 px-2 py-1.5 text-xs font-medium text-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-50"
+                            >
+                              ✗ {t('portal.components.orderKanban.void_button')}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {isPaid && (
+                        <div className="mt-3">
                           <button
                             type="button"
-                            onClick={() => approve(o.id)}
+                            onClick={() => voidIt(o.id)}
                             disabled={isBusy}
-                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg bg-[#10b981] px-2 py-1.5 text-xs font-semibold text-white hover:bg-[#0ea271] disabled:opacity-50"
+                            className="inline-flex w-full items-center justify-center gap-1 rounded-lg border border-[#f87171]/30 px-2 py-1.5 text-[11px] font-medium text-[#f87171]/80 hover:bg-[#f87171]/10 disabled:opacity-50"
                           >
-                            {isBusy ? <Spinner size={12} /> : <span>✓</span>}
-                            {t('portal.components.orderKanban.approve_button')}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => reject(o.id)}
-                            disabled={isBusy}
-                            className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#f87171]/40 px-2 py-1.5 text-xs font-medium text-[#f87171] hover:bg-[#f87171]/10 disabled:opacity-50"
-                          >
-                            ✗ {t('portal.components.orderKanban.reject_button')}
+                            {isBusy ? <Spinner size={12} /> : <span className="material-symbols-outlined text-[12px]">undo</span>}
+                            {t('portal.components.orderKanban.refund_button')}
                           </button>
                         </div>
                       )}

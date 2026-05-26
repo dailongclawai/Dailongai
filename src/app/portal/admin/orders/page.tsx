@@ -50,14 +50,15 @@ export default function AdminOrdersPage() {
   }, [loading, session, profile, router, refresh]);
 
   const counts = useMemo(() => {
-    let pending = 0, approved = 0, paid = 0, closed = 0;
+    // Payment-first: 'approved' is transient (Casso webhook bumps pending→approved→paid in ~1s),
+    // so we bucket it with awaiting just in case the second update stalls.
+    let awaiting = 0, paid = 0, closed = 0;
     for (const o of orders) {
-      if (o.status === 'pending') pending++;
-      else if (o.status === 'approved') approved++;
+      if (o.status === 'pending' || o.status === 'approved') awaiting++;
       else if (o.status === 'paid') paid++;
       else closed++;
     }
-    return { pending, approved, paid, closed };
+    return { awaiting, paid, closed };
   }, [orders]);
 
   if (loading || profile?.role !== 'admin') {
@@ -75,9 +76,7 @@ export default function AdminOrdersPage() {
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.orders.eyebrow')}</p>
           <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.admin.orders.title')}</h1>
           <p className="mt-1 text-sm text-[#9ca3af]">
-            <span className="text-[#f59e0b]">{counts.pending} {t('portal.admin.orders.count.pending')}</span>
-            {' · '}
-            <span className="text-[#3b82f6]">{counts.approved} {t('portal.admin.orders.count.approved')}</span>
+            <span className="text-[#f59e0b]">{counts.awaiting} {t('portal.admin.orders.count.awaiting')}</span>
             {' · '}
             <span className="text-[#10b981]">{counts.paid} {t('portal.admin.orders.count.paid')}</span>
             {' · '}

@@ -116,6 +116,7 @@ export interface PublicActiveModel {
   code: string;
   name: string;
   base_price: number;
+  image_url: string | null;
 }
 
 export async function getPublicDealerInfo(slug: string): Promise<{ dealer_id: string; dealer_name: string } | null> {
@@ -128,11 +129,12 @@ export async function getPublicDealerInfo(slug: string): Promise<{ dealer_id: st
 export async function getPublicActiveModels(): Promise<PublicActiveModel[]> {
   const { data, error } = await getSupabaseClient().rpc('get_public_active_models');
   if (error || !data) return [];
-  return (data as Array<{ id: string; code: string; name: string; base_price: number | string }>).map((m) => ({
+  return (data as Array<{ id: string; code: string; name: string; base_price: number | string; image_url: string | null }>).map((m) => ({
     id: m.id,
     code: m.code,
     name: m.name,
     base_price: Number(m.base_price),
+    image_url: m.image_url ?? null,
   }));
 }
 
@@ -306,6 +308,37 @@ export async function rejectOrder(orderId: string, reason: string): Promise<void
     .update({ status: 'rejected', rejection_reason: reason })
     .eq('id', orderId);
   if (error) throw error;
+}
+
+// Manual override when Casso webhook misses a payment (rare). Bumps pending→approved→paid.
+export async function markOrderPaid(orderId: string, adminId: string): Promise<void> {
+  const { error: appErr } = await getSupabaseClient()
+    .from('orders')
+    .update({ status: 'approved', approved_at: new Date().toISOString(), approved_by: adminId })
+    .eq('id', orderId)
+    .eq('status', 'pending');
+  if (appErr) throw appErr;
+  const { error: paidErr } = await getSupabaseClient()
+    .from('orders')
+    .update({ status: 'paid' })
+    .eq('id', orderId);
+  if (paidErr) throw paidErr;
+}
+
+// Void a paid order (e.g. refund / customer cancellation). Marks voided_at on commission too.
+export async function voidOrder(orderId: string, adminId: string, reason: string): Promise<void> {
+  const sb = getSupabaseClient();
+  const { error: ordErr } = await sb
+    .from('orders')
+    .update({ status: 'voided', voided_at: new Date().toISOString(), voided_by: adminId, rejection_reason: reason })
+    .eq('id', orderId);
+  if (ordErr) throw ordErr;
+  // Cascade: void related commission payouts
+  await sb
+    .from('commission_payouts')
+    .update({ voided_at: new Date().toISOString() })
+    .eq('order_id', orderId)
+    .is('voided_at', null);
 }
 
 export async function getInboxMessages(): Promise<PortalMessage[]> {
