@@ -10,7 +10,7 @@ export function AdminNav() {
   const items = [
     { href: '/portal/admin', label: t('portal.shell.nav.dashboard'), exact: true },
     { href: '/portal/admin/orders', label: t('portal.shell.nav.orders') },
-    { href: '/portal/admin/payouts', label: t('portal.shell.nav.commission') },
+    { href: '/portal/admin/payouts', label: t('portal.shell.nav.payout_requests') },
     { href: '/portal/admin/products', label: t('portal.shell.nav.products') },
     { href: '/portal/admin/supervisors', label: t('portal.shell.nav.supervisors') },
     { href: '/portal/admin/upgrade', label: t('portal.shell.nav.upgrade') },

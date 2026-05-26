@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
-import { getAdminPayoutQueue, adminProcessPayout, getAdminPayoutRequests, adminProcessPayoutRequest } from '@/lib/portal-queries';
+import { getAdminPayoutQueue, getAdminPayoutRequests, adminProcessPayoutRequest } from '@/lib/portal-queries';
 import type { AdminPayoutRow } from '@/lib/portal-types';
 import type { PayoutRequestWithRequester, PayoutRequest } from '@/lib/portal-queries';
 
@@ -19,8 +19,6 @@ export default function PayoutsPage() {
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<AdminPayoutRow[]>([]);
-  const [proofRefs, setProofRefs] = useState<Record<string, string>>({});
-  const [processing, setProcessing] = useState<string | null>(null);
   const [requests, setRequests] = useState<PayoutRequestWithRequester[]>([]);
   const [reqProcessing, setReqProcessing] = useState<string | null>(null);
   const [reqNotes, setReqNotes] = useState<Record<string, string>>({});
@@ -68,29 +66,10 @@ export default function PayoutsPage() {
 
   if (loading || profile?.role !== 'admin') return null;
 
-  const pending = rows.filter((r) => !r.paid_at);
+  // Commission accrual (commission_payouts.paid_at) is auto-stamped by Casso webhook
+  // when customer payment lands — admin no longer manually marks individual rows.
+  // Only payout REQUESTS (dealer/supervisor lump-sum withdrawals) still need admin action.
   const paid = rows.filter((r) => r.paid_at);
-  const pendingTotal = pending.reduce((s, r) => s + Number(r.amount), 0);
-
-  const process = async (row: AdminPayoutRow) => {
-    setProcessing(row.id);
-    try {
-      await adminProcessPayout(row.id, proofRefs[row.id] ?? '');
-      toast.success(`${t('portal.admin.payouts.toast.paid_prefix')} ${row.recipient_name ?? row.recipient_email}`);
-      setRows((rs) =>
-        rs.map((r) =>
-          r.id === row.id
-            ? { ...r, paid_at: new Date().toISOString(), payment_proof_url: proofRefs[row.id] ?? '' }
-            : r
-        )
-      );
-      setProofRefs((p) => ({ ...p, [row.id]: '' }));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('portal.admin.payouts.toast.paid.error'));
-    } finally {
-      setProcessing(null);
-    }
-  };
 
   return (
     <PortalShell
@@ -99,7 +78,7 @@ export default function PayoutsPage() {
     >
       <div className="mb-8">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
-          {pending.length} {t('portal.admin.payouts.eyebrow.pending')} · {t('portal.admin.payouts.eyebrow.total')} {fmtVnd(pendingTotal)}
+          {requests.filter((r) => r.status === 'pending').length} {t('portal.admin.payouts.eyebrow.requests_pending')}
         </p>
         <h1 className="mt-2 font-headline text-3xl">{t('portal.admin.payouts.title')}</h1>
       </div>
@@ -198,70 +177,7 @@ export default function PayoutsPage() {
         </section>
       )}
 
-      {/* Pending payouts */}
-      {pending.length === 0 ? (
-        <div className="mb-10 rounded-2xl border-2 border-dashed border-[#1f2937]/50 p-10 text-center text-sm text-[#e7eaf0]/40">
-          {t('portal.admin.payouts.empty.pending')}
-        </div>
-      ) : (
-        <div className="mb-10 overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
-          {pending.map((row, idx) => (
-            <div key={row.id}>
-              {idx > 0 && <div className="border-t border-[#1f2937]/40" />}
-              <div className="p-5">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider ${
-                        row.recipient_role === 'supervisor'
-                          ? 'bg-[#10b981]/15 text-[#10b981]'
-                          : 'bg-[#ff5625]/15 text-[#ff5625]'
-                      }`}>
-                        {row.recipient_role}
-                      </span>
-                      <p className="text-sm font-semibold text-[#e7eaf0]">
-                        {row.recipient_name ?? row.recipient_email}
-                      </p>
-                    </div>
-                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-[#e7eaf0]/60">
-                      <span>{t('portal.admin.payouts.row.serial')}: <span className="font-mono tabular-nums">{row.serial_number}</span></span>
-                      <span>{t('portal.admin.payouts.row.customer')}: {row.customer_name}</span>
-                      <span>{t('portal.admin.payouts.row.sale_date')}: <span className="font-mono tabular-nums">{row.sale_date}</span></span>
-                      <span>{t('portal.admin.payouts.row.sale_amount')}: <span className="font-mono tabular-nums">{fmtVnd(row.sale_price)}</span></span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono tabular-nums text-2xl font-semibold text-[#e7eaf0]">
-                      {fmtVnd(row.amount)}
-                    </p>
-                    <p className="text-[10px] text-[#e7eaf0]/40">{t('portal.admin.payouts.row.commission_label')}</p>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-center gap-3">
-                  <input
-                    type="text"
-                    value={proofRefs[row.id] ?? ''}
-                    onChange={(e) => setProofRefs((p) => ({ ...p, [row.id]: e.target.value }))}
-                    placeholder={t('portal.admin.payouts.row.proof_placeholder')}
-                    className="min-w-0 flex-1 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
-                  />
-                  <button
-                    type="button"
-                    disabled={processing === row.id}
-                    onClick={() => process(row)}
-                    className="shrink-0 rounded-full bg-[#10b981] px-5 py-2 text-xs font-medium text-[#121416] transition-colors hover:bg-[#10b981]/80 disabled:opacity-50"
-                  >
-                    {processing === row.id ? t('portal.admin.payouts.action.processing') : t('portal.admin.payouts.action.confirm_paid')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Paid history */}
+      {/* Paid history (auto-accrual from Casso webhook + payout request settlements) */}
       {paid.length > 0 && (
         <section>
           <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">{t('portal.admin.payouts.history.heading')} ({paid.length})</p>
