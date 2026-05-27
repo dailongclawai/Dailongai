@@ -34,6 +34,7 @@ export interface ProductModel {
   name: string;
   description: string | null;
   base_price: string;
+  image_url: string | null;
   active: boolean;
   created_at: string;
 }

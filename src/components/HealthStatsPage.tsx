@@ -372,7 +372,13 @@ export default function HealthStatsPage() {
 
           <div className="relative z-10 space-y-6 sm:space-y-8">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black font-headline tracking-tighter text-on-surface uppercase">
-              {t('health.prevention_heading').replace('.', '')} <span className="text-primary italic">{t('health.prevention_heading').split(' ').pop()}</span>
+              {(() => {
+                const heading = t('health.prevention_heading');
+                const i = heading.lastIndexOf(' ');
+                return i === -1
+                  ? <span className="text-primary italic">{heading}</span>
+                  : <>{heading.slice(0, i)} <span className="text-primary italic">{heading.slice(i + 1)}</span></>;
+              })()}
             </h2>
             <p className="text-secondary max-w-lg mx-auto text-xs sm:text-sm leading-relaxed">
               {t('health.prevention_desc')}

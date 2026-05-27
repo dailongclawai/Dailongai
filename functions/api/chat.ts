@@ -56,7 +56,7 @@ Hotline: 0935 999 922
 • Tập đoàn Y Tế Ngũ Hợp — 32 năm kinh nghiệm thiết bị y tế
 • 210 bằng sáng chế
 • 6.360 bệnh nhân lâm sàng tại 3 bệnh viện hạng cao cấp Trung Quốc
-• Giấy phép lưu hành TBYT: 260000036/PCBB-HN (Sở Y tế Hà Nội)
+• Giấy phép lưu hành TBYT: 260001468/PCBB-HN (Sở Y tế Hà Nội, cấp 12/05/2026)
 • Giấy phép mua bán TBYT: 250000599/PCBMB-HN
 • ISO 13485 + ISO 9001
 Video giới thiệu: https://youtu.be/LjwgNdnKIGc?si=R8piCR6wdxsduv3q (CHỈ gửi 1 lần khi khách hỏi về công dụng/demo)

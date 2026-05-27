@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
+import { getSupabaseClient } from '@/lib/supabase';
 import {
   PAYMENT_BANK_CODE,
   PAYMENT_ACCOUNT,
@@ -60,6 +61,28 @@ async function downloadQR(url: string, filename: string, labels: { shareTitle: s
 export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
   const { t } = useI18n();
   const [fullscreen, setFullscreen] = useState(false);
+  const [paidAt, setPaidAt] = useState<Date | null>(null);
+  const toastedRef = useRef(false);
+
+  // Poll order status every 3s until paid. Stops on unmount or after detecting paid.
+  useEffect(() => {
+    if (paidAt) return;
+    let cancelled = false;
+    const sb = getSupabaseClient();
+    const check = async () => {
+      const { data } = await sb.from('orders').select('status').eq('id', orderId).maybeSingle();
+      if (cancelled) return;
+      if (data?.status === 'paid' && !toastedRef.current) {
+        toastedRef.current = true;
+        setPaidAt(new Date());
+        toast.success(t('portal.components.paymentQR.paid_toast'));
+        setFullscreen(false);
+      }
+    };
+    void check();
+    const id = setInterval(check, 3000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [orderId, paidAt, t]);
 
   // Close modal on Escape
   useEffect(() => {
@@ -68,6 +91,30 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
+
+  if (paidAt) {
+    return (
+      <div className="rounded-2xl border-2 border-[#10b981]/50 bg-gradient-to-br from-[#10b981]/10 to-[#11151a] p-6 text-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#10b981] shadow-[0_0_40px_rgba(16,185,129,0.6)] animate-[pulse_2s_ease-in-out_infinite]">
+          <span className="material-symbols-outlined text-[44px] text-white" style={{ fontVariationSettings: "'FILL' 1, 'wght' 700" }}>check</span>
+        </div>
+        <h3 className="mt-5 font-headline text-2xl text-[#10b981]">{t('portal.components.paymentQR.paid_title')}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-[#cbd5e1]">{t('portal.components.paymentQR.paid_subtitle')}</p>
+        <div className="mt-5 grid grid-cols-2 gap-3 text-left text-sm">
+          <div className="rounded-lg border border-[#1f2937] bg-[#0a0c0f] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">{t('portal.components.paymentQR.paid_amount_label')}</p>
+            <p className="mt-1 font-mono tabular-nums text-base font-bold text-[#10b981]">{fmtVnd(amount)} ₫</p>
+          </div>
+          <div className="rounded-lg border border-[#1f2937] bg-[#0a0c0f] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#9ca3af]">{t('portal.components.paymentQR.paid_time_label')}</p>
+            <p className="mt-1 font-mono tabular-nums text-base font-bold text-[#e7eaf0]">
+              {paidAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!PAYMENT_ENABLED) {
     return (
@@ -150,8 +197,16 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
           </button>
         </div>
 
+        <div className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#f59e0b]/30 bg-[#f59e0b]/5 py-2.5 text-xs text-[#f59e0b]">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#f59e0b] opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#f59e0b]"></span>
+          </span>
+          <span className="font-medium">{t('portal.components.paymentQR.waiting_label')}</span>
+        </div>
+
         {dealerName && (
-          <p className="mt-4 text-center text-[11px] leading-relaxed text-[#9ca3af]">
+          <p className="mt-3 text-center text-[11px] leading-relaxed text-[#9ca3af]">
             {t('portal.components.paymentQR.after_transfer_prefix')}{' '}
             <span className="font-semibold text-[#e7eaf0]">{dealerName}</span>.
           </p>

@@ -13,6 +13,7 @@ import { AddressPicker, emptyAddress, fullAddress, type AddressValue } from '@/c
 import { InvoiceFieldsSection, emptyInvoice, validateInvoice, type InvoiceInfo } from '@/components/portal/InvoiceFieldsSection';
 import { useI18n } from '@/lib/i18n';
 import { PaymentQRCard } from '@/components/portal/PaymentQRCard';
+import { ProductPicker } from '@/components/portal/ProductPicker';
 import { trackReferral } from '@/lib/referral-tracker';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -160,16 +161,7 @@ function PublicOrderForm() {
         >
           <div>
             <label className="block text-[11px] uppercase tracking-wider text-[#a0a0a8] mb-1.5">Sản phẩm</label>
-            <select
-              value={modelId}
-              onChange={(e) => setModelId(e.target.value)}
-              required
-              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#121416] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]"
-            >
-              {models.map((m) => (
-                <option key={m.id} value={m.id}>{m.name} · {m.code}</option>
-              ))}
-            </select>
+            <ProductPicker models={models} selectedId={modelId} onSelect={setModelId} surface="public" />
           </div>
 
           <div>

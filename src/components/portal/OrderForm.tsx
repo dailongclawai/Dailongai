@@ -8,6 +8,7 @@ import type { ProductModel } from '@/lib/portal-types';
 import { AddressPicker, emptyAddress, fullAddress, type AddressValue } from '@/components/portal/AddressPicker';
 import { InvoiceFieldsSection, emptyInvoice, validateInvoice, type InvoiceInfo } from '@/components/portal/InvoiceFieldsSection';
 import { PaymentQRCard } from '@/components/portal/PaymentQRCard';
+import { ProductPicker } from '@/components/portal/ProductPicker';
 import { orderMemo } from '@/lib/vietqr';
 import { useI18n } from '@/lib/i18n';
 
@@ -113,18 +114,9 @@ export function OrderForm({ userId: _userId }: { userId: string }) {
       className="mx-auto max-w-2xl space-y-5 rounded-2xl border border-[#1f2937]/40 bg-[#1a1c1e] p-6"
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-        <div>
+        <div className="sm:col-span-2">
           <label className="block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5">{t('portal.components.orderForm.label_product')}</label>
-          <select
-            value={modelId}
-            onChange={(e) => setModelId(e.target.value)}
-            required
-            className="w-full rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]"
-          >
-            {models.map((m) => (
-              <option key={m.id} value={m.id}>{m.name} · {m.code}</option>
-            ))}
-          </select>
+          <ProductPicker models={models} selectedId={modelId} onSelect={setModelId} />
         </div>
 
         <div>

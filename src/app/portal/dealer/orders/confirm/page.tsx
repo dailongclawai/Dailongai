@@ -9,10 +9,10 @@ import { PortalShell } from '@/components/portal/PortalShell';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
 
-const BANK_BIN = '970407';
-const BANK_ACCOUNT = '6889989898';
+const BANK_BIN = '970422';
+const BANK_ACCOUNT = '89588999999';
 const BANK_OWNER = 'CTY TNHH CONG NGHE VA Y TE DAI LONG';
-const BANK_NAME = 'Techcombank';
+const BANK_NAME = 'MBBank';
 
 function vietqrUrl(amount: number, info: string) {
   const params = new URLSearchParams({
