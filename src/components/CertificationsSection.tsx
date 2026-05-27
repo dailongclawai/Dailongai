@@ -18,7 +18,7 @@ export default function CertificationsSection() {
 
   const certs: CertItem[] = [
     {
-      src: "/certificates/giay-phep-luu-hanh.webp",
+      src: "/certificates/giay-phep-luu-hanh-2026.webp",
       titleKey: "cert_section.item1_title",
       issuerKey: "cert_section.item1_issuer",
       alt: "Giấy phép lưu hành ZhiDun tại Việt Nam",
