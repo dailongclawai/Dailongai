@@ -329,7 +329,7 @@ const en: Record<string, string> = {
     'product.tax_included': 'Tax included',
     'product.benefits_title': 'Health Benefits',
     'product.order_now': 'ORDER NOW',
-    'product.buy_now': 'Buy now',
+    'product.buy_now': 'BUY NOW',
     'product.zalo_consult': 'ZALO CONSULTATION',
     'product.view_specs_btn': 'VIEW SPECS',
     'product.return_policy': '7-day return if manufacturing defect. COD delivery nationwide.',

@@ -11,6 +11,7 @@ export default function ProductPage() {
   const [activeImg, setActiveImg] = useState(0);
   const [buyOpen, setBuyOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
   const { t, locale } = useI18n();
 
   const galleryImages = [
@@ -82,6 +83,19 @@ export default function ProductPage() {
     })();
     return () => { cancelled = true; cleanup?.(); };
   }, [locale]);
+
+  useEffect(() => {
+    if (!buyOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setBuyOpen(false); };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeBtnRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [buyOpen]);
 
   return (
     <div ref={pageRef} className="min-h-screen" style={{ paddingTop: "80px" }}>
@@ -546,10 +560,10 @@ export default function ProductPage() {
       </div>
 
       {buyOpen && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 z-[200] overflow-y-auto bg-black/80 backdrop-blur-sm p-4" onClick={() => setBuyOpen(false)}>
+        <div role="dialog" aria-modal="true" aria-label="Mua ngay" className="fixed inset-0 z-[210] overflow-y-auto bg-black/80 backdrop-blur-sm p-4" onClick={() => setBuyOpen(false)}>
           <div className="mx-auto my-8 max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-end mb-2">
-              <button type="button" aria-label="Đóng" onClick={() => setBuyOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
+              <button ref={closeBtnRef} type="button" aria-label="Đóng" onClick={() => setBuyOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>

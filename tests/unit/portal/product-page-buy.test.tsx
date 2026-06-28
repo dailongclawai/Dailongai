@@ -13,4 +13,12 @@ describe('ProductPage buy now', () => {
     fireEvent.click(screen.getByRole('button', { name: 'product.buy_now' }));
     expect(screen.getByTestId('quick-checkout')).toBeInTheDocument();
   });
+
+  it('closes the modal on overlay click', () => {
+    render(<ProductPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'product.buy_now' }));
+    expect(screen.getByTestId('quick-checkout')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('dialog'));
+    expect(screen.queryByTestId('quick-checkout')).toBeNull();
+  });
 });
