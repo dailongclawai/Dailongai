@@ -297,6 +297,7 @@ const ru: Record<string, string> = {
     'product.tax_included': 'Включая налоги',
     'product.benefits_title': 'Полезные свойства',
     'product.order_now': 'ЗАКАЗАТЬ СЕЙЧАС',
+    'product.buy_now': 'Купить сейчас',
     'product.zalo_consult': 'КОНСУЛЬТАЦИЯ В ZALO',
     'product.view_specs_btn': 'ХАРАКТЕРИСТИКИ',
     'product.return_policy': 'Возврат 7 дней при заводском браке. Доставка наложенным платежом по всей стране.',

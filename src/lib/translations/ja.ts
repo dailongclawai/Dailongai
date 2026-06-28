@@ -329,6 +329,7 @@ const ja: Record<string, string> = {
     'product.tax_included': '税込',
     'product.benefits_title': 'サポート効果',
     'product.order_now': '今すぐ注文',
+    'product.buy_now': '今すぐ購入',
     'product.zalo_consult': 'ZALO相談',
     'product.view_specs_btn': 'スペックを見る',
     'product.return_policy': '製造不良の場合7日間返品可。全国代引き配送。',

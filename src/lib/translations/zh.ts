@@ -329,6 +329,7 @@ const zh: Record<string, string> = {
     'product.tax_included': '含税',
     'product.benefits_title': '辅助功效',
     'product.order_now': '立即订购',
+    'product.buy_now': '立即购买',
     'product.zalo_consult': 'ZALO咨询',
     'product.view_specs_btn': '查看参数',
     'product.return_policy': '生产缺陷7天退换。全国货到付款。',

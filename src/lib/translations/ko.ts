@@ -329,6 +329,7 @@ const ko: Record<string, string> = {
     'product.tax_included': '세금 포함',
     'product.benefits_title': '건강 효과',
     'product.order_now': '지금 주문하기',
+    'product.buy_now': '지금 구매',
     'product.zalo_consult': 'ZALO 상담',
     'product.view_specs_btn': '사양 보기',
     'product.return_policy': '제조 결함 시 7일 교환·반품. 전국 착불 배송.',

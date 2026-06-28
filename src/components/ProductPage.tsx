@@ -4,9 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { product, certifications, contactInfo } from "@/data/siteData";
 import { useI18n } from "@/lib/i18n";
+import { QuickCheckout } from "@/components/portal/QuickCheckout";
+import { HOUSE_ORDER_SLUG } from "@/lib/portal-queries";
 
 export default function ProductPage() {
   const [activeImg, setActiveImg] = useState(0);
+  const [buyOpen, setBuyOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
   const { t, locale } = useI18n();
 
@@ -270,6 +273,13 @@ export default function ProductPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => setBuyOpen(true)}
+                  className="flex-1 py-3 bg-[#ff5625] text-white font-headline font-bold tracking-widest text-[10px] sm:text-xs text-center uppercase hover:bg-[#ff5625]/90 transition-all"
+                >
+                  {t('product.buy_now')}
+                </button>
                 <a href={contactInfo.zalo} target="_blank" rel="noopener noreferrer"
                   className="flex-1 py-3 border border-[#0068ff]/30 text-[#4da6ff] font-headline font-bold tracking-widest text-[10px] sm:text-xs text-center uppercase hover:bg-[#0068ff]/10 transition-all">
                   {t('product.zalo_consult')}
@@ -534,6 +544,19 @@ export default function ProductPage() {
         {/* Bottom spacer */}
         <div className="h-16 sm:h-24" />
       </div>
+
+      {buyOpen && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-[200] overflow-y-auto bg-black/80 backdrop-blur-sm p-4" onClick={() => setBuyOpen(false)}>
+          <div className="mx-auto my-8 max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-end mb-2">
+              <button type="button" aria-label="Đóng" onClick={() => setBuyOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <QuickCheckout slug={HOUSE_ORDER_SLUG} surface="public" hideProductPicker onClose={() => setBuyOpen(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

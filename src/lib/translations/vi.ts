@@ -370,6 +370,7 @@ const vi: Record<string, string> = {
     'product.tax_included': 'Đã bao gồm thuế',
     'product.benefits_title': 'Công dụng hỗ trợ',
     'product.order_now': 'ĐẶT HÀNG NGAY',
+    'product.buy_now': 'Mua ngay',
     'product.zalo_consult': 'NHẮN ZALO TƯ VẤN',
     'product.view_specs_btn': 'XEM THÔNG SỐ',
     'product.return_policy': 'Đổi trả 7 ngày nếu lỗi sản xuất. Giao hàng COD toàn quốc.',
