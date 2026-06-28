@@ -39,7 +39,8 @@ describe('QuickCheckout', () => {
     render(<QuickCheckout slug="dai-long" surface="public" hideProductPicker />);
 
     // Wait for models to load (getPublicActiveModels resolves, setting modelId)
-    await waitFor(() => expect(mockGetModels).toHaveBeenCalled());
+    // Wait for models to load — loader is replaced by the form (name input appears)
+    await waitFor(() => expect(screen.getByPlaceholderText('Họ tên khách')).toBeInTheDocument());
 
     // Fill customer name
     const nameInput = screen.getByPlaceholderText('Họ tên khách');
@@ -66,26 +67,24 @@ describe('QuickCheckout', () => {
 
   it('does not render ProductPicker when hideProductPicker is true', async () => {
     render(<QuickCheckout slug="dai-long" surface="public" hideProductPicker />);
-    await waitFor(() => expect(mockGetModels).toHaveBeenCalled());
+    // Wait for the loader to be replaced by the form
+    await waitFor(() => expect(screen.getByPlaceholderText('Họ tên khách')).toBeInTheDocument());
     expect(screen.queryByTestId('product-picker')).not.toBeInTheDocument();
   });
 
   it('renders ProductPicker when hideProductPicker is false', async () => {
     render(<QuickCheckout slug="dai-long" surface="public" />);
-    await waitFor(() => expect(mockGetModels).toHaveBeenCalled());
-    expect(screen.getByTestId('product-picker')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('product-picker')).toBeInTheDocument());
   });
 
   it('shows dealerName header line when dealerName is provided', async () => {
     render(<QuickCheckout slug="dai-long" surface="public" hideProductPicker dealerName="ABC Dealer" />);
-    await waitFor(() => expect(mockGetModels).toHaveBeenCalled());
-    expect(screen.getByText(/Đại lý phụ trách/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(/Đại lý phụ trách/)).toBeInTheDocument());
     expect(screen.getByText('ABC Dealer')).toBeInTheDocument();
   });
 
   it('shows Gửi đơn button label when dealerName is provided', async () => {
     render(<QuickCheckout slug="dai-long" surface="public" hideProductPicker dealerName="ABC Dealer" />);
-    await waitFor(() => expect(mockGetModels).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: 'Gửi đơn' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Gửi đơn' })).toBeInTheDocument());
   });
 });

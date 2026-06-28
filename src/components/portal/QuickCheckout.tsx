@@ -37,6 +37,7 @@ export function QuickCheckout({
   const { t } = useI18n();
 
   const [models, setModels] = useState<PublicActiveModel[]>([]);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
   const [modelId, setModelId] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [customer, setCustomer] = useState('');
@@ -52,7 +53,7 @@ export function QuickCheckout({
     getPublicActiveModels().then((ms) => {
       setModels(ms);
       if (ms[0]) setModelId(ms[0].id);
-    });
+    }).finally(() => setModelsLoaded(true));
   }, []);
 
   // Track dealer QR view (dedup'd per browser per day)
@@ -121,6 +122,16 @@ export function QuickCheckout({
           >
             Gửi đơn khác
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!modelsLoaded) {
+    return (
+      <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+        <div className="mx-auto max-w-lg">
+          <div className="rounded-2xl border border-[#3d3f41]/40 bg-[#1a1c1e] p-8 text-center text-sm text-[#a0a0a8]">Đang tải sản phẩm…</div>
         </div>
       </div>
     );
