@@ -25,4 +25,11 @@ describe('PaymentQRCard public surface', () => {
     await waitFor(() => expect(getStatus).toHaveBeenCalledWith('o-1'));
     await waitFor(() => expect(screen.getByText('portal.components.paymentQR.paid_title')).toBeInTheDocument());
   });
+
+  it('portal surface does not call the public RPC', async () => {
+    getStatus.mockResolvedValue('pending');
+    render(<PaymentQRCard orderId="o-2" amount={100} />);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(getStatus).not.toHaveBeenCalled();
+  });
 });

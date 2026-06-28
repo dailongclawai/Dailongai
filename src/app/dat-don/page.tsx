@@ -130,7 +130,7 @@ function PublicOrderForm() {
             </p>
           </div>
 
-          <PaymentQRCard orderId={orderId} amount={paidAmount} dealerName={dealerName} />
+          <PaymentQRCard orderId={orderId} amount={paidAmount} dealerName={dealerName} surface="public" />
 
           <button
             onClick={() => { setDone(false); setOrderId(''); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); setInvoice(emptyInvoice); }}
