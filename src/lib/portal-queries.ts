@@ -169,6 +169,15 @@ export async function recordDealerOrder(input: {
   return data as string;
 }
 
+export const HOUSE_ORDER_SLUG = 'dai-long';
+
+export async function getPaymentStatusPublic(orderId: string): Promise<string | null> {
+  const { data, error } = await getSupabaseClient().rpc('get_payment_status_public', { p_order_id: orderId });
+  if (error || !data) return null;
+  const row = Array.isArray(data) ? data[0] : data;
+  return row?.status ?? null;
+}
+
 export async function submitPublicOrder(input: {
   slug: string;
   model_id: string;
