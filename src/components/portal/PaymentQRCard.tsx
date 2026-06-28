@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
 import { getSupabaseClient } from '@/lib/supabase';
+import { getPaymentStatusPublic } from '@/lib/portal-queries';
 import {
   PAYMENT_BANK_CODE,
   PAYMENT_ACCOUNT,
@@ -19,6 +20,7 @@ interface Props {
   orderId: string;
   amount: number;
   dealerName?: string | null;
+  surface?: 'portal' | 'public';
 }
 
 async function downloadQR(url: string, filename: string, labels: { shareTitle: string; toastSuccess: string; toastFallback: string }) {
@@ -58,7 +60,7 @@ async function downloadQR(url: string, filename: string, labels: { shareTitle: s
   }
 }
 
-export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
+export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' }: Props) {
   const { t } = useI18n();
   const [fullscreen, setFullscreen] = useState(false);
   const [paidAt, setPaidAt] = useState<Date | null>(null);
@@ -70,9 +72,15 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
     let cancelled = false;
     const sb = getSupabaseClient();
     const check = async () => {
-      const { data } = await sb.from('orders').select('status').eq('id', orderId).maybeSingle();
+      let status: string | null = null;
+      if (surface === 'public') {
+        status = await getPaymentStatusPublic(orderId);
+      } else {
+        const { data } = await sb.from('orders').select('status').eq('id', orderId).maybeSingle();
+        status = (data as { status?: string } | null)?.status ?? null;
+      }
       if (cancelled) return;
-      if (data?.status === 'paid' && !toastedRef.current) {
+      if (status === 'paid' && !toastedRef.current) {
         toastedRef.current = true;
         setPaidAt(new Date());
         toast.success(t('portal.components.paymentQR.paid_toast'));
@@ -82,7 +90,7 @@ export function PaymentQRCard({ orderId, amount, dealerName }: Props) {
     void check();
     const id = setInterval(check, 3000);
     return () => { cancelled = true; clearInterval(id); };
-  }, [orderId, paidAt, t]);
+  }, [orderId, paidAt, t, surface]);
 
   // Close modal on Escape
   useEffect(() => {
