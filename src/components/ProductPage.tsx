@@ -567,7 +567,7 @@ export default function ProductPage() {
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
-            <QuickCheckout slug={HOUSE_ORDER_SLUG} surface="public" hideProductPicker onClose={() => setBuyOpen(false)} />
+            <QuickCheckout slug={HOUSE_ORDER_SLUG} surface="public" hideProductPicker chromeless onClose={() => setBuyOpen(false)} />
           </div>
         </div>
       )}

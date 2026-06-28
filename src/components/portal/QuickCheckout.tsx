@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { toast, Toaster } from 'sonner';
 import {
   getPublicActiveModels,
@@ -23,6 +23,8 @@ export interface QuickCheckoutProps {
   // Must already be verified via getPublicDealerInfo before being passed — the dealer_view referral event trusts it.
   dealerId?: string | null;
   hideProductPicker?: boolean;
+  // When true, render without full-page chrome (for modal use — the modal provides the container).
+  chromeless?: boolean;
   onClose?: () => void;
 }
 
@@ -32,6 +34,7 @@ export function QuickCheckout({
   dealerName,
   dealerId,
   hideProductPicker,
+  chromeless,
   // onClose is available for modal callers; not used in the form itself
   onClose: _onClose,  // eslint-disable-line @typescript-eslint/no-unused-vars
 }: QuickCheckoutProps) {
@@ -101,49 +104,38 @@ export function QuickCheckout({
     } finally { setBusy(false); }
   };
 
+  let content: ReactNode;
+
   if (done) {
-    return (
-      <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
-        <Toaster position="top-center" theme="dark" richColors />
-        <div className="mx-auto max-w-lg">
-          <div className="text-center mb-6">
-            <span className="material-symbols-outlined text-emerald-400 text-[56px]">check_circle</span>
-            <h1 className="font-headline text-2xl mt-2">Đã ghi nhận đơn</h1>
-            {dealerName && (
-              <p className="text-sm text-[#a0a0a8] mt-1">
-                Đơn đã gửi tới <span className="text-[#ff5625] font-bold">{dealerName}</span>
-              </p>
-            )}
-          </div>
-
-          <PaymentQRCard orderId={orderId} amount={paidAmount} dealerName={dealerName} surface={surface} />
-
-          <button
-            onClick={() => { setDone(false); setOrderId(''); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); setInvoice(emptyInvoice); }}
-            className="mt-6 w-full rounded-lg border border-[#3d3f41]/40 bg-[#1a1c1e] py-2 text-xs text-[#a0a0a8] hover:text-[#e2e2e5]"
-          >
-            Gửi đơn khác
-          </button>
+    content = (
+      <>
+        <div className="text-center mb-6">
+          <span className="material-symbols-outlined text-emerald-400 text-[56px]">check_circle</span>
+          <h1 className="font-headline text-2xl mt-2">Đã ghi nhận đơn</h1>
+          {dealerName && (
+            <p className="text-sm text-[#a0a0a8] mt-1">
+              Đơn đã gửi tới <span className="text-[#ff5625] font-bold">{dealerName}</span>
+            </p>
+          )}
         </div>
-      </div>
-    );
-  }
 
-  if (!modelsLoaded) {
-    return (
-      <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
-        <Toaster position="top-center" theme="dark" richColors />
-        <div className="mx-auto max-w-lg">
-          <div className="rounded-2xl border border-[#3d3f41]/40 bg-[#1a1c1e] p-8 text-center text-sm text-[#a0a0a8]">Đang tải sản phẩm…</div>
-        </div>
-      </div>
-    );
-  }
+        <PaymentQRCard orderId={orderId} amount={paidAmount} dealerName={dealerName} surface={surface} />
 
-  return (
-    <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
-      <Toaster position="top-center" theme="dark" richColors />
-      <div className="mx-auto max-w-lg">
+        <button
+          onClick={() => { setDone(false); setOrderId(''); setQuantity(1); setCustomer(''); setPhone(''); setAddress(emptyAddress); setInvoice(emptyInvoice); }}
+          className="mt-6 w-full rounded-lg border border-[#3d3f41]/40 bg-[#1a1c1e] py-2 text-xs text-[#a0a0a8] hover:text-[#e2e2e5]"
+        >
+          Gửi đơn khác
+        </button>
+      </>
+    );
+  } else if (!modelsLoaded) {
+    content = (
+      <div className="rounded-2xl border border-[#3d3f41]/40 bg-[#1a1c1e] p-8 text-center text-sm text-[#a0a0a8]">Đang tải sản phẩm…</div>
+    );
+  } else {
+    content = (
+      <>
         <div className="text-center mb-8">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625] font-bold">Đại Long Medical</p>
           <h1 className="font-headline text-3xl mt-2">Đặt đơn nhanh</h1>
@@ -258,7 +250,20 @@ export function QuickCheckout({
             Đơn sẽ được Đại Long Medical duyệt trong giờ hành chính. Đại lý sẽ liên hệ với khách hàng để hoàn tất.
           </p>
         </form>
-      </div>
-    </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Toaster position="top-center" theme="dark" richColors />
+      {chromeless ? (
+        <div className="text-[#e2e2e5]">{content}</div>
+      ) : (
+        <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+          <div className="mx-auto max-w-lg">{content}</div>
+        </div>
+      )}
+    </>
   );
 }
