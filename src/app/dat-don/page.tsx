@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Toaster } from 'sonner';
 import { getPublicDealerInfo } from '@/lib/portal-queries';
 import { QuickCheckout } from '@/components/portal/QuickCheckout';
 
@@ -48,9 +47,6 @@ function PublicOrderForm() {
   }
 
   return (
-    <>
-      <Toaster position="top-center" theme="dark" richColors />
-      <QuickCheckout slug={slug} surface="public" dealerName={dealerName} dealerId={dealerId} />
-    </>
+    <QuickCheckout slug={slug} surface="public" dealerName={dealerName} dealerId={dealerId} />
   );
 }

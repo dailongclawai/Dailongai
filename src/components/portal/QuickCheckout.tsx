@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import {
   getPublicActiveModels,
   submitPublicOrder,
@@ -20,6 +20,7 @@ export interface QuickCheckoutProps {
   slug: string;
   surface: 'public';
   dealerName?: string | null;
+  // Must already be verified via getPublicDealerInfo before being passed — the dealer_view referral event trusts it.
   dealerId?: string | null;
   hideProductPicker?: boolean;
   onClose?: () => void;
@@ -103,6 +104,7 @@ export function QuickCheckout({
   if (done) {
     return (
       <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+        <Toaster position="top-center" theme="dark" richColors />
         <div className="mx-auto max-w-lg">
           <div className="text-center mb-6">
             <span className="material-symbols-outlined text-emerald-400 text-[56px]">check_circle</span>
@@ -130,6 +132,7 @@ export function QuickCheckout({
   if (!modelsLoaded) {
     return (
       <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+        <Toaster position="top-center" theme="dark" richColors />
         <div className="mx-auto max-w-lg">
           <div className="rounded-2xl border border-[#3d3f41]/40 bg-[#1a1c1e] p-8 text-center text-sm text-[#a0a0a8]">Đang tải sản phẩm…</div>
         </div>
@@ -139,6 +142,7 @@ export function QuickCheckout({
 
   return (
     <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+      <Toaster position="top-center" theme="dark" richColors />
       <div className="mx-auto max-w-lg">
         <div className="text-center mb-8">
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625] font-bold">Đại Long Medical</p>
