@@ -1,9 +1,14 @@
--- House dealer for direct /san-pham purchases. No external commission:
--- a FIXED rate_value=0 rule makes calc_commission emit a 0d payout row.
+-- House dealer for direct /san-pham purchases ("Đại Long trực tiếp").
 --
--- PREREQUISITE (run once, manually in Supabase Studio before this migration):
+-- PREREQUISITE (run once, in Supabase Studio before this migration):
 --   Authentication -> Add user: email house@dailongai.com, Auto Confirm = ON.
--- profiles.id FK -> auth.users(id), so the auth user must exist first.
+--   (Or insert into auth.users directly.) profiles.id FK -> auth.users(id).
+--
+-- No external commission: the commission system has no 0-value path
+-- (dealer_commissions_fixed_range_chk forces fixed ∈ [4.5M, 7.5M]; the tier
+-- floor is 15%). So the house earns nothing via calc_commission instead — see
+-- 20260629120200_calc_commission_skip_house.sql. Here we just give the house its
+-- profile/slug and strip the auto-created default commission rule.
 
 insert into public.profiles (id, role, status, full_name, order_slug)
 select u.id, 'dealer'::public.profile_role, 'active'::public.profile_status,
@@ -16,9 +21,7 @@ on conflict (id) do update
       full_name = 'Đại Long trực tiếp',
       order_slug = 'dai-long';
 
--- Fail loud if the prerequisite auth user was not created: otherwise the migration
--- exits 0 but submit_public_order('dai-long') throws 'Mã đại lý không hợp lệ' on every
--- direct purchase, with no signal to the operator.
+-- Fail loud if the prerequisite auth user was not created.
 do $$
 begin
   if not exists (
@@ -28,23 +31,7 @@ begin
   end if;
 end $$;
 
--- handle_new_user() auto-creates a default 'percent' 15% rule on auth-user creation.
--- Remove every rule for the house dealer that is not the FIXED 0 rule, so calc_commission
--- can never fall through to a non-zero rate (no external commission, robustly).
+-- House earns nothing; remove the default rule handle_new_user() auto-creates.
 delete from public.dealer_commissions dc
 using public.profiles p
-where dc.dealer_id = p.id
-  and p.order_slug = 'dai-long'
-  and not (dc.commission_type = 'fixed'::public.commission_type
-           and dc.rate_value = 0 and dc.model_id is null);
-
-insert into public.dealer_commissions
-  (dealer_id, model_id, commission_type, rate_value, effective_from, set_by)
-select p.id, null, 'fixed'::public.commission_type, 0, date '2020-01-01', p.id
-from public.profiles p
-where p.order_slug = 'dai-long'
-  and not exists (
-    select 1 from public.dealer_commissions dc
-    where dc.dealer_id = p.id and dc.commission_type = 'fixed'
-      and dc.model_id is null
-  );
+where dc.dealer_id = p.id and p.order_slug = 'dai-long';
