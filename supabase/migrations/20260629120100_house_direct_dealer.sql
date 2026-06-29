@@ -28,6 +28,16 @@ begin
   end if;
 end $$;
 
+-- handle_new_user() auto-creates a default 'percent' 15% rule on auth-user creation.
+-- Remove every rule for the house dealer that is not the FIXED 0 rule, so calc_commission
+-- can never fall through to a non-zero rate (no external commission, robustly).
+delete from public.dealer_commissions dc
+using public.profiles p
+where dc.dealer_id = p.id
+  and p.order_slug = 'dai-long'
+  and not (dc.commission_type = 'fixed'::public.commission_type
+           and dc.rate_value = 0 and dc.model_id is null);
+
 insert into public.dealer_commissions
   (dealer_id, model_id, commission_type, rate_value, effective_from, set_by)
 select p.id, null, 'fixed'::public.commission_type, 0, date '2020-01-01', p.id
