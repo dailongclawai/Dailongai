@@ -4,13 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import { contactInfo } from "@/data/siteData";
 import { useI18n } from "@/lib/i18n";
 
-export default function ContactForm() {
+interface ContactFormProps {
+  source?: string;
+}
+
+export default function ContactForm({ source = "dailongai.com" }: ContactFormProps = {}) {
   const { t, locale } = useI18n();
   const sectionRef = useRef<HTMLElement>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [form, setForm] = useState({ name: "", phone: "", email: "", interest: "", message: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", interest: "", message: "", website: "" });
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -51,13 +55,14 @@ export default function ContactForm() {
           email: form.email || "",
           interest: form.interest || "",
           message: form.message || "",
-          source: "dailongai.com",
+          website: form.website,
+          source,
         }),
       });
       const data = await res.json();
       if (!data.ok) throw new Error("Send failed");
       setSubmitted(true);
-      setForm({ name: "", phone: "", email: "", interest: "", message: "" });
+      setForm({ name: "", phone: "", email: "", interest: "", message: "", website: "" });
       setTimeout(() => setSubmitted(false), 5000);
     } catch {
       setError(t('contact.submit_error'));
@@ -101,6 +106,16 @@ export default function ContactForm() {
 
           <div className="">
             <form onSubmit={handleSubmit} className="glass-panel p-5 sm:p-6 md:p-8 rounded-xl space-y-3 sm:space-y-4">
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={form.website}
+                onChange={(e) => setForm({ ...form, website: e.target.value })}
+                style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.name')} *</label>

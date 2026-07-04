@@ -1,6 +1,7 @@
 import SmoothScroll from "@/components/SmoothScroll";
 import Header from "@/components/Header";
 import ProductPage from "@/components/ProductPage";
+import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 import ZaloButton from "@/components/ZaloButton";
 import type { Metadata } from "next";
@@ -19,6 +20,7 @@ export default function SanPham() {
       <ZaloButton />
       <main>
         <ProductPage />
+        <ContactForm source="san-pham" />
       </main>
       <Footer />
     </SmoothScroll>
