@@ -26,7 +26,7 @@ export default function HeroSection() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-headline tracking-tighter leading-[0.9] text-on-surface mb-6">
-            ZHIDUN <span className="text-primary italic">CEO.</span>
+            LIPID SHIELD <span className="text-primary italic">CEO.</span>
           </h1>
 
           <p className="text-secondary max-w-2xl mx-auto leading-relaxed text-sm sm:text-base font-normal">

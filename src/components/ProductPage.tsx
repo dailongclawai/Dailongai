@@ -114,7 +114,7 @@ export default function ProductPage() {
                 <span className="text-primary font-bold">{t('nav.products')}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black font-headline tracking-tighter text-on-surface">
-                ZhiDun <span className="text-primary italic">CEO</span>
+                Lipid Shield <span className="text-primary italic">CEO</span>
               </h2>
               <p className="text-secondary text-xs sm:text-sm mt-1">{t('product.subtitle')}</p>
             </div>
@@ -338,7 +338,7 @@ export default function ProductPage() {
             {/* Header */}
             <div className="text-center space-y-4">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline tracking-tighter uppercase">
-                {t('product.content_heading')} <span className="text-primary italic">ZhiDun</span>
+                {t('product.content_heading')} <span className="text-primary italic">Lipid Shield</span>
               </h2>
               <p className="text-lg sm:text-xl text-secondary max-w-2xl mx-auto">
                 {t('product.content_subheading')}

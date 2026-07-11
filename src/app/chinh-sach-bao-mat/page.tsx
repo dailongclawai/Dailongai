@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
           <p>
             Chính sách này áp dụng cho mọi khách hàng, đối tác truy cập website
             dailongai.com, sử dụng biểu mẫu liên hệ, đăng ký tư vấn, mua sản phẩm
-            ZhiDun CEO hoặc trao đổi qua kênh Zalo OA chính thức của Đại Long.
+            Lipid Shield hoặc trao đổi qua kênh Zalo OA chính thức của Đại Long.
           </p>
 
           <h2>2. Dữ liệu cá nhân thu thập</h2>

@@ -30,7 +30,7 @@ export default function CTASection() {
 
         <div className="cta-inner relative z-10 space-y-5 sm:space-y-6">
           <h2 className="text-2xl sm:text-3xl md:text-5xl font-black font-headline tracking-tighter text-on-surface uppercase opacity-0">
-            ZhiDun<br /><span className="text-primary italic">{product.promoPrice}đ</span>
+            Lipid Shield<br /><span className="text-primary italic">{product.promoPrice}đ</span>
           </h2>
           <p className="text-secondary max-w-lg mx-auto text-xs sm:text-sm opacity-0">
             {t('cta.promo')}
