@@ -106,6 +106,10 @@ export default function RootLayout({
                     addressRegion: "Đống Đa",
                     addressCountry: "VN",
                   },
+                  sameAs: [
+                    "https://www.tiktok.com/@dailongai",
+                    "https://zalo.me/2860930231550407599",
+                  ],
                 },
                 {
                   "@type": "WebSite",
