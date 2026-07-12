@@ -107,6 +107,7 @@ export default function RootLayout({
                     addressCountry: "VN",
                   },
                   sameAs: [
+                    "https://www.facebook.com/1089676634231460",
                     "https://www.tiktok.com/@dailongai",
                     "https://zalo.me/2860930231550407599",
                   ],
