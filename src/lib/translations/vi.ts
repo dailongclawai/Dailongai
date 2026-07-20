@@ -1512,7 +1512,7 @@ const vi: Record<string, string> = {
     // Press citation — Tap chi Mot The Gioi, 20/07/2026
     'press.label': 'Được báo chí đưa tin',
     'press.quote': 'Công nghệ laser bán dẫn bước sóng 650nm, chiếu xạ đồng thời tại khoang mũi và động mạch quay ở cổ tay, được giới thiệu trên chuyên mục Y học.',
-    'press.meta': 'Tạp chí Một Thế Giới · Lê Đình Sơn · 20/07/2026 · Đại Long - công nghệ chăm sóc sức khoẻ phân phối tại Việt Nam',
+    'press.meta': 'Tạp chí Một Thế Giới · CƠ QUAN CỦA HỘI THÔNG TIN KHOA HỌC VÀ CÔNG NGHỆ VIỆT NAM · 20/07/2026 · Đại Long - công nghệ chăm sóc sức khoẻ phân phối tại Việt Nam',
     'press.cta': 'Đọc bài gốc',
     'press.image_alt': 'Bài báo trên Tạp chí Một Thế Giới về máy laser bán dẫn bước sóng 650nm',
 
