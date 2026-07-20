@@ -595,6 +595,13 @@ const zh: Record<string, string> = {
 
     'team.sidenav.phase': '第四阶段',
     'team.sidenav.status': '运行中',
+    // Press citation — Tap chi Mot The Gioi, 20/07/2026
+    'press.label': '媒体报道',
+    'press.quote': '650nm波长半导体激光技术，可同时照射鼻腔与腕部桡动脉，获《一个世界》杂志医学栏目报道。',
+    'press.meta': '《一个世界》杂志 · Lê Đình Sơn · 2026年7月20日 · 由 Đại Long - 健康护理科技 在越南经销',
+    'press.cta': '阅读原文',
+    'press.image_alt': '《一个世界》杂志关于650nm半导体激光设备的报道',
+
 };
 
 export default zh;

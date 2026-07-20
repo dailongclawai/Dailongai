@@ -596,6 +596,13 @@ const ja: Record<string, string> = {
 
     'team.sidenav.phase': 'Phase 04',
     'team.sidenav.status': '稼働中',
+    // Press citation — Tap chi Mot The Gioi, 20/07/2026
+    'press.label': 'メディア掲載',
+    'press.quote': '波長650nmの半導体レーザー技術。鼻腔と手首の橈骨動脈を同時に照射する仕組みが、医学セクションで紹介されました。',
+    'press.meta': 'モッテゾイ誌 · Lê Đình Sơn · 2026年7月20日 · ベトナムでの販売は Đại Long - ヘルスケアテクノロジー',
+    'press.cta': '原文を読む',
+    'press.image_alt': '650nm半導体レーザー機器に関するモッテゾイ誌の記事',
+
 };
 
 export default ja;

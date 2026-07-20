@@ -596,6 +596,13 @@ const ko: Record<string, string> = {
 
     'team.sidenav.phase': '4단계',
     'team.sidenav.status': '운영 중',
+    // Press citation — Tap chi Mot The Gioi, 20/07/2026
+    'press.label': '언론 보도',
+    'press.quote': '650nm 파장의 반도체 레이저 기술로 비강과 손목 요골동맥을 동시에 조사하는 방식이 의학 섹션에 소개되었습니다.',
+    'press.meta': '못테저이 매거진 · Lê Đình Sơn · 2026년 7월 20일 · 베트남 유통 Đại Long - 헬스케어 테크놀로지',
+    'press.cta': '원문 보기',
+    'press.image_alt': '650nm 반도체 레이저 기기에 관한 못테저이 매거진 기사',
+
 };
 
 export default ko;

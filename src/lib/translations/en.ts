@@ -1506,6 +1506,13 @@ const en: Record<string, string> = {
     'portal.components.supervisorIncomeSummary.legend_paid': 'Received',
     'portal.components.supervisorIncomeSummary.legend_pending': 'Pending',
 
+    // Press citation — Tap chi Mot The Gioi, 20/07/2026
+    'press.label': 'In the press',
+    'press.quote': 'Semiconductor laser technology at a 650nm wavelength, irradiating the nasal cavity and the radial artery at the wrist simultaneously, featured in the Medicine section.',
+    'press.meta': 'Mot The Gioi Magazine · Le Dinh Son · 20 Jul 2026 · Distributed in Vietnam by Dai Long - healthcare technology',
+    'press.cta': 'Read the original',
+    'press.image_alt': 'Mot The Gioi Magazine article on the 650nm semiconductor laser device',
+
 };
 
 export default en;

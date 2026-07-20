@@ -115,6 +115,7 @@ export default function ProductPage() {
               </div>
               <h2 className="text-2xl sm:text-3xl font-black font-headline tracking-tighter text-on-surface">
                 Lipid Shield <span className="text-primary italic">CEO</span>
+                <span className="text-secondary font-normal tracking-normal text-sm sm:text-base ml-2">(Zhi Dun CEO)</span>
               </h2>
               <p className="text-secondary text-xs sm:text-sm mt-1">{t('product.subtitle')}</p>
             </div>
