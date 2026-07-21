@@ -15,6 +15,7 @@ export interface BlogArticle {
   excerpt: string
   content: string
   featured?: boolean
+  related_slugs?: string[]
 }
 
 export interface BlogArticleCard {
@@ -67,11 +68,13 @@ export function getNonFeaturedArticles(): BlogArticle[] {
 export function getRelatedArticles(slug: string, limit = 6): BlogArticle[] {
   const all = getAllArticles().filter(a => a.slug !== slug && !/-\d{10,}$/.test(a.slug))
   const current = getArticleBySlug(slug)
-  const sameCategory = current
-    ? all.filter(a => a.category === current.category)
-    : []
+  const bySlug = new Map(all.map(a => [a.slug, a]))
+  // Editorial topical links first (related_slugs), then fill by recency.
+  const curated = (current?.related_slugs || [])
+    .map(s => bySlug.get(s))
+    .filter((a): a is BlogArticle => Boolean(a))
   const seen = new Set<string>()
-  const ordered = [...sameCategory, ...all].filter(a => {
+  const ordered = [...curated, ...all].filter(a => {
     if (seen.has(a.slug)) return false
     seen.add(a.slug)
     return true
