@@ -144,7 +144,7 @@ export const advantages = [
     icon: "headset",
     title: "Showroom tại Hà Nội và TP. Hồ Chí Minh",
     description:
-      "Trải nghiệm trực tiếp tại 165,171 Yên Lãng, Đống Đa, Hà Nội hoặc đường D12 Empire City Thủ Thiêm, tháp Tilia, An Khánh, TP.HCM. Mở cửa 9:00-18:00 từ thứ 2 đến thứ 6, tư vấn miễn phí.",
+      "Trải nghiệm trực tiếp tại 165 Yên Lãng, Đống Đa, Hà Nội hoặc đường D12 Empire City Thủ Thiêm, tháp Tilia, An Khánh, TP.HCM. Mở cửa 9:00-18:00 từ thứ 2 đến thứ 6, tư vấn miễn phí.",
   },
   {
     icon: "refresh",
@@ -220,11 +220,11 @@ export const testimonials = [
 
 export const contactInfo = {
   company: "Công ty TNHH Công nghệ và Y tế Đại Long",
-  address: "165,171 Yên Lãng, Phường Đống Đa, Hà Nội",
+  address: "165 Yên Lãng, Phường Đống Đa, Hà Nội",
   hotline: "0935 999 922",
   email: "dongoclong@dailongai.com",
   website: "dailong.ai",
-  showroom: "165,171 Yên Lãng, Đống Đa, Hà Nội",
+  showroom: "165 Yên Lãng, Đống Đa, Hà Nội",
   showroomHCM: "Đường D12 Empire City Thủ Thiêm, tháp Tilia, phường An Khánh, TP. Hồ Chí Minh",
   showroomHours: "9:00 - 18:00 từ thứ 2 đến thứ 6",
   zalo: "https://zalo.me/2860930231550407599",

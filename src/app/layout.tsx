@@ -101,9 +101,10 @@ export default function RootLayout({
                   },
                   address: {
                     "@type": "PostalAddress",
-                    streetAddress: "165,171 Yên Lãng",
+                    streetAddress: "165 Yên Lãng",
                     addressLocality: "Hà Nội",
                     addressRegion: "Đống Đa",
+                    postalCode: "510000",
                     addressCountry: "VN",
                   },
                   sameAs: [
@@ -150,9 +151,10 @@ export default function RootLayout({
                   medicalSpecialty: ["PhysicalTherapy", "Cardiovascular", "Geriatric"],
                   address: {
                     "@type": "PostalAddress",
-                    streetAddress: "165,171 Yên Lãng",
+                    streetAddress: "165 Yên Lãng",
                     addressLocality: "Hà Nội",
                     addressRegion: "Đống Đa",
+                    postalCode: "510000",
                     addressCountry: "VN",
                   },
                   openingHoursSpecification: {

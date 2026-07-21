@@ -201,7 +201,7 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>Công ty TNHH Công nghệ và Y tế Đại Long</strong>
             </li>
-            <li>Địa chỉ: 165, 171 Yên Lãng, Đống Đa, Hà Nội</li>
+            <li>Địa chỉ: 165 Yên Lãng, Đống Đa, Hà Nội</li>
             <li>Hotline: 0935 999 922</li>
             <li>Email: <a href="mailto:dongoclong@dailongai.com">dongoclong@dailongai.com</a></li>
           </ul>
