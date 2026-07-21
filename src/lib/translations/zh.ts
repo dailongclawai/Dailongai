@@ -132,6 +132,7 @@ const zh: Record<string, string> = {
       '拨打热线、通过Zalo留言或留下您的信息——Đại Long团队将为您推荐最适合的脂盾方案。',
     'contact.showroom_hn': '河内展厅',
     'contact.showroom_hcm': '胡志明市展厅',
+    'contact.office_hcm': '胡志明市办公室',
     'contact.name': '姓名',
     'contact.phone': '电话号码',
     'contact.email': '电子邮箱',

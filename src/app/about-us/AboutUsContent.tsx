@@ -57,10 +57,6 @@ export default function AboutUsContent() {
                   <div className="text-3xl font-bold text-primary mb-1">210+</div>
                   <div className="text-xs uppercase tracking-tight text-secondary">{t('aboutpage.patents')}</div>
                 </div>
-                <div>
-                  <div className="text-3xl font-bold text-primary mb-1">6360</div>
-                  <div className="text-xs uppercase tracking-tight text-secondary">{t('aboutpage.clinical_patients')}</div>
-                </div>
               </div>
             </div>
           </div>

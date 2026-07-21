@@ -226,6 +226,7 @@ export const contactInfo = {
   website: "dailong.ai",
   showroom: "165 Yên Lãng, Đống Đa, Hà Nội",
   showroomHCM: "Đường D12 Empire City Thủ Thiêm, tháp Tilia, phường An Khánh, TP. Hồ Chí Minh",
+  officeHCM: "152 Võ Văn Kiệt, phường Bến Thành, TP. Hồ Chí Minh",
   showroomHours: "9:00 - 18:00 từ thứ 2 đến thứ 6",
   zalo: "https://zalo.me/2860930231550407599",
   facebook: "https://www.facebook.com/1089676634231460",

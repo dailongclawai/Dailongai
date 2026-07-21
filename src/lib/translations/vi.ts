@@ -132,6 +132,7 @@ const vi: Record<string, string> = {
       'Gọi hotline, nhắn Zalo hoặc để lại thông tin — đội ngũ Đại Long sẽ tư vấn giải pháp Zhi Dun CEO phù hợp nhất cho bạn.',
     'contact.showroom_hn': 'Showroom Hà Nội',
     'contact.showroom_hcm': 'Showroom TP.HCM',
+    'contact.office_hcm': 'Văn phòng TP.HCM',
     'contact.name': 'Họ và tên',
     'contact.phone': 'Số điện thoại',
     'contact.email': 'Email',

@@ -92,6 +92,7 @@ export default function ContactForm({ source = "dailongai.com" }: ContactFormPro
             {[
               { label: t('contact.showroom_hn'), value: contactInfo.showroom, sub: contactInfo.showroomHours },
               { label: t('contact.showroom_hcm'), value: contactInfo.showroomHCM, sub: contactInfo.showroomHours },
+              { label: t('contact.office_hcm'), value: contactInfo.officeHCM },
               { label: "Hotline", value: contactInfo.hotline },
               { label: "E-Mail", value: contactInfo.email },
               { label: "Zalo Shop", value: "Nhắn tin tư vấn qua Zalo" },

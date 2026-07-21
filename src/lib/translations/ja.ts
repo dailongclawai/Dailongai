@@ -132,6 +132,7 @@ const ja: Record<string, string> = {
       'ホットラインに電話、Zaloでメッセージ、または情報をお残しください——Đại Longチームが最適なZhi Dun CEOソリューションをご提案します。',
     'contact.showroom_hn': 'ハノイ・ショールーム',
     'contact.showroom_hcm': 'ホーチミン市ショールーム',
+    'contact.office_hcm': 'ホーチミン市オフィス',
     'contact.name': '氏名',
     'contact.phone': '電話番号',
     'contact.email': 'メールアドレス',

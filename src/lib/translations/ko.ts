@@ -132,6 +132,7 @@ const ko: Record<string, string> = {
       '핫라인 전화, Zalo 메시지 또는 정보를 남겨 주세요——Đại Long 팀이 최적의 Zhi Dun CEO 솔루션을 추천해 드립니다.',
     'contact.showroom_hn': '하노이 쇼룸',
     'contact.showroom_hcm': '호치민시 쇼룸',
+    'contact.office_hcm': '호치민시 사무실',
     'contact.name': '이름',
     'contact.phone': '전화번호',
     'contact.email': '이메일',

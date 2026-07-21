@@ -113,6 +113,7 @@ const ru: Record<string, string> = {
     'contact.desc': 'Позвоните, напишите в Zalo или оставьте заявку — команда Đại Long подберёт оптимальное решение Zhi Dun CEO для вас.',
     'contact.showroom_hn': 'Шоурум Ханой',
     'contact.showroom_hcm': 'Шоурум Хошимин',
+    'contact.office_hcm': 'Офис Хошимин',
     'contact.name': 'Полное имя',
     'contact.phone': 'Номер телефона',
     'contact.email': 'Email',
