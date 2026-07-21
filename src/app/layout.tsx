@@ -111,6 +111,7 @@ export default function RootLayout({
                     "https://www.facebook.com/1089676634231460",
                     "https://www.tiktok.com/@dailongai",
                     "https://zalo.me/2860930231550407599",
+                    "https://maps.google.com/?cid=6086458135801533925",
                   ],
                 },
                 {
@@ -157,6 +158,12 @@ export default function RootLayout({
                     postalCode: "510000",
                     addressCountry: "VN",
                   },
+                  geo: {
+                    "@type": "GeoCoordinates",
+                    latitude: 21.0097541,
+                    longitude: 105.8156485,
+                  },
+                  hasMap: "https://maps.google.com/?cid=6086458135801533925",
                   openingHoursSpecification: {
                     "@type": "OpeningHoursSpecification",
                     dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
