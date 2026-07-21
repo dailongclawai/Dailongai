@@ -31,18 +31,18 @@ export const mockOrders: Array<{
   id: string;
   serial: string;
   customer: string;
-  model: 'Lipid Shield A' | 'Lipid Shield B';
+  model: 'Zhi Dun CEO A' | 'Zhi Dun CEO B';
   price: number;
   date: string;
   status: OrderStatus;
   commission: number;
 }> = [
-  { id: '1', serial: 'SN-2026-0142', customer: 'Cô Lan – Q.Tân Phú', model: 'Lipid Shield B', price: 92_000_000, date: '2026-05-21', status: 'pending', commission: 9_200_000 },
-  { id: '2', serial: 'SN-2026-0141', customer: 'Chú Hùng – Q.7', model: 'Lipid Shield A', price: 55_000_000, date: '2026-05-20', status: 'pending', commission: 5_000_000 },
-  { id: '3', serial: 'SN-2026-0138', customer: 'Anh Khoa – Hà Đông', model: 'Lipid Shield A', price: 58_000_000, date: '2026-05-18', status: 'approved', commission: 5_000_000 },
-  { id: '4', serial: 'SN-2026-0135', customer: 'Cô Mai – Đà Nẵng', model: 'Lipid Shield B', price: 88_000_000, date: '2026-05-15', status: 'approved', commission: 8_800_000 },
-  { id: '5', serial: 'SN-2026-0131', customer: 'Chị Hồng – Cần Thơ', model: 'Lipid Shield A', price: 52_000_000, date: '2026-05-10', status: 'paid', commission: 5_000_000 },
-  { id: '6', serial: 'SN-2026-0128', customer: 'Anh Đức – Vũng Tàu', model: 'Lipid Shield B', price: 95_000_000, date: '2026-05-06', status: 'paid', commission: 9_500_000 },
+  { id: '1', serial: 'SN-2026-0142', customer: 'Cô Lan – Q.Tân Phú', model: 'Zhi Dun CEO B', price: 92_000_000, date: '2026-05-21', status: 'pending', commission: 9_200_000 },
+  { id: '2', serial: 'SN-2026-0141', customer: 'Chú Hùng – Q.7', model: 'Zhi Dun CEO A', price: 55_000_000, date: '2026-05-20', status: 'pending', commission: 5_000_000 },
+  { id: '3', serial: 'SN-2026-0138', customer: 'Anh Khoa – Hà Đông', model: 'Zhi Dun CEO A', price: 58_000_000, date: '2026-05-18', status: 'approved', commission: 5_000_000 },
+  { id: '4', serial: 'SN-2026-0135', customer: 'Cô Mai – Đà Nẵng', model: 'Zhi Dun CEO B', price: 88_000_000, date: '2026-05-15', status: 'approved', commission: 8_800_000 },
+  { id: '5', serial: 'SN-2026-0131', customer: 'Chị Hồng – Cần Thơ', model: 'Zhi Dun CEO A', price: 52_000_000, date: '2026-05-10', status: 'paid', commission: 5_000_000 },
+  { id: '6', serial: 'SN-2026-0128', customer: 'Anh Đức – Vũng Tàu', model: 'Zhi Dun CEO B', price: 95_000_000, date: '2026-05-06', status: 'paid', commission: 9_500_000 },
 ];
 
 export const fmtVnd = (n: number) =>

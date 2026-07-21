@@ -26,10 +26,10 @@ export default function HeroSection() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-headline tracking-tighter leading-[0.9] text-on-surface mb-3">
-            LIPID SHIELD <span className="text-primary italic">CEO.</span>
+            ZHI DUN <span className="text-primary italic">CEO.</span>
           </h1>
 
-          <p className="text-secondary text-xs sm:text-sm tracking-wide mb-6">(Zhi Dun CEO)</p>
+          <p className="text-secondary text-xs sm:text-sm tracking-wide mb-6">(trước đây: Lipid Shield)</p>
 
           <p className="text-secondary max-w-2xl mx-auto leading-relaxed text-sm sm:text-base font-normal">
             {t('hero.tagline')}. {t('hero.description')}

@@ -6,15 +6,15 @@ import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Tư vấn máy laser trị liệu Đại Long | Lipid Shield bảo hành 5 năm",
+  title: "Tư vấn máy laser trị liệu Đại Long | Zhi Dun CEO bảo hành 5 năm",
   description:
-    "Để lại thông tin để nhận tư vấn miễn phí về máy laser trị liệu (laser bán dẫn) Lipid Shield — giấy phép thiết bị y tế TBYT 260001468/PCBB-HN, bảo hành chính hãng 5 năm.",
+    "Để lại thông tin để nhận tư vấn miễn phí về máy laser trị liệu (laser bán dẫn) Zhi Dun CEO — giấy phép thiết bị y tế TBYT 260001468/PCBB-HN, bảo hành chính hãng 5 năm.",
   alternates: { canonical: "/tu-van" },
 };
 
 const trustPoints = [
   "Giấy phép thiết bị y tế số TBYT 260001468/PCBB-HN do Sở Y tế Hà Nội cấp.",
-  "Lipid Shield bảo hành chính hãng 5 năm.",
+  "Zhi Dun CEO bảo hành chính hãng 5 năm.",
   "Showroom trải nghiệm trực tiếp tại Hà Nội và TP. Hồ Chí Minh, tư vấn qua hotline hoặc Zalo.",
 ];
 
@@ -30,7 +30,7 @@ export default function TuVan() {
               Nhận tư vấn máy laser trị liệu Đại Long
             </h1>
             <p className="text-secondary text-sm sm:text-base leading-relaxed max-w-2xl">
-              Để lại thông tin, đội ngũ Đại Long - công nghệ chăm sóc sức khoẻ sẽ liên hệ tư vấn miễn phí về máy laser trị liệu (laser bán dẫn) Lipid Shield phù hợp với nhu cầu của Quý khách.
+              Để lại thông tin, đội ngũ Đại Long - công nghệ chăm sóc sức khoẻ sẽ liên hệ tư vấn miễn phí về máy laser trị liệu (laser bán dẫn) Zhi Dun CEO phù hợp với nhu cầu của Quý khách.
             </p>
           </div>
 

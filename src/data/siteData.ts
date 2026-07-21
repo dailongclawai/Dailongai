@@ -46,7 +46,7 @@ export const aboutFeatures = [
 ];
 
 export const product = {
-  name: "Lipid Shield",
+  name: "Zhi Dun CEO",
   model: "CEO",
   tagline: "Máy Laser Bán dẫn Công suất thấp",
   wavelength: "650nm",
@@ -71,9 +71,9 @@ export const product = {
 export const solutions = [
   {
     id: 1,
-    title: "Lipid Shield — Bộ sản phẩm chính",
+    title: "Zhi Dun CEO — Bộ sản phẩm chính",
     description:
-      "Bộ máy laser trị liệu Lipid Shield đầy đủ phụ kiện, đóng gói cao cấp trong vali chuyên dụng. Được cấp phép lưu hành tại Việt Nam và Trung Quốc.",
+      "Bộ máy laser trị liệu Zhi Dun CEO đầy đủ phụ kiện, đóng gói cao cấp trong vali chuyên dụng. Được cấp phép lưu hành tại Việt Nam và Trung Quốc.",
     image: "/images/zhidun-2.webp",
     highlights: [
       "Laser bán dẫn 650nm công suất thấp",
@@ -85,7 +85,7 @@ export const solutions = [
     id: 2,
     title: "Thiết bị Laser cầm tay thông minh",
     description:
-      "Thiết bị Lipid Shield nhỏ gọn với 2 chế độ chiếu: khoang mũi và cổ tay. Màn hình hiển thị thời gian, cường độ. Dễ sử dụng tại nhà mỗi ngày.",
+      "Thiết bị Zhi Dun CEO nhỏ gọn với 2 chế độ chiếu: khoang mũi và cổ tay. Màn hình hiển thị thời gian, cường độ. Dễ sử dụng tại nhà mỗi ngày.",
     image: "/images/zhidun-3.webp",
     highlights: [
       "Chế độ chiếu mũi & cổ tay",
@@ -171,7 +171,7 @@ export const processSteps = [
     step: 2,
     title: "Tư vấn giải pháp",
     description:
-      "Chuyên gia tư vấn 1-1 về sản phẩm Lipid Shield, cách sử dụng và kỳ vọng phù hợp với tình trạng sức khỏe.",
+      "Chuyên gia tư vấn 1-1 về sản phẩm Zhi Dun CEO, cách sử dụng và kỳ vọng phù hợp với tình trạng sức khỏe.",
   },
   {
     step: 3,
@@ -202,13 +202,13 @@ export const testimonials = [
     name: "Bác sĩ Nguyễn T.H.",
     role: "Phòng khám tư nhân, Hà Nội",
     content:
-      "Tôi đã tìm hiểu laser trị liệu bước sóng thấp khá lâu. Lipid Shield có đầy đủ giấy phép lưu hành, đó là điều tôi cần trước khi giới thiệu cho bệnh nhân. Đội ngũ Đại Long tư vấn rất rõ ràng.",
+      "Tôi đã tìm hiểu laser trị liệu bước sóng thấp khá lâu. Zhi Dun CEO có đầy đủ giấy phép lưu hành, đó là điều tôi cần trước khi giới thiệu cho bệnh nhân. Đội ngũ Đại Long tư vấn rất rõ ràng.",
   },
   {
     name: "Anh Trần Minh Đ.",
     role: "Doanh nhân, 52 tuổi",
     content:
-      "Sử dụng Lipid Shield được 3 tháng, giấc ngủ cải thiện rõ rệt. Thiết bị nhỏ gọn, dùng tại nhà rất tiện. Bảo hành 5 năm nên rất yên tâm.",
+      "Sử dụng Zhi Dun CEO được 3 tháng, giấc ngủ cải thiện rõ rệt. Thiết bị nhỏ gọn, dùng tại nhà rất tiện. Bảo hành 5 năm nên rất yên tâm.",
   },
   {
     name: "Chị Phạm Thu L.",
@@ -233,7 +233,7 @@ export const contactInfo = {
 };
 
 export const interestOptions = [
-  "Mua Lipid Shield cho cá nhân",
+  "Mua Zhi Dun CEO cho cá nhân",
   "Tư vấn cho phòng khám / bệnh viện",
   "Hợp tác phân phối / đại lý",
   "Hỗ trợ kỹ thuật / bảo hành",

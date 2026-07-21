@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   description:
     "Đại Long — Đơn vị tiên phong cung cấp thiết bị laser trị liệu và giải pháp công nghệ y tế hiện đại. Ứng dụng công nghệ tiên tiến vào chăm sóc sức khỏe.",
   keywords:
-    "công nghệ y tế, thiết bị laser, Đại Long, laser trị liệu, Lipid Shield, công nghệ chăm sóc sức khỏe",
+    "công nghệ y tế, thiết bị laser, Đại Long, laser trị liệu, Zhi Dun CEO, Lipid Shield, công nghệ chăm sóc sức khỏe",
   openGraph: {
     title: "Đại Long | Công nghệ & Y tế",
     description: "Giải pháp Laser Trị liệu & Công nghệ Y tế Hiện đại",
@@ -122,11 +122,12 @@ export default function RootLayout({
                 },
                 {
                   "@type": "Product",
-                  name: "Lipid Shield — Máy Laser Bán dẫn Công suất thấp",
+                  name: "Zhi Dun CEO — Máy Laser Bán dẫn Công suất thấp",
+                  alternateName: "Lipid Shield",
                   description:
                     "Thiết bị laser trị liệu bước sóng 650nm, hỗ trợ tuần hoàn máu, cải thiện giấc ngủ. Bảo hành 5 năm chính hãng.",
                   image: `${siteUrl}/images/sp-1.webp`,
-                  brand: { "@type": "Brand", name: "Lipid Shield" },
+                  brand: { "@type": "Brand", name: "Zhi Dun" },
                   offers: {
                     "@type": "Offer",
                     price: "29500000",

@@ -5,9 +5,9 @@ import ZaloButton from "@/components/ZaloButton";
 import ContactPageClient from "./ContactPageClient";
 
 export const metadata: Metadata = {
-  title: "Liên hệ | Đại Long — Tư vấn & Đặt hàng Lipid Shield",
+  title: "Liên hệ | Đại Long — Tư vấn & Đặt hàng Zhi Dun CEO",
   description:
-    "Liên hệ Đại Long để được tư vấn và đặt hàng thiết bị laser trị liệu Lipid Shield chính hãng. Hotline 0935 999 922.",
+    "Liên hệ Đại Long để được tư vấn và đặt hàng thiết bị laser trị liệu Zhi Dun CEO chính hãng. Hotline 0935 999 922.",
   alternates: { canonical: "/lien-he" },
 };
 

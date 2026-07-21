@@ -52,8 +52,8 @@ export const departments: Department[] = [
         avatar: "sen-ceo.jpeg",
         role: { vi: "CEO Đại Long", en: "Đại Long CEO", zh: "大龙首席执行官" },
         mission: {
-          vi: "Tracking P&L, outreach Lipid Shield, lead-to-revenue pipeline.",
-          en: "Tracks P&L, runs Lipid Shield outreach, manages lead-to-revenue pipeline.",
+          vi: "Tracking P&L, outreach Zhi Dun CEO, lead-to-revenue pipeline.",
+          en: "Tracks P&L, runs Zhi Dun CEO outreach, manages lead-to-revenue pipeline.",
           zh: "追踪损益、智盾合作、潜客到营收管道。",
         },
       },

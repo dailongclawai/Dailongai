@@ -136,7 +136,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* CTA */}
           <div className="mt-16 p-8 rounded-2xl bg-surface-low border border-primary/10 text-center">
-            <h3 className="text-xl font-headline font-bold mb-3">Tìm hiểu thêm về Lipid Shield</h3>
+            <h3 className="text-xl font-headline font-bold mb-3">Tìm hiểu thêm về Zhi Dun CEO</h3>
             <p className="text-secondary text-sm mb-6">Liên hệ đội ngũ tư vấn Đại Long để được hỗ trợ chi tiết</p>
             <div className="flex flex-wrap gap-3 justify-center">
               <a href="/#contact" className="bg-primary-container text-on-primary px-6 py-3 font-headline font-bold text-xs tracking-[0.1em] uppercase">

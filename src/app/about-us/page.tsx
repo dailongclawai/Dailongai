@@ -5,9 +5,9 @@ import ZaloButton from "@/components/ZaloButton";
 import AboutUsContent from "./AboutUsContent";
 
 export const metadata: Metadata = {
-  title: "Về chúng tôi | Đại Long — Phân phối Lipid Shield chính hãng",
+  title: "Về chúng tôi | Đại Long — Phân phối Zhi Dun CEO chính hãng",
   description:
-    "Tìm hiểu về Công ty TNHH Công nghệ và Y tế Đại Long — đơn vị phân phối độc quyền thiết bị laser trị liệu Lipid Shield tại Việt Nam.",
+    "Tìm hiểu về Công ty TNHH Công nghệ và Y tế Đại Long — đơn vị phân phối độc quyền thiết bị laser trị liệu Zhi Dun CEO tại Việt Nam.",
   alternates: { canonical: "/about-us" },
 };
 

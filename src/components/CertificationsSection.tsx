@@ -21,7 +21,7 @@ export default function CertificationsSection() {
       src: "/certificates/giay-phep-luu-hanh-2026.webp",
       titleKey: "cert_section.item1_title",
       issuerKey: "cert_section.item1_issuer",
-      alt: "Giấy phép lưu hành Lipid Shield tại Việt Nam",
+      alt: "Giấy phép lưu hành Zhi Dun CEO tại Việt Nam",
     },
     {
       src: "/certificates/partner-vn-consular.webp",

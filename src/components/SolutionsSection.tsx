@@ -8,7 +8,7 @@ export default function SolutionsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { t, locale } = useI18n();
 
-  const marqueeItems = ["Lipid Shield", "Laser 650nm", t('marquee.warranty'), "ISO 13485", t('marquee.consult'), t('marquee.shipping')];
+  const marqueeItems = ["Zhi Dun CEO", "Laser 650nm", t('marquee.warranty'), "ISO 13485", t('marquee.consult'), t('marquee.shipping')];
 
   const solutions = [
     {
