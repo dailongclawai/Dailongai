@@ -128,7 +128,7 @@ export default function AboutUsContent() {
           <div className="lg:w-1/2 relative">
             <div className="absolute -inset-10 bg-primary-container/5 blur-[80px] rounded-full" />
             <div className="relative rounded-[48px] overflow-hidden aspect-[4/3] bg-surface-container">
-              <img src="/images/research-lab-v3.webp" alt={t('aboutpage.partnership')} className="w-full h-full object-cover" loading="lazy" decoding="async" width={800} height={600} />
+              <img src="/images/research-lab-v4.webp" alt={t('aboutpage.partnership')} className="w-full h-full object-cover" loading="lazy" decoding="async" width={800} height={600} />
             </div>
           </div>
           <div className="lg:w-1/2">
