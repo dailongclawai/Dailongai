@@ -16,7 +16,6 @@ export default function Header() {
     { label: t('nav.about'), href: '/about-us' },
     { label: t('nav.products'), href: '/san-pham' },
     { label: t('nav.health'), href: '/thuc-trang-suc-khoe' },
-    { label: t('nav.team'), href: '/doi-ngu-ai' },
     { label: t('nav.blog'), href: '/blog' },
     { label: t('nav.contact'), href: '/lien-he' },
   ];

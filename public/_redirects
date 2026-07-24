@@ -5,6 +5,8 @@
 /health-status /thuc-trang-suc-khoe 301
 /ai / 301
 /ai/* / 301
+/doi-ngu-ai /about-us 301
+/doi-ngu-ai/ /about-us 301
 
 # Blog duplicate-cluster consolidation (SEO de-cannibalization)
 /blog/laser-tri-lieu-giam-mo-mau /blog/giam-mo-mau-bang-laser 301
