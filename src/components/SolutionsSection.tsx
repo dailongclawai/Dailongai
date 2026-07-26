@@ -126,7 +126,7 @@ export default function SolutionsSection() {
                     ))}
                   </ul>
                   <a href="#contact" onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
-                    className="text-[9px] sm:text-[10px] font-headline font-bold text-primary tracking-widest flex items-center gap-2 group-hover:gap-3 transition-all uppercase">
+                    className="text-[9px] sm:text-[10px] font-headline font-bold text-primary tracking-widest flex items-center gap-2 py-2 group-hover:gap-3 transition-all uppercase">
                     {t('solutions.consult')} <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </a>
                 </div>

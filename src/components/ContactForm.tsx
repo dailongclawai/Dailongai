@@ -119,28 +119,28 @@ export default function ContactForm({ source = "dailongai.com" }: ContactFormPro
               />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.name')} *</label>
-                  <input type="text" required value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} placeholder={t('contact.placeholder_name')} className={inputClass} />
+                  <label htmlFor="contact-name" className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.name')} *</label>
+                  <input id="contact-name" type="text" autoComplete="name" required value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} placeholder={t('contact.placeholder_name')} className={inputClass} />
                 </div>
                 <div>
-                  <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.phone')} *</label>
-                  <input type="tel" required value={form.phone} onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))} placeholder={t('contact.placeholder_phone')} className={inputClass} />
+                  <label htmlFor="contact-phone" className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.phone')} *</label>
+                  <input id="contact-phone" type="tel" autoComplete="tel" required value={form.phone} onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))} placeholder={t('contact.placeholder_phone')} className={inputClass} />
                 </div>
               </div>
               <div>
-                <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.email')}</label>
-                <input type="email" value={form.email} onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))} placeholder={t('contact.placeholder_email')} className={inputClass} />
+                <label htmlFor="contact-email" className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.email')}</label>
+                <input id="contact-email" type="email" autoComplete="email" value={form.email} onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))} placeholder={t('contact.placeholder_email')} className={inputClass} />
               </div>
               <div>
-                <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.interest')}</label>
-                <select value={form.interest} onChange={(e) => setForm((prev) => ({ ...prev, interest: e.target.value }))} className={`${inputClass} appearance-none`}>
+                <label htmlFor="contact-interest" className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.interest')}</label>
+                <select id="contact-interest" value={form.interest} onChange={(e) => setForm((prev) => ({ ...prev, interest: e.target.value }))} className={`${inputClass} appearance-none`}>
                   <option value="" className="bg-surface">{t('contact.select_interest')}</option>
                   {interestOptions.map((o) => <option key={o} value={o} className="bg-surface">{o}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.message')}</label>
-                <textarea rows={3} value={form.message} onChange={(e) => setForm((prev) => ({ ...prev, message: e.target.value }))} placeholder={t('contact.placeholder_message')} className={`${inputClass} resize-none`} />
+                <label htmlFor="contact-message" className="block text-[9px] sm:text-[10px] text-secondary uppercase tracking-widest font-headline font-bold mb-1 sm:mb-1.5">{t('contact.message')}</label>
+                <textarea id="contact-message" rows={3} value={form.message} onChange={(e) => setForm((prev) => ({ ...prev, message: e.target.value }))} placeholder={t('contact.placeholder_message')} className={`${inputClass} resize-none`} />
               </div>
               {error && <p className="text-center text-red-400 text-xs sm:text-sm">{error}</p>}
               <button type="submit" disabled={loading} className="w-full py-3.5 sm:py-4 bg-primary-container text-on-primary font-headline font-black tracking-widest text-[10px] sm:text-xs uppercase glow-primary-hover hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 disabled:opacity-50">

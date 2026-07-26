@@ -83,7 +83,7 @@ export default function PressSection() {
             href={ARTICLE_URL}
             target="_blank"
             rel="noopener"
-            className="press-reveal inline-flex items-center gap-2 text-sm font-headline font-bold text-primary border-b border-transparent hover:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 pb-0.5 transition-colors whitespace-nowrap"
+            className="press-reveal inline-flex items-center gap-2 text-sm font-headline font-bold text-primary border-b border-transparent hover:border-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 py-1 pb-0.5 transition-colors whitespace-nowrap"
           >
             {t("press.cta")}
             <span aria-hidden="true">→</span>

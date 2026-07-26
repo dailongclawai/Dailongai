@@ -182,8 +182,16 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-on-surface font-body selection:bg-primary-container/30">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-primary-container focus:text-on-primary focus:font-headline focus:font-bold focus:text-xs focus:uppercase focus:tracking-widest focus:rounded"
+        >
+          Tới nội dung chính
+        </a>
         <I18nProvider>
-          {children}
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
           <BackgroundMusic />
           <ChatWidget />
         </I18nProvider>
