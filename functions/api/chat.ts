@@ -114,54 +114,6 @@ Hotline: 0935 999 922
 Zalo Shop: https://zalo.me/2860930231550407599`;
 
 const RATE_LIMIT = 20;
-const rateLimitMap = new Map<string, { count: number; reset: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.reset) {
-    rateLimitMap.set(ip, { count: 1, reset: now + 60_000 });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT) return false;
-  entry.count++;
-  return true;
-}
-
-// Daily session limit: max 3 sessions per IP per day, each session max 3 minutes
-const SESSION_LIMIT = 3;
-const SESSION_MAX_MS = 6 * 60 * 1000; // 6 minutes
-const dailySessionMap = new Map<string, { sessions: Map<string, number>; resetAt: number }>();
-
-function checkSessionLimit(ip: string, sessionId: string): { allowed: boolean; reason?: string } {
-  const now = Date.now();
-  let entry = dailySessionMap.get(ip);
-
-  // Reset daily at midnight (or after 24h for in-memory simplicity)
-  if (!entry || now > entry.resetAt) {
-    entry = { sessions: new Map(), resetAt: now + 24 * 60 * 60 * 1000 };
-    dailySessionMap.set(ip, entry);
-  }
-
-  const sessionStart = entry.sessions.get(sessionId);
-
-  if (sessionStart) {
-    // Existing session — check if expired (3 min)
-    if (now - sessionStart > SESSION_MAX_MS) {
-      return { allowed: false, reason: 'session_expired' };
-    }
-    return { allowed: true };
-  }
-
-  // New session — check daily limit
-  if (entry.sessions.size >= SESSION_LIMIT) {
-    return { allowed: false, reason: 'daily_limit' };
-  }
-
-  // Register new session
-  entry.sessions.set(sessionId, now);
-  return { allowed: true };
-}
 
 export async function onRequestPost(context: any) {
   const { request, env, data } = context;
@@ -173,13 +125,14 @@ export async function onRequestPost(context: any) {
     return Response.json({ status: 'ok', endpoint: 'chat' }, { status: 400 });
   }
 
-  if (!checkRateLimit(ip)) {
+  const { checkRateLimit, checkSessionLimit } = await import('./_ratelimit');
+  if (!(await checkRateLimit(env.MEO_STATS, 'ai', ip, RATE_LIMIT))) {
     return Response.json({ error: 'Quá nhiều yêu cầu, vui lòng thử lại sau.' }, { status: 429 });
   }
 
   // Session limit check
   const sessionId = request.headers.get('x-chat-session') || 'default';
-  const sessionCheck = checkSessionLimit(ip, sessionId);
+  const sessionCheck = await checkSessionLimit(env.MEO_STATS, ip, sessionId);
   if (!sessionCheck.allowed) {
     const msg = sessionCheck.reason === 'session_expired'
       ? 'Phiên chat đã hết thời gian (tối đa 3 phút). Vui lòng mở phiên mới.'

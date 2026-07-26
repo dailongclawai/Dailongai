@@ -1,9 +1,28 @@
 import { ChatRequestSchema } from "./_schemas";
+import { checkRateLimit, checkSessionLimit } from "./_ratelimit";
+
+// Shares the 'ai' bucket and session counters with /api/chat — same Workers AI
+// spend, so the two endpoints must not each grant a fresh quota.
+const RATE_LIMIT = 20;
 
 export async function onRequestPost(context: any) {
   const { request, env } = context;
   const ai = env.AI;
   if (!ai) return Response.json({ error: 'AI service unavailable' }, { status: 500 });
+
+  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+  if (!(await checkRateLimit(env.MEO_STATS, 'ai', ip, RATE_LIMIT))) {
+    return Response.json({ error: 'Quá nhiều yêu cầu, vui lòng thử lại sau.' }, { status: 429 });
+  }
+
+  const sessionId = request.headers.get('x-chat-session') || 'default';
+  const sessionCheck = await checkSessionLimit(env.MEO_STATS, ip, sessionId);
+  if (!sessionCheck.allowed) {
+    const msg = sessionCheck.reason === 'session_expired'
+      ? 'Phiên chat đã hết thời gian (tối đa 6 phút). Vui lòng mở phiên mới.'
+      : 'Anh/chị đã sử dụng hết 3 lượt chat miễn phí hôm nay. Vui lòng quay lại ngày mai hoặc liên hệ hotline 0935 999 922 để được tư vấn trực tiếp.';
+    return Response.json({ error: msg, code: sessionCheck.reason }, { status: 429 });
+  }
 
   let raw: unknown;
   try { raw = await request.json(); } catch {

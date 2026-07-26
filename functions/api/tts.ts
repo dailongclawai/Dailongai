@@ -1,25 +1,13 @@
 import { TtsSchema } from "./_schemas";
+import { checkRateLimit } from "./_ratelimit";
 
 const RATE_LIMIT = 20;
-const rateLimitMap = new Map<string, { count: number; reset: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.reset) {
-    rateLimitMap.set(ip, { count: 1, reset: now + 60_000 });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT) return false;
-  entry.count++;
-  return true;
-}
 
 export async function onRequestPost(context: any) {
   const { request, env } = context;
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
 
-  if (!checkRateLimit(ip)) {
+  if (!(await checkRateLimit(env.MEO_STATS, 'tts', ip, RATE_LIMIT))) {
     return Response.json({ error: 'Quá nhiều yêu cầu, vui lòng thử lại sau.' }, { status: 429 });
   }
 
