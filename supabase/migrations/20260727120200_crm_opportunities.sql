@@ -2,7 +2,7 @@
 -- Khi vào giai đoạn won/lost thì tự đóng (closed_at); quay lại open thì mở lại.
 
 CREATE SEQUENCE IF NOT EXISTS public.crm_opportunity_code_seq;
-GRANT USAGE, SELECT ON SEQUENCE public.crm_opportunity_code_seq TO authenticated;
+GRANT USAGE ON SEQUENCE public.crm_opportunity_code_seq TO authenticated;
 
 CREATE TABLE IF NOT EXISTS public.crm_opportunities (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.crm_opportunities (
     quantity smallint NOT NULL DEFAULT 1 CHECK (quantity > 0),
     amount numeric(14,2) NOT NULL DEFAULT 0 CHECK (amount >= 0),
     expected_close_date date NOT NULL DEFAULT (current_date + 15),
-    owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES public.profiles(id),
     order_id uuid REFERENCES public.orders(id) ON DELETE SET NULL,
     closed_at timestamptz,
     lost_reason text,
@@ -79,8 +79,8 @@ BEGIN
             'crm_stage_change',
             'crm_opportunities',
             NEW.id,
-            jsonb_build_object('stage_id', OLD.stage_id),
-            jsonb_build_object('stage_id', NEW.stage_id)
+            jsonb_build_object('stage_id', OLD.stage_id, 'lost_reason', OLD.lost_reason),
+            jsonb_build_object('stage_id', NEW.stage_id, 'lost_reason', NEW.lost_reason)
         );
     END IF;
     RETURN NEW;
@@ -114,6 +114,11 @@ CREATE POLICY crm_opps_insert ON public.crm_opportunities
             WHERE a.id = account_id
               AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
         )
+        AND (contact_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_contacts c
+            WHERE c.id = contact_id
+              AND (c.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
     );
 
 DROP POLICY IF EXISTS crm_opps_update ON public.crm_opportunities;
@@ -126,6 +131,11 @@ CREATE POLICY crm_opps_update ON public.crm_opportunities
             WHERE a.id = account_id
               AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
         )
+        AND (contact_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_contacts c
+            WHERE c.id = contact_id
+              AND (c.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
     )
     WITH CHECK (
         (owner_id = auth.uid() OR public.current_role() = 'admin')
@@ -134,6 +144,11 @@ CREATE POLICY crm_opps_update ON public.crm_opportunities
             WHERE a.id = account_id
               AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
         )
+        AND (contact_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_contacts c
+            WHERE c.id = contact_id
+              AND (c.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
     );
 
 DROP POLICY IF EXISTS crm_opps_delete ON public.crm_opportunities;
