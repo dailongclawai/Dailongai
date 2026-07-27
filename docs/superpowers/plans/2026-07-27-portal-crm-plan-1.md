@@ -389,10 +389,10 @@ DELETE FROM auth.users;
 INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
     ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000d1','authenticated','authenticated','d1@dailongai.com'),
     ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000d2','authenticated','authenticated','d2@dailongai.com'),
-    ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000s1','authenticated','authenticated','s1@dailongai.com'),
+    ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000a1','authenticated','authenticated','s1@dailongai.com'),
     ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000c1','authenticated','authenticated','admin@dailongai.com');
-UPDATE public.profiles SET role='supervisor', status='active' WHERE id='00000000-0000-0000-0000-0000000000s1';
-UPDATE public.profiles SET role='dealer', status='active', supervisor_id='00000000-0000-0000-0000-0000000000s1' WHERE id='00000000-0000-0000-0000-0000000000d1';
+UPDATE public.profiles SET role='supervisor', status='active' WHERE id='00000000-0000-0000-0000-0000000000a1';
+UPDATE public.profiles SET role='dealer', status='active', supervisor_id='00000000-0000-0000-0000-0000000000a1' WHERE id='00000000-0000-0000-0000-0000000000d1';
 UPDATE public.profiles SET role='dealer', status='active' WHERE id='00000000-0000-0000-0000-0000000000d2';
 UPDATE public.profiles SET role='admin', status='active' WHERE id='00000000-0000-0000-0000-0000000000c1';
 
@@ -443,7 +443,7 @@ SELECT results_eq(
 );
 
 -- 6. supervisor thấy khách của dealer trong nhánh
-SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000s1';
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000a1';
 SELECT results_eq(
     $$SELECT count(*)::int FROM public.crm_accounts$$,
     ARRAY[1],
