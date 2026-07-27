@@ -73,6 +73,18 @@ git checkout -b portal-crm
 
 **Tests frontend:** `tests/unit/portal/crm-board.test.ts`, `tests/unit/portal/crm-queries.test.ts`.
 
+## Sai lệch đã áp dụng trong lúc thi công (code là chuẩn, không phải văn bản gốc)
+
+Review sau mỗi task tìm ra lỗi thật; các migration đã sửa tại chỗ (chưa deploy đi đâu nên không cần migration vá). Nếu đọc plan thấy khác code, **tin code**:
+
+1. **Ghi phải kiểm bản ghi cha.** Khoá ngoại không chịu RLS, nên `crm_contacts`, `crm_opportunities`, `crm_activities` đều phải kiểm quyền sở hữu của `account_id` / `contact_id` / `opportunity_id` trong `WITH CHECK` (và `USING` khi UPDATE). Dùng phép thử **sở hữu** (`owner_id = auth.uid() OR admin`), KHÔNG dùng `crm_owner_visible` — supervisor được đọc bản ghi của nhánh nhưng không được ghi lên đó.
+2. **`owner_id` bỏ `ON DELETE CASCADE`** ở cả 4 bảng CRM — theo đúng `orders.dealer_id`, để xoá một profile không âm thầm xoá sạch dữ liệu kinh doanh.
+3. **`crm_owner_visible`** thêm điều kiện `current_role() = 'supervisor'` trước khi xét `supervisor_id`, khớp `profiles_select_team` / `orders_supervisor_select_team`.
+4. **Mã tự sinh luôn được gán** (bỏ nhánh `IF NEW.code IS NULL`) để client không thể chiếm trước một mã mà sequence sẽ sinh ra sau.
+5. **Sequence chỉ `GRANT USAGE`**, không `SELECT` — `SELECT` cho phép đọc `last_value`, lộ tổng số bản ghi toàn công ty.
+6. **Audit đổi giai đoạn ghi kèm `lost_reason`** vì mở lại cơ hội sẽ xoá trường này.
+7. **pgTAP phủ thêm ca phủ định**: quyền ghi admin-only của `crm_stages`; supervisor không sửa được bản ghi nhánh; đại lý lạ không thấy/không chèn được; giả mạo `owner_id`, `account_id`, `contact_id` đều bị chặn (SQLSTATE `42501`).
+
 ## Quy ước bắt buộc khi viết 3 trang CRM
 
 `PortalShell` nhận prop `variant?: 'dealer' | 'supervisor' | 'admin'` và **mặc định là `'dealer'`** (`PortalShell.tsx:16-23`) — biến này quyết định sidebar nào được render. Vì 3 trang CRM dùng chung cho cả 3 vai trò, mỗi trang **phải** truyền `variant={profile.role ?? 'dealer'}`, nếu không supervisor và admin sẽ thấy sidebar của đại lý.
@@ -252,7 +264,7 @@ CREATE TABLE IF NOT EXISTS public.crm_accounts (
         ('website', 'zalo', 'facebook', 'google_ads', 'tiktok', 'referral', 'hotline', 'event', 'other')),
     referrer_profile_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
     linked_profile_id uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-    owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES public.profiles(id),
     notes text,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
@@ -316,7 +328,7 @@ CREATE TABLE IF NOT EXISTS public.crm_contacts (
     is_primary boolean NOT NULL DEFAULT false,
     do_not_call boolean NOT NULL DEFAULT false,
     do_not_email boolean NOT NULL DEFAULT false,
-    owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES public.profiles(id),
     notes text,
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
@@ -515,7 +527,7 @@ CREATE TABLE IF NOT EXISTS public.crm_opportunities (
     quantity smallint NOT NULL DEFAULT 1 CHECK (quantity > 0),
     amount numeric(14,2) NOT NULL DEFAULT 0 CHECK (amount >= 0),
     expected_close_date date NOT NULL DEFAULT (current_date + 15),
-    owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES public.profiles(id),
     order_id uuid REFERENCES public.orders(id) ON DELETE SET NULL,
     closed_at timestamptz,
     lost_reason text,
@@ -794,7 +806,7 @@ CREATE TABLE IF NOT EXISTS public.crm_activities (
     account_id uuid REFERENCES public.crm_accounts(id) ON DELETE CASCADE,
     opportunity_id uuid REFERENCES public.crm_opportunities(id) ON DELETE CASCADE,
     contact_id uuid REFERENCES public.crm_contacts(id) ON DELETE SET NULL,
-    owner_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+    owner_id uuid NOT NULL REFERENCES public.profiles(id),
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT crm_activities_needs_parent
