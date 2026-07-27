@@ -598,16 +598,42 @@ CREATE POLICY crm_opps_select ON public.crm_opportunities
     FOR SELECT TO authenticated
     USING (public.crm_owner_visible(owner_id));
 
+-- Ghi phải kiểm CẢ bản ghi cha: khoá ngoại KHÔNG chịu RLS, nên nếu chỉ kiểm
+-- owner_id thì một đại lý biết UUID khách của đại lý khác (UUID nằm trên URL vì
+-- portal là static export) vẫn tạo được cơ hội gắn vào khách đó.
+-- Dùng phép thử SỞ HỮU (a.owner_id), không phải crm_owner_visible: supervisor
+-- được ĐỌC khách của nhánh nhưng không được ghi lên đó.
 DROP POLICY IF EXISTS crm_opps_insert ON public.crm_opportunities;
 CREATE POLICY crm_opps_insert ON public.crm_opportunities
     FOR INSERT TO authenticated
-    WITH CHECK (owner_id = auth.uid() OR public.current_role() = 'admin');
+    WITH CHECK (
+        (owner_id = auth.uid() OR public.current_role() = 'admin')
+        AND EXISTS (
+            SELECT 1 FROM public.crm_accounts a
+            WHERE a.id = account_id
+              AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
+        )
+    );
 
 DROP POLICY IF EXISTS crm_opps_update ON public.crm_opportunities;
 CREATE POLICY crm_opps_update ON public.crm_opportunities
     FOR UPDATE TO authenticated
-    USING (owner_id = auth.uid() OR public.current_role() = 'admin')
-    WITH CHECK (owner_id = auth.uid() OR public.current_role() = 'admin');
+    USING (
+        (owner_id = auth.uid() OR public.current_role() = 'admin')
+        AND EXISTS (
+            SELECT 1 FROM public.crm_accounts a
+            WHERE a.id = account_id
+              AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
+        )
+    )
+    WITH CHECK (
+        (owner_id = auth.uid() OR public.current_role() = 'admin')
+        AND EXISTS (
+            SELECT 1 FROM public.crm_accounts a
+            WHERE a.id = account_id
+              AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
+        )
+    );
 
 DROP POLICY IF EXISTS crm_opps_delete ON public.crm_opportunities;
 CREATE POLICY crm_opps_delete ON public.crm_opportunities
@@ -616,7 +642,6 @@ CREATE POLICY crm_opps_delete ON public.crm_opportunities
 
 REVOKE EXECUTE ON FUNCTION public.crm_opportunity_before_write() FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.crm_opportunity_audit_stage() FROM PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.crm_set_account_code() FROM PUBLIC;
 ```
 
 - [ ] **Step 2: Apply**
@@ -793,16 +818,42 @@ CREATE POLICY crm_activities_select ON public.crm_activities
     FOR SELECT TO authenticated
     USING (public.crm_owner_visible(owner_id));
 
+-- Như crm_opportunities: phải kiểm bản ghi cha vì khoá ngoại không chịu RLS.
+-- Hoạt động gắn được vào khách HOẶC cơ hội, nên kiểm từng cột khi nó khác NULL.
 DROP POLICY IF EXISTS crm_activities_insert ON public.crm_activities;
 CREATE POLICY crm_activities_insert ON public.crm_activities
     FOR INSERT TO authenticated
-    WITH CHECK (owner_id = auth.uid() OR public.current_role() = 'admin');
+    WITH CHECK (
+        (owner_id = auth.uid() OR public.current_role() = 'admin')
+        AND (account_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_accounts a
+            WHERE a.id = account_id
+              AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
+        AND (opportunity_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_opportunities o
+            WHERE o.id = opportunity_id
+              AND (o.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
+    );
 
 DROP POLICY IF EXISTS crm_activities_update ON public.crm_activities;
 CREATE POLICY crm_activities_update ON public.crm_activities
     FOR UPDATE TO authenticated
     USING (owner_id = auth.uid() OR public.current_role() = 'admin')
-    WITH CHECK (owner_id = auth.uid() OR public.current_role() = 'admin');
+    WITH CHECK (
+        (owner_id = auth.uid() OR public.current_role() = 'admin')
+        AND (account_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_accounts a
+            WHERE a.id = account_id
+              AND (a.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
+        AND (opportunity_id IS NULL OR EXISTS (
+            SELECT 1 FROM public.crm_opportunities o
+            WHERE o.id = opportunity_id
+              AND (o.owner_id = auth.uid() OR public.current_role() = 'admin')
+        ))
+    );
 
 DROP POLICY IF EXISTS crm_activities_delete ON public.crm_activities;
 CREATE POLICY crm_activities_delete ON public.crm_activities
