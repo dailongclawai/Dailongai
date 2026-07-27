@@ -177,3 +177,106 @@ export interface AuditEntry {
   after: Record<string, unknown> | null;
   created_at: string;
 }
+
+// ── CRM ──
+
+export type CrmPipeline = 'b2c_device' | 'b2b_dealer';
+export type CrmForecast = 'open' | 'won' | 'lost';
+export type CrmAccountKind = 'customer' | 'dealer_prospect';
+export type CrmActivityKind = 'task' | 'call' | 'meeting';
+export type CrmSource =
+  | 'website' | 'zalo' | 'facebook' | 'google_ads'
+  | 'tiktok' | 'referral' | 'hotline' | 'event' | 'other';
+
+export interface CrmStage {
+  id: string;
+  pipeline: CrmPipeline;
+  name: string;
+  probability: number;
+  forecast: CrmForecast;
+  sort_order: number;
+  active: boolean;
+}
+
+export interface CrmAccount {
+  id: string;
+  code: string | null;
+  kind: CrmAccountKind;
+  name: string;
+  is_individual: boolean;
+  phone: string | null;
+  email: string | null;
+  zalo_phone: string | null;
+  tax_code: string | null;
+  province: string | null;
+  address: string | null;
+  source: CrmSource | null;
+  referrer_profile_id: string | null;
+  linked_profile_id: string | null;
+  owner_id: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CrmContact {
+  id: string;
+  account_id: string;
+  full_name: string;
+  title: string | null;
+  phone: string | null;
+  email: string | null;
+  zalo_phone: string | null;
+  is_primary: boolean;
+  do_not_call: boolean;
+  do_not_email: boolean;
+  owner_id: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CrmOpportunityBoardRow {
+  id: string;
+  code: string | null;
+  name: string;
+  pipeline: CrmPipeline;
+  stage_id: string;
+  stage_name: string;
+  probability: number;
+  forecast: CrmForecast;
+  sort_order: number;
+  amount: number;
+  quantity: number;
+  expected_close_date: string;
+  owner_id: string;
+  owner_name: string | null;
+  account_id: string;
+  account_name: string;
+  account_phone: string | null;
+  account_kind: CrmAccountKind;
+  contact_id: string | null;
+  model_id: string | null;
+  order_id: string | null;
+  closed_at: string | null;
+  lost_reason: string | null;
+  created_at: string;
+}
+
+export interface CrmActivityRow {
+  id: string;
+  kind: CrmActivityKind;
+  subject: string;
+  notes: string | null;
+  due_at: string | null;
+  done_at: string | null;
+  outcome: string | null;
+  account_id: string | null;
+  account_name: string | null;
+  account_phone: string | null;
+  opportunity_id: string | null;
+  opportunity_name: string | null;
+  contact_id: string | null;
+  owner_id: string;
+  created_at: string;
+}
