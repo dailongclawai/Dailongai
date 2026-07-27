@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(8);
+SELECT plan(12);
 
 TRUNCATE public.profiles, public.product_models CASCADE;
 DELETE FROM auth.users;
@@ -16,8 +16,8 @@ UPDATE public.profiles SET role='admin', status='active' WHERE id='00000000-0000
 -- d1 tạo 1 khách hàng
 SET LOCAL ROLE authenticated;
 SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d1';
-INSERT INTO public.crm_accounts (name, phone, source, owner_id)
-VALUES ('Cô Lan', '0901000001', 'zalo', '00000000-0000-0000-0000-0000000000d1');
+INSERT INTO public.crm_accounts (id, name, phone, source, owner_id)
+VALUES ('20000000-0000-0000-0000-000000000001', 'Cô Lan', '0901000001', 'zalo', '00000000-0000-0000-0000-0000000000d1');
 
 -- 1. auto code KH-xxxxxx
 SELECT matches(
@@ -80,6 +80,39 @@ SELECT results_eq(
     $$SELECT count(*)::int FROM public.crm_accounts$$,
     ARRAY[1],
     'admin sees all accounts'
+);
+
+-- 9. dealer khác nhánh không thấy liên hệ nào (contacts isolation, giống #4)
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d2';
+SELECT results_eq(
+    $$SELECT count(*)::int FROM public.crm_contacts$$,
+    ARRAY[0],
+    'unrelated dealer d2 sees no contact (RLS isolation)'
+);
+
+-- 10. supervisor đọc được khách của nhánh nhưng không được sửa
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000a1';
+SELECT results_eq(
+    $$WITH u AS (UPDATE public.crm_accounts SET name='SV sửa' RETURNING 1)
+      SELECT count(*)::int FROM u$$,
+    ARRAY[0],
+    'supervisor cannot update branch account (read-only)'
+);
+
+-- 11. d2 không chèn được liên hệ vào khách của d1 dù tự nhận owner_id là mình
+-- (account id lấy thẳng từ fixture vì d2 không SELECT được account của d1)
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d2';
+SELECT throws_ok(
+    $$INSERT INTO public.crm_contacts (account_id, full_name, owner_id)
+      VALUES ('20000000-0000-0000-0000-000000000001', 'Chen ngang', '00000000-0000-0000-0000-0000000000d2')$$,
+    '42501'
+);
+
+-- 12. d2 không tạo được crm_accounts với owner_id giả mạo thành d1
+SELECT throws_ok(
+    $$INSERT INTO public.crm_accounts (name, owner_id)
+      VALUES ('Giả mạo', '00000000-0000-0000-0000-0000000000d1')$$,
+    '42501'
 );
 
 RESET ROLE;
