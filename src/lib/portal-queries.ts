@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -649,4 +649,210 @@ export async function getAuditLog(limit = 100): Promise<AuditEntry[]> {
     .order('created_at', { ascending: false })
     .limit(limit);
   return (data as AuditEntry[]) ?? [];
+}
+
+// ── CRM ──
+
+export async function getCrmStages(): Promise<CrmStage[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_stages')
+    .select('*')
+    .eq('active', true)
+    .order('pipeline')
+    .order('sort_order');
+  if (error) throw error;
+  return (data as CrmStage[]) ?? [];
+}
+
+export async function getCrmAccounts(kind?: CrmAccountKind): Promise<CrmAccount[]> {
+  let q = getSupabaseClient().from('crm_accounts').select('*').order('created_at', { ascending: false });
+  if (kind) q = q.eq('kind', kind);
+  const { data, error } = await q;
+  if (error) throw error;
+  return (data as CrmAccount[]) ?? [];
+}
+
+export interface CrmAccountInput {
+  name: string;
+  kind: CrmAccountKind;
+  isIndividual?: boolean;
+  phone?: string | null;
+  email?: string | null;
+  zaloPhone?: string | null;
+  taxCode?: string | null;
+  province?: string | null;
+  address?: string | null;
+  source?: CrmSource | null;
+  notes?: string | null;
+  ownerId: string;
+}
+
+function crmAccountRow(input: CrmAccountInput) {
+  return {
+    name: input.name.trim(),
+    kind: input.kind,
+    is_individual: input.isIndividual ?? true,
+    phone: input.phone?.trim() || null,
+    email: input.email?.trim() || null,
+    zalo_phone: input.zaloPhone?.trim() || null,
+    tax_code: input.taxCode?.trim() || null,
+    province: input.province?.trim() || null,
+    address: input.address?.trim() || null,
+    source: input.source ?? null,
+    notes: input.notes?.trim() || null,
+    owner_id: input.ownerId,
+  };
+}
+
+export async function createCrmAccount(input: CrmAccountInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_accounts').insert(crmAccountRow(input));
+  if (error) throw error;
+}
+
+export async function updateCrmAccount(id: string, input: CrmAccountInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_accounts').update(crmAccountRow(input)).eq('id', id);
+  if (error) throw error;
+}
+
+export async function getCrmContacts(accountId: string): Promise<CrmContact[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_contacts')
+    .select('*')
+    .eq('account_id', accountId)
+    .order('is_primary', { ascending: false })
+    .order('created_at');
+  if (error) throw error;
+  return (data as CrmContact[]) ?? [];
+}
+
+export interface CrmContactInput {
+  accountId: string;
+  fullName: string;
+  title?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  zaloPhone?: string | null;
+  isPrimary?: boolean;
+  ownerId: string;
+}
+
+export async function createCrmContact(input: CrmContactInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_contacts').insert({
+    account_id: input.accountId,
+    full_name: input.fullName.trim(),
+    title: input.title?.trim() || null,
+    phone: input.phone?.trim() || null,
+    email: input.email?.trim() || null,
+    zalo_phone: input.zaloPhone?.trim() || null,
+    is_primary: input.isPrimary ?? false,
+    owner_id: input.ownerId,
+  });
+  if (error) throw error;
+}
+
+export async function deleteCrmContact(id: string): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_contacts').delete().eq('id', id);
+  if (error) throw error;
+}
+
+export async function getCrmBoard(pipeline: CrmPipeline): Promise<CrmOpportunityBoardRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_opportunity_board')
+    .select('*')
+    .eq('pipeline', pipeline)
+    .order('sort_order')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmOpportunityBoardRow[]) ?? [];
+}
+
+export interface CrmOpportunityInput {
+  accountId: string;
+  contactId?: string | null;
+  pipeline: CrmPipeline;
+  stageId: string;
+  name: string;
+  modelId?: string | null;
+  quantity?: number;
+  amount: number;
+  expectedCloseDate?: string | null;
+  notes?: string | null;
+  ownerId: string;
+}
+
+function crmOpportunityRow(input: CrmOpportunityInput) {
+  return {
+    account_id: input.accountId,
+    contact_id: input.contactId ?? null,
+    pipeline: input.pipeline,
+    stage_id: input.stageId,
+    name: input.name.trim(),
+    model_id: input.modelId ?? null,
+    quantity: input.quantity ?? 1,
+    amount: input.amount,
+    ...(input.expectedCloseDate ? { expected_close_date: input.expectedCloseDate } : {}),
+    notes: input.notes?.trim() || null,
+    owner_id: input.ownerId,
+  };
+}
+
+export async function createCrmOpportunity(input: CrmOpportunityInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_opportunities').insert(crmOpportunityRow(input));
+  if (error) throw error;
+}
+
+export async function updateCrmOpportunity(id: string, input: CrmOpportunityInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_opportunities').update(crmOpportunityRow(input)).eq('id', id);
+  if (error) throw error;
+}
+
+export async function moveOpportunityStage(id: string, stageId: string, lostReason?: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_opportunities')
+    .update({ stage_id: stageId, lost_reason: lostReason ?? null })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function getCrmActivities(): Promise<CrmActivityRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_activity_inbox')
+    .select('*')
+    .order('due_at', { ascending: true, nullsFirst: false })
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmActivityRow[]) ?? [];
+}
+
+export interface CrmActivityInput {
+  kind: CrmActivityKind;
+  subject: string;
+  notes?: string | null;
+  dueAt?: string | null;
+  accountId?: string | null;
+  opportunityId?: string | null;
+  contactId?: string | null;
+  ownerId: string;
+}
+
+export async function createCrmActivity(input: CrmActivityInput): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_activities').insert({
+    kind: input.kind,
+    subject: input.subject.trim(),
+    notes: input.notes?.trim() || null,
+    due_at: input.dueAt ?? null,
+    account_id: input.accountId ?? null,
+    opportunity_id: input.opportunityId ?? null,
+    contact_id: input.contactId ?? null,
+    owner_id: input.ownerId,
+  });
+  if (error) throw error;
+}
+
+export async function completeActivity(id: string, outcome?: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_activities')
+    .update({ done_at: new Date().toISOString(), outcome: outcome?.trim() || null })
+    .eq('id', id);
+  if (error) throw error;
 }
