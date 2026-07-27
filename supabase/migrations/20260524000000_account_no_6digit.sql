@@ -17,10 +17,14 @@ UPDATE public.profiles p
   FROM numbered n
  WHERE p.id = n.id;
 
--- Move sequence head past any existing values
+-- Move sequence head past any existing values.
+-- is_called = false → nextval() trả về đúng giá trị này, nên phải truyền "số kế tiếp".
+-- Bảng rỗng (mọi lần supabase db reset) thì giá trị là 100001 = MINVALUE của sequence;
+-- truyền 100000 như trước sẽ lỗi 22003 "out of bounds for sequence".
 SELECT setval(
   'public.profiles_account_no_seq',
-  GREATEST(COALESCE((SELECT MAX(account_no) FROM public.profiles), 100000), 100000)
+  COALESCE((SELECT MAX(account_no) FROM public.profiles), 100000) + 1,
+  false
 );
 
 -- Future inserts auto-assign next number

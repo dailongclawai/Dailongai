@@ -10,6 +10,17 @@
 -- 20260629120200_calc_commission_skip_house.sql. Here we just give the house its
 -- profile/slug and strip the auto-created default commission rule.
 
+-- Tự tạo auth user nếu chưa có, để `supabase db reset` trên máy trắng không chết.
+-- Trên prod migration này đã chạy xong nên nhánh này không đụng tới dữ liệu thật.
+-- Tài khoản house không dùng để đăng nhập nên không cần mật khẩu / auth.identities.
+insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at,
+                        raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+                        confirmation_token, recovery_token, email_change, email_change_token_new)
+select '00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated', 'authenticated',
+       'house@dailongai.com', now(), '{"provider":"email","providers":["email"]}', '{}', now(), now(),
+       '', '', '', ''
+where not exists (select 1 from auth.users where email = 'house@dailongai.com');
+
 insert into public.profiles (id, role, status, full_name, order_slug)
 select u.id, 'dealer'::public.profile_role, 'active'::public.profile_status,
        'Đại Long trực tiếp', 'dai-long'
