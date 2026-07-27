@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS public.crm_stages (
 
 ALTER TABLE public.crm_stages ENABLE ROW LEVEL SECURITY;
 
+-- Reads intentionally include inactive stages so admins can reactivate them;
+-- the client filters `active` itself.
 DROP POLICY IF EXISTS crm_stages_select_all ON public.crm_stages;
 CREATE POLICY crm_stages_select_all ON public.crm_stages
     FOR SELECT TO authenticated
