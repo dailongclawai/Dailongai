@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(8);
+SELECT plan(10);
 
 TRUNCATE public.profiles, public.product_models CASCADE;
 DELETE FROM auth.users;
@@ -74,6 +74,21 @@ SELECT results_eq(
     $$SELECT count(*)::int FROM public.crm_staff_report$$,
     ARRAY[0],
     'staff không xem được báo cáo tổng hợp'
+);
+
+-- 9. staff thấy đồng nghiệp qua danh bạ (RLS profiles chặn đọc trực tiếp)
+SELECT results_eq(
+    $$SELECT count(*)::int FROM public.crm_staff_directory$$,
+    ARRAY[2],
+    'staff xem được danh bạ 2 staff qua crm_staff_directory'
+);
+
+-- 10. đại lý không đọc được danh bạ staff
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d1';
+SELECT results_eq(
+    $$SELECT count(*)::int FROM public.crm_staff_directory$$,
+    ARRAY[0],
+    'dealer không đọc được danh bạ staff'
 );
 
 RESET ROLE;

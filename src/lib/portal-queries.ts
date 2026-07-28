@@ -869,11 +869,11 @@ export async function getCrmSettings(): Promise<CrmSettings | null> {
 }
 
 export async function getStaffPeers(segment: StaffSegment): Promise<StaffPeer[]> {
+  // Đọc qua view crm_staff_directory: RLS của profiles không cho staff đọc
+  // profile của staff khác, view chỉ lộ 4 cột cần cho việc chọn người nhận.
   const { data, error } = await getSupabaseClient()
-    .from('profiles')
+    .from('crm_staff_directory')
     .select('id, full_name, email, staff_segment')
-    .eq('role', 'staff')
-    .eq('status', 'active')
     .eq('staff_segment', segment)
     .order('full_name');
   if (error) throw error;
