@@ -559,6 +559,8 @@ const vi: Record<string, string> = {
     'portal.crm.accounts.new': 'Thêm khách hàng',
     'portal.crm.accounts.empty': 'Chưa có khách hàng nào',
     'portal.crm.accounts.col_code': 'Mã',
+    'portal.crm.accounts.col_staff': 'Nhân viên phụ trách',
+    'portal.crm.accounts.created_by': 'Tạo bởi',
     'portal.crm.account.new': 'Thêm khách hàng',
     'portal.crm.account.edit': 'Sửa khách hàng',
     'portal.crm.account.name': 'Tên khách hàng',

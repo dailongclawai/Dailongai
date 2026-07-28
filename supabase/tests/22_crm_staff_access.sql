@@ -76,11 +76,14 @@ SELECT results_eq(
     'staff không xem được báo cáo tổng hợp'
 );
 
--- 9. staff thấy đồng nghiệp qua danh bạ (RLS profiles chặn đọc trực tiếp)
+-- 9. staff thấy đồng nghiệp qua danh bạ (RLS profiles chặn đọc trực tiếp).
+-- Danh bạ gồm cả admin (để hiện tên người tạo bản ghi khi admin tự tạo), nên
+-- đếm riêng số staff bằng staff_segment IS NOT NULL.
 SELECT results_eq(
-    $$SELECT count(*)::int FROM public.crm_staff_directory$$,
+    $$SELECT count(*)::int FROM public.crm_staff_directory
+      WHERE staff_segment IS NOT NULL$$,
     ARRAY[2],
-    'staff xem được danh bạ 2 staff qua crm_staff_directory'
+    'staff xem được 2 đồng nghiệp staff qua crm_staff_directory'
 );
 
 -- 10. đại lý không đọc được danh bạ staff

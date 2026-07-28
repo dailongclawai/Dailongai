@@ -216,9 +216,20 @@ export interface CrmAccount {
   referrer_profile_id: string | null;
   linked_profile_id: string | null;
   owner_id: string;
+  created_by: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** crm_account_list: khách hàng kèm tên người quản lý + người tạo (join qua danh bạ). */
+export interface CrmAccountListRow extends CrmAccount {
+  owner_name: string | null;
+  owner_email: string | null;
+  owner_segment: StaffSegment | null;
+  creator_name: string | null;
+  creator_email: string | null;
+  was_handed_over: boolean;
 }
 
 export interface CrmContact {

@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -664,12 +664,14 @@ export async function getCrmStages(): Promise<CrmStage[]> {
   return (data as CrmStage[]) ?? [];
 }
 
-export async function getCrmAccounts(kind?: CrmAccountKind): Promise<CrmAccount[]> {
-  let q = getSupabaseClient().from('crm_accounts').select('*').order('created_at', { ascending: false });
+export async function getCrmAccounts(kind?: CrmAccountKind): Promise<CrmAccountListRow[]> {
+  // Đọc qua view crm_account_list để có tên người quản lý + người tạo; RLS của
+  // crm_accounts vẫn lọc dòng vì view dùng security_invoker.
+  let q = getSupabaseClient().from('crm_account_list').select('*').order('created_at', { ascending: false });
   if (kind) q = q.eq('kind', kind);
   const { data, error } = await q;
   if (error) throw error;
-  return (data as CrmAccount[]) ?? [];
+  return (data as CrmAccountListRow[]) ?? [];
 }
 
 export interface CrmAccountInput {

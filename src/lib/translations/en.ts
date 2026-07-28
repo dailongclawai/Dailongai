@@ -556,6 +556,8 @@ const en: Record<string, string> = {
     'portal.crm.accounts.new': 'New customer',
     'portal.crm.accounts.empty': 'No customers yet',
     'portal.crm.accounts.col_code': 'Code',
+    'portal.crm.accounts.col_staff': 'Owner',
+    'portal.crm.accounts.created_by': 'Created by',
     'portal.crm.account.new': 'New customer',
     'portal.crm.account.edit': 'Edit customer',
     'portal.crm.account.name': 'Customer name',

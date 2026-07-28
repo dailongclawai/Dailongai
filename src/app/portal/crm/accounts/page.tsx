@@ -8,13 +8,13 @@ import { getCrmAccounts } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
-import type { CrmAccount, CrmAccountKind } from '@/lib/portal-types';
+import type { CrmAccount, CrmAccountKind, CrmAccountListRow } from '@/lib/portal-types';
 
 export default function CrmAccountsPage() {
   const router = useRouter();
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
-  const [rows, setRows] = useState<CrmAccount[]>([]);
+  const [rows, setRows] = useState<CrmAccountListRow[]>([]);
   const [busy, setBusy] = useState(true);
   const [kind, setKind] = useState<CrmAccountKind | 'all'>('all');
   const [q, setQ] = useState('');
@@ -84,7 +84,7 @@ export default function CrmAccountsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[#3d3f41]">
-        <table className="w-full min-w-[720px] text-left text-sm">
+        <table className="w-full min-w-[860px] text-left text-sm">
           <thead className="bg-[#282a2c] text-[#a0a0a8]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_code')}</th>
@@ -93,14 +93,15 @@ export default function CrmAccountsPage() {
               <th className="px-4 py-3">{t('portal.crm.account.phone')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.province')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.source')}</th>
+              <th className="px-4 py-3">{t('portal.crm.accounts.col_staff')}</th>
             </tr>
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={6} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {filtered.map(r => (
               <tr
@@ -116,6 +117,14 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.phone ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
+                <td className="px-4 py-3">
+                  <span className="text-[#e2e2e5]">{r.owner_name || r.owner_email || '—'}</span>
+                  {r.creator_name && r.created_by !== r.owner_id && (
+                    <span className="mt-0.5 block text-xs text-[#00daf3]">
+                      {t('portal.crm.accounts.created_by')}: {r.creator_name}
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

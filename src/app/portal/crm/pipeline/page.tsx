@@ -134,6 +134,12 @@ export default function CrmPipelinePage() {
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.account_name}</p>
                   <p className="mt-2 text-sm font-bold text-[#ff5625]">{fmtVnd(Number(r.amount))}đ</p>
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.expected_close_date}</p>
+                  {r.owner_name && (
+                    <p className="mt-1 flex items-center gap-1 text-xs text-[#00daf3]">
+                      <span className="material-symbols-outlined text-[14px]">person</span>
+                      {r.owner_name}
+                    </p>
+                  )}
                 </article>
               ))}
               {col.rows.length === 0 && (
