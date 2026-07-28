@@ -9,8 +9,8 @@ INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
     ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000a1','authenticated','authenticated','s1@dailongai.com'),
     ('00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-0000000000c1','authenticated','authenticated','admin@dailongai.com');
 UPDATE public.profiles SET role='supervisor', status='active' WHERE id='00000000-0000-0000-0000-0000000000a1';
-UPDATE public.profiles SET role='dealer', status='active', supervisor_id='00000000-0000-0000-0000-0000000000a1' WHERE id='00000000-0000-0000-0000-0000000000d1';
-UPDATE public.profiles SET role='dealer', status='active' WHERE id='00000000-0000-0000-0000-0000000000d2';
+UPDATE public.profiles SET role='staff', status='active', staff_segment='b2c' WHERE id='00000000-0000-0000-0000-0000000000d1';
+UPDATE public.profiles SET role='staff', status='active', staff_segment='b2c' WHERE id='00000000-0000-0000-0000-0000000000d2';
 UPDATE public.profiles SET role='admin', status='active' WHERE id='00000000-0000-0000-0000-0000000000c1';
 
 -- d1 tạo 1 khách hàng
@@ -59,19 +59,20 @@ SELECT results_eq(
     'dealer d2 cannot update d1 account'
 );
 
--- 6. supervisor thấy khách của dealer trong nhánh
+-- 6. Boss chốt 28/07/2026: CRM chỉ mở cho staff + admin ⇒ supervisor KHÔNG thấy gì.
+-- (Trước đây assertion này kỳ vọng supervisor thấy khách của nhánh; luật đã đổi.)
 SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000a1';
 SELECT results_eq(
     $$SELECT count(*)::int FROM public.crm_accounts$$,
-    ARRAY[1],
-    'supervisor sees account owned by dealer in own branch'
+    ARRAY[0],
+    'supervisor is locked out of CRM accounts (staff-only rule)'
 );
 
--- 7. supervisor cũng thấy liên hệ của nhánh
+-- 7. supervisor cũng không thấy liên hệ
 SELECT results_eq(
     $$SELECT count(*)::int FROM public.crm_contacts$$,
-    ARRAY[1],
-    'supervisor sees contact owned by dealer in own branch'
+    ARRAY[0],
+    'supervisor is locked out of CRM contacts (staff-only rule)'
 );
 
 -- 8. admin thấy tất cả
