@@ -10,6 +10,7 @@ import { groupByStage, sumAmount, weightedForecast } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmOpportunityDrawer } from '@/components/portal/CrmOpportunityDrawer';
+import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
 import type { CrmOpportunityBoardRow, CrmPipeline, CrmStage } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -25,6 +26,7 @@ export default function CrmPipelinePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<CrmOpportunityBoardRow | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [losing, setLosing] = useState<{ id: string; stage: CrmStage } | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -55,16 +57,25 @@ export default function CrmPipelinePage() {
   const columns = useMemo(() => groupByStage(stages, rows, pipeline), [stages, rows, pipeline]);
   const openRows = rows.filter(r => r.forecast === 'open');
 
-  const drop = async (stageId: string) => {
-    if (!dragId) return;
-    const id = dragId;
-    setDragId(null);
+  const move = async (id: string, stageId: string, reasonId?: string, notes?: string) => {
     try {
-      await moveOpportunityStage(id, stageId);
+      await moveOpportunityStage(id, stageId, reasonId, notes);
       await load(pipeline);
     } catch (e) {
       toast.error((e as Error).message);
     }
+  };
+
+  const drop = async (stage: CrmStage) => {
+    if (!dragId) return;
+    const id = dragId;
+    setDragId(null);
+    // Thả vào cột thua thì phải hỏi lý do trước, nếu không DB sẽ từ chối.
+    if (stage.forecast === 'lost') {
+      setLosing({ id, stage });
+      return;
+    }
+    await move(id, stage.id);
   };
 
   if (loading || !profile) return null;
@@ -112,7 +123,7 @@ export default function CrmPipelinePage() {
           <div
             key={col.stage.id}
             onDragOver={e => e.preventDefault()}
-            onDrop={() => void drop(col.stage.id)}
+            onDrop={() => void drop(col.stage)}
             className="w-[280px] flex-shrink-0 rounded-2xl bg-[#1a1c1e] p-3"
           >
             <div className="mb-3 flex items-center justify-between">
@@ -134,6 +145,11 @@ export default function CrmPipelinePage() {
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.account_name}</p>
                   <p className="mt-2 text-sm font-bold text-[#ff5625]">{fmtVnd(Number(r.amount))}đ</p>
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.expected_close_date}</p>
+                  {r.lost_reason_name && (
+                    <p className="mt-1 inline-block rounded-full bg-[#282a2c] px-2 py-0.5 text-xs text-[#ff5625]">
+                      {r.lost_reason_name}
+                    </p>
+                  )}
                   {r.owner_name && (
                     <p className="mt-1 flex items-center gap-1 text-xs text-[#00daf3]">
                       <span className="material-symbols-outlined text-[14px]">person</span>
@@ -158,6 +174,18 @@ export default function CrmPipelinePage() {
         ownerId={profile.id}
         onClose={() => setDrawerOpen(false)}
         onSaved={() => void load(pipeline)}
+      />
+
+      <CrmLostReasonDialog
+        open={losing !== null}
+        pipeline={pipeline}
+        stageName={losing?.stage.name ?? ''}
+        onClose={() => setLosing(null)}
+        onConfirm={(reasonId, notes) => {
+          const target = losing;
+          setLosing(null);
+          if (target) void move(target.id, target.stage.id, reasonId, notes);
+        }}
       />
     </PortalShell>
   );

@@ -6,9 +6,9 @@ import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth-context';
 import { CrmHandoverDialog } from './CrmHandoverDialog';
 import {
-  createCrmAccount, updateCrmAccount, getCrmContacts, createCrmContact, deleteCrmContact,
+  createCrmAccount, updateCrmAccount, getCrmContacts, createCrmContact, deleteCrmContact, lookupCrmPhones,
 } from '@/lib/portal-queries';
-import type { CrmAccount, CrmAccountKind, CrmContact, CrmSource } from '@/lib/portal-types';
+import type { CrmAccount, CrmAccountKind, CrmContact, CrmPhoneMatch, CrmSource } from '@/lib/portal-types';
 
 const SOURCES: CrmSource[] = ['website', 'zalo', 'facebook', 'google_ads', 'tiktok', 'referral', 'hotline', 'event', 'other'];
 
@@ -36,6 +36,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [newContact, setNewContact] = useState({ full_name: '', phone: '', title: '' });
   const [handoverOpen, setHandoverOpen] = useState(false);
+  const [dup, setDup] = useState<CrmPhoneMatch | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -48,9 +49,22 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
     setAddress(account?.address ?? '');
     setSource(account?.source ?? '');
     setNotes(account?.notes ?? '');
+    setDup(null);
     if (account) getCrmContacts(account.id).then(setContacts).catch(() => setContacts([]));
     else setContacts([]);
   }, [open, account]);
+
+  // Tra ngay khi rời ô số điện thoại. Trigger dưới DB mới là chốt chặn thật; ở đây
+  // chỉ báo sớm để nhân viên biết khách đã có chủ và xin bắn khách thay vì gõ tiếp.
+  const checkPhone = async (value: string) => {
+    if (!value.trim()) { setDup(null); return; }
+    try {
+      const hits = await lookupCrmPhones([value]);
+      setDup(hits.find(h => h.account_id !== account?.id) ?? null);
+    } catch {
+      setDup(null);
+    }
+  };
 
   const save = async () => {
     if (!name.trim()) { toast.error(t('portal.crm.account.name_required')); return; }
@@ -134,13 +148,30 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={label} htmlFor="crm-acc-phone">{t('portal.crm.account.phone')}</label>
-              <input id="crm-acc-phone" className={field} value={phone} onChange={e => setPhone(e.target.value)} />
+              <input
+                id="crm-acc-phone" className={field} value={phone}
+                onChange={e => setPhone(e.target.value)}
+                onBlur={e => void checkPhone(e.target.value)}
+              />
             </div>
             <div>
               <label className={label} htmlFor="crm-acc-zalo">Zalo</label>
               <input id="crm-acc-zalo" className={field} value={zalo} onChange={e => setZalo(e.target.value)} />
             </div>
           </div>
+          {dup && (
+            <div className="rounded-xl border border-[#ff5625] bg-[#ff5625]/10 px-3 py-2">
+              <p className="text-sm font-semibold text-[#ff5625]">{t('portal.crm.account.dup_title')}</p>
+              <p className="mt-1 text-sm text-[#e2e2e5]">{dup.name}{dup.code ? ` · ${dup.code}` : ''}</p>
+              <p className="mt-0.5 text-xs text-[#a0a0a8]">
+                {t('portal.crm.account.dup_owner')}: {dup.owner_name || '—'}
+                {dup.is_mine ? ` · ${t('portal.crm.account.dup_mine')}` : ''}
+              </p>
+              {!dup.is_mine && (
+                <p className="mt-1 text-xs text-[#00daf3]">{t('portal.crm.account.dup_hint')}</p>
+              )}
+            </div>
+          )}
           <div>
             <label className={label} htmlFor="crm-acc-email">Email</label>
             <input id="crm-acc-email" className={field} value={email} onChange={e => setEmail(e.target.value)} />

@@ -3,8 +3,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
-import { createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels } from '@/lib/portal-queries';
-import type { CrmAccount, CrmOpportunityBoardRow, CrmPipeline, CrmStage, ProductModel } from '@/lib/portal-types';
+import {
+  createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
+} from '@/lib/portal-queries';
+import type {
+  CrmAccount, CrmLostReason, CrmOpportunityBoardRow, CrmPipeline, CrmStage, ProductModel,
+} from '@/lib/portal-types';
 
 interface Props {
   open: boolean;
@@ -29,13 +33,19 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
   const [closeDate, setCloseDate] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [reasons, setReasons] = useState<CrmLostReason[]>([]);
+  const [lostReasonId, setLostReasonId] = useState('');
+  const [lostNotes, setLostNotes] = useState('');
 
   const pipelineStages = stages.filter(s => s.pipeline === pipeline).sort((a, b) => a.sort_order - b.sort_order);
+  const isLost = pipelineStages.find(s => s.id === stageId)?.forecast === 'lost';
+  const pipelineReasons = reasons.filter(r => !r.pipeline || r.pipeline === pipeline);
 
   useEffect(() => {
     if (!open) return;
     void getCrmAccounts().then(setAccounts).catch(() => setAccounts([]));
     void getActiveModels().then(setModels).catch(() => setModels([]));
+    void getCrmLostReasons().then(setReasons).catch(() => setReasons([]));
     setAccountId(row?.account_id ?? '');
     setStageId(row?.stage_id ?? pipelineStages[0]?.id ?? '');
     setName(row?.name ?? '');
@@ -44,17 +54,22 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
     setAmount(row ? Number(row.amount) : 0);
     setCloseDate(row?.expected_close_date ?? '');
     setNotes('');
+    setLostReasonId(row?.lost_reason_id ?? '');
+    setLostNotes(row?.lost_notes ?? '');
   }, [open, row, pipeline]);
 
   const save = async () => {
     if (!accountId) { toast.error(t('portal.crm.opp.account_required')); return; }
     if (!name.trim()) { toast.error(t('portal.crm.opp.name_required')); return; }
+    if (isLost && !lostReasonId) { toast.error(t('portal.crm.lost.required')); return; }
     setSaving(true);
     try {
       const input = {
         accountId, pipeline, stageId, name,
         modelId: modelId || null, quantity, amount,
         expectedCloseDate: closeDate || null, notes, ownerId,
+        lostReasonId: isLost ? lostReasonId : null,
+        lostNotes: isLost ? lostNotes : null,
       };
       if (row) await updateCrmOpportunity(row.id, input);
       else await createCrmOpportunity(input);
@@ -103,6 +118,28 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
               {pipelineStages.map(s => <option key={s.id} value={s.id}>{s.name} · {s.probability}%</option>)}
             </select>
           </div>
+          {isLost && (
+            <>
+              <div>
+                <label className={label} htmlFor="crm-opp-lost-reason">{t('portal.crm.lost.reason')}</label>
+                <select
+                  id="crm-opp-lost-reason" className={field}
+                  value={lostReasonId} onChange={e => setLostReasonId(e.target.value)}
+                >
+                  <option value="">—</option>
+                  {pipelineReasons.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={label} htmlFor="crm-opp-lost-notes">{t('portal.crm.lost.notes')}</label>
+                <input
+                  id="crm-opp-lost-notes" className={field}
+                  value={lostNotes} onChange={e => setLostNotes(e.target.value)}
+                  placeholder={t('portal.crm.lost.notes_hint')}
+                />
+              </div>
+            </>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={label} htmlFor="crm-opp-model">{t('portal.crm.opp.model')}</label>

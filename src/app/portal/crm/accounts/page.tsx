@@ -8,6 +8,7 @@ import { getCrmAccounts } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
+import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import type { CrmAccount, CrmAccountKind, CrmAccountListRow } from '@/lib/portal-types';
 
 export default function CrmAccountsPage() {
@@ -20,6 +21,7 @@ export default function CrmAccountsPage() {
   const [q, setQ] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<CrmAccount | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -75,6 +77,13 @@ export default function CrmAccountsPage() {
           <option value="customer">{t('portal.crm.account.kind_customer')}</option>
           <option value="dealer_prospect">{t('portal.crm.account.kind_prospect')}</option>
         </select>
+        <button
+          onClick={() => setImportOpen(true)}
+          className="flex items-center gap-2 rounded-xl border border-[#3d3f41] px-4 py-2 text-[#e2e2e5]"
+        >
+          <span className="material-symbols-outlined text-[18px]">upload_file</span>
+          {t('portal.crm.import.title')}
+        </button>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
           className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
@@ -137,6 +146,13 @@ export default function CrmAccountsPage() {
         ownerId={profile.id}
         onClose={() => setDrawerOpen(false)}
         onSaved={load}
+      />
+
+      <CrmImportDialog
+        open={importOpen}
+        ownerId={profile.id}
+        onClose={() => setImportOpen(false)}
+        onDone={load}
       />
     </PortalShell>
   );

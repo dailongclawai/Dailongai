@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer, CrmLostReason, CrmPhoneMatch } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -711,6 +711,22 @@ export async function createCrmAccount(input: CrmAccountInput): Promise<void> {
   if (error) throw error;
 }
 
+/** Nhập hàng loạt. Trigger chống trùng chạy từng dòng nên phải chia lô: một số
+ *  trùng lọt lưới sẽ làm hỏng cả lô, chia nhỏ thì phần còn lại vẫn vào được. */
+export async function createCrmAccountsBulk(inputs: CrmAccountInput[]): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_accounts').insert(inputs.map(crmAccountRow));
+  if (error) throw error;
+}
+
+/** Tra số điện thoại xuyên RLS để biết khách đã tồn tại và ai đang phụ trách. */
+export async function lookupCrmPhones(phones: string[]): Promise<CrmPhoneMatch[]> {
+  const clean = phones.map(p => p.trim()).filter(Boolean);
+  if (clean.length === 0) return [];
+  const { data, error } = await getSupabaseClient().rpc('crm_lookup_phones', { p_phones: clean });
+  if (error) throw error;
+  return (data as CrmPhoneMatch[]) ?? [];
+}
+
 export async function updateCrmAccount(id: string, input: CrmAccountInput): Promise<void> {
   const { error } = await getSupabaseClient().from('crm_accounts').update(crmAccountRow(input)).eq('id', id);
   if (error) throw error;
@@ -779,6 +795,8 @@ export interface CrmOpportunityInput {
   amount: number;
   expectedCloseDate?: string | null;
   notes?: string | null;
+  lostReasonId?: string | null;
+  lostNotes?: string | null;
   ownerId: string;
 }
 
@@ -794,6 +812,8 @@ function crmOpportunityRow(input: CrmOpportunityInput) {
     amount: input.amount,
     ...(input.expectedCloseDate ? { expected_close_date: input.expectedCloseDate } : {}),
     notes: input.notes?.trim() || null,
+    lost_reason_id: input.lostReasonId ?? null,
+    lost_notes: input.lostNotes?.trim() || null,
     owner_id: input.ownerId,
   };
 }
@@ -808,10 +828,25 @@ export async function updateCrmOpportunity(id: string, input: CrmOpportunityInpu
   if (error) throw error;
 }
 
-export async function moveOpportunityStage(id: string, stageId: string, lostReason?: string): Promise<void> {
+export async function getCrmLostReasons(): Promise<CrmLostReason[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_lost_reasons')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order');
+  if (error) throw error;
+  return (data as CrmLostReason[]) ?? [];
+}
+
+export async function moveOpportunityStage(
+  id: string,
+  stageId: string,
+  lostReasonId?: string | null,
+  lostNotes?: string | null,
+): Promise<void> {
   const { error } = await getSupabaseClient()
     .from('crm_opportunities')
-    .update({ stage_id: stageId, lost_reason: lostReason ?? null })
+    .update({ stage_id: stageId, lost_reason_id: lostReasonId ?? null, lost_notes: lostNotes?.trim() || null })
     .eq('id', id);
   if (error) throw error;
 }

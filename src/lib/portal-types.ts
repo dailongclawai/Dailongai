@@ -274,8 +274,30 @@ export interface CrmOpportunityBoardRow {
   model_id: string | null;
   order_id: string | null;
   closed_at: string | null;
-  lost_reason: string | null;
+  lost_reason_id: string | null;
+  lost_reason_name: string | null;
+  lost_notes: string | null;
   created_at: string;
+}
+
+/** Danh mục lý do mất. pipeline = null nghĩa là dùng chung cho cả hai pipeline. */
+export interface CrmLostReason {
+  id: string;
+  name: string;
+  pipeline: CrmPipeline | null;
+  sort_order: number;
+  active: boolean;
+}
+
+/** Kết quả tra số điện thoại xuyên RLS — đủ để biết phải xin bắn khách từ ai. */
+export interface CrmPhoneMatch {
+  phone_norm: string;
+  account_id: string;
+  code: string | null;
+  name: string;
+  owner_id: string;
+  owner_name: string | null;
+  is_mine: boolean;
 }
 
 export interface CrmActivityRow {
