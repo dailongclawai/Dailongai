@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 import { getSupabaseClient } from '@/lib/supabase';
 import { trackReferral } from '@/lib/referral-tracker';
+import { useSearchString } from '@/lib/use-client-location';
 import { OAuthButton } from '@/components/portal/OAuthButton';
 import { Spinner } from '@/components/portal/Spinner';
 import { PasswordInput } from '@/components/portal/PasswordInput';
@@ -20,16 +21,16 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
-  const [ref, setRef] = useState<string | null>(null);
+  // Mã giới thiệu suy thẳng từ URL; effect chỉ còn làm việc với hệ thống bên ngoài
+  // (localStorage và ghi nhận lượt xem), không đặt state nữa.
+  const search = useSearchString();
+  const ref = new URLSearchParams(search).get('ref');
 
   useEffect(() => {
-    const r = new URLSearchParams(window.location.search).get('ref');
-    if (r) {
-      setRef(r);
-      localStorage.setItem('portal_ref', r);
-      void trackReferral({ eventType: 'supervisor_view', supervisorId: r });
-    }
-  }, []);
+    if (!ref) return;
+    localStorage.setItem('portal_ref', ref);
+    void trackReferral({ eventType: 'supervisor_view', supervisorId: ref });
+  }, [ref]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();

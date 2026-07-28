@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { contactInfo } from "@/data/siteData";
 
@@ -145,7 +146,7 @@ export default function ThankYouContent() {
 
         {/* CTA buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center gap-2 bg-primary-container text-on-primary font-headline font-bold text-xs uppercase tracking-[0.1em] px-8 py-4 hover:brightness-110 transition-all active:scale-[0.98]"
           >
@@ -163,7 +164,7 @@ export default function ThankYouContent() {
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
-          </a>
+          </Link>
           <a
             href={contactInfo.zalo}
             target="_blank"

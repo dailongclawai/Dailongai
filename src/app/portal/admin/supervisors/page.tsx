@@ -23,12 +23,17 @@ export default function AdminSupervisorsPage() {
   const [unassigned, setUnassigned] = useState<UnassignedDealer[]>([]);
   const [editingDealer, setEditingDealer] = useState<{ id: string; name: string } | null>(null);
 
-  const refresh = useCallback(async () => {
-    const [sv, tm, ua] = await Promise.all([getAllSupervisors(), getAllTeamMembers(), getUnassignedDealers()]);
-    setSupervisors(sv);
-    setTeam(tm);
-    setUnassigned(ua);
-  }, []);
+  // Trả thẳng promise và chỉ đặt state trong callback — hàm không còn setState
+  // đồng bộ nào nên gọi được từ trong effect.
+  const refresh = useCallback(
+    () => Promise.all([getAllSupervisors(), getAllTeamMembers(), getUnassignedDealers()])
+      .then(([sv, tm, ua]) => {
+        setSupervisors(sv);
+        setTeam(tm);
+        setUnassigned(ua);
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (loading) return;

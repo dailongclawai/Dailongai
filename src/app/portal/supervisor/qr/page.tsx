@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { useOrigin } from '@/lib/use-client-location';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { PortalSkeleton } from '@/components/portal/PortalSkeleton';
 
@@ -13,8 +14,12 @@ export default function SupervisorQRPage() {
   const router = useRouter();
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
-  const [refLink, setRefLink] = useState('');
   const [qr, setQr] = useState('');
+  const origin = useOrigin();
+
+  // Link giới thiệu suy thẳng lúc render; effect chỉ còn sinh ảnh QR trong callback.
+  const base = process.env.NEXT_PUBLIC_PORTAL_URL || origin;
+  const refLink = session && base ? `${base}/portal/register?ref=${session.user.id}` : '';
 
   useEffect(() => {
     if (loading) return;
@@ -23,14 +28,13 @@ export default function SupervisorQRPage() {
   }, [loading, session, profile, router]);
 
   useEffect(() => {
-    if (!session) return;
-    const base = process.env.NEXT_PUBLIC_PORTAL_URL || window.location.origin;
-    const link = `${base}/portal/register?ref=${session.user.id}`;
-    setRefLink(link);
-    QRCode.toDataURL(link, { width: 512, margin: 2, color: { dark: '#0c0e10', light: '#ffffff' } })
-      .then(setQr)
-      .catch(() => setQr(''));
-  }, [session]);
+    if (!refLink) return;
+    let cancelled = false;
+    QRCode.toDataURL(refLink, { width: 512, margin: 2, color: { dark: '#0c0e10', light: '#ffffff' } })
+      .then(d => { if (!cancelled) setQr(d); })
+      .catch(() => { if (!cancelled) setQr(''); });
+    return () => { cancelled = true; };
+  }, [refLink]);
 
   if (loading || profile?.role !== 'supervisor') {
     return (

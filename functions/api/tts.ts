@@ -1,9 +1,28 @@
 import { TtsSchema } from "./_schemas";
-import { checkRateLimit } from "./_ratelimit";
+import { checkRateLimit, type KV } from "./_ratelimit";
 
 const RATE_LIMIT = 20;
 
-export async function onRequestPost(context: any) {
+interface Env {
+  MEO_STATS: KV;
+  OPENAI_API_KEY?: string;
+  AI_GATEWAY_URL?: string;
+  CF_ACCOUNT_ID?: string;
+  AI_GATEWAY_ID?: string;
+}
+
+interface DailyStats {
+  messages: number;
+  sessions: unknown[];
+  ips: unknown[];
+  ttsCount: number;
+}
+
+export async function onRequestPost(context: {
+  request: Request;
+  env: Env;
+  waitUntil(promise: Promise<unknown>): void;
+}) {
   const { request, env } = context;
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
 
@@ -64,10 +83,10 @@ export async function onRequestPost(context: any) {
     if (env.MEO_STATS) {
       const today = new Date().toISOString().slice(0, 10);
       const statsKey = `stats:${today}`;
-      (context as any).waitUntil((async () => {
+      context.waitUntil((async () => {
         try {
           const raw = await env.MEO_STATS.get(statsKey);
-          const stats = raw ? JSON.parse(raw) : { messages: 0, sessions: [], ips: [], ttsCount: 0 };
+          const stats: DailyStats = raw ? JSON.parse(raw) : { messages: 0, sessions: [], ips: [], ttsCount: 0 };
           stats.ttsCount = (stats.ttsCount || 0) + 1;
           await env.MEO_STATS.put(statsKey, JSON.stringify(stats), { expirationTtl: 7 * 86400 });
         } catch {}
@@ -81,7 +100,7 @@ export async function onRequestPost(context: any) {
         'Cache-Control': 'public, max-age=86400',
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     console.error('[tts API error]', err);
     return Response.json({ error: 'TTS generation failed' }, { status: 500 });
   }

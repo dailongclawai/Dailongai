@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ZaloButton from "@/components/ZaloButton";
@@ -82,9 +83,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <article data-pagefind-body data-pagefind-meta={`title:${article.title}`} className="max-w-3xl mx-auto px-5 sm:px-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-[10px] text-secondary mb-6">
-            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
+            <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
             <span className="text-secondary/30">/</span>
-            <a href="/blog" className="hover:text-primary transition-colors">Blog</a>
+            <Link href="/blog" className="hover:text-primary transition-colors">Blog</Link>
             <span className="text-secondary/30">/</span>
             <span className="text-primary font-bold truncate max-w-[200px]">{article.title}</span>
           </div>
@@ -139,9 +140,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <h3 className="text-xl font-headline font-bold mb-3">Tìm hiểu thêm về Zhi Dun CEO</h3>
             <p className="text-secondary text-sm mb-6">Liên hệ đội ngũ tư vấn Đại Long để được hỗ trợ chi tiết</p>
             <div className="flex flex-wrap gap-3 justify-center">
-              <a href="/#contact" className="bg-primary-container text-on-primary px-6 py-3 font-headline font-bold text-xs tracking-[0.1em] uppercase">
+              <Link href="/#contact" className="bg-primary-container text-on-primary px-6 py-3 font-headline font-bold text-xs tracking-[0.1em] uppercase">
                 TƯ VẤN NGAY
-              </a>
+              </Link>
               <a href={`tel:${contactInfo.hotline.replace(/\s/g, "")}`} className="border border-outline-variant text-on-surface px-6 py-3 font-headline font-bold text-xs tracking-[0.1em] uppercase hover:bg-surface-high transition-all">
                 GỌI {contactInfo.hotline}
               </a>

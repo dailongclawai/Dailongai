@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 
 const LuminousFilaments = dynamic(() => import("@/components/LuminousFilaments"), { ssr: false });
@@ -166,9 +167,9 @@ export default function AboutUsContent() {
         <div className="bg-gradient-to-br from-primary-container to-primary rounded-[48px] p-10 sm:p-16 text-center relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline text-on-primary mb-8 tracking-tighter uppercase">{t('aboutpage.cta')}</h2>
-            <a href="/#contact" className="inline-block bg-surface-lowest text-on-surface px-8 sm:px-12 py-4 sm:py-5 rounded-full font-bold text-base sm:text-lg hover:bg-surface-high transition-all duration-300 shadow-2xl">
+            <Link href="/#contact" className="inline-block bg-surface-lowest text-on-surface px-8 sm:px-12 py-4 sm:py-5 rounded-full font-bold text-base sm:text-lg hover:bg-surface-high transition-all duration-300 shadow-2xl">
               {t('aboutpage.cta_btn')}
-            </a>
+            </Link>
           </div>
         </div>
       </section>

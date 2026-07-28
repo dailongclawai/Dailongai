@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
@@ -12,20 +12,28 @@ interface Props {
   teamCount: number;
 }
 
+// origin chỉ có ở trình duyệt — đọc qua useSyncExternalStore để khỏi lệch hydrate
+// và khỏi phải setState trong effect.
+const subscribeNever = () => () => {};
+const readOrigin = () => window.location.origin;
+const readOriginOnServer = () => '';
+
 export function SupervisorInviteCard({ supervisorId, supervisorName, teamCount }: Props) {
   const { t } = useI18n();
-  const [refLink, setRefLink] = useState('');
   const [qr, setQr] = useState('');
+  const origin = useSyncExternalStore(subscribeNever, readOrigin, readOriginOnServer);
+
+  const base = process.env.NEXT_PUBLIC_PORTAL_URL || origin;
+  const refLink = supervisorId && base ? `${base}/portal/register?ref=${supervisorId}` : '';
 
   useEffect(() => {
-    if (!supervisorId) return;
-    const base = process.env.NEXT_PUBLIC_PORTAL_URL || window.location.origin;
-    const link = `${base}/portal/register?ref=${supervisorId}`;
-    setRefLink(link);
-    QRCode.toDataURL(link, { width: 320, margin: 2, color: { dark: '#0c0e10', light: '#ffffff' } })
-      .then(setQr)
-      .catch(() => setQr(''));
-  }, [supervisorId]);
+    if (!refLink) return;
+    let cancelled = false;
+    QRCode.toDataURL(refLink, { width: 320, margin: 2, color: { dark: '#0c0e10', light: '#ffffff' } })
+      .then(d => { if (!cancelled) setQr(d); })
+      .catch(() => { if (!cancelled) setQr(''); });
+    return () => { cancelled = true; };
+  }, [refLink]);
 
   const copyLink = async () => {
     if (!refLink) return;

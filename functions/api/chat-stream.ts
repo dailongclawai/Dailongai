@@ -1,11 +1,21 @@
 import { ChatRequestSchema } from "./_schemas";
-import { checkRateLimit, checkSessionLimit } from "./_ratelimit";
+import { checkRateLimit, checkSessionLimit, type KV } from "./_ratelimit";
 
 // Shares the 'ai' bucket and session counters with /api/chat — same Workers AI
 // spend, so the two endpoints must not each grant a fresh quota.
 const RATE_LIMIT = 20;
 
-export async function onRequestPost(context: any) {
+interface AiBinding {
+  run(model: string, input: Record<string, unknown>): Promise<unknown>;
+}
+
+interface Env {
+  AI?: AiBinding;
+  MEO_STATS: KV;
+  VECTORIZE?: VectorizeBinding;
+}
+
+export async function onRequestPost(context: { request: Request; env: Env }) {
   const { request, env } = context;
   const ai = env.AI;
   if (!ai) return Response.json({ error: 'AI service unavailable' }, { status: 500 });
@@ -39,7 +49,7 @@ export async function onRequestPost(context: any) {
 
   const SYSTEM = `Bạn là AI Meo Meo — trợ lý của Đại Long. Trả lời ngắn (3-5 câu), thân thiện, KHÔNG dùng markdown. KHÔNG chẩn đoán bệnh; nếu câu hỏi vượt phạm vi y khoa cơ bản, hướng khách đến bác sĩ hoặc hotline 0935 999 922.${ragContext ? `\n\nTÀI LIỆU THAM KHẢO:\n${ragContext}` : ''}`;
 
-  const aiResp: any = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+  const aiResp = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
     messages: [{ role: 'system', content: SYSTEM }, ...trimmed],
     max_tokens: 1024,
     temperature: 0.3,
@@ -96,11 +106,12 @@ export async function onRequestPost(context: any) {
 interface VectorizeMatch { id: string; score: number; metadata?: { title?: string; url?: string; text?: string } }
 interface VectorizeBinding { query(vec: number[], opts: { topK: number; returnMetadata: 'all' | 'indexed' | 'none' }): Promise<{ matches: VectorizeMatch[] }> }
 
-async function retrieveContext(ai: any, vec: VectorizeBinding | undefined, query: string) {
+async function retrieveContext(ai: AiBinding, vec: VectorizeBinding | undefined, query: string) {
   if (!vec || !query || query.length < 4) return { context: '', citations: [] as { title: string; url: string }[] };
   try {
-    const emb: any = await ai.run('@cf/baai/bge-m3', { text: [query] });
-    const vector: number[] = emb?.data?.[0] || emb?.[0];
+    // Workers AI trả về { data: number[][] } cho bge-m3, nhưng một số bản trả thẳng mảng.
+    const emb = await ai.run('@cf/baai/bge-m3', { text: [query] }) as { data?: number[][] } | number[][] | undefined;
+    const vector = Array.isArray(emb) ? emb[0] : emb?.data?.[0];
     if (!vector?.length) return { context: '', citations: [] };
     const result = await vec.query(vector, { topK: 3, returnMetadata: 'all' });
     const filtered = (result.matches || []).filter((m) => m.score >= 0.55);

@@ -20,8 +20,8 @@ export default function Header() {
     { label: t('nav.contact'), href: '/lien-he' },
   ];
 
-  // Close drawer on route change
-  useEffect(() => { setDrawerOpen(false); }, [pathname]);
+  // Ngăn kéo đóng ngay tại chỗ bấm link (xem dl-drawer__nav bên dưới) thay vì
+  // theo dõi pathname trong effect.
 
   // Lock body scroll while drawer open
   useEffect(() => {
@@ -132,7 +132,12 @@ export default function Header() {
         </div>
         <nav className="dl-drawer__nav">
           {navLinks.map((l) => (
-            <Link key={l.href} href={l.href} className={`dl-drawer-link${isActive(l.href) ? ' active' : ''}`}>
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setDrawerOpen(false)}
+              className={`dl-drawer-link${isActive(l.href) ? ' active' : ''}`}
+            >
               {l.label}
             </Link>
           ))}

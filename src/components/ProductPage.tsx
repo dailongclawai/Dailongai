@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { product, certifications, contactInfo } from "@/data/siteData";
 import { useI18n } from "@/lib/i18n";
 import { QuickCheckout } from "@/components/portal/QuickCheckout";
@@ -109,7 +110,7 @@ export default function ProductPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div>
               <div className="flex items-center gap-2 text-[10px] text-secondary mb-3">
-                <a href="/" className="hover:text-primary transition-colors">{t('nav.home')}</a>
+                <Link href="/" className="hover:text-primary transition-colors">{t('nav.home')}</Link>
                 <span className="text-secondary/30">/</span>
                 <span className="text-primary font-bold">{t('nav.products')}</span>
               </div>

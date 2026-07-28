@@ -11,11 +11,14 @@ export function TierCard({ profileId, audience = 'dealer' }: { profileId: string
   const [status, setStatus] = useState<DealerTierStatus | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Chỉ đặt state trong callback của promise. `loading` khởi tạo sẵn là true nên
+  // lần dựng đầu vẫn ra khung chờ, không cần setLoading(true) ngay trong effect.
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     getDealerTierStatus(profileId)
-      .then(setStatus)
-      .finally(() => setLoading(false));
+      .then(s => { if (!cancelled) setStatus(s); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [profileId]);
 
   if (loading) {

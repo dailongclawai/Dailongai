@@ -73,16 +73,21 @@ interface SupervisorFunnelProps {
 export function SupervisorFunnelCard({ supervisorId }: SupervisorFunnelProps) {
   const { t } = useI18n();
   const [days, setDays] = useState<7 | 30 | 90>(30);
-  const [data, setData] = useState<SupervisorFunnel | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Gắn kết quả với đúng bộ tham số đã tải xong, nhờ vậy suy ra được `loading`
+  // ngay lúc render khi người dùng đổi mốc 7/30/90 — không phải setState trong effect.
+  const [loaded, setLoaded] = useState<{ key: string; data: SupervisorFunnel | null } | null>(null);
+  const key = `${days}|${supervisorId ?? ''}`;
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     getSupervisorFunnel(days, supervisorId)
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
-  }, [days, supervisorId]);
+      .then(d => { if (!cancelled) setLoaded({ key, data: d }); })
+      .catch(() => { if (!cancelled) setLoaded({ key, data: null }); });
+    return () => { cancelled = true; };
+  }, [days, supervisorId, key]);
+
+  const loading = loaded?.key !== key;
+  const data = loaded?.data ?? null;
 
   const stages: Stage[] = [
     { label: t('portal.components.funnelChart.supervisor_stage_visitor'), value: data?.unique_visitors ?? 0, color: '#3b82f6' },
@@ -149,16 +154,19 @@ interface DealerFunnelProps {
 export function DealerQrFunnelCard({ dealerId }: DealerFunnelProps) {
   const { t } = useI18n();
   const [days, setDays] = useState<7 | 30 | 90>(30);
-  const [data, setData] = useState<DealerQrFunnel | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState<{ key: string; data: DealerQrFunnel | null } | null>(null);
+  const key = `${days}|${dealerId ?? ''}`;
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     getDealerQrFunnel(days, dealerId)
-      .then(setData)
-      .catch(() => setData(null))
-      .finally(() => setLoading(false));
-  }, [days, dealerId]);
+      .then(d => { if (!cancelled) setLoaded({ key, data: d }); })
+      .catch(() => { if (!cancelled) setLoaded({ key, data: null }); });
+    return () => { cancelled = true; };
+  }, [days, dealerId, key]);
+
+  const loading = loaded?.key !== key;
+  const data = loaded?.data ?? null;
 
   const stages: Stage[] = [
     { label: t('portal.components.funnelChart.dealer_stage_visitor'), value: data?.unique_visitors ?? 0, color: '#3b82f6' },

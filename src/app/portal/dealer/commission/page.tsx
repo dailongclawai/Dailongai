@@ -56,10 +56,13 @@ export default function DealerCommissionPage() {
     if (!session) { router.replace('/portal/login'); return; }
     if (profile?.role && profile.role !== 'dealer') { router.replace('/portal/403'); return; }
     if (profile) {
-      setFetching(true);
+      // `fetching` khởi tạo sẵn là true nên không cần bật lại đồng bộ ở đây;
+      // chỉ hạ cờ trong callback khi dữ liệu đã về.
+      let cancelled = false;
       getDealerLedger(profile.id)
-        .then(setRows)
-        .finally(() => setFetching(false));
+        .then(r => { if (!cancelled) setRows(r); })
+        .finally(() => { if (!cancelled) setFetching(false); });
+      return () => { cancelled = true; };
     }
   }, [loading, session, profile, router]);
 

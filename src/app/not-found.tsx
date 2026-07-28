@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { navLinks } from "@/data/siteData";
@@ -22,7 +23,7 @@ export default function NotFound() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-12">
-            <a
+            <Link
               href="/"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-on-primary font-headline font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-opacity"
             >
@@ -31,7 +32,7 @@ export default function NotFound() {
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
               Về trang chủ
-            </a>
+            </Link>
             <a
               href="/lien-he"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 border border-outline-variant text-on-surface font-headline font-bold text-sm uppercase tracking-wider hover:bg-surface-container transition-colors"

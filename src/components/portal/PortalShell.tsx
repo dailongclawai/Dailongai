@@ -32,7 +32,8 @@ export function PortalShell({
     if (session) getUnreadCount().then(setUnread);
   }, [session]);
 
-  useEffect(() => { setOpen(false); }, [pathname]);
+  // Sidebar đóng ngay tại chỗ bấm link (xem NavLink bên dưới) thay vì theo dõi
+  // pathname trong effect.
 
   const NAV: Record<Variant, NavItem[]> = {
     admin: [
@@ -84,6 +85,7 @@ export function PortalShell({
       <Link
         key={it.href}
         href={it.href}
+        onClick={() => setOpen(false)}
         className={`flex items-center gap-3 px-6 py-3 transition-colors duration-200 group ${
           active
             ? 'text-[#ff5625] border-l-4 border-[#ff5625] bg-[#ff5625]/[0.06] font-semibold'

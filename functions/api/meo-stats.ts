@@ -1,6 +1,19 @@
 import { StatsQuerySchema } from "./_schemas";
+import type { KV } from "./_ratelimit";
 
-export async function onRequestGet(context: any) {
+interface Env {
+  STATS_SECRET?: string;
+  MEO_STATS?: KV;
+}
+
+interface DailyStats {
+  messages?: number;
+  ips?: unknown[];
+  sessions?: unknown[];
+  ttsCount?: number;
+}
+
+export async function onRequestGet(context: { request: Request; env: Env }) {
   const { env, request } = context;
 
   // Simple auth via secret header
@@ -27,7 +40,7 @@ export async function onRequestGet(context: any) {
     return Response.json({ date: dateParam, messages: 0, uniqueUsers: 0, sessions: 0, ttsCount: 0 });
   }
 
-  const stats = JSON.parse(raw);
+  const stats: DailyStats = JSON.parse(raw);
   return Response.json({
     date: dateParam,
     messages: stats.messages || 0,

@@ -115,9 +115,43 @@ Zalo Shop: https://zalo.me/2860930231550407599`;
 
 const RATE_LIMIT = 20;
 
-export async function onRequestPost(context: any) {
+interface AiBinding {
+  run(model: string, input: Record<string, unknown>): Promise<unknown>;
+}
+
+interface KV {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+}
+
+interface Env {
+  AI?: AiBinding;
+  MEO_STATS: KV;
+  VECTORIZE?: VectorizeBinding;
+  LEAD_WEBHOOK_URL?: string;
+  WEB_LEAD_SECRET?: string;
+}
+
+// Binding AI có thể nằm ở env, ở chính context, hoặc ở data tuỳ cách Pages nạp —
+// giữ nguyên cả ba đường tìm như cũ, chỉ khai báo kiểu cho chúng.
+interface ChatContext {
+  request: Request;
+  env: Env;
+  data?: { AI?: AiBinding };
+  AI?: AiBinding;
+  waitUntil(promise: Promise<unknown>): void;
+}
+
+interface DailyStats {
+  messages?: number;
+  sessions?: unknown[];
+  ips?: unknown[];
+  ttsCount?: number;
+}
+
+export async function onRequestPost(context: ChatContext) {
   const { request, env, data } = context;
-  const ai = env.AI ?? (context as any).AI ?? (data as any)?.AI;
+  const ai = env.AI ?? context.AI ?? data?.AI;
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
 
   // Health check bypass — skip rate/session limits, return 400 immediately
@@ -175,13 +209,13 @@ export async function onRequestPost(context: any) {
       ...trimmed,
     ];
 
-    const data: any = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
+    const result = await ai.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
       messages,
       max_tokens: 1024,
       temperature: 0.3,
-    });
+    }) as { response?: string };
 
-    const content = data.response ?? '';
+    const content = result.response ?? '';
 
     // Detect lead info (name + phone) in conversation and send to CRM
     const allMessages = [...trimmed, { role: 'assistant', content }];
@@ -203,7 +237,7 @@ export async function onRequestPost(context: any) {
       const webhookUrl = env.LEAD_WEBHOOK_URL || 'https://zalo.longanhai.com/api/web-lead';
 
       // Use waitUntil so the Worker stays alive until webhook completes
-      (context as any).waitUntil(
+      context.waitUntil(
         secret ? fetch(webhookUrl, {
           method: 'POST',
           headers: {
@@ -226,10 +260,10 @@ export async function onRequestPost(context: any) {
     if (env.MEO_STATS) {
       const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
       const statsKey = `stats:${today}`;
-      (context as any).waitUntil((async () => {
+      context.waitUntil((async () => {
         try {
           const raw = await env.MEO_STATS.get(statsKey);
-          const stats = raw ? JSON.parse(raw) : { messages: 0, sessions: new Set() as any, ips: new Set() as any, ttsCount: 0 };
+          const stats: DailyStats = raw ? JSON.parse(raw) : { messages: 0, sessions: [], ips: [], ttsCount: 0 };
           // Deserialize sets from arrays
           const ips = new Set(Array.isArray(stats.ips) ? stats.ips : []);
           const sessions = new Set(Array.isArray(stats.sessions) ? stats.sessions : []);
@@ -246,7 +280,7 @@ export async function onRequestPost(context: any) {
     }
 
     return Response.json({ content, citations });
-  } catch (err: any) {
+  } catch (err) {
     console.error('[chat API error]', err);
     return Response.json({ error: 'AI service error' }, { status: 500 });
   }
@@ -263,14 +297,15 @@ interface VectorizeBinding {
 }
 
 async function retrieveContext(
-  ai: any,
+  ai: AiBinding,
   vec: VectorizeBinding | undefined,
   query: string
 ): Promise<{ context: string; citations: { title: string; url: string }[] }> {
   if (!vec || !query || query.length < 4) return { context: '', citations: [] };
   try {
-    const emb: any = await ai.run('@cf/baai/bge-m3', { text: [query] });
-    const vector: number[] = emb?.data?.[0] || emb?.[0];
+    // Workers AI trả về { data: number[][] } cho bge-m3, nhưng một số bản trả thẳng mảng.
+    const emb = await ai.run('@cf/baai/bge-m3', { text: [query] }) as { data?: number[][] } | number[][] | undefined;
+    const vector = Array.isArray(emb) ? emb[0] : emb?.data?.[0];
     if (!vector?.length) return { context: '', citations: [] };
     const result = await vec.query(vector, { topK: 3, returnMetadata: 'all' });
     if (!result.matches?.length) return { context: '', citations: [] };

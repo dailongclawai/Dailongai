@@ -15,19 +15,19 @@ export default function ProfilePage() {
   const router = useRouter();
   const { session, profile, loading, refresh } = useAuth();
   const { t } = useI18n();
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  // Ô nhập lấy giá trị từ hồ sơ cho tới khi người dùng gõ đè. Giữ phần đã gõ trong
+  // state riêng để không phải đồng bộ từ hồ sơ bằng setState trong effect.
+  const [fullNameEdit, setFullNameEdit] = useState<string | null>(null);
+  const [phoneEdit, setPhoneEdit] = useState<string | null>(null);
+  const fullName = fullNameEdit ?? profile?.full_name ?? '';
+  const phone = phoneEdit ?? profile?.phone ?? '';
   const [newPassword, setNewPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (loading) return;
     if (!session) router.replace('/portal/login');
-    else if (profile) {
-      setFullName(profile.full_name ?? '');
-      setPhone(profile.phone ?? '');
-    }
-  }, [loading, session, profile, router]);
+  }, [loading, session, router]);
 
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +88,7 @@ export default function ProfilePage() {
             <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">{t('portal.profile.label.full_name')}</label>
             <input
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => setFullNameEdit(e.target.value)}
               className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 focus:border-[#ff5625] outline-none"
             />
           </div>
@@ -96,7 +96,7 @@ export default function ProfilePage() {
             <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">{t('portal.profile.label.phone')}</label>
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhoneEdit(e.target.value)}
               className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 focus:border-[#ff5625] outline-none"
             />
           </div>

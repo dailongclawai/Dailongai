@@ -20,18 +20,21 @@ export default function RegistrationsPage() {
   const [models, setModels] = useState<ProductModel[]>([]);
   const [fetching, setFetching] = useState(true);
 
-  const refresh = useCallback(async () => {
-    setFetching(true);
+  // Trả thẳng promise và chỉ đặt state trong callback — hàm không còn setState
+  // đồng bộ nào nên gọi được từ trong effect. `fetching` khởi tạo sẵn là true;
+  // các lần làm mới sau bật lại cờ ngay trong nút bấm, không phải ở đây.
+  const refresh = useCallback(() => {
     const client = getSupabaseClient();
-    const [{ data: p }, { data: sv }, { data: m }] = await Promise.all([
+    return Promise.all([
       client.from('profiles').select('*').is('role', null).eq('status', 'pending').order('created_at', { ascending: false }),
       client.from('profiles').select('*').eq('role', 'supervisor').eq('status', 'active'),
       client.from('product_models').select('*').eq('active', true).order('code'),
-    ]);
-    setPending((p as Profile[]) ?? []);
-    setSupervisors((sv as Profile[]) ?? []);
-    setModels((m as ProductModel[]) ?? []);
-    setFetching(false);
+    ]).then(([{ data: p }, { data: sv }, { data: m }]) => {
+      setPending((p as Profile[]) ?? []);
+      setSupervisors((sv as Profile[]) ?? []);
+      setModels((m as ProductModel[]) ?? []);
+      setFetching(false);
+    });
   }, []);
 
   useEffect(() => {

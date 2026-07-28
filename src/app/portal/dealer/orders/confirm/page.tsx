@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { useSearchString } from '@/lib/use-client-location';
 import { PortalShell } from '@/components/portal/PortalShell';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
@@ -27,17 +28,13 @@ export default function OrderConfirmPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
   const { t } = useI18n();
-  const [count, setCount] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [note, setNote] = useState('');
-
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    setCount(Number(p.get('count') ?? 0));
-    setTotal(Number(p.get('total') ?? 0));
-    const date = p.get('date') ?? new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    setNote(`DAILONG ${date}`);
-  }, []);
+  // Ba giá trị này chỉ để hiển thị, người dùng không sửa — suy thẳng từ URL.
+  const search = useSearchString();
+  const params = new URLSearchParams(search);
+  const count = Number(params.get('count') ?? 0);
+  const total = Number(params.get('total') ?? 0);
+  const noteDate = params.get('date') ?? new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const note = `DAILONG ${noteDate}`;
 
   useEffect(() => {
     if (loading) return;

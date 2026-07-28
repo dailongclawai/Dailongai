@@ -43,8 +43,10 @@ export function AddressPicker({
 }) {
   const { t } = useI18n();
   const [provinces, setProvinces] = useState<Province[]>([]);
-  const [wards, setWards] = useState<Ward[]>([]);
-  const [loadingWards, setLoadingWards] = useState(false);
+  // Gắn danh sách phường với đúng mã tỉnh đã tải xong, nhờ vậy suy ra được danh
+  // sách hiện hành và cờ đang tải ngay lúc render, không phải setState trong effect.
+  const [loadedWards, setLoadedWards] = useState<{ code: string; list: Ward[] } | null>(null);
+  const provinceCode = value.province_code ?? '';
 
   useEffect(() => {
     fetch('/data/vn-provinces.json')
@@ -54,14 +56,17 @@ export function AddressPicker({
   }, []);
 
   useEffect(() => {
-    if (!value.province_code) { setWards([]); return; }
-    setLoadingWards(true);
-    fetch(`/data/vn-wards/${value.province_code}.json`)
+    if (!provinceCode) return;
+    let cancelled = false;
+    fetch(`/data/vn-wards/${provinceCode}.json`)
       .then((r) => r.json())
-      .then(setWards)
-      .catch(() => setWards([]))
-      .finally(() => setLoadingWards(false));
-  }, [value.province_code]);
+      .then((list: Ward[]) => { if (!cancelled) setLoadedWards({ code: provinceCode, list }); })
+      .catch(() => { if (!cancelled) setLoadedWards({ code: provinceCode, list: [] }); });
+    return () => { cancelled = true; };
+  }, [provinceCode]);
+
+  const wards = loadedWards?.code === provinceCode ? loadedWards.list : [];
+  const loadingWards = Boolean(provinceCode) && loadedWards?.code !== provinceCode;
 
   const onProvince = (code: string) => {
     const p = provinces.find((x) => x.code === code);

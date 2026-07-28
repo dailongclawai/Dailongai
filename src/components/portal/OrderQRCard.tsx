@@ -1,30 +1,39 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { toast } from 'sonner';
 import QRCode from 'qrcode';
 import { useI18n } from '@/lib/i18n';
 
+// origin chỉ có ở trình duyệt. useSyncExternalStore cho phép đọc nó mà không lệch
+// giữa HTML dựng sẵn và lần hydrate đầu, đồng thời không phải setState trong effect.
+const subscribeNever = () => () => {};
+const readOrigin = () => window.location.origin;
+const readOriginOnServer = () => '';
+
 export function OrderQRCard({ slug }: { slug: string | null }) {
   const { t } = useI18n();
   const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [origin, setOrigin] = useState('');
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') setOrigin(window.location.origin);
-  }, []);
+  const origin = useSyncExternalStore(subscribeNever, readOrigin, readOriginOnServer);
 
   const url = slug && origin ? `${origin}/dat-don?d=${encodeURIComponent(slug)}` : '';
 
   useEffect(() => {
-    if (!url) { setDataUrl(null); return; }
+    if (!url) return;
+    let cancelled = false;
     QRCode.toDataURL(url, {
       width: 480,
       margin: 1,
       color: { dark: '#121416', light: '#ffffff' },
       errorCorrectionLevel: 'M',
-    }).then(setDataUrl).catch(() => setDataUrl(null));
+    })
+      .then(d => { if (!cancelled) setDataUrl(d); })
+      .catch(() => { if (!cancelled) setDataUrl(null); });
+    return () => { cancelled = true; };
   }, [url]);
+
+  // Khi chưa có url thì không hiện mã cũ — lọc lúc render thay vì xoá bằng setState.
+  const shownDataUrl = url ? dataUrl : null;
 
   if (!slug) {
     return (
@@ -56,8 +65,8 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
 
       <div className="mb-5 flex justify-center">
         <div className="rounded-xl bg-white p-3">
-          {dataUrl ? (
-            <img src={dataUrl} alt={t('portal.components.orderQR.alt')} className="block h-[220px] w-[220px]" />
+          {shownDataUrl ? (
+            <img src={shownDataUrl} alt={t('portal.components.orderQR.alt')} className="block h-[220px] w-[220px]" />
           ) : (
             <div className="h-[220px] w-[220px] animate-pulse rounded bg-[#3d3f41]/20" />
           )}
@@ -78,10 +87,10 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
           {t('portal.components.orderQR.copy')}
         </button>
         <a
-          href={dataUrl ?? '#'}
+          href={shownDataUrl ?? '#'}
           download={`qr-dat-don-${slug}.png`}
-          aria-disabled={!dataUrl}
-          className={`flex flex-col items-center justify-center gap-1 rounded-lg bg-[#ff5625] px-2 py-3 text-xs font-bold text-white shadow-lg  transition-all hover:bg-[#ff5625]/90 active:scale-95 ${!dataUrl ? 'pointer-events-none opacity-50' : ''}`}
+          aria-disabled={!shownDataUrl}
+          className={`flex flex-col items-center justify-center gap-1 rounded-lg bg-[#ff5625] px-2 py-3 text-xs font-bold text-white shadow-lg  transition-all hover:bg-[#ff5625]/90 active:scale-95 ${!shownDataUrl ? 'pointer-events-none opacity-50' : ''}`}
         >
           <span className="material-symbols-outlined text-[20px]">download</span>
           {t('portal.components.orderQR.download')}
