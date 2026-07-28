@@ -10,7 +10,7 @@ import { useI18n } from '@/lib/i18n';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { AccountIdBadge } from './AccountIdBadge';
 
-type Variant = 'dealer' | 'supervisor' | 'admin';
+type Variant = 'dealer' | 'supervisor' | 'admin' | 'staff';
 interface NavItem { href: string; label: string; icon: string; exact?: boolean }
 
 export function PortalShell({
@@ -48,16 +48,20 @@ export function PortalShell({
     ],
     dealer: [
       { href: '/portal/dashboard', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
-      { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
       { href: '/portal/dealer/commission', label: t('portal.shell.nav.commission'), icon: 'payments' },
       { href: '/portal/dealer/qr', label: t('portal.shell.nav.qr_orders'), icon: 'qr_code_2' },
       { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
     ],
     supervisor: [
       { href: '/portal/supervisor', label: t('portal.shell.nav.team'), icon: 'groups', exact: true },
-      { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
       { href: '/portal/supervisor/commission', label: t('portal.shell.nav.commission_stats'), icon: 'payments' },
       { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
+    ],
+    staff: [
+      { href: '/portal/crm/accounts', label: t('portal.crm.nav.accounts'), icon: 'contacts' },
+      { href: '/portal/crm/pipeline', label: t('portal.crm.nav.pipeline'), icon: 'view_kanban' },
+      { href: '/portal/crm/activities', label: t('portal.crm.nav.activities'), icon: 'task_alt' },
+      { href: '/portal/crm/commission', label: t('portal.crm.nav.commission'), icon: 'payments' },
     ],
   };
   const items = NAV[variant];

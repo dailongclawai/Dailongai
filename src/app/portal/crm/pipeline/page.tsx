@@ -30,6 +30,13 @@ export default function CrmPipelinePage() {
     if (!loading && !session) router.replace('/portal/login');
   }, [loading, session, router]);
 
+  // Boss chốt 28/07/2026: CRM chỉ mở cho staff và admin
+  useEffect(() => {
+    if (!loading && profile && profile.role !== 'staff' && profile.role !== 'admin') {
+      router.replace('/portal/403');
+    }
+  }, [loading, profile, router]);
+
   const load = useCallback(async (p: CrmPipeline) => {
     setBusy(true);
     try {

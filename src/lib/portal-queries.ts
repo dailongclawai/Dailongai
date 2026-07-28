@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -855,4 +855,79 @@ export async function completeActivity(id: string, outcome?: string): Promise<vo
     .update({ done_at: new Date().toISOString(), outcome: outcome?.trim() || null })
     .eq('id', id);
   if (error) throw error;
+}
+
+// ── CRM staff (Plan 2) ──
+
+export async function getCrmSettings(): Promise<CrmSettings | null> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_settings')
+    .select('base_price, staff_rate_b2c, staff_rate_b2b, crossover_bonus_rate')
+    .maybeSingle();
+  if (error) throw error;
+  return (data as CrmSettings) ?? null;
+}
+
+export async function getStaffPeers(segment: StaffSegment): Promise<StaffPeer[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('profiles')
+    .select('id, full_name, email, staff_segment')
+    .eq('role', 'staff')
+    .eq('status', 'active')
+    .eq('staff_segment', segment)
+    .order('full_name');
+  if (error) throw error;
+  return (data as StaffPeer[]) ?? [];
+}
+
+export async function handoverAccount(accountId: string, toStaffId: string, note?: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('staff_handover_account', {
+    p_account_id: accountId,
+    p_to_staff: toStaffId,
+    p_note: note?.trim() || null,
+  });
+  if (error) throw error;
+}
+
+export async function getMyStaffCommissions(): Promise<CrmStaffCommission[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_staff_commissions')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmStaffCommission[]) ?? [];
+}
+
+export async function adminConfirmStaffDeal(opportunityId: string, orderId?: string): Promise<number> {
+  const { data, error } = await getSupabaseClient().rpc('admin_confirm_staff_deal', {
+    p_opportunity_id: opportunityId,
+    p_order_id: orderId ?? null,
+  });
+  if (error) throw error;
+  return (data as number) ?? 0;
+}
+
+export async function adminPayStaffCommission(commissionId: string, paymentRef: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('admin_pay_staff_commission', {
+    p_commission_id: commissionId,
+    p_payment_ref: paymentRef,
+  });
+  if (error) throw error;
+}
+
+export async function adminSetStaff(userId: string, segment: StaffSegment): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('admin_set_staff', {
+    p_user_id: userId,
+    p_segment: segment,
+  });
+  if (error) throw error;
+}
+
+export async function getCrmStaffReport(): Promise<CrmStaffReportRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_staff_report')
+    .select('*')
+    .order('staff_name');
+  if (error) throw error;
+  return (data as CrmStaffReportRow[]) ?? [];
 }

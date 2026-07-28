@@ -1,4 +1,5 @@
-export type ProfileRole = 'dealer' | 'supervisor' | 'admin';
+export type ProfileRole = 'dealer' | 'supervisor' | 'admin' | 'staff';
+export type StaffSegment = 'b2c' | 'b2b';
 export type ProfileStatus = 'pending' | 'active' | 'suspended';
 
 export interface Profile {
@@ -9,6 +10,7 @@ export interface Profile {
   email: string | null;
   avatar_url: string | null;
   role: ProfileRole | null;
+  staff_segment: StaffSegment | null;
   status: ProfileStatus;
   supervisor_id: string | null;
   business_name: string | null;
@@ -281,4 +283,54 @@ export interface CrmActivityRow {
   contact_id: string | null;
   owner_id: string;
   created_at: string;
+}
+
+// ── CRM staff (Plan 2) ──
+
+export interface CrmSettings {
+  base_price: number;
+  staff_rate_b2c: number;
+  staff_rate_b2b: number;
+  crossover_bonus_rate: number;
+}
+
+export type CrmCommissionStatus = 'pending' | 'payable' | 'paid' | 'void';
+
+export interface CrmStaffCommission {
+  id: string;
+  opportunity_id: string;
+  staff_id: string;
+  role_in_deal: 'closer' | 'referrer';
+  pipeline: CrmPipeline;
+  base_price: string;
+  rate: string;
+  amount: string;
+  status: CrmCommissionStatus;
+  handover_id: string | null;
+  order_id: string | null;
+  confirmed_at: string | null;
+  paid_at: string | null;
+  payment_ref: string | null;
+  created_at: string;
+}
+
+export interface CrmStaffReportRow {
+  staff_id: string;
+  staff_name: string | null;
+  staff_email: string | null;
+  staff_segment: StaffSegment | null;
+  deals_won: number;
+  deals_open: number;
+  commission_closer: string;
+  commission_referral: string;
+  amount_pending: string;
+  amount_payable: string;
+  amount_paid: string;
+}
+
+export interface StaffPeer {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  staff_segment: StaffSegment | null;
 }

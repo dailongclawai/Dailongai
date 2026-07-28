@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
+import { useAuth } from '@/lib/auth-context';
+import { CrmHandoverDialog } from './CrmHandoverDialog';
 import {
   createCrmAccount, updateCrmAccount, getCrmContacts, createCrmContact, deleteCrmContact,
 } from '@/lib/portal-queries';
@@ -20,6 +22,7 @@ interface Props {
 
 export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: Props) {
   const { t } = useI18n();
+  const { profile } = useAuth();
   const [name, setName] = useState('');
   const [kind, setKind] = useState<CrmAccountKind>('customer');
   const [phone, setPhone] = useState('');
@@ -32,6 +35,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
   const [saving, setSaving] = useState(false);
   const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [newContact, setNewContact] = useState({ full_name: '', phone: '', title: '' });
+  const [handoverOpen, setHandoverOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -211,6 +215,25 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
               {t('portal.crm.contact.add')}
             </button>
           </div>
+        )}
+
+        {account && profile?.role === 'staff' && profile.staff_segment && (
+          <>
+            <button
+              onClick={() => setHandoverOpen(true)}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-[#00daf3] py-2.5 text-sm text-[#00daf3]"
+            >
+              <span className="material-symbols-outlined text-[18px]">swap_horiz</span>
+              {t('portal.crm.handover.button')}
+            </button>
+            <CrmHandoverDialog
+              open={handoverOpen}
+              accountId={account.id}
+              mySegment={profile.staff_segment}
+              onClose={() => setHandoverOpen(false)}
+              onDone={() => { onSaved(); onClose(); }}
+            />
+          </>
         )}
       </div>
     </div>

@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { getSupabaseClient } from '@/lib/supabase';
+import { adminSetStaff } from '@/lib/portal-queries';
+import type { StaffSegment } from '@/lib/portal-types';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { AdminNav } from '@/components/portal/AdminNav';
 import { AccountIdBadge } from '@/components/portal/AccountIdBadge';
@@ -24,6 +26,8 @@ export default function AdminUpgradePage() {
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [userId, setUserId] = useState('');
+  const [staffId, setStaffId] = useState('');
+  const [staffSegment, setStaffSegment] = useState<StaffSegment>('b2c');
   const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -58,6 +62,24 @@ export default function AdminUpgradePage() {
     toast.success(t('portal.admin.upgrade.toast.upgraded'));
     setUserId('');
     await refresh();
+  };
+
+  const assignStaff = async () => {
+    if (!staffId.trim()) {
+      toast.error(t('portal.admin.upgrade.toast.missing_id'));
+      return;
+    }
+    setBusy(true);
+    try {
+      await adminSetStaff(staffId.trim(), staffSegment);
+      toast.success(t('portal.admin.upgrade.staff_done'));
+      setStaffId('');
+      await refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const downgrade = async (id: string, name: string | null) => {
@@ -100,6 +122,46 @@ export default function AdminUpgradePage() {
         >
           {t('portal.admin.upgrade.action.promote')}
         </button>
+      </div>
+
+      {/* Boss chốt 28/07/2026: CRM chỉ mở cho staff — admin gán vai trò ở đây */}
+      <div className="mb-8 rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-4">
+        <h2 className="mb-3 text-sm font-bold text-[#e7eaf0]">{t('portal.admin.upgrade.staff_title')}</h2>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[240px] flex-1">
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60" htmlFor="staff-user-id">
+              {t('portal.admin.upgrade.input.label')}
+            </label>
+            <input
+              id="staff-user-id"
+              value={staffId}
+              onChange={(e) => setStaffId(e.target.value)}
+              placeholder={t('portal.admin.upgrade.input.placeholder')}
+              className="w-full rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm font-mono tabular-nums outline-none focus:border-[#ff5625]"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60" htmlFor="staff-segment">
+              {t('portal.admin.upgrade.staff_segment')}
+            </label>
+            <select
+              id="staff-segment"
+              value={staffSegment}
+              onChange={(e) => setStaffSegment(e.target.value as StaffSegment)}
+              className="rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
+            >
+              <option value="b2c">{t('portal.crm.pipeline.b2c_device')}</option>
+              <option value="b2b">{t('portal.crm.pipeline.b2b_dealer')}</option>
+            </select>
+          </div>
+          <button
+            onClick={() => void assignStaff()}
+            disabled={busy}
+            className="rounded-full bg-[#00daf3] px-5 py-2.5 text-sm font-medium text-[#0c0e10] transition-colors hover:bg-[#00daf3]/90 disabled:opacity-50"
+          >
+            {t('portal.admin.upgrade.staff_submit')}
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto portal-scroll rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
