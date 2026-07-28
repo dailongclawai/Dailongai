@@ -1,5 +1,5 @@
 BEGIN;
-SELECT plan(8);
+SELECT plan(12);
 
 TRUNCATE public.profiles, public.product_models CASCADE;
 DELETE FROM auth.users;
@@ -97,6 +97,55 @@ SELECT results_eq(
         AND role_in_deal='referrer'$$,
     ARRAY[0],
     'thưởng chuyển khách chỉ tính một lần'
+);
+
+-- ── Chiều ngược lại: B2B bắn khách sang B2C cũng được thưởng (Boss chốt 28/07/2026) ──
+
+SET LOCAL ROLE authenticated;
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-00000000005b';
+INSERT INTO public.crm_accounts (id, name, kind, owner_id)
+VALUES ('20000000-0000-0000-0000-0000000000c9', 'Khách hoá ra chỉ mua lẻ',
+        'customer', '00000000-0000-0000-0000-00000000005b');
+
+-- 9. B2B bắn được khách sang staff B2C
+SELECT lives_ok(
+    $$SELECT public.staff_handover_account(
+        '20000000-0000-0000-0000-0000000000c9',
+        '00000000-0000-0000-0000-00000000005c', 'Khách chỉ mua 1 máy dùng, chuyển B2C')$$,
+    'staff B2B bắn khách sang staff B2C'
+);
+
+-- 10. B2C chốt deal bán máy -> 3 dòng (1 closer + 2 thưởng)
+SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-00000000005c';
+INSERT INTO public.crm_opportunities (id, account_id, pipeline, stage_id, name, amount, owner_id)
+SELECT '30000000-0000-0000-0000-0000000000c9',
+       '20000000-0000-0000-0000-0000000000c9', 'b2c_device',
+       (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='won'),
+       'Bán 1 máy cho khách B2C', 29500000, '00000000-0000-0000-0000-00000000005c';
+RESET ROLE;
+SELECT results_eq(
+    $$SELECT count(*)::int FROM public.crm_staff_commissions
+      WHERE opportunity_id='30000000-0000-0000-0000-0000000000c9'$$,
+    ARRAY[3],
+    'chiều B2B->B2C cũng sinh 3 dòng: 1 closer + 2 thưởng'
+);
+
+-- 11. thưởng vẫn 375.000 mỗi người
+SELECT results_eq(
+    $$SELECT DISTINCT amount FROM public.crm_staff_commissions
+      WHERE opportunity_id='30000000-0000-0000-0000-0000000000c9'
+        AND role_in_deal='referrer'$$,
+    ARRAY[375000::numeric(14,2)],
+    'chiều B2B->B2C: mỗi người vẫn nhận 375.000'
+);
+
+-- 12. người chốt B2C ăn đủ 20% = 3.000.000, không bị trừ
+SELECT results_eq(
+    $$SELECT amount FROM public.crm_staff_commissions
+      WHERE opportunity_id='30000000-0000-0000-0000-0000000000c9'
+        AND role_in_deal='closer'$$,
+    ARRAY[3000000::numeric(14,2)],
+    'chiều B2B->B2C: người chốt B2C vẫn ăn đủ 20% = 3.000.000'
 );
 
 SELECT * FROM finish();
