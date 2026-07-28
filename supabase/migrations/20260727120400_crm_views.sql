@@ -30,7 +30,7 @@ SELECT
     o.created_at
 FROM public.crm_opportunities o
 JOIN public.crm_stages   s ON s.id = o.stage_id
-JOIN public.crm_accounts a ON a.id = o.account_id
+LEFT JOIN public.crm_accounts a ON a.id = o.account_id
 LEFT JOIN public.profiles p ON p.id = o.owner_id;
 
 CREATE OR REPLACE VIEW public.crm_activity_inbox

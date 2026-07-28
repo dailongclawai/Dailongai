@@ -252,9 +252,11 @@ export interface CrmOpportunityBoardRow {
   owner_id: string;
   owner_name: string | null;
   account_id: string;
-  account_name: string;
+  // LEFT JOIN trong crm_opportunity_board: nếu RLS che bản ghi khách hàng thì
+  // các cột này về NULL, cơ hội vẫn hiện trên bảng thay vì biến mất.
+  account_name: string | null;
   account_phone: string | null;
-  account_kind: CrmAccountKind;
+  account_kind: CrmAccountKind | null;
   contact_id: string | null;
   model_id: string | null;
   order_id: string | null;
