@@ -38,6 +38,7 @@ export function PortalShell({
     admin: [
       { href: '/portal/admin', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
       { href: '/portal/admin/orders', label: t('portal.shell.nav.orders'), icon: 'shopping_cart' },
+      { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
       { href: '/portal/admin/payouts', label: t('portal.shell.nav.payout_requests'), icon: 'payments' },
       { href: '/portal/admin/products', label: t('portal.shell.nav.products'), icon: 'medical_services' },
       { href: '/portal/admin/supervisors', label: t('portal.shell.nav.supervisors'), icon: 'groups' },
@@ -47,12 +48,14 @@ export function PortalShell({
     ],
     dealer: [
       { href: '/portal/dashboard', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
+      { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
       { href: '/portal/dealer/commission', label: t('portal.shell.nav.commission'), icon: 'payments' },
       { href: '/portal/dealer/qr', label: t('portal.shell.nav.qr_orders'), icon: 'qr_code_2' },
       { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
     ],
     supervisor: [
       { href: '/portal/supervisor', label: t('portal.shell.nav.team'), icon: 'groups', exact: true },
+      { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
       { href: '/portal/supervisor/commission', label: t('portal.shell.nav.commission_stats'), icon: 'payments' },
       { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
     ],
