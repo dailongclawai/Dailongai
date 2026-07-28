@@ -2,12 +2,14 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: "./out",
+      // Next 16 xuất tĩnh ra file phẳng (out/san-pham.html); thư mục cùng tên chỉ
+      // chứa payload .txt nên đường dẫn kiểu /san-pham/index.html trả về 404.
       url: [
         "http://localhost/index.html",
-        "http://localhost/san-pham/index.html",
-        "http://localhost/blog/index.html",
-        "http://localhost/about-us/index.html",
-        "http://localhost/lien-he/index.html",
+        "http://localhost/san-pham.html",
+        "http://localhost/blog.html",
+        "http://localhost/about-us.html",
+        "http://localhost/lien-he.html",
       ],
       numberOfRuns: 1,
       settings: {
