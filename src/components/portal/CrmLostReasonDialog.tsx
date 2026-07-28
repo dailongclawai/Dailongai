@@ -22,12 +22,11 @@ export function CrmLostReasonDialog({ open, pipeline, stageName, onClose, onConf
   const [reasonId, setReasonId] = useState('');
   const [notes, setNotes] = useState('');
 
+  // Không reset state trong effect — trang kanban gắn `key` theo cơ hội đang thả nên
+  // mỗi lần mở là một instance mới, ô chọn tự sạch.
   useEffect(() => {
-    if (!open) return;
-    setReasonId('');
-    setNotes('');
     void getCrmLostReasons().then(setReasons).catch(() => setReasons([]));
-  }, [open]);
+  }, []);
 
   if (!open) return null;
 

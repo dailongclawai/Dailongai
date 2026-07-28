@@ -106,6 +106,36 @@ test('mục 3 — kéo cơ hội sang cột thua thì bắt buộc chọn lý do
   await expect(card.getByText('Giá cao')).toBeVisible({ timeout: 15_000 });
 });
 
+test('mục 3b — kéo thẻ sang cột thua trên kanban thì hộp thoại lý do bật lên', async ({ page }) => {
+  await login(page, B2C);
+  await page.goto('/portal/crm/pipeline');
+
+  const opp = `${OPP} keo tha`;
+  await page.getByRole('button', { name: 'Thêm cơ hội' }).click();
+  await page.selectOption('#crm-opp-account', { label: `${HOA} · ${PHONE}` });
+  await page.fill('#crm-opp-name', opp);
+  await page.fill('#crm-opp-amount', '9000000');
+  await page.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await expect(page.getByText('Đã lưu cơ hội')).toBeVisible({ timeout: 15_000 });
+
+  // Kéo–thả HTML5 thật không mô phỏng được bằng mouse; bắn thẳng sự kiện mà
+  // React đang lắng nghe (onDragStart / onDragOver / onDrop).
+  const card = page.locator('article').filter({ hasText: opp }).first();
+  const lostCol = page.locator('div').filter({ has: page.getByText('Không mua', { exact: true }) }).last();
+  await card.dispatchEvent('dragstart');
+  await lostCol.dispatchEvent('dragover');
+  await lostCol.dispatchEvent('drop');
+
+  // Hộp thoại phải bật, và bấm xác nhận khi chưa chọn lý do thì bị chặn.
+  await expect(page.getByText('Vì sao mất cơ hội này?')).toBeVisible({ timeout: 10_000 });
+  await page.getByRole('button', { name: 'Xác nhận mất' }).click();
+  await expect(page.getByText('Phải chọn lý do mất')).toBeVisible({ timeout: 10_000 });
+
+  await page.selectOption('#lost-reason', { label: 'Mất liên lạc' });
+  await page.getByRole('button', { name: 'Xác nhận mất' }).click();
+  await expect(page.locator('article').filter({ hasText: opp }).getByText('Mất liên lạc')).toBeVisible({ timeout: 15_000 });
+});
+
 test('mục 4 — nhập Excel: đếm đúng trùng, chặn nhập trước khi kiểm tra, tạo được khách mới', async ({ page }) => {
   await login(page, B2C);
 

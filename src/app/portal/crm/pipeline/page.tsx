@@ -177,6 +177,7 @@ export default function CrmPipelinePage() {
       />
 
       <CrmLostReasonDialog
+        key={losing?.id ?? 'none'}
         open={losing !== null}
         pipeline={pipeline}
         stageName={losing?.stage.name ?? ''}
