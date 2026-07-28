@@ -243,7 +243,7 @@ export default function PayoutInfoPage() {
 
   const verified = !!profile.payout_verified_at
     || !!(profile.bank_name && profile.bank_account_name && profile.bank_account_number);
-  const variant = profile.role === 'supervisor' ? 'supervisor' : 'dealer';
+  const variant = profile.role ?? 'dealer';
   const currentBankCode = bankCode || (banks.find((b) => b.shortName === profile.bank_name)?.code ?? '');
   const currentBankBin = bankBin || (banks.find((b) => b.shortName === profile.bank_name)?.bin ?? '');
 

@@ -130,7 +130,7 @@ export default function InboxPage() {
   ];
 
   return (
-    <PortalShell variant={profile.role === 'admin' ? 'admin' : profile.role === 'supervisor' ? 'supervisor' : 'dealer'}>
+    <PortalShell variant={profile.role ?? 'dealer'}>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">{t('portal.inbox.eyebrow')}</p>

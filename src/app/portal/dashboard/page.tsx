@@ -24,6 +24,9 @@ export default function DashboardPage() {
     }
     if (profile.role === 'admin') { router.replace('/portal/admin'); return; }
     if (profile.role === 'supervisor') { router.replace('/portal/supervisor'); return; }
+    // Trang này chỉ dành cho đại lý; vai trò khác mà rơi vào đây thì phải đẩy đi,
+    // vì dòng `return null` bên dưới sẽ cho ra màn hình trống.
+    if (profile.role === 'staff') { router.replace('/portal/crm/accounts'); return; }
   }, [loading, session, profile, router]);
 
   if (loading || !session || !profile || profile.role !== 'dealer') return null;

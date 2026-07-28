@@ -45,6 +45,13 @@ export default function PortalIndex() {
       router.replace('/portal/supervisor');
       return;
     }
+    // staff (nhân viên kinh doanh) không có trang tổng quan đại lý — vào thẳng CRM.
+    // Thiếu nhánh này thì staff bị đẩy về /portal/dashboard và trang đó render null
+    // → màn hình đen (Boss gặp 28/07/2026).
+    if (profile.role === 'staff') {
+      router.replace('/portal/crm/accounts');
+      return;
+    }
     router.replace('/portal/dashboard');
   }, [loading, session, profile, router, refresh]);
 
