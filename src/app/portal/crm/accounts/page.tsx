@@ -12,6 +12,8 @@ import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import type { CrmAccount, CrmAccountKind, CrmAccountListRow, CrmStage } from '@/lib/portal-types';
 
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
+
 // Chỉ đổi màu CHỮ và viền, giữ nền đặc. Nền trong suốt làm hộp thả xuống của
 // native select không đọc được vì trình duyệt bỏ qua style đặt trên <option>.
 function STATUS_STYLE(label: string): string {
@@ -124,7 +126,7 @@ export default function CrmAccountsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[#3d3f41]">
-        <table className="w-full min-w-[860px] text-left text-sm">
+        <table className="w-full min-w-[1040px] text-left text-sm">
           <thead className="bg-[#282a2c] text-[#a0a0a8]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_code')}</th>
@@ -133,15 +135,17 @@ export default function CrmAccountsPage() {
               <th className="px-4 py-3">{t('portal.crm.account.phone')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.province')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.source')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_machines')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_commission')}</th>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_status')}</th>
             </tr>
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {filtered.map(r => (
               <tr
@@ -157,6 +161,17 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.phone ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#e2e2e5]">
+                  {r.total_quantity > 0 ? r.total_quantity : '—'}
+                  {r.open_deals > 0 && (
+                    <span className="ml-1 text-xs font-sans text-[#a0a0a8]">
+                      ({r.open_deals} {t('portal.crm.accounts.open_short')})
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">
+                  {Number(r.expected_commission) > 0 ? `${fmtVnd(Number(r.expected_commission))}đ` : '—'}
+                </td>
                 {/* stopPropagation: bấm vào ô chọn không được mở ngăn kéo chi tiết */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,

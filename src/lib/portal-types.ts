@@ -233,6 +233,12 @@ export interface CrmAccountListRow extends CrmAccount {
   /** Tên giai đoạn nhân viên đang chọn cho khách này. */
   status_label: string;
   stage_id: string | null;
+  /** Tổng số máy khách đặt, cộng từ các cơ hội chưa thua. */
+  total_quantity: number;
+  /** Hoa hồng nhân viên dự kiến nhận từ khách này = tổng giá trị × staff_rate. */
+  expected_commission: string;
+  /** Số cơ hội còn đang mở của khách. */
+  open_deals: number;
 }
 
 export interface CrmContact {

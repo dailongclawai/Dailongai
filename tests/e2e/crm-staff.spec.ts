@@ -242,6 +242,16 @@ test('mục 5 — gắn đơn hàng vào cơ hội: ô chọn có mặt và lưu
   await expect(card.getByText(/1 máy/)).toBeVisible({ timeout: 15_000 });
   await expect(card.getByText(/Hoa hồng dự kiến: 2\.950\.000đ/)).toBeVisible();
   await expect(card.getByText(/Dùng thử 30 ngày/)).toBeVisible();
+
+  // Và BẢNG KHÁCH HÀNG cũng phải hiện hai con số đó — chỗ Boss báo còn thiếu.
+  await page.goto('/portal/crm/accounts');
+  await expect(page.getByRole('columnheader', { name: 'Số máy' })).toBeVisible();
+  await expect(page.getByRole('columnheader', { name: 'Hoa hồng dự kiến' })).toBeVisible();
+  const custRow = page.getByRole('row').filter({ hasText: HOA });
+  // Chị Hoa có 3 cơ hội, nhưng 2 cái đã bị chuyển sang "thua" ở bài 3 và 3b nên
+  // KHÔNG được cộng vào. Chỉ còn cơ hội 29.500.000 → hoa hồng dự kiến 2.950.000.
+  await expect(custRow.getByText(/1 đang mở/)).toBeVisible({ timeout: 15_000 });
+  await expect(custRow.getByText(/2\.950\.000đ/)).toBeVisible();
 });
 
 test.afterEach(async ({ page }) => { await logout(page); });
