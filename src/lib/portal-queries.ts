@@ -766,6 +766,7 @@ export interface CrmOpportunityInput {
   notes?: string | null;
   lostReasonId?: string | null;
   lostNotes?: string | null;
+  trialDays?: number | null;
   ownerId: string;
 }
 
@@ -782,6 +783,7 @@ function crmOpportunityRow(input: CrmOpportunityInput) {
     notes: input.notes?.trim() || null,
     lost_reason_id: input.lostReasonId ?? null,
     lost_notes: input.lostNotes?.trim() || null,
+    trial_days: input.trialDays ?? null,
     owner_id: input.ownerId,
   };
 }
@@ -890,6 +892,13 @@ export async function getMyStaffCommissions(): Promise<CrmStaffCommission[]> {
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data as CrmStaffCommission[]) ?? [];
+}
+
+/** Chuyển những dòng đã hết hạn dùng thử sang payable. Chỉ admin. */
+export async function releaseDueCommissions(): Promise<number> {
+  const { data, error } = await getSupabaseClient().rpc('crm_release_due_commissions');
+  if (error) throw error;
+  return (data as number) ?? 0;
 }
 
 export async function adminPayStaffCommission(commissionId: string, paymentRef: string): Promise<void> {

@@ -11,6 +11,7 @@ const stages: CrmStage[] = [
 const row = (id: string, stage_id: string, amount: number, probability: number): CrmOpportunityBoardRow => ({
   id, code: 'CH-000001', name: 'opp ' + id, stage_id,
   stage_name: 'x', probability, forecast: 'open', sort_order: 1, amount, quantity: 1,
+  trial_days: null, expected_commission: String(amount * 0.1),
   expected_close_date: '2026-08-10', owner_id: 'o1', owner_name: null,
   account_id: 'a1', account_name: 'Cô Lan', account_phone: null, account_kind: 'customer',
   contact_id: null, model_id: null, order_id: null, closed_at: null,

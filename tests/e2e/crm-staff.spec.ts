@@ -232,9 +232,16 @@ test('mục 5 — gắn đơn hàng vào cơ hội: ô chọn có mặt và lưu
   await expect(orderSelect.getByRole('option', { name: 'Chưa gắn đơn nào' })).toBeAttached();
   await expect(page.getByText(/Phải gắn đơn thì khi khách thanh toán/)).toBeVisible();
 
-  // Lưu lại khi vẫn để trống thì không được văng lỗi.
+  // Đặt 30 ngày dùng thử rồi lưu.
+  await page.fill('#crm-opp-trial', '30');
   await page.getByRole('button', { name: 'Lưu', exact: true }).click();
   await expect(page.getByText('Đã lưu cơ hội')).toBeVisible({ timeout: 15_000 });
+
+  // Thẻ kanban phải hiện số máy, hoa hồng dự kiến và nhãn dùng thử.
+  const card = page.locator('article').filter({ hasText: opp });
+  await expect(card.getByText(/1 máy/)).toBeVisible({ timeout: 15_000 });
+  await expect(card.getByText(/Hoa hồng dự kiến: 2\.950\.000đ/)).toBeVisible();
+  await expect(card.getByText(/Dùng thử 30 ngày/)).toBeVisible();
 });
 
 test.afterEach(async ({ page }) => { await logout(page); });

@@ -131,7 +131,22 @@ export default function CrmPipelinePage() {
                 >
                   <p className="text-sm font-semibold text-[#e2e2e5]">{r.name}</p>
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.account_name}</p>
-                  <p className="mt-2 text-sm font-bold text-[#ff5625]">{fmtVnd(Number(r.amount))}đ</p>
+                  <p className="mt-2 text-sm font-bold text-[#ff5625]">
+                    {fmtVnd(Number(r.amount))}đ
+                    <span className="ml-1 text-xs font-normal text-[#a0a0a8]">
+                      · {r.quantity} {t('portal.crm.opp.machines')}
+                    </span>
+                  </p>
+                  {Number(r.expected_commission) > 0 && (
+                    <p className="mt-1 text-xs text-[#00daf3]">
+                      {t('portal.crm.opp.expected_commission')}: {fmtVnd(Number(r.expected_commission))}đ
+                    </p>
+                  )}
+                  {r.trial_days && (
+                    <p className="mt-1 inline-block rounded-full bg-[#ff5625]/15 px-2 py-0.5 text-xs text-[#ff5625]">
+                      {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
+                    </p>
+                  )}
                   <p className="mt-1 text-xs text-[#a0a0a8]">{r.expected_close_date}</p>
                   {r.lost_reason_name && (
                     <p className="mt-1 inline-block rounded-full bg-[#282a2c] px-2 py-0.5 text-xs text-[#ff5625]">

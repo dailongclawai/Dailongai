@@ -40,6 +40,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
   const [lostNotes, setLostNotes] = useState('');
   const [orders, setOrders] = useState<CrmLinkableOrder[]>([]);
   const [orderId, setOrderId] = useState('');
+  const [trialDays, setTrialDays] = useState('');
 
   const pipelineStages = [...stages].sort((a, b) => a.sort_order - b.sort_order);
   const isLost = pipelineStages.find(s => s.id === stageId)?.forecast === 'lost';
@@ -53,6 +54,8 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     : listPrice;
   const suggested = unitPrice * quantity;
   const belowSuggested = suggested > 0 && amount > 0 && amount < suggested;
+  // Hoa hồng dự kiến hiện ngay từ lúc bắt đầu theo khách, không đợi chốt deal.
+  const expectedCommission = row ? Number(row.expected_commission) : 0;
 
   useEffect(() => {
     if (!open) return;
@@ -70,6 +73,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     setLostReasonId(row?.lost_reason_id ?? '');
     setLostNotes(row?.lost_notes ?? '');
     setOrderId(row?.order_id ?? '');
+    setTrialDays(row?.trial_days ? String(row.trial_days) : '');
   }, [open, row]);
 
   // Danh sách đơn phụ thuộc khách đang chọn, nạp lại mỗi khi đổi khách.
@@ -94,6 +98,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
         expectedCloseDate: closeDate || null, notes, ownerId,
         lostReasonId: isLost ? lostReasonId : null,
         lostNotes: isLost ? lostNotes : null,
+        trialDays: trialDays ? Number(trialDays) : null,
       };
       if (row) {
         await updateCrmOpportunity(row.id, input);
@@ -218,6 +223,28 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
               {belowSuggested && (
                 <span className="ml-2 text-[#ff5625]">
                   {t('portal.crm.opp.price_below')} {(100 - (amount / suggested) * 100).toFixed(1)}%
+                </span>
+              )}
+            </p>
+          )}
+
+          <div>
+            <label className={label} htmlFor="crm-opp-trial">{t('portal.crm.opp.trial_days')}</label>
+            <input
+              id="crm-opp-trial" type="number" min={0} max={365} className={field}
+              value={trialDays} onChange={e => setTrialDays(e.target.value)}
+              placeholder="30"
+            />
+            <p className="mt-1 text-xs text-[#a0a0a8]">{t('portal.crm.opp.trial_hint')}</p>
+          </div>
+
+          {row && expectedCommission > 0 && (
+            <p className="rounded-xl bg-[#282a2c] px-3 py-2 text-sm text-[#a0a0a8]">
+              {t('portal.crm.opp.expected_commission')}:{' '}
+              <b className="text-[#00daf3]">{fmtVnd(expectedCommission)}đ</b>
+              {row.trial_days && (
+                <span className="ml-2 text-xs text-[#ff5625]">
+                  {t('portal.crm.opp.trial_hold')} {row.trial_days} {t('portal.crm.opp.days')}
                 </span>
               )}
             </p>

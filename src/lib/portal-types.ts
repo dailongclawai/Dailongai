@@ -263,6 +263,10 @@ export interface CrmOpportunityBoardRow {
   sort_order: number;
   amount: number;
   quantity: number;
+  /** Số ngày khách dùng thử. NULL = bán đứt, hoa hồng chi ngay khi thanh toán. */
+  trial_days: number | null;
+  /** Hoa hồng nhân viên sẽ nhận nếu deal thành công = amount × staff_rate. */
+  expected_commission: string;
   expected_close_date: string;
   owner_id: string;
   owner_name: string | null;
@@ -348,6 +352,8 @@ export interface CrmStaffCommission {
   rate: string;
   amount: string;
   status: CrmCommissionStatus;
+  /** Mốc đủ điều kiện chi. Có dùng thử thì bằng ngày thanh toán cộng số ngày thử. */
+  eligible_at: string;
   order_id: string;
   confirmed_at: string | null;
   paid_at: string | null;

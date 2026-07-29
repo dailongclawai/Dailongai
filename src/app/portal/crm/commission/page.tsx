@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getMyStaffCommissions, adminPayStaffCommission } from '@/lib/portal-queries';
+import { getMyStaffCommissions, adminPayStaffCommission, releaseDueCommissions } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import type { CrmStaffCommission, CrmCommissionStatus } from '@/lib/portal-types';
@@ -64,6 +64,16 @@ export default function CrmCommissionPage() {
   const isAdmin = profile?.role === 'admin';
 
 
+  const release = async () => {
+    try {
+      const n = await releaseDueCommissions();
+      toast.success(`${t('portal.crm.commission.released')}: ${n}`);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
   const pay = async (id: string) => {
     const ref = window.prompt(t('portal.crm.commission.payment_ref'));
     if (!ref) return;
@@ -87,7 +97,17 @@ export default function CrmCommissionPage() {
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
-      <h1 className="mb-5 text-xl font-bold text-[#e2e2e5]">{t('portal.crm.commission.title')}</h1>
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.commission.title')}</h1>
+        {isAdmin && (
+          <button
+            onClick={() => void release()}
+            className="rounded-xl border border-[#00daf3] px-4 py-2 text-sm text-[#00daf3]"
+          >
+            {t('portal.crm.commission.release')}
+          </button>
+        )}
+      </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {cards.map(c => (
@@ -127,10 +147,17 @@ export default function CrmCommissionPage() {
                 <td className="px-4 py-3 font-bold text-[#e2e2e5]">{fmtVnd(Number(r.amount))}đ</td>
                 <td className={`px-4 py-3 ${STATUS_COLOR[r.status]}`}>
                   {t('portal.crm.commission.' + r.status)}
+                  {r.status === 'pending' && (
+                    <span className="mt-0.5 block text-xs text-[#a0a0a8]">
+                      {t('portal.crm.commission.waiting_trial')}{' '}
+                      {new Date(r.eligible_at).toLocaleDateString('vi-VN')}
+                    </span>
+                  )}
                 </td>
                 {isAdmin && (
                   <td className="px-4 py-3">
-                    {r.status === 'payable' && (
+                    {(r.status === 'payable'
+                      || (r.status === 'pending' && new Date(r.eligible_at) <= new Date())) && (
                       <button onClick={() => void pay(r.id)} className="rounded-lg border border-[#3d3f41] px-3 py-1.5 text-xs text-[#e2e2e5] hover:border-[#34d399]">
                         {t('portal.crm.commission.mark_paid')}
                       </button>
