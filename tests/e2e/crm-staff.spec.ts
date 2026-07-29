@@ -213,4 +213,28 @@ test('mục 4 — nhập Excel: đếm đúng trùng, chặn nhập trước khi
   await expect(page.getByRole('cell', { name: `Chị Hoa trùng ${stamp}` })).toHaveCount(0);
 });
 
+test('mục 5 — gắn đơn hàng vào cơ hội: ô chọn có mặt và lưu được', async ({ page }) => {
+  await login(page, B2C);
+  await page.goto('/portal/crm/pipeline');
+
+  const opp = `${OPP} gan don`;
+  await page.getByRole('button', { name: 'Thêm cơ hội' }).click();
+  await page.selectOption('#crm-opp-account', { label: `${HOA} · ${PHONE}` });
+  await page.fill('#crm-opp-name', opp);
+  await page.fill('#crm-opp-amount', '29500000');
+  await page.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await expect(page.getByText('Đã lưu cơ hội')).toBeVisible({ timeout: 15_000 });
+
+  // Cơ hội mới chưa có ô gắn đơn (chỉ hiện khi mở lại bản đã lưu).
+  await page.getByText(opp).click();
+  const orderSelect = page.locator('#crm-opp-order');
+  await expect(orderSelect).toBeVisible({ timeout: 10_000 });
+  await expect(orderSelect.getByRole('option', { name: 'Chưa gắn đơn nào' })).toBeAttached();
+  await expect(page.getByText(/Phải gắn đơn thì khi khách thanh toán/)).toBeVisible();
+
+  // Lưu lại khi vẫn để trống thì không được văng lỗi.
+  await page.getByRole('button', { name: 'Lưu', exact: true }).click();
+  await expect(page.getByText('Đã lưu cơ hội')).toBeVisible({ timeout: 15_000 });
+});
+
 test.afterEach(async ({ page }) => { await logout(page); });

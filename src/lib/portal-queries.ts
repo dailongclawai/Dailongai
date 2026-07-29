@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -816,6 +816,22 @@ export async function moveOpportunityStage(
     .from('crm_opportunities')
     .update({ stage_id: stageId, lost_reason_id: lostReasonId ?? null, lost_notes: lostNotes?.trim() || null })
     .eq('id', id);
+  if (error) throw error;
+}
+
+/** Đơn hàng chưa cơ hội nào nhận, đơn trùng số điện thoại khách xếp trước.
+ *  Đi qua RPC vì nhân viên kinh doanh không có quyền đọc thẳng bảng orders. */
+export async function getOrdersForAccount(accountId: string): Promise<CrmLinkableOrder[]> {
+  const { data, error } = await getSupabaseClient()
+    .rpc('crm_orders_for_account', { p_account_id: accountId });
+  if (error) throw error;
+  return (data as CrmLinkableOrder[]) ?? [];
+}
+
+/** Gắn đơn vào cơ hội; truyền null để gỡ. */
+export async function linkOrderToOpportunity(opportunityId: string, orderId: string | null): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .rpc('crm_link_order', { p_opportunity_id: opportunityId, p_order_id: orderId });
   if (error) throw error;
 }
 

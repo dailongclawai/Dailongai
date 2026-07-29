@@ -11,7 +11,7 @@ import { getAllModels, createModel, updateModel } from '@/lib/portal-queries';
 import type { ProductModel } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(n);
-const emptyForm = { id: '', code: '', name: '', description: '', base_price: '', active: true };
+const emptyForm = { id: '', code: '', name: '', description: '', base_price: '', dealer_price: '', active: true };
 
 export default function AdminProductsPage() {
   const router = useRouter();
@@ -35,12 +35,14 @@ export default function AdminProductsPage() {
   if (loading || profile?.role !== 'admin') return null;
 
   const edit = (m: ProductModel) => {
-    setForm({ id: m.id, code: m.code, name: m.name, description: m.description ?? '', base_price: String(Number(m.base_price)), active: m.active });
+    setForm({ id: m.id, code: m.code, name: m.name, description: m.description ?? '', base_price: String(Number(m.base_price)), dealer_price: m.dealer_price ? String(Number(m.dealer_price)) : '', active: m.active });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const save = async () => {
     const price = Number(form.base_price.replace(/[^\d]/g, ''));
+    const dealerRaw = form.dealer_price.replace(/[^\d]/g, '');
+    const dealerPrice = dealerRaw ? Number(dealerRaw) : null;
     if (!form.code.trim() || !form.name.trim() || !(price >= 0)) {
       toast.error(t('portal.admin.products.toast.invalid'));
       return;
@@ -52,6 +54,7 @@ export default function AdminProductsPage() {
         name: form.name.trim(),
         description: form.description.trim() || null,
         base_price: price,
+        dealer_price: dealerPrice,
         active: form.active,
       };
       if (form.id) await updateModel(form.id, payload);
@@ -108,6 +111,11 @@ export default function AdminProductsPage() {
             <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.price_label')}</label>
             <input value={form.base_price} onChange={(e) => setForm({ ...form, base_price: e.target.value })} placeholder="29500000" className={`${input} font-mono tabular-nums`} />
           </div>
+          <div>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.dealer_price_label')}</label>
+            <input value={form.dealer_price} onChange={(e) => setForm({ ...form, dealer_price: e.target.value })} placeholder="24000000" className={`${input} font-mono tabular-nums`} />
+            <p className="mt-1 text-[11px] text-[#e7eaf0]/50">{t('portal.admin.products.form.dealer_price_hint')}</p>
+          </div>
           <div className="flex items-end gap-3">
             <label className="flex items-center gap-2 text-sm text-[#e7eaf0]/80">
               <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-[#ff5625]" />
@@ -133,18 +141,20 @@ export default function AdminProductsPage() {
               <th className="px-4 py-3">{t('portal.admin.products.table.code')}</th>
               <th className="px-4 py-3">{t('portal.admin.products.table.name')}</th>
               <th className="px-4 py-3 text-right">{t('portal.admin.products.table.price')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.admin.products.table.dealer_price')}</th>
               <th className="px-4 py-3 text-center">{t('portal.admin.products.table.status')}</th>
               <th className="px-4 py-3 text-right"></th>
             </tr>
           </thead>
           <tbody>
             {models.length === 0 ? (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-[#e7eaf0]/50">{t('portal.admin.products.table.empty')}</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-[#e7eaf0]/50">{t('portal.admin.products.table.empty')}</td></tr>
             ) : models.map((m) => (
               <tr key={m.id} className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
                 <td className="px-4 py-3 font-mono text-[#e7eaf0]/80">{m.code}</td>
                 <td className="px-4 py-3 font-medium">{m.name}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums">{fmtVnd(Number(m.base_price))}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#e7eaf0]/70">{m.dealer_price ? fmtVnd(Number(m.dealer_price)) : '—'}</td>
                 <td className="px-4 py-3 text-center">
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${m.active ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#1a1f26] text-[#e7eaf0]/50'}`}>
                     {m.active ? t('portal.admin.products.status.active') : t('portal.admin.products.status.hidden')}

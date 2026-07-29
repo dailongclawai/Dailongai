@@ -5,10 +5,13 @@ import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
 import {
   createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
+  getOrdersForAccount, linkOrderToOpportunity,
 } from '@/lib/portal-queries';
 import type {
-  CrmAccount, CrmLostReason, CrmOpportunityBoardRow, CrmStage, ProductModel,
+  CrmAccount, CrmLinkableOrder, CrmLostReason, CrmOpportunityBoardRow, CrmStage, ProductModel,
 } from '@/lib/portal-types';
+
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 interface Props {
   open: boolean;
@@ -35,9 +38,21 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
   const [reasons, setReasons] = useState<CrmLostReason[]>([]);
   const [lostReasonId, setLostReasonId] = useState('');
   const [lostNotes, setLostNotes] = useState('');
+  const [orders, setOrders] = useState<CrmLinkableOrder[]>([]);
+  const [orderId, setOrderId] = useState('');
 
   const pipelineStages = [...stages].sort((a, b) => a.sort_order - b.sort_order);
   const isLost = pipelineStages.find(s => s.id === stageId)?.forecast === 'lost';
+
+  // Đại lý và bán lẻ chỉ khác giá: đại lý lấy dealer_price nếu model có đặt.
+  const account = accounts.find(a => a.id === accountId);
+  const model = models.find(m => m.id === modelId);
+  const listPrice = model ? Number(model.base_price) : 0;
+  const unitPrice = account?.kind === 'dealer_prospect' && model?.dealer_price
+    ? Number(model.dealer_price)
+    : listPrice;
+  const suggested = unitPrice * quantity;
+  const belowSuggested = suggested > 0 && amount > 0 && amount < suggested;
 
   useEffect(() => {
     if (!open) return;
@@ -54,7 +69,18 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     setNotes('');
     setLostReasonId(row?.lost_reason_id ?? '');
     setLostNotes(row?.lost_notes ?? '');
+    setOrderId(row?.order_id ?? '');
   }, [open, row]);
+
+  // Danh sách đơn phụ thuộc khách đang chọn, nạp lại mỗi khi đổi khách.
+  useEffect(() => {
+    if (!open || !accountId) { setOrders([]); return; }
+    let cancelled = false;
+    void getOrdersForAccount(accountId)
+      .then(o => { if (!cancelled) setOrders(o); })
+      .catch(() => { if (!cancelled) setOrders([]); });
+    return () => { cancelled = true; };
+  }, [open, accountId]);
 
   const save = async () => {
     if (!accountId) { toast.error(t('portal.crm.opp.account_required')); return; }
@@ -69,8 +95,14 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
         lostReasonId: isLost ? lostReasonId : null,
         lostNotes: isLost ? lostNotes : null,
       };
-      if (row) await updateCrmOpportunity(row.id, input);
-      else await createCrmOpportunity(input);
+      if (row) {
+        await updateCrmOpportunity(row.id, input);
+        if ((row.order_id ?? '') !== orderId) {
+          await linkOrderToOpportunity(row.id, orderId || null);
+        }
+      } else {
+        await createCrmOpportunity(input);
+      }
       toast.success(t('portal.crm.opp.saved'));
       onSaved();
       onClose();
@@ -167,6 +199,47 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
               <input id="crm-opp-close" type="date" className={field} value={closeDate} onChange={e => setCloseDate(e.target.value)} />
             </div>
           </div>
+
+          {suggested > 0 && (
+            <p className="text-xs text-[#a0a0a8]">
+              {account?.kind === 'dealer_prospect' && model?.dealer_price
+                ? t('portal.crm.opp.price_dealer')
+                : t('portal.crm.opp.price_list')}
+              : <b className="text-[#e2e2e5]">{fmtVnd(suggested)}đ</b>
+              {amount !== suggested && (
+                <button
+                  type="button"
+                  onClick={() => setAmount(suggested)}
+                  className="ml-2 text-[#00daf3] underline"
+                >
+                  {t('portal.crm.opp.price_apply')}
+                </button>
+              )}
+              {belowSuggested && (
+                <span className="ml-2 text-[#ff5625]">
+                  {t('portal.crm.opp.price_below')} {(100 - (amount / suggested) * 100).toFixed(1)}%
+                </span>
+              )}
+            </p>
+          )}
+
+          {row && (
+            <div>
+              <label className={label} htmlFor="crm-opp-order">{t('portal.crm.opp.order')}</label>
+              <select id="crm-opp-order" className={field} value={orderId} onChange={e => setOrderId(e.target.value)}>
+                <option value="">{t('portal.crm.opp.order_none')}</option>
+                {row.order_id && !orders.some(o => o.order_id === row.order_id) && (
+                  <option value={row.order_id}>{t('portal.crm.opp.order_current')}</option>
+                )}
+                {orders.map(o => (
+                  <option key={o.order_id} value={o.order_id}>
+                    {o.phone_matches ? '★ ' : ''}{o.serial_number} · {o.customer_name} · {fmtVnd(Number(o.sale_price))}đ
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-[#a0a0a8]">{t('portal.crm.opp.order_hint')}</p>
+            </div>
+          )}
           <div>
             <label className={label} htmlFor="crm-opp-notes">{t('portal.crm.account.notes')}</label>
             <textarea id="crm-opp-notes" rows={3} className={field} value={notes} onChange={e => setNotes(e.target.value)} />

@@ -36,6 +36,8 @@ export interface ProductModel {
   name: string;
   description: string | null;
   base_price: string;
+  /** Giá bán cho đại lý. NULL nghĩa là đại lý mua bằng base_price. */
+  dealer_price: string | null;
   image_url: string | null;
   active: boolean;
   created_at: string;
@@ -286,6 +288,17 @@ export interface CrmLostReason {
   name: string;
   sort_order: number;
   active: boolean;
+}
+
+/** Đơn hàng chưa gắn cơ hội nào, trả về từ crm_orders_for_account. */
+export interface CrmLinkableOrder {
+  order_id: string;
+  serial_number: string;
+  customer_name: string;
+  sale_price: string;
+  sale_date: string;
+  status: string;
+  phone_matches: boolean;
 }
 
 /** Kết quả tra số điện thoại xuyên RLS — đủ để biết phải xin bắn khách từ ai. */
