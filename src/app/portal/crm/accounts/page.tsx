@@ -12,13 +12,14 @@ import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import type { CrmAccount, CrmAccountKind, CrmAccountListRow, CrmStage } from '@/lib/portal-types';
 
-// Tô màu theo chặng: hoàn thành xanh lá, mất đỏ, mới tiếp nhận xám, còn lại xanh dương.
+// Chỉ đổi màu CHỮ và viền, giữ nền đặc. Nền trong suốt làm hộp thả xuống của
+// native select không đọc được vì trình duyệt bỏ qua style đặt trên <option>.
 function STATUS_STYLE(label: string): string {
-  if (label === 'Hoàn thành đơn') return 'bg-[#34d399]/15 text-[#34d399]';
-  if (label === 'Không mua') return 'bg-[#f87171]/15 text-[#f87171]';
-  if (label === 'Chốt đơn') return 'bg-[#ff5625]/15 text-[#ff5625]';
-  if (label === 'Mới tiếp nhận') return 'bg-[#282a2c] text-[#a0a0a8]';
-  return 'bg-[#00daf3]/15 text-[#00daf3]';
+  if (label === 'Hoàn thành đơn') return 'text-[#34d399] border-[#34d399]/40';
+  if (label === 'Không mua') return 'text-[#f87171] border-[#f87171]/40';
+  if (label === 'Chốt đơn') return 'text-[#ff5625] border-[#ff5625]/40';
+  if (label === 'Mới tiếp nhận') return 'text-[#a0a0a8] border-[#3d3f41]';
+  return 'text-[#00daf3] border-[#00daf3]/40';
 }
 
 export default function CrmAccountsPage() {
@@ -158,14 +159,16 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
                 {/* stopPropagation: bấm vào ô chọn không được mở ngăn kéo chi tiết */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                  {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,
+                      nếu không macOS sẽ vẽ nền sáng và chữ màu bị chìm. */}
                   <select
                     aria-label={t('portal.crm.accounts.col_status')}
                     value={r.stage_id ?? ''}
                     onChange={e => void changeStage(r.id, e.target.value)}
-                    className={`cursor-pointer rounded-full border-0 px-2.5 py-1 text-xs font-medium outline-none ${STATUS_STYLE(r.status_label)}`}
+                    className={`cursor-pointer rounded-full border bg-[#1e2022] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)}`}
                   >
                     {stages.map(s => (
-                      <option key={s.id} value={s.id} className="bg-[#1e2022] text-[#e2e2e5]">{s.name}</option>
+                      <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
                 </td>

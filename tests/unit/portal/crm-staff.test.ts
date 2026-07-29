@@ -1,19 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handoverAccount, adminPayStaffCommission, adminSetStaff } from '@/lib/portal-queries';
+import { adminPayStaffCommission, adminSetStaff } from '@/lib/portal-queries';
 
 const rpcMock = vi.fn().mockResolvedValue({ data: 1, error: null });
 vi.mock('@/lib/supabase', () => ({ getSupabaseClient: () => ({ rpc: rpcMock }) }));
 
 beforeEach(() => rpcMock.mockClear());
-
-describe('handoverAccount', () => {
-  it('calls staff_handover_account with mapped params', async () => {
-    await handoverAccount('acc-1', 'staff-2', 'ghi chú');
-    expect(rpcMock).toHaveBeenCalledWith('staff_handover_account', {
-      p_account_id: 'acc-1', p_to_staff: 'staff-2', p_note: 'ghi chú',
-    });
-  });
-});
 
 describe('adminPayStaffCommission', () => {
   it('calls admin_pay_staff_commission with payment ref', async () => {

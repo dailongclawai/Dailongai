@@ -3,12 +3,10 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
-import { useAuth } from '@/lib/auth-context';
-import { CrmHandoverDialog } from './CrmHandoverDialog';
 import {
-  createCrmAccount, updateCrmAccount, getCrmContacts, createCrmContact, deleteCrmContact, lookupCrmPhones,
+  createCrmAccount, updateCrmAccount, lookupCrmPhones,
 } from '@/lib/portal-queries';
-import type { CrmAccount, CrmAccountKind, CrmContact, CrmPhoneMatch, CrmSource } from '@/lib/portal-types';
+import type { CrmAccount, CrmAccountKind, CrmPhoneMatch, CrmSource } from '@/lib/portal-types';
 
 const SOURCES: CrmSource[] = ['website', 'zalo', 'facebook', 'google_ads', 'tiktok', 'referral', 'hotline', 'event', 'other'];
 
@@ -22,7 +20,6 @@ interface Props {
 
 export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: Props) {
   const { t } = useI18n();
-  const { profile } = useAuth();
   const [name, setName] = useState('');
   const [kind, setKind] = useState<CrmAccountKind>('customer');
   const [phone, setPhone] = useState('');
@@ -33,9 +30,6 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
   const [source, setSource] = useState<CrmSource | ''>('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
-  const [contacts, setContacts] = useState<CrmContact[]>([]);
-  const [newContact, setNewContact] = useState({ full_name: '', phone: '', title: '' });
-  const [handoverOpen, setHandoverOpen] = useState(false);
   const [dup, setDup] = useState<CrmPhoneMatch | null>(null);
 
   useEffect(() => {
@@ -50,8 +44,6 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
     setSource(account?.source ?? '');
     setNotes(account?.notes ?? '');
     setDup(null);
-    if (account) getCrmContacts(account.id).then(setContacts).catch(() => setContacts([]));
-    else setContacts([]);
   }, [open, account]);
 
   // Tra ngay khi rời ô số điện thoại. Trigger dưới DB mới là chốt chặn thật; ở đây
@@ -83,33 +75,6 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
       toast.error((e as Error).message);
     } finally {
       setSaving(false);
-    }
-  };
-
-  const addContact = async () => {
-    if (!account || !newContact.full_name.trim()) return;
-    try {
-      await createCrmContact({
-        accountId: account.id,
-        fullName: newContact.full_name,
-        phone: newContact.phone,
-        title: newContact.title,
-        isPrimary: contacts.length === 0,
-        ownerId,
-      });
-      setNewContact({ full_name: '', phone: '', title: '' });
-      setContacts(await getCrmContacts(account.id));
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  };
-
-  const removeContact = async (id: string) => {
-    try {
-      await deleteCrmContact(id);
-      if (account) setContacts(await getCrmContacts(account.id));
-    } catch (e) {
-      toast.error((e as Error).message);
     }
   };
 
@@ -206,66 +171,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
           </button>
         </div>
 
-        {account && (
-          <div className="mt-8">
-            <h3 className="mb-3 text-sm font-bold text-[#e2e2e5]">{t('portal.crm.contact.section')}</h3>
-            <ul className="mb-3 space-y-2">
-              {contacts.map(c => (
-                <li key={c.id} className="flex items-center justify-between rounded-xl bg-[#282a2c] px-3 py-2">
-                  <span className="text-sm text-[#e2e2e5]">
-                    {c.full_name}
-                    {c.title ? ` · ${c.title}` : ''}
-                    {c.phone ? ` · ${c.phone}` : ''}
-                    {c.is_primary ? ' ★' : ''}
-                  </span>
-                  <button onClick={() => removeContact(c.id)} aria-label={t('portal.crm.contact.delete')} className="text-[#a0a0a8]">
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                  </button>
-                </li>
-              ))}
-              {contacts.length === 0 && <li className="text-sm text-[#a0a0a8]">{t('portal.crm.contact.empty')}</li>}
-            </ul>
-            <div className="grid grid-cols-3 gap-2">
-              <input
-                className={field} placeholder={t('portal.crm.contact.name')} aria-label={t('portal.crm.contact.name')}
-                value={newContact.full_name}
-                onChange={e => setNewContact({ ...newContact, full_name: e.target.value })}
-              />
-              <input
-                className={field} placeholder={t('portal.crm.contact.title')} aria-label={t('portal.crm.contact.title')}
-                value={newContact.title}
-                onChange={e => setNewContact({ ...newContact, title: e.target.value })}
-              />
-              <input
-                className={field} placeholder={t('portal.crm.account.phone')} aria-label={t('portal.crm.account.phone')}
-                value={newContact.phone}
-                onChange={e => setNewContact({ ...newContact, phone: e.target.value })}
-              />
-            </div>
-            <button onClick={addContact} className="mt-2 w-full rounded-xl border border-[#3d3f41] py-2 text-sm text-[#e2e2e5]">
-              {t('portal.crm.contact.add')}
-            </button>
-          </div>
-        )}
 
-        {account && profile?.role === 'staff' && profile.staff_segment && (
-          <>
-            <button
-              onClick={() => setHandoverOpen(true)}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-[#00daf3] py-2.5 text-sm text-[#00daf3]"
-            >
-              <span className="material-symbols-outlined text-[18px]">swap_horiz</span>
-              {t('portal.crm.handover.button')}
-            </button>
-            <CrmHandoverDialog
-              open={handoverOpen}
-              accountId={account.id}
-              mySegment={profile.staff_segment}
-              onClose={() => setHandoverOpen(false)}
-              onDone={() => { onSaved(); onClose(); }}
-            />
-          </>
-        )}
       </div>
     </div>
   );

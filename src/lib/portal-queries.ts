@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer, CrmLostReason, CrmPhoneMatch } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -740,46 +740,9 @@ export async function setCrmAccountStage(accountId: string, stageId: string): Pr
   if (error) throw error;
 }
 
-export async function getCrmContacts(accountId: string): Promise<CrmContact[]> {
-  const { data, error } = await getSupabaseClient()
-    .from('crm_contacts')
-    .select('*')
-    .eq('account_id', accountId)
-    .order('is_primary', { ascending: false })
-    .order('created_at');
-  if (error) throw error;
-  return (data as CrmContact[]) ?? [];
-}
 
-export interface CrmContactInput {
-  accountId: string;
-  fullName: string;
-  title?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  zaloPhone?: string | null;
-  isPrimary?: boolean;
-  ownerId: string;
-}
 
-export async function createCrmContact(input: CrmContactInput): Promise<void> {
-  const { error } = await getSupabaseClient().from('crm_contacts').insert({
-    account_id: input.accountId,
-    full_name: input.fullName.trim(),
-    title: input.title?.trim() || null,
-    phone: input.phone?.trim() || null,
-    email: input.email?.trim() || null,
-    zalo_phone: input.zaloPhone?.trim() || null,
-    is_primary: input.isPrimary ?? false,
-    owner_id: input.ownerId,
-  });
-  if (error) throw error;
-}
 
-export async function deleteCrmContact(id: string): Promise<void> {
-  const { error } = await getSupabaseClient().from('crm_contacts').delete().eq('id', id);
-  if (error) throw error;
-}
 
 export async function getCrmBoard(): Promise<CrmOpportunityBoardRow[]> {
   const { data, error } = await getSupabaseClient()
@@ -901,35 +864,8 @@ export async function completeActivity(id: string, outcome?: string): Promise<vo
 
 // ── CRM staff (Plan 2) ──
 
-export async function getCrmSettings(): Promise<CrmSettings | null> {
-  const { data, error } = await getSupabaseClient()
-    .from('crm_settings')
-    .select('staff_rate')
-    .maybeSingle();
-  if (error) throw error;
-  return (data as CrmSettings) ?? null;
-}
 
-export async function getStaffPeers(segment: StaffSegment): Promise<StaffPeer[]> {
-  // Đọc qua view crm_staff_directory: RLS của profiles không cho staff đọc
-  // profile của staff khác, view chỉ lộ 4 cột cần cho việc chọn người nhận.
-  const { data, error } = await getSupabaseClient()
-    .from('crm_staff_directory')
-    .select('id, full_name, email, staff_segment')
-    .eq('staff_segment', segment)
-    .order('full_name');
-  if (error) throw error;
-  return (data as StaffPeer[]) ?? [];
-}
 
-export async function handoverAccount(accountId: string, toStaffId: string, note?: string): Promise<void> {
-  const { error } = await getSupabaseClient().rpc('staff_handover_account', {
-    p_account_id: accountId,
-    p_to_staff: toStaffId,
-    p_note: note?.trim() || null,
-  });
-  if (error) throw error;
-}
 
 export async function getMyStaffCommissions(): Promise<CrmStaffCommission[]> {
   const { data, error } = await getSupabaseClient()

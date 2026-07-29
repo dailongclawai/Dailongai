@@ -61,8 +61,24 @@ test('staff đăng nhập vào thẳng CRM và tạo được khách', async ({ 
   await expect(row.getByRole('combobox', { name: 'Trạng thái' })).toHaveValue(/.+/);
   await expect(row.getByRole('option', { name: 'Mới tiếp nhận', selected: true })).toBeAttached();
 
+  // Ô chọn phải có đủ 8 giai đoạn để bấm vào là thấy — Boss báo trước đó không thấy gì.
+  const statusSelect = row.getByRole('combobox', { name: 'Trạng thái' });
+  await expect(statusSelect.getByRole('option')).toHaveCount(8);
+  for (const label of ['Mới tiếp nhận', 'Đàm phán giá', 'Hoàn thành đơn', 'Không mua']) {
+    await expect(statusSelect.getByRole('option', { name: label })).toBeAttached();
+  }
+
+  // Ngăn kéo chi tiết không còn phần Liên hệ lẫn nút Bắn khách.
+  await page.getByRole('cell', { name: HOA }).click();
+  await expect(page.getByRole('heading', { name: 'Sửa khách hàng' })).toBeVisible();
+  await expect(page.getByText('Liên hệ', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Thêm liên hệ')).toHaveCount(0);
+  await expect(page.getByText('Bắn khách sang mảng khác')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Đóng' }).click();
+  await expect(page.getByRole('heading', { name: 'Sửa khách hàng' })).toHaveCount(0);
+
   // Nhân viên tự chọn giai đoạn khác ngay trên bảng, không cần tạo cơ hội.
-  await row.getByRole('combobox', { name: 'Trạng thái' }).selectOption({ label: 'Đàm phán giá' });
+  await statusSelect.selectOption({ label: 'Đàm phán giá' });
   await page.reload();
   const reloaded = page.getByRole('row').filter({ hasText: HOA });
   await expect(reloaded.getByRole('option', { name: 'Đàm phán giá', selected: true })).toBeAttached({ timeout: 15_000 });
@@ -83,7 +99,7 @@ test('mục 1 — nhân viên khác nhập lại cùng số (dạng +84) thì b�
   await expect(page.getByText('Số điện thoại này đã có trong hệ thống')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText(HOA)).toBeVisible();
   await expect(page.getByText('Nhân viên B2C')).toBeVisible();
-  await expect(page.getByText(/xin bắn khách từ nhân viên đang phụ trách/)).toBeVisible();
+  await expect(page.getByText(/liên hệ nhân viên đang phụ trách/)).toBeVisible();
 
   // Chốt chặn thật nằm dưới DB: bấm Lưu vẫn phải hỏng.
   await page.getByRole('button', { name: 'Lưu', exact: true }).click();

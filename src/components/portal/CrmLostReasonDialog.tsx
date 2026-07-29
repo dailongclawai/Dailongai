@@ -63,7 +63,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
           </div>
           <div className="flex gap-2">
             <button onClick={onClose} className="flex-1 rounded-xl border border-[#3d3f41] py-2.5 text-[#e2e2e5]">
-              {t('portal.crm.handover.cancel')}
+              {t('portal.crm.lost.cancel')}
             </button>
             <button onClick={submit} className="flex-1 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white">
               {t('portal.crm.lost.confirm')}
