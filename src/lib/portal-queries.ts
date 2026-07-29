@@ -731,6 +731,15 @@ export async function updateCrmAccount(id: string, input: CrmAccountInput): Prom
   if (error) throw error;
 }
 
+/** Nhân viên tự chọn giai đoạn cho khách, không phải qua cơ hội. */
+export async function setCrmAccountStage(accountId: string, stageId: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_accounts')
+    .update({ stage_id: stageId })
+    .eq('id', accountId);
+  if (error) throw error;
+}
+
 export async function getCrmContacts(accountId: string): Promise<CrmContact[]> {
   const { data, error } = await getSupabaseClient()
     .from('crm_contacts')

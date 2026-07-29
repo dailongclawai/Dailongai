@@ -1,22 +1,23 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmAccounts } from '@/lib/portal-queries';
+import { getCrmAccounts, getCrmStages, setCrmAccountStage } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
-import type { CrmAccount, CrmAccountKind, CrmAccountListRow } from '@/lib/portal-types';
+import type { CrmAccount, CrmAccountKind, CrmAccountListRow, CrmStage } from '@/lib/portal-types';
 
-// Tô màu theo chặng: xong thì xanh lá, đang chờ đơn thì cam, mất thì đỏ, còn lại xám.
+// Tô màu theo chặng: hoàn thành xanh lá, mất đỏ, mới tiếp nhận xám, còn lại xanh dương.
 function STATUS_STYLE(label: string): string {
   if (label === 'Hoàn thành đơn') return 'bg-[#34d399]/15 text-[#34d399]';
-  if (label === 'Đã duyệt đơn' || label === 'Chờ duyệt đơn') return 'bg-[#ff5625]/15 text-[#ff5625]';
-  if (label === 'Không mua' || label === 'Đơn bị từ chối' || label === 'Đơn đã huỷ') return 'bg-[#f87171]/15 text-[#f87171]';
-  if (label === 'Chưa có cơ hội') return 'bg-[#282a2c] text-[#a0a0a8]';
+  if (label === 'Không mua') return 'bg-[#f87171]/15 text-[#f87171]';
+  if (label === 'Chốt đơn') return 'bg-[#ff5625]/15 text-[#ff5625]';
+  if (label === 'Mới tiếp nhận') return 'bg-[#282a2c] text-[#a0a0a8]';
   return 'bg-[#00daf3]/15 text-[#00daf3]';
 }
 
@@ -31,6 +32,7 @@ export default function CrmAccountsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<CrmAccount | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [stages, setStages] = useState<CrmStage[]>([]);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -55,6 +57,25 @@ export default function CrmAccountsPage() {
   useEffect(() => {
     if (session) void load();
   }, [session, load]);
+
+  useEffect(() => {
+    if (session) void getCrmStages().then(setStages).catch(() => setStages([]));
+  }, [session]);
+
+  // Đổi ngay tại chỗ rồi mới gọi máy chủ, để bảng không giật một nhịp.
+  const changeStage = async (accountId: string, stageId: string) => {
+    const before = rows;
+    const stage = stages.find(s => s.id === stageId);
+    setRows(rs => rs.map(r => r.id === accountId
+      ? { ...r, stage_id: stageId, status_label: stage?.name ?? r.status_label }
+      : r));
+    try {
+      await setCrmAccountStage(accountId, stageId);
+    } catch (e) {
+      setRows(before);
+      toast.error((e as Error).message);
+    }
+  };
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -135,10 +156,18 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.phone ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLE(r.status_label)}`}>
-                    {r.status_label}
-                  </span>
+                {/* stopPropagation: bấm vào ô chọn không được mở ngăn kéo chi tiết */}
+                <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                  <select
+                    aria-label={t('portal.crm.accounts.col_status')}
+                    value={r.stage_id ?? ''}
+                    onChange={e => void changeStage(r.id, e.target.value)}
+                    className={`cursor-pointer rounded-full border-0 px-2.5 py-1 text-xs font-medium outline-none ${STATUS_STYLE(r.status_label)}`}
+                  >
+                    {stages.map(s => (
+                      <option key={s.id} value={s.id} className="bg-[#1e2022] text-[#e2e2e5]">{s.name}</option>
+                    ))}
+                  </select>
                 </td>
               </tr>
             ))}

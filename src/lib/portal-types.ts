@@ -228,8 +228,9 @@ export interface CrmAccountListRow extends CrmAccount {
   creator_name: string | null;
   creator_email: string | null;
   was_handed_over: boolean;
-  /** Suy tự động: trạng thái đơn hàng nếu có, không thì tên giai đoạn cơ hội mới nhất. */
+  /** Tên giai đoạn nhân viên đang chọn cho khách này. */
   status_label: string;
+  stage_id: string | null;
 }
 
 export interface CrmContact {

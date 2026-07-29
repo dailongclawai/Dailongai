@@ -55,10 +55,17 @@ test('staff đăng nhập vào thẳng CRM và tạo được khách', async ({ 
   await expect(page.getByText('Đã lưu khách hàng')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('cell', { name: HOA })).toBeVisible({ timeout: 15_000 });
 
-  // Cột Trạng thái (thay cho cột Nhân viên phụ trách): khách mới chưa có cơ hội nào.
+  // Cột Trạng thái (thay cho cột Nhân viên phụ trách) — khách mới vào giai đoạn đầu.
   await expect(page.getByRole('columnheader', { name: 'Trạng thái' })).toBeVisible();
   const row = page.getByRole('row').filter({ hasText: HOA });
-  await expect(row.getByText('Chưa có cơ hội')).toBeVisible();
+  await expect(row.getByRole('combobox', { name: 'Trạng thái' })).toHaveValue(/.+/);
+  await expect(row.getByRole('option', { name: 'Mới tiếp nhận', selected: true })).toBeAttached();
+
+  // Nhân viên tự chọn giai đoạn khác ngay trên bảng, không cần tạo cơ hội.
+  await row.getByRole('combobox', { name: 'Trạng thái' }).selectOption({ label: 'Đàm phán giá' });
+  await page.reload();
+  const reloaded = page.getByRole('row').filter({ hasText: HOA });
+  await expect(reloaded.getByRole('option', { name: 'Đàm phán giá', selected: true })).toBeAttached({ timeout: 15_000 });
 });
 
 test('mục 1 — nhân viên khác nhập lại cùng số (dạng +84) thì bị cảnh báo và bị DB chặn', async ({ page }) => {
@@ -110,10 +117,6 @@ test('mục 3 — kéo cơ hội sang cột thua thì bắt buộc chọn lý do
   const card = page.locator('article').filter({ hasText: OPP });
   await expect(card.getByText('Giá cao')).toBeVisible({ timeout: 15_000 });
 
-  // Trạng thái khách chạy theo giai đoạn cơ hội, không phải nhập tay.
-  await page.goto('/portal/crm/accounts');
-  const row = page.getByRole('row').filter({ hasText: HOA });
-  await expect(row.getByText('Không mua')).toBeVisible({ timeout: 15_000 });
 });
 
 test('mục 3b — kéo thẻ sang cột thua trên kanban thì hộp thoại lý do bật lên', async ({ page }) => {
