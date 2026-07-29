@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
 import { getCrmLostReasons } from '@/lib/portal-queries';
-import type { CrmLostReason, CrmPipeline } from '@/lib/portal-types';
+import type { CrmLostReason } from '@/lib/portal-types';
 
 interface Props {
   open: boolean;
-  pipeline: CrmPipeline;
   stageName: string;
   onClose: () => void;
   onConfirm: (lostReasonId: string, lostNotes: string) => void;
@@ -16,7 +15,7 @@ interface Props {
 
 /** Hỏi lý do trước khi thả một cơ hội vào cột thua trên bảng kanban. Trigger dưới
  *  DB cũng chặn, nhưng chặn ở đó chỉ ném lỗi — người dùng cần chỗ để chọn. */
-export function CrmLostReasonDialog({ open, pipeline, stageName, onClose, onConfirm }: Props) {
+export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Props) {
   const { t } = useI18n();
   const [reasons, setReasons] = useState<CrmLostReason[]>([]);
   const [reasonId, setReasonId] = useState('');
@@ -31,7 +30,6 @@ export function CrmLostReasonDialog({ open, pipeline, stageName, onClose, onConf
   if (!open) return null;
 
   const field = 'w-full rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
-  const pipelineReasons = reasons.filter(r => !r.pipeline || r.pipeline === pipeline);
 
   const submit = () => {
     if (!reasonId) { toast.error(t('portal.crm.lost.required')); return; }
@@ -50,7 +48,7 @@ export function CrmLostReasonDialog({ open, pipeline, stageName, onClose, onConf
             </label>
             <select id="lost-reason" className={field} value={reasonId} onChange={e => setReasonId(e.target.value)}>
               <option value="">—</option>
-              {pipelineReasons.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+              {reasons.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
           </div>
           <div>

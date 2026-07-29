@@ -7,12 +7,11 @@ import {
   createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
 } from '@/lib/portal-queries';
 import type {
-  CrmAccount, CrmLostReason, CrmOpportunityBoardRow, CrmPipeline, CrmStage, ProductModel,
+  CrmAccount, CrmLostReason, CrmOpportunityBoardRow, CrmStage, ProductModel,
 } from '@/lib/portal-types';
 
 interface Props {
   open: boolean;
-  pipeline: CrmPipeline;
   stages: CrmStage[];
   row: CrmOpportunityBoardRow | null;
   ownerId: string;
@@ -20,7 +19,7 @@ interface Props {
   onSaved: () => void;
 }
 
-export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onClose, onSaved }: Props) {
+export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSaved }: Props) {
   const { t } = useI18n();
   const [accounts, setAccounts] = useState<CrmAccount[]>([]);
   const [models, setModels] = useState<ProductModel[]>([]);
@@ -37,9 +36,8 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
   const [lostReasonId, setLostReasonId] = useState('');
   const [lostNotes, setLostNotes] = useState('');
 
-  const pipelineStages = stages.filter(s => s.pipeline === pipeline).sort((a, b) => a.sort_order - b.sort_order);
+  const pipelineStages = [...stages].sort((a, b) => a.sort_order - b.sort_order);
   const isLost = pipelineStages.find(s => s.id === stageId)?.forecast === 'lost';
-  const pipelineReasons = reasons.filter(r => !r.pipeline || r.pipeline === pipeline);
 
   useEffect(() => {
     if (!open) return;
@@ -56,7 +54,7 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
     setNotes('');
     setLostReasonId(row?.lost_reason_id ?? '');
     setLostNotes(row?.lost_notes ?? '');
-  }, [open, row, pipeline]);
+  }, [open, row]);
 
   const save = async () => {
     if (!accountId) { toast.error(t('portal.crm.opp.account_required')); return; }
@@ -65,7 +63,7 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
     setSaving(true);
     try {
       const input = {
-        accountId, pipeline, stageId, name,
+        accountId, stageId, name,
         modelId: modelId || null, quantity, amount,
         expectedCloseDate: closeDate || null, notes, ownerId,
         lostReasonId: isLost ? lostReasonId : null,
@@ -127,7 +125,7 @@ export function CrmOpportunityDrawer({ open, pipeline, stages, row, ownerId, onC
                   value={lostReasonId} onChange={e => setLostReasonId(e.target.value)}
                 >
                   <option value="">—</option>
-                  {pipelineReasons.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                  {reasons.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                 </select>
               </div>
               <div>

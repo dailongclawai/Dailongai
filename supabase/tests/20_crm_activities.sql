@@ -14,12 +14,11 @@ SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d1';
 INSERT INTO public.crm_accounts (id, name, owner_id)
 VALUES ('20000000-0000-0000-0000-000000000001', 'Cô Lan', '00000000-0000-0000-0000-0000000000d1');
 
--- fixture cho test 6: cơ hội của d1 trên pipeline b2c_device, giai đoạn đầu
-INSERT INTO public.crm_opportunities (id, account_id, pipeline, stage_id, name, amount, owner_id)
+-- fixture cho test 6: cơ hội của d1 ở giai đoạn đầu
+INSERT INTO public.crm_opportunities (id, account_id, stage_id, name, amount, owner_id)
 SELECT '30000000-0000-0000-0000-000000000001',
        '20000000-0000-0000-0000-000000000001',
-       'b2c_device',
-       (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=1),
+       (SELECT id FROM public.crm_stages WHERE sort_order=1),
        'Cô Lan - 1 máy',
        29500000,
        '00000000-0000-0000-0000-0000000000d1';

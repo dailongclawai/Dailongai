@@ -11,12 +11,11 @@ INSERT INTO auth.users (instance_id, id, aud, role, email) VALUES
 UPDATE public.profiles SET role='dealer', status='active' WHERE id='00000000-0000-0000-0000-0000000000d1';
 UPDATE public.profiles SET role='admin',  status='active' WHERE id='00000000-0000-0000-0000-0000000000c1';
 
--- 1. cấu hình mặc định đúng con số Boss chốt
+-- 1. cấu hình mặc định đúng con số Boss chốt 29/07: một mức 10% cho mọi nhân viên
 SELECT results_eq(
-    $$SELECT base_price, staff_rate_b2c, staff_rate_b2b, crossover_bonus_rate
-      FROM public.crm_settings$$,
-    $$VALUES (15000000::numeric(14,2), 0.2000::numeric(5,4), 0.1000::numeric(5,4), 0.0500::numeric(5,4))$$,
-    'crm_settings mặc định: 15tr, 20%, 10%, 5%'
+    $$SELECT staff_rate FROM public.crm_settings$$,
+    ARRAY[0.1000::numeric(5,4)],
+    'crm_settings mặc định: một mức hoa hồng 10%'
 );
 
 -- 2. admin gán được vai trò staff

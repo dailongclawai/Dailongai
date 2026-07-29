@@ -45,9 +45,7 @@ export default function CrmReportsPage() {
   const totals = useMemo(() => ({
     won: rows.reduce((a, r) => a + Number(r.deals_won), 0),
     open: rows.reduce((a, r) => a + Number(r.deals_open), 0),
-    closer: rows.reduce((a, r) => a + Number(r.commission_closer), 0),
-    referral: rows.reduce((a, r) => a + Number(r.commission_referral), 0),
-    pending: rows.reduce((a, r) => a + Number(r.amount_pending), 0),
+    total: rows.reduce((a, r) => a + Number(r.commission_total), 0),
     payable: rows.reduce((a, r) => a + Number(r.amount_payable), 0),
     paid: rows.reduce((a, r) => a + Number(r.amount_paid), 0),
   }), [rows]);
@@ -67,8 +65,7 @@ export default function CrmReportsPage() {
               <th className="px-4 py-3">{t('portal.crm.reports.col_segment')}</th>
               <th className="px-4 py-3">{t('portal.crm.reports.col_won')}</th>
               <th className="px-4 py-3">{t('portal.crm.reports.col_open')}</th>
-              <th className="px-4 py-3">{t('portal.crm.reports.col_closer')}</th>
-              <th className="px-4 py-3">{t('portal.crm.reports.col_referral')}</th>
+              <th className="px-4 py-3">{t('portal.crm.reports.col_commission')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.pending')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.payable')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.paid')}</th>
@@ -85,13 +82,11 @@ export default function CrmReportsPage() {
               <tr key={r.staff_id} className="border-t border-[#3d3f41]">
                 <td className="px-4 py-3 text-[#e2e2e5]">{r.staff_name || r.staff_email || r.staff_id.slice(0, 8)}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">
-                  {r.staff_segment ? t('portal.crm.pipeline.' + (r.staff_segment === 'b2c' ? 'b2c_device' : 'b2b_dealer')) : '—'}
+                  {r.staff_segment ? r.staff_segment.toUpperCase() : '—'}
                 </td>
                 <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{r.deals_open}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(Number(r.commission_closer))}đ</td>
-                <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(Number(r.commission_referral))}đ</td>
-                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(Number(r.amount_pending))}đ</td>
+                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(Number(r.commission_total))}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(Number(r.amount_payable))}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(Number(r.amount_paid))}đ</td>
               </tr>
@@ -102,9 +97,7 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3" />
                 <td className="px-4 py-3 text-[#34d399]">{totals.won}</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{totals.open}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(totals.closer)}đ</td>
-                <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(totals.referral)}đ</td>
-                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(totals.pending)}đ</td>
+                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(totals.total)}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(totals.payable)}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>

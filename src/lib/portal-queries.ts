@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmPipeline, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer, CrmLostReason, CrmPhoneMatch } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmContact, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmSettings, CrmStaffCommission, CrmStaffReportRow, StaffPeer, CrmLostReason, CrmPhoneMatch } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -658,7 +658,6 @@ export async function getCrmStages(): Promise<CrmStage[]> {
     .from('crm_stages')
     .select('*')
     .eq('active', true)
-    .order('pipeline')
     .order('sort_order');
   if (error) throw error;
   return (data as CrmStage[]) ?? [];
@@ -773,11 +772,10 @@ export async function deleteCrmContact(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function getCrmBoard(pipeline: CrmPipeline): Promise<CrmOpportunityBoardRow[]> {
+export async function getCrmBoard(): Promise<CrmOpportunityBoardRow[]> {
   const { data, error } = await getSupabaseClient()
     .from('crm_opportunity_board')
     .select('*')
-    .eq('pipeline', pipeline)
     .order('sort_order')
     .order('created_at', { ascending: false });
   if (error) throw error;
@@ -787,7 +785,6 @@ export async function getCrmBoard(pipeline: CrmPipeline): Promise<CrmOpportunity
 export interface CrmOpportunityInput {
   accountId: string;
   contactId?: string | null;
-  pipeline: CrmPipeline;
   stageId: string;
   name: string;
   modelId?: string | null;
@@ -804,7 +801,6 @@ function crmOpportunityRow(input: CrmOpportunityInput) {
   return {
     account_id: input.accountId,
     contact_id: input.contactId ?? null,
-    pipeline: input.pipeline,
     stage_id: input.stageId,
     name: input.name.trim(),
     model_id: input.modelId ?? null,
@@ -899,7 +895,7 @@ export async function completeActivity(id: string, outcome?: string): Promise<vo
 export async function getCrmSettings(): Promise<CrmSettings | null> {
   const { data, error } = await getSupabaseClient()
     .from('crm_settings')
-    .select('base_price, staff_rate_b2c, staff_rate_b2b, crossover_bonus_rate')
+    .select('staff_rate')
     .maybeSingle();
   if (error) throw error;
   return (data as CrmSettings) ?? null;
@@ -933,15 +929,6 @@ export async function getMyStaffCommissions(): Promise<CrmStaffCommission[]> {
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data as CrmStaffCommission[]) ?? [];
-}
-
-export async function adminConfirmStaffDeal(opportunityId: string, orderId?: string): Promise<number> {
-  const { data, error } = await getSupabaseClient().rpc('admin_confirm_staff_deal', {
-    p_opportunity_id: opportunityId,
-    p_order_id: orderId ?? null,
-  });
-  if (error) throw error;
-  return (data as number) ?? 0;
 }
 
 export async function adminPayStaffCommission(commissionId: string, paymentRef: string): Promise<void> {

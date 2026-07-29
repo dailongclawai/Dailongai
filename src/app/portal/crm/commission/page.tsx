@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getMyStaffCommissions, adminConfirmStaffDeal, adminPayStaffCommission } from '@/lib/portal-queries';
+import { getMyStaffCommissions, adminPayStaffCommission } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import type { CrmStaffCommission, CrmCommissionStatus } from '@/lib/portal-types';
@@ -63,15 +63,6 @@ export default function CrmCommissionPage() {
 
   const isAdmin = profile?.role === 'admin';
 
-  const confirm = async (opportunityId: string) => {
-    try {
-      const n = await adminConfirmStaffDeal(opportunityId);
-      toast.success(`${t('portal.crm.commission.confirm')}: ${n}`);
-      await load();
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
-  };
 
   const pay = async (id: string) => {
     const ref = window.prompt(t('portal.crm.commission.payment_ref'));
@@ -113,7 +104,6 @@ export default function CrmCommissionPage() {
             <tr>
               <th className="px-4 py-3">{t('portal.crm.commission.col_date')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.col_deal')}</th>
-              <th className="px-4 py-3">{t('portal.crm.commission.col_role')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.col_base')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.col_rate')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.col_amount')}</th>
@@ -123,19 +113,16 @@ export default function CrmCommissionPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={isAdmin ? 8 : 7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && rows.length === 0 && (
-              <tr><td colSpan={isAdmin ? 8 : 7} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.commission.empty')}</td></tr>
+              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.commission.empty')}</td></tr>
             )}
             {rows.map(r => (
               <tr key={r.id} className="border-t border-[#3d3f41]">
                 <td className="px-4 py-3 text-[#a0a0a8]">{new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3 font-mono text-[#00daf3]">{r.opportunity_id.slice(0, 8)}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">
-                  {t(r.role_in_deal === 'closer' ? 'portal.crm.commission.role_closer' : 'portal.crm.commission.role_referrer')}
-                </td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{fmtVnd(Number(r.base_price))}đ</td>
+                <td className="px-4 py-3 text-[#a0a0a8]">{fmtVnd(Number(r.order_value))}đ</td>
                 <td className="px-4 py-3 text-[#a0a0a8]">{(Number(r.rate) * 100).toFixed(1)}%</td>
                 <td className="px-4 py-3 font-bold text-[#e2e2e5]">{fmtVnd(Number(r.amount))}đ</td>
                 <td className={`px-4 py-3 ${STATUS_COLOR[r.status]}`}>
@@ -143,11 +130,6 @@ export default function CrmCommissionPage() {
                 </td>
                 {isAdmin && (
                   <td className="px-4 py-3">
-                    {r.status === 'pending' && (
-                      <button onClick={() => void confirm(r.opportunity_id)} className="rounded-lg border border-[#3d3f41] px-3 py-1.5 text-xs text-[#e2e2e5] hover:border-[#ff5625]">
-                        {t('portal.crm.commission.confirm')}
-                      </button>
-                    )}
                     {r.status === 'payable' && (
                       <button onClick={() => void pay(r.id)} className="rounded-lg border border-[#3d3f41] px-3 py-1.5 text-xs text-[#e2e2e5] hover:border-[#34d399]">
                         {t('portal.crm.commission.mark_paid')}

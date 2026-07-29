@@ -11,7 +11,7 @@ import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmOpportunityDrawer } from '@/components/portal/CrmOpportunityDrawer';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
-import type { CrmOpportunityBoardRow, CrmPipeline, CrmStage } from '@/lib/portal-types';
+import type { CrmOpportunityBoardRow, CrmStage } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -19,7 +19,6 @@ export default function CrmPipelinePage() {
   const router = useRouter();
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
-  const [pipeline, setPipeline] = useState<CrmPipeline>('b2c_device');
   const [stages, setStages] = useState<CrmStage[]>([]);
   const [rows, setRows] = useState<CrmOpportunityBoardRow[]>([]);
   const [busy, setBusy] = useState(true);
@@ -39,10 +38,10 @@ export default function CrmPipelinePage() {
     }
   }, [loading, profile, router]);
 
-  const load = useCallback(async (p: CrmPipeline) => {
+  const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [s, r] = await Promise.all([getCrmStages(), getCrmBoard(p)]);
+      const [s, r] = await Promise.all([getCrmStages(), getCrmBoard()]);
       setStages(s);
       setRows(r);
     } finally {
@@ -51,16 +50,16 @@ export default function CrmPipelinePage() {
   }, []);
 
   useEffect(() => {
-    if (session) void load(pipeline);
-  }, [session, pipeline, load]);
+    if (session) void load();
+  }, [session, load]);
 
-  const columns = useMemo(() => groupByStage(stages, rows, pipeline), [stages, rows, pipeline]);
+  const columns = useMemo(() => groupByStage(stages, rows), [stages, rows]);
   const openRows = rows.filter(r => r.forecast === 'open');
 
   const move = async (id: string, stageId: string, reasonId?: string, notes?: string) => {
     try {
       await moveOpportunityStage(id, stageId, reasonId, notes);
-      await load(pipeline);
+      await load();
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -85,17 +84,6 @@ export default function CrmPipelinePage() {
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.pipeline.title')}</h1>
-        <div className="flex rounded-xl border border-[#3d3f41] p-1">
-          {(['b2c_device', 'b2b_dealer'] as CrmPipeline[]).map(p => (
-            <button
-              key={p}
-              onClick={() => setPipeline(p)}
-              className={`rounded-lg px-3 py-1.5 text-sm ${pipeline === p ? 'bg-[#ff5625] text-white' : 'text-[#a0a0a8]'}`}
-            >
-              {t('portal.crm.pipeline.' + p)}
-            </button>
-          ))}
-        </div>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
           className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
@@ -168,18 +156,16 @@ export default function CrmPipelinePage() {
 
       <CrmOpportunityDrawer
         open={drawerOpen}
-        pipeline={pipeline}
         stages={stages}
         row={editing}
         ownerId={profile.id}
         onClose={() => setDrawerOpen(false)}
-        onSaved={() => void load(pipeline)}
+        onSaved={() => void load()}
       />
 
       <CrmLostReasonDialog
         key={losing?.id ?? 'none'}
         open={losing !== null}
-        pipeline={pipeline}
         stageName={losing?.stage.name ?? ''}
         onClose={() => setLosing(null)}
         onConfirm={(reasonId, notes) => {

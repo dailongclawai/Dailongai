@@ -54,6 +54,11 @@ test('staff đăng nhập vào thẳng CRM và tạo được khách', async ({ 
   // Bắt buộc thấy toast thành công — nếu lệnh ghi hỏng thì toast là lỗi, không phải cái này.
   await expect(page.getByText('Đã lưu khách hàng')).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('cell', { name: HOA })).toBeVisible({ timeout: 15_000 });
+
+  // Cột Trạng thái (thay cho cột Nhân viên phụ trách): khách mới chưa có cơ hội nào.
+  await expect(page.getByRole('columnheader', { name: 'Trạng thái' })).toBeVisible();
+  const row = page.getByRole('row').filter({ hasText: HOA });
+  await expect(row.getByText('Chưa có cơ hội')).toBeVisible();
 });
 
 test('mục 1 — nhân viên khác nhập lại cùng số (dạng +84) thì bị cảnh báo và bị DB chặn', async ({ page }) => {
@@ -104,6 +109,11 @@ test('mục 3 — kéo cơ hội sang cột thua thì bắt buộc chọn lý do
   await expect(page.getByText('Đã lưu cơ hội')).toBeVisible({ timeout: 15_000 });
   const card = page.locator('article').filter({ hasText: OPP });
   await expect(card.getByText('Giá cao')).toBeVisible({ timeout: 15_000 });
+
+  // Trạng thái khách chạy theo giai đoạn cơ hội, không phải nhập tay.
+  await page.goto('/portal/crm/accounts');
+  const row = page.getByRole('row').filter({ hasText: HOA });
+  await expect(row.getByText('Không mua')).toBeVisible({ timeout: 15_000 });
 });
 
 test('mục 3b — kéo thẻ sang cột thua trên kanban thì hộp thoại lý do bật lên', async ({ page }) => {

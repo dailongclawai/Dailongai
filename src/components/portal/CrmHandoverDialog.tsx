@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
-import { getStaffPeers, handoverAccount, getCrmSettings } from '@/lib/portal-queries';
+import { getStaffPeers, handoverAccount } from '@/lib/portal-queries';
 import type { StaffPeer, StaffSegment } from '@/lib/portal-types';
 
 interface Props {
@@ -20,7 +20,6 @@ export function CrmHandoverDialog({ open, accountId, mySegment, onClose, onDone 
   const [peers, setPeers] = useState<StaffPeer[]>([]);
   const [toStaff, setToStaff] = useState('');
   const [note, setNote] = useState('');
-  const [bonus, setBonus] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -28,9 +27,6 @@ export function CrmHandoverDialog({ open, accountId, mySegment, onClose, onDone 
     setToStaff('');
     setNote('');
     void getStaffPeers(target).then(setPeers).catch(() => setPeers([]));
-    void getCrmSettings()
-      .then(s => setBonus(s ? (Number(s.base_price) * Number(s.crossover_bonus_rate)) / 2 : null))
-      .catch(() => setBonus(null));
   }, [open, target]);
 
   const submit = async () => {
@@ -75,11 +71,6 @@ export function CrmHandoverDialog({ open, accountId, mySegment, onClose, onDone 
             </label>
             <textarea id="handover-note" rows={2} className={field} value={note} onChange={e => setNote(e.target.value)} />
           </div>
-          {bonus !== null && (
-            <p className="rounded-xl bg-[#282a2c] px-3 py-2 text-xs text-[#00daf3]">
-              {t('portal.crm.handover.bonus_hint')}: {new Intl.NumberFormat('vi-VN').format(bonus)}đ
-            </p>
-          )}
           <div className="flex gap-2">
             <button onClick={onClose} className="flex-1 rounded-xl border border-[#3d3f41] py-2.5 text-[#e2e2e5]">
               {t('portal.crm.handover.cancel')}

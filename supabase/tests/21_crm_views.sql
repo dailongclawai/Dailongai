@@ -13,10 +13,10 @@ SET LOCAL ROLE authenticated;
 SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d1';
 INSERT INTO public.crm_accounts (id, name, owner_id)
 VALUES ('20000000-0000-0000-0000-000000000001', 'Cô Lan', '00000000-0000-0000-0000-0000000000d1');
-INSERT INTO public.crm_opportunities (id, account_id, pipeline, stage_id, name, amount, owner_id)
+INSERT INTO public.crm_opportunities (id, account_id, stage_id, name, amount, owner_id)
 SELECT '30000000-0000-0000-0000-000000000001',
-       '20000000-0000-0000-0000-000000000001', 'b2c_device',
-       (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=2),
+       '20000000-0000-0000-0000-000000000001',
+       (SELECT id FROM public.crm_stages WHERE sort_order=2),
        'Cô Lan - 1 máy', 29500000, '00000000-0000-0000-0000-0000000000d1';
 INSERT INTO public.crm_activities (kind, subject, account_id, owner_id)
 VALUES ('task', 'Gửi tài liệu', '20000000-0000-0000-0000-000000000001',
@@ -27,7 +27,7 @@ SELECT results_eq(
     $$SELECT account_name, stage_name, probability
       FROM public.crm_opportunity_board
       WHERE id='30000000-0000-0000-0000-000000000001'$$,
-    $$VALUES ('Cô Lan', 'Đang quan tâm', 30::smallint)$$,
+    $$VALUES ('Cô Lan', 'Đã liên hệ', 25::smallint)$$,
     'crm_opportunity_board joins account name, stage name and probability'
 );
 

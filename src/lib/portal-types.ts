@@ -182,7 +182,6 @@ export interface AuditEntry {
 
 // ── CRM ──
 
-export type CrmPipeline = 'b2c_device' | 'b2b_dealer';
 export type CrmForecast = 'open' | 'won' | 'lost';
 export type CrmAccountKind = 'customer' | 'dealer_prospect';
 export type CrmActivityKind = 'task' | 'call' | 'meeting';
@@ -192,7 +191,6 @@ export type CrmSource =
 
 export interface CrmStage {
   id: string;
-  pipeline: CrmPipeline;
   name: string;
   probability: number;
   forecast: CrmForecast;
@@ -230,6 +228,8 @@ export interface CrmAccountListRow extends CrmAccount {
   creator_name: string | null;
   creator_email: string | null;
   was_handed_over: boolean;
+  /** Suy tự động: trạng thái đơn hàng nếu có, không thì tên giai đoạn cơ hội mới nhất. */
+  status_label: string;
 }
 
 export interface CrmContact {
@@ -253,7 +253,6 @@ export interface CrmOpportunityBoardRow {
   id: string;
   code: string | null;
   name: string;
-  pipeline: CrmPipeline;
   stage_id: string;
   stage_name: string;
   probability: number;
@@ -280,11 +279,10 @@ export interface CrmOpportunityBoardRow {
   created_at: string;
 }
 
-/** Danh mục lý do mất. pipeline = null nghĩa là dùng chung cho cả hai pipeline. */
+/** Danh mục lý do mất, dùng chung cho mọi cơ hội. */
 export interface CrmLostReason {
   id: string;
   name: string;
-  pipeline: CrmPipeline | null;
   sort_order: number;
   active: boolean;
 }
@@ -321,10 +319,8 @@ export interface CrmActivityRow {
 // ── CRM staff (Plan 2) ──
 
 export interface CrmSettings {
-  base_price: number;
-  staff_rate_b2c: number;
-  staff_rate_b2b: number;
-  crossover_bonus_rate: number;
+  /** Một mức duy nhất cho mọi nhân viên. Boss chốt 29/07/2026: 10%. */
+  staff_rate: number;
 }
 
 export type CrmCommissionStatus = 'pending' | 'payable' | 'paid' | 'void';
@@ -333,14 +329,12 @@ export interface CrmStaffCommission {
   id: string;
   opportunity_id: string;
   staff_id: string;
-  role_in_deal: 'closer' | 'referrer';
-  pipeline: CrmPipeline;
-  base_price: string;
+  /** Giá trị đơn hàng lúc phát sinh, chốt cứng để đổi cấu hình không viết lại quá khứ. */
+  order_value: string;
   rate: string;
   amount: string;
   status: CrmCommissionStatus;
-  handover_id: string | null;
-  order_id: string | null;
+  order_id: string;
   confirmed_at: string | null;
   paid_at: string | null;
   payment_ref: string | null;
@@ -354,9 +348,7 @@ export interface CrmStaffReportRow {
   staff_segment: StaffSegment | null;
   deals_won: number;
   deals_open: number;
-  commission_closer: string;
-  commission_referral: string;
-  amount_pending: string;
+  commission_total: string;
   amount_payable: string;
   amount_paid: string;
 }

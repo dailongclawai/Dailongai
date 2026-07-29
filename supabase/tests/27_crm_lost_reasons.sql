@@ -21,35 +21,41 @@ INSERT INTO public.crm_accounts (id, name, phone, owner_id)
 VALUES ('20000000-0000-0000-0000-0000000000a1', 'Chị Hoa', '0912345678',
         '00000000-0000-0000-0000-00000000005c');
 
-INSERT INTO public.crm_opportunities (id, account_id, pipeline, stage_id, name, amount, owner_id)
+INSERT INTO public.crm_opportunities (id, account_id, stage_id, name, amount, owner_id)
 VALUES ('30000000-0000-0000-0000-0000000000b1',
-        '20000000-0000-0000-0000-0000000000a1', 'b2c_device',
-        (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=1),
+        '20000000-0000-0000-0000-0000000000a1',
+        (SELECT id FROM public.crm_stages WHERE sort_order=1),
         'Máy laser cho chị Hoa', 15000000, '00000000-0000-0000-0000-00000000005c');
 
 -- 2. chuyển sang giai đoạn thua mà không chọn lý do — phải bị chặn
 SELECT throws_ok(
     $$UPDATE public.crm_opportunities
-      SET stage_id=(SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='lost')
+      SET stage_id=(SELECT id FROM public.crm_stages WHERE forecast='lost')
       WHERE id='30000000-0000-0000-0000-0000000000b1'$$,
     NULL, NULL,
     'chuyển sang giai đoạn thua mà thiếu lý do thì bị chặn'
 );
 
--- 3. lý do riêng của pipeline B2B không dùng được cho cơ hội B2C
+-- 3. lý do đã tắt hoạt động thì không dùng được
+SET LOCAL ROLE postgres;
+UPDATE public.crm_lost_reasons SET active = false WHERE name = 'Khác';
+SET LOCAL ROLE authenticated;
 SELECT throws_ok(
     $$UPDATE public.crm_opportunities
-      SET stage_id=(SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='lost'),
-          lost_reason_id=(SELECT id FROM public.crm_lost_reasons WHERE pipeline='b2b_dealer')
+      SET stage_id=(SELECT id FROM public.crm_stages WHERE forecast='lost'),
+          lost_reason_id=(SELECT id FROM public.crm_lost_reasons WHERE name='Khác')
       WHERE id='30000000-0000-0000-0000-0000000000b1'$$,
     NULL, NULL,
-    'lý do dành riêng cho B2B không dùng được cho cơ hội B2C'
+    'lý do đã tắt hoạt động thì không chọn được'
 );
+SET LOCAL ROLE postgres;
+UPDATE public.crm_lost_reasons SET active = true WHERE name = 'Khác';
+SET LOCAL ROLE authenticated;
 
 -- 4. có lý do hợp lệ thì chuyển được
 SELECT lives_ok(
     $$UPDATE public.crm_opportunities
-      SET stage_id=(SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='lost'),
+      SET stage_id=(SELECT id FROM public.crm_stages WHERE forecast='lost'),
           lost_reason_id=(SELECT id FROM public.crm_lost_reasons WHERE name='Giá cao'),
           lost_notes='Khách so với hàng Trung Quốc rẻ hơn 30%'
       WHERE id='30000000-0000-0000-0000-0000000000b1'$$,
@@ -72,7 +78,7 @@ SELECT results_eq(
 
 -- 7. kéo ngược về giai đoạn đang mở thì xoá sạch lý do và ghi chú thua
 UPDATE public.crm_opportunities
-SET stage_id=(SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=2)
+SET stage_id=(SELECT id FROM public.crm_stages WHERE sort_order=2)
 WHERE id='30000000-0000-0000-0000-0000000000b1';
 SELECT results_eq(
     $$SELECT lost_reason_id, lost_notes, closed_at FROM public.crm_opportunities
@@ -85,7 +91,7 @@ SELECT results_eq(
 -- Guard chỉ soát lúc đổi giai đoạn nên đặt lại lý do về NULL mà giữ nguyên
 -- giai đoạn sẽ tạo đúng tình trạng của dữ liệu cũ.
 UPDATE public.crm_opportunities
-SET stage_id=(SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='lost'),
+SET stage_id=(SELECT id FROM public.crm_stages WHERE forecast='lost'),
     lost_reason_id=(SELECT id FROM public.crm_lost_reasons WHERE name='Mất liên lạc')
 WHERE id='30000000-0000-0000-0000-0000000000b1';
 UPDATE public.crm_opportunities SET lost_reason_id=NULL

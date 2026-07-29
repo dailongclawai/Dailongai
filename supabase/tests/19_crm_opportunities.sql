@@ -17,11 +17,10 @@ SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-0000000000d1';
 INSERT INTO public.crm_accounts (id, name, phone, owner_id)
 VALUES ('20000000-0000-0000-0000-000000000001', 'Cô Lan', '0901000001', '00000000-0000-0000-0000-0000000000d1');
 
-INSERT INTO public.crm_opportunities (id, account_id, pipeline, stage_id, name, amount, owner_id)
+INSERT INTO public.crm_opportunities (id, account_id, stage_id, name, amount, owner_id)
 SELECT '30000000-0000-0000-0000-000000000001',
        '20000000-0000-0000-0000-000000000001',
-       'b2c_device',
-       (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=1),
+       (SELECT id FROM public.crm_stages WHERE sort_order=1),
        'Cô Lan - 1 máy',
        29500000,
        '00000000-0000-0000-0000-0000000000d1';
@@ -49,19 +48,19 @@ SELECT results_eq(
     'open stage leaves closed_at NULL'
 );
 
--- 4. không được gán giai đoạn của pipeline khác
+-- 4. không được gán một giai đoạn không tồn tại
 -- Dùng dạng 2 tham số throws_ok(query, errcode). RAISE EXCEPTION mặc định là P0001.
 -- KHÔNG truyền NULL vào throws_ok: Postgres sẽ báo "function is not unique" vì nhập nhằng overload.
 SELECT throws_ok(
     $$UPDATE public.crm_opportunities
-      SET stage_id = (SELECT id FROM public.crm_stages WHERE pipeline='b2b_dealer' AND sort_order=1)
+      SET stage_id = '00000000-0000-0000-0000-0000000000ff'
       WHERE id='30000000-0000-0000-0000-000000000001'$$,
     'P0001'
 );
 
 -- 5. chuyển sang giai đoạn won thì tự đóng
 UPDATE public.crm_opportunities
-SET stage_id = (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND forecast='won')
+SET stage_id = (SELECT id FROM public.crm_stages WHERE forecast='won')
 WHERE id='30000000-0000-0000-0000-000000000001';
 SELECT results_eq(
     $$SELECT closed_at IS NOT NULL FROM public.crm_opportunities
@@ -101,10 +100,9 @@ SELECT results_eq(
 -- 9. d2 không gắn được cơ hội vào khách của d1 dù tự nhận owner_id là mình
 -- (account id lấy thẳng từ fixture vì d2 không SELECT được account của d1)
 SELECT throws_ok(
-    $$INSERT INTO public.crm_opportunities (account_id, pipeline, stage_id, name, owner_id)
+    $$INSERT INTO public.crm_opportunities (account_id, stage_id, name, owner_id)
       SELECT '20000000-0000-0000-0000-000000000001',
-             'b2c_device',
-             (SELECT id FROM public.crm_stages WHERE pipeline='b2c_device' AND sort_order=1),
+             (SELECT id FROM public.crm_stages WHERE sort_order=1),
              'Chen ngang',
              '00000000-0000-0000-0000-0000000000d2'$$,
     '42501'
