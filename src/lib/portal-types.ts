@@ -191,6 +191,36 @@ export type CrmSource =
   | 'website' | 'zalo' | 'facebook' | 'google_ads'
   | 'tiktok' | 'referral' | 'hotline' | 'event' | 'other';
 
+export type CrmOrgType =
+  | 'benh_vien_cong' | 'benh_vien_tu' | 'phong_kham' | 'spa' | 'dai_ly' | 'khac';
+
+/** Một mốc trên dòng thời gian của khách: hoạt động hoặc lần đổi giai đoạn. */
+export interface CrmTimelineEntry {
+  account_id: string;
+  at: string | null;
+  entry: 'activity' | 'stage';
+  sub_kind: string | null;
+  title: string;
+  detail: string | null;
+  who: string | null;
+}
+
+/** Cơ hội quá hạn đóng hoặc lâu không ai động tới. */
+export interface CrmFollowupRow {
+  id: string;
+  code: string | null;
+  name: string;
+  account_id: string;
+  account_name: string;
+  stage_name: string;
+  amount: string;
+  expected_close_date: string;
+  last_activity_at: string | null;
+  days_idle: number;
+  reason: 'overdue' | 'stale';
+  owner_name: string | null;
+}
+
 export interface CrmStage {
   id: string;
   name: string;
@@ -213,6 +243,8 @@ export interface CrmAccount {
   province: string | null;
   address: string | null;
   source: CrmSource | null;
+  /** Loại cơ sở của khách tổ chức. Chỉ 'dai_ly' mới có dải chiết khấu. */
+  org_type: CrmOrgType | null;
   referrer_profile_id: string | null;
   linked_profile_id: string | null;
   owner_id: string;

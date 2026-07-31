@@ -1,5 +1,6 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue,
+  CrmTimelineEntry, CrmFollowupRow, CrmOrgType } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -684,6 +685,7 @@ export interface CrmAccountInput {
   province?: string | null;
   address?: string | null;
   source?: CrmSource | null;
+  orgType?: CrmOrgType | null;
   notes?: string | null;
   ownerId: string;
 }
@@ -697,6 +699,8 @@ function crmAccountRow(input: CrmAccountInput) {
     email: input.email?.trim() || null,
     zalo_phone: input.zaloPhone?.trim() || null,
     tax_code: input.taxCode?.trim() || null,
+    // Loại cơ sở chỉ có nghĩa với khách tổ chức; khách cá nhân luôn để trống.
+    org_type: input.kind === 'dealer_prospect' ? (input.orgType ?? null) : null,
     province: input.province?.trim() || null,
     address: input.address?.trim() || null,
     source: input.source ?? null,
@@ -842,6 +846,47 @@ export function suggestedUnitPrice(
   const base = Number(model.base_price);
   if (kind !== 'dealer_prospect' || !model.dealer_price) return base;
   return Math.round(base * (1 - (settings?.dealer_discount_min ?? 0)));
+}
+
+/** Một khách kèm các cột tổng hợp, dùng cho trang chi tiết. */
+export async function getCrmAccountById(id: string): Promise<CrmAccountListRow | null> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_account_list')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as CrmAccountListRow) ?? null;
+}
+
+/** Mọi cơ hội của một khách, mới nhất lên trước. */
+export async function getAccountOpportunities(accountId: string): Promise<CrmOpportunityBoardRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_opportunity_board')
+    .select('*')
+    .eq('account_id', accountId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmOpportunityBoardRow[]) ?? [];
+}
+
+/** Dòng thời gian của một khách: hoạt động và những lần cơ hội đổi giai đoạn. */
+export async function getAccountTimeline(accountId: string): Promise<CrmTimelineEntry[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_account_timeline')
+    .select('*')
+    .eq('account_id', accountId);
+  if (error) throw error;
+  return (data as CrmTimelineEntry[]) ?? [];
+}
+
+/** Cơ hội quá hạn đóng hoặc lâu không ai động tới. */
+export async function getFollowupDue(): Promise<CrmFollowupRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_followup_due')
+    .select('*');
+  if (error) throw error;
+  return (data as CrmFollowupRow[]) ?? [];
 }
 
 /** Cơ hội còn đang mở của một khách, cũ nhất lên trước. */

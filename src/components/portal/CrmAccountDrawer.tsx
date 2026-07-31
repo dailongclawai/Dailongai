@@ -6,9 +6,10 @@ import { useI18n } from '@/lib/i18n';
 import {
   createCrmAccount, updateCrmAccount, lookupCrmPhones,
 } from '@/lib/portal-queries';
-import type { CrmAccount, CrmAccountKind, CrmPhoneMatch, CrmSource } from '@/lib/portal-types';
+import type { CrmAccount, CrmAccountKind, CrmOrgType, CrmPhoneMatch, CrmSource } from '@/lib/portal-types';
 
 const SOURCES: CrmSource[] = ['website', 'zalo', 'facebook', 'google_ads', 'tiktok', 'referral', 'hotline', 'event', 'other'];
+const ORG_TYPES: CrmOrgType[] = ['benh_vien_cong', 'benh_vien_tu', 'phong_kham', 'spa', 'dai_ly', 'khac'];
 
 interface Props {
   open: boolean;
@@ -28,6 +29,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
   const [province, setProvince] = useState('');
   const [address, setAddress] = useState('');
   const [source, setSource] = useState<CrmSource | ''>('');
+  const [orgType, setOrgType] = useState<CrmOrgType | ''>('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [dup, setDup] = useState<CrmPhoneMatch | null>(null);
@@ -42,6 +44,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
     setProvince(account?.province ?? '');
     setAddress(account?.address ?? '');
     setSource(account?.source ?? '');
+    setOrgType(account?.org_type ?? '');
     setNotes(account?.notes ?? '');
     setDup(null);
   }, [open, account]);
@@ -64,7 +67,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
     try {
       const input = {
         name, kind, phone, email, zaloPhone: zalo, province, address,
-        source: source || null, notes, ownerId,
+        source: source || null, orgType: orgType || null, notes, ownerId,
       };
       if (account) await updateCrmAccount(account.id, input);
       else await createCrmAccount(input);
@@ -110,6 +113,25 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
               <option value="dealer_prospect">{t('portal.crm.account.kind_prospect')}</option>
             </select>
           </div>
+          {/* Loại cơ sở chỉ hỏi với khách tổ chức. Riêng "đại lý phân phối" mới
+              được hưởng dải chiết khấu, nơi khác mua về dùng trả giá niêm yết. */}
+          {kind === 'dealer_prospect' && (
+            <div>
+              <label className={label} htmlFor="crm-acc-org">{t('portal.crm.account.org_type')}</label>
+              <select
+                id="crm-acc-org" className={field}
+                value={orgType} onChange={e => setOrgType(e.target.value as CrmOrgType | '')}
+              >
+                <option value="">—</option>
+                {ORG_TYPES.map(o => (
+                  <option key={o} value={o}>{t('portal.crm.org.' + o)}</option>
+                ))}
+              </select>
+              {orgType === 'dai_ly' && (
+                <p className="mt-1 text-xs text-[#00daf3]">{t('portal.crm.account.org_dealer_hint')}</p>
+              )}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={label} htmlFor="crm-acc-phone">{t('portal.crm.account.phone')}</label>

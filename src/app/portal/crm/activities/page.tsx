@@ -1,17 +1,20 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmActivities, completeActivity } from '@/lib/portal-queries';
+import { getCrmActivities, completeActivity, getFollowupDue } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmActivityDrawer } from '@/components/portal/CrmActivityDrawer';
-import type { CrmActivityRow } from '@/lib/portal-types';
+import type { CrmActivityRow, CrmFollowupRow } from '@/lib/portal-types';
 
-type Bucket = 'overdue' | 'today' | 'upcoming' | 'done';
+type Bucket = 'overdue' | 'today' | 'upcoming' | 'done' | 'followup';
+
+const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 function bucketOf(a: CrmActivityRow, now: Date): Bucket {
   if (a.done_at) return 'done';
@@ -30,6 +33,7 @@ export default function CrmActivitiesPage() {
   const [rows, setRows] = useState<CrmActivityRow[]>([]);
   const [busy, setBusy] = useState(true);
   const [tab, setTab] = useState<Bucket>('today');
+  const [followup, setFollowup] = useState<CrmFollowupRow[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -46,7 +50,9 @@ export default function CrmActivitiesPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      setRows(await getCrmActivities());
+      const [acts, due] = await Promise.all([getCrmActivities(), getFollowupDue()]);
+      setRows(acts);
+      setFollowup(due);
     } finally {
       setBusy(false);
     }
@@ -58,7 +64,7 @@ export default function CrmActivitiesPage() {
 
   const buckets = useMemo(() => {
     const now = new Date();
-    const acc: Record<Bucket, CrmActivityRow[]> = { overdue: [], today: [], upcoming: [], done: [] };
+    const acc: Record<Bucket, CrmActivityRow[]> = { overdue: [], today: [], upcoming: [], done: [], followup: [] };
     rows.forEach(r => acc[bucketOf(r, now)].push(r));
     return acc;
   }, [rows]);
@@ -74,7 +80,7 @@ export default function CrmActivitiesPage() {
 
   if (loading || !profile) return null;
 
-  const TABS: Bucket[] = ['overdue', 'today', 'upcoming', 'done'];
+  const TABS: Bucket[] = ['overdue', 'today', 'upcoming', 'done', 'followup'];
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
@@ -93,15 +99,55 @@ export default function CrmActivitiesPage() {
             onClick={() => setTab(b)}
             className={`rounded-xl px-4 py-2 text-sm ${tab === b ? 'bg-[#ff5625] text-white' : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
           >
-            {t('portal.crm.activities.' + b)} ({buckets[b].length})
+            {t('portal.crm.activities.' + b)} ({b === 'followup' ? followup.length : buckets[b].length})
           </button>
         ))}
       </div>
 
       {busy && <p className="text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
 
-      <ul className="space-y-2">
-        {buckets[tab].map(a => (
+      {tab === 'followup' && (
+        <ul className="space-y-2">
+          {followup.map(f => (
+            <li key={f.id} className="flex items-start gap-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-4">
+              <span className={`material-symbols-outlined text-[20px] ${f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#ff5625]'}`}>
+                {f.reason === 'overdue' ? 'event_busy' : 'hourglass_empty'}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-[var(--crm-text)]">
+                  {f.name}
+                  {f.code && <span className="ml-2 font-mono text-xs text-[var(--crm-muted)]">{f.code}</span>}
+                </p>
+                <p className="mt-1 text-xs text-[var(--crm-muted)]">
+                  {f.account_name} · {f.stage_name} · {fmtVnd(Number(f.amount))}đ
+                </p>
+                <p className="mt-1 text-xs">
+                  <span className={f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#ff5625]'}>
+                    {t('portal.crm.followup.' + f.reason)}
+                  </span>
+                  <span className="text-[var(--crm-muted)]">
+                    {' '}· {f.expected_close_date} · {f.days_idle} {t('portal.crm.followup.idle_days')}
+                  </span>
+                </p>
+              </div>
+              <Link
+                href={`/portal/crm/accounts/detail?id=${f.account_id}`}
+                className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff5625]"
+              >
+                {t('portal.crm.detail.tab_overview')}
+              </Link>
+            </li>
+          ))}
+          {!busy && followup.length === 0 && (
+            <li className="rounded-2xl border border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
+              {t('portal.crm.followup.empty')}
+            </li>
+          )}
+        </ul>
+      )}
+
+      <ul className={`space-y-2 ${tab === 'followup' ? 'hidden' : ''}`}>
+        {buckets[tab === 'followup' ? 'today' : tab].map(a => (
           <li key={a.id} className="flex items-start gap-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-4">
             <span className="material-symbols-outlined text-[20px] text-[#00daf3]">
               {a.kind === 'call' ? 'call' : a.kind === 'meeting' ? 'event' : 'task_alt'}
@@ -124,7 +170,7 @@ export default function CrmActivitiesPage() {
             )}
           </li>
         ))}
-        {!busy && buckets[tab].length === 0 && (
+        {!busy && tab !== 'followup' && buckets[tab].length === 0 && (
           <li className="rounded-2xl border border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
             {t('portal.crm.activities.empty')}
           </li>

@@ -16,10 +16,11 @@ import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
 import type {
-  CrmAccount, CrmAccountKind, CrmAccountListRow, CrmSettings, CrmStage, ProductModel,
+  CrmAccount, CrmAccountKind, CrmAccountListRow, CrmOrgType, CrmSettings, CrmStage, ProductModel,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
+const ORG_TYPES: CrmOrgType[] = ['benh_vien_cong', 'benh_vien_tu', 'phong_kham', 'spa', 'dai_ly', 'khac'];
 
 // Chỉ đổi màu CHỮ và viền, giữ nền đặc. Nền trong suốt làm hộp thả xuống của
 // native select không đọc được vì trình duyệt bỏ qua style đặt trên <option>.
@@ -38,6 +39,7 @@ export default function CrmAccountsPage() {
   const [rows, setRows] = useState<CrmAccountListRow[]>([]);
   const [busy, setBusy] = useState(true);
   const [kind, setKind] = useState<CrmAccountKind | 'all'>('all');
+  const [org, setOrg] = useState<CrmOrgType | 'all'>('all');
   const [q, setQ] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<CrmAccount | null>(null);
@@ -176,10 +178,11 @@ export default function CrmAccountsPage() {
     const needle = q.trim().toLowerCase();
     return rows.filter(r => {
       if (kind !== 'all' && r.kind !== kind) return false;
+      if (org !== 'all' && r.org_type !== org) return false;
       if (!needle) return true;
       return [r.name, r.phone, r.code, r.province].some(v => (v ?? '').toLowerCase().includes(needle));
     });
-  }, [rows, kind, q]);
+  }, [rows, kind, org, q]);
 
   if (loading || !profile) return null;
 
@@ -201,6 +204,15 @@ export default function CrmAccountsPage() {
           <option value="all">{t('portal.crm.accounts.all_kinds')}</option>
           <option value="customer">{t('portal.crm.account.kind_customer')}</option>
           <option value="dealer_prospect">{t('portal.crm.account.kind_prospect')}</option>
+        </select>
+        <select
+          className={field}
+          value={org}
+          onChange={e => setOrg(e.target.value as CrmOrgType | 'all')}
+          aria-label={t('portal.crm.account.org_type')}
+        >
+          <option value="all">{t('portal.crm.accounts.all_orgs')}</option>
+          {ORG_TYPES.map(o => <option key={o} value={o}>{t('portal.crm.org.' + o)}</option>)}
         </select>
         <button
           onClick={() => setImportOpen(true)}
@@ -243,12 +255,17 @@ export default function CrmAccountsPage() {
               <tr
                 key={r.id}
                 className="cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)]"
-                onClick={() => { setEditing(r); setDrawerOpen(true); }}
+                onClick={() => router.push(`/portal/crm/accounts/detail?id=${r.id}`)}
               >
                 <td className="px-4 py-3 font-mono text-[#00daf3]">{r.code}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{r.name}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">
                   {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
+                  {r.org_type && (
+                    <span className="mt-0.5 block text-xs text-[var(--crm-muted)]/70">
+                      {t('portal.crm.org.' + r.org_type)}
+                    </span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.phone ?? '—'}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.province ?? '—'}</td>
