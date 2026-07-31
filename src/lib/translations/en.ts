@@ -788,6 +788,7 @@ const en: Record<string, string> = {
     'portal.crm.import.done': 'Customers imported',
     'portal.crm.import.made_opps': 'opportunities created',
     'portal.crm.import.set_stages': 'accounts staged',
+    'portal.crm.import.skipped_lost': 'rows skipped (customer marked lost)',
 
     // ── Portal pages + components (i18n) ──
     'portal.auth.common.logo_home_aria': 'Đại Long home',

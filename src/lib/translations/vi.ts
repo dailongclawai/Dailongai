@@ -791,6 +791,7 @@ const vi: Record<string, string> = {
     'portal.crm.import.done': 'Đã nhập số khách',
     'portal.crm.import.made_opps': 'cơ hội đã lập',
     'portal.crm.import.set_stages': 'khách đã đặt trạng thái',
+    'portal.crm.import.skipped_lost': 'dòng bỏ lập cơ hội vì khách Không mua',
 
     // ── Portal pages + components (i18n) ──
     'portal.auth.common.logo_home_aria': 'Đại Long trang chủ',

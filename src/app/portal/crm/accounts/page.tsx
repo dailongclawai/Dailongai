@@ -288,10 +288,14 @@ export default function CrmAccountsPage() {
                     min={1}
                     defaultValue={r.total_quantity > 0 ? r.total_quantity : ''}
                     aria-label={t('portal.crm.accounts.col_machines')}
-                    title={t('portal.crm.accounts.machines_hint')}
+                    // Khách đã chốt sổ thì khoá luôn ô này. Gõ số máy sẽ lập cơ hội
+                    // mới ở bước mở đầu chuỗi — ra cảnh khách ghi "Không mua" mà
+                    // bảng Cơ hội lại bày một thương vụ đang chạy.
+                    disabled={r.stage_locked}
+                    title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : t('portal.crm.accounts.machines_hint')}
                     onBlur={e => void saveMachines(r, Number(e.target.value))}
                     onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                    className="w-16 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s2)] px-2 py-1 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+                    className={`w-16 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s2)] px-2 py-1 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625] ${r.stage_locked ? 'cursor-not-allowed opacity-70' : ''}`}
                   />
                   {r.open_deals > 0 && (
                     <span className="ml-1 text-xs text-[var(--crm-muted)]">

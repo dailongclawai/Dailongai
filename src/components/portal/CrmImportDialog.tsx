@@ -51,6 +51,20 @@ function guessColumn(headers: string[], key: FieldKey): number {
   return -1;
 }
 
+/** Có lập cơ hội cho dòng này không.
+ *
+ *  Khách đã "Không mua" thì KHÔNG lập. Cơ hội ở giai đoạn thua bắt buộc phải có
+ *  lý do mất (trigger dưới DB chặn), mà file Excel không mang thông tin đó. Lập
+ *  bừa ở bước mở đầu chuỗi thì ra cảnh khách ghi "Không mua" mà bảng Cơ hội lại
+ *  bày một thương vụ đang chạy.
+ *
+ *  Riêng "Hoàn thành đơn" vẫn lập: đặt trạng thái khách xong, trigger đẩy cơ hội
+ *  sang đúng bước hoàn thành, nên nhập lại đơn đã xong vẫn khớp. */
+export function nenLapCoHoi(soMay: number, forecastGiaiDoan: string | null): boolean {
+  if (!Number.isFinite(soMay) || soMay < 1) return false;
+  return forecastGiaiDoan !== 'lost';
+}
+
 interface Props {
   open: boolean;
   ownerId: string;
@@ -171,14 +185,18 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
       const model = models.length === 1 ? models[0] : null;
       let soCoHoi = 0;
       let soTrangThai = 0;
+      let soBoQuaViThua = 0;
 
       for (let i = 0; i < importable.length; i++) {
         const id = ids[i];
         if (!id) continue;
         const row = importable[i].row;
 
+        const stage = stageByName(cell(row, 'stage'));
         const soMay = Number(cell(row, 'quantity').replace(/[^\d]/g, ''));
-        if (buocDau && Number.isFinite(soMay) && soMay >= 1) {
+        if (soMay >= 1 && !nenLapCoHoi(soMay, stage?.forecast ?? null)) soBoQuaViThua++;
+
+        if (buocDau && nenLapCoHoi(soMay, stage?.forecast ?? null)) {
           const donGia = model ? suggestedUnitPrice(model, kind, settings) : 0;
           await createCrmOpportunity({
             accountId: id,
@@ -197,7 +215,6 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
           soCoHoi++;
         }
 
-        const stage = stageByName(cell(row, 'stage'));
         if (stage) {
           await setCrmAccountStage(id, stage.id);
           soTrangThai++;
@@ -207,6 +224,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
       const them = [
         soCoHoi > 0 ? `${soCoHoi} ${t('portal.crm.import.made_opps')}` : '',
         soTrangThai > 0 ? `${soTrangThai} ${t('portal.crm.import.set_stages')}` : '',
+        soBoQuaViThua > 0 ? `${soBoQuaViThua} ${t('portal.crm.import.skipped_lost')}` : '',
       ].filter(Boolean).join(', ');
       toast.success(`${t('portal.crm.import.done')}: ${payload.length}${them ? ` · ${them}` : ''}`);
       reset();
