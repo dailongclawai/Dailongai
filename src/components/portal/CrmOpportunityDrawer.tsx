@@ -5,10 +5,11 @@ import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
 import {
   createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
-  getOrdersForAccount, linkOrderToOpportunity,
+  getCrmSettings, getOrdersForAccount, linkOrderToOpportunity, suggestedUnitPrice,
 } from '@/lib/portal-queries';
 import type {
-  CrmAccount, CrmLinkableOrder, CrmLostReason, CrmOpportunityBoardRow, CrmStage, ProductModel,
+  CrmAccount, CrmLinkableOrder, CrmLostReason, CrmOpportunityBoardRow, CrmSettings, CrmStage,
+  ProductModel,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -41,17 +42,16 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
   const [orders, setOrders] = useState<CrmLinkableOrder[]>([]);
   const [orderId, setOrderId] = useState('');
   const [trialDays, setTrialDays] = useState('');
+  const [settings, setSettings] = useState<CrmSettings | null>(null);
 
   const pipelineStages = [...stages].sort((a, b) => a.sort_order - b.sort_order);
   const isLost = pipelineStages.find(s => s.id === stageId)?.forecast === 'lost';
 
-  // Đại lý và bán lẻ chỉ khác giá: đại lý lấy dealer_price nếu model có đặt.
+  // Đại lý và bán lẻ chỉ khác giá: đại lý được gợi ý mức chiết khấu tối thiểu,
+  // còn dư địa thương lượng xuống tới sàn dealer_price.
   const account = accounts.find(a => a.id === accountId);
   const model = models.find(m => m.id === modelId);
-  const listPrice = model ? Number(model.base_price) : 0;
-  const unitPrice = account?.kind === 'dealer_prospect' && model?.dealer_price
-    ? Number(model.dealer_price)
-    : listPrice;
+  const unitPrice = model && account ? suggestedUnitPrice(model, account.kind, settings) : 0;
   const suggested = unitPrice * quantity;
   const belowSuggested = suggested > 0 && amount > 0 && amount < suggested;
   // Hoa hồng dự kiến hiện ngay từ lúc bắt đầu theo khách, không đợi chốt deal.
@@ -62,6 +62,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     void getCrmAccounts().then(setAccounts).catch(() => setAccounts([]));
     void getActiveModels().then(setModels).catch(() => setModels([]));
     void getCrmLostReasons().then(setReasons).catch(() => setReasons([]));
+    void getCrmSettings().then(setSettings).catch(() => setSettings(null));
     setAccountId(row?.account_id ?? '');
     setStageId(row?.stage_id ?? pipelineStages[0]?.id ?? '');
     setName(row?.name ?? '');

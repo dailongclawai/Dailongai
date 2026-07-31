@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -819,6 +819,29 @@ export async function moveOpportunityStage(
     .update({ stage_id: stageId, lost_reason_id: lostReasonId ?? null, lost_notes: lostNotes?.trim() || null })
     .eq('id', id);
   if (error) throw error;
+}
+
+/** Cấu hình CRM dùng chung. Ai đăng nhập cũng đọc được, chỉ admin sửa. */
+export async function getCrmSettings(): Promise<CrmSettings | null> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_settings')
+    .select('staff_rate, dealer_discount_min')
+    .maybeSingle();
+  if (error) throw error;
+  return (data as CrmSettings) ?? null;
+}
+
+/** Đơn giá gợi ý cho một model theo loại khách: đại lý phải được chiết khấu ít
+ *  nhất `dealer_discount_min`, nên gợi ý đúng mức tối thiểu đó — còn dư địa cho
+ *  nhân viên thương lượng xuống tới sàn `dealer_price`. */
+export function suggestedUnitPrice(
+  model: Pick<ProductModel, 'base_price' | 'dealer_price'>,
+  kind: CrmAccountKind,
+  settings: CrmSettings | null,
+): number {
+  const base = Number(model.base_price);
+  if (kind !== 'dealer_prospect' || !model.dealer_price) return base;
+  return Math.round(base * (1 - (settings?.dealer_discount_min ?? 0)));
 }
 
 /** Cơ hội còn đang mở của một khách, cũ nhất lên trước. */

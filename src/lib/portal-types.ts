@@ -345,6 +345,8 @@ export interface CrmActivityRow {
 export interface CrmSettings {
   /** Một mức duy nhất cho mọi nhân viên. Boss chốt 29/07/2026: 10%. */
   staff_rate: number;
+  /** Chiết khấu tối thiểu phải dành cho đại lý. Boss chốt 01/08/2026: 15%. */
+  dealer_discount_min: number;
 }
 
 export type CrmCommissionStatus = 'pending' | 'payable' | 'paid' | 'void';

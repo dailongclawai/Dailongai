@@ -6,15 +6,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
-  createCrmOpportunity, getActiveModels, getCrmAccounts, getCrmStages, getOpenOpportunities,
-  moveOpportunityStage, setCrmAccountStage, setOpportunityQuantity,
+  createCrmOpportunity, getActiveModels, getCrmAccounts, getCrmSettings, getCrmStages,
+  getOpenOpportunities, moveOpportunityStage, setCrmAccountStage, setOpportunityQuantity,
+  suggestedUnitPrice,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
-import type { CrmAccount, CrmAccountKind, CrmAccountListRow, CrmStage, ProductModel } from '@/lib/portal-types';
+import type {
+  CrmAccount, CrmAccountKind, CrmAccountListRow, CrmSettings, CrmStage, ProductModel,
+} from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -42,6 +45,7 @@ export default function CrmAccountsPage() {
   const [stages, setStages] = useState<CrmStage[]>([]);
   const [losing, setLosing] = useState<{ account: CrmAccountListRow; stage: CrmStage } | null>(null);
   const [models, setModels] = useState<ProductModel[]>([]);
+  const [settings, setSettings] = useState<CrmSettings | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -72,7 +76,9 @@ export default function CrmAccountsPage() {
   }, [session]);
 
   useEffect(() => {
-    if (session) void getActiveModels().then(setModels).catch(() => setModels([]));
+    if (!session) return;
+    void getActiveModels().then(setModels).catch(() => setModels([]));
+    void getCrmSettings().then(setSettings).catch(() => setSettings(null));
   }, [session]);
 
   // Đổi ngay tại chỗ rồi mới gọi máy chủ, để bảng không giật một nhịp.
@@ -139,14 +145,10 @@ export default function CrmAccountsPage() {
         const stage = stages.find(s => s.id === account.stage_id && s.forecast === 'open')
           ?? stages.filter(s => s.forecast === 'open').sort((a, b) => a.sort_order - b.sort_order)[0];
         if (!stage) { toast.error(t('portal.crm.accounts.machines_no_stage')); return; }
-        // Chỉ có đúng một model đang bán thì điền sẵn giá niêm yết để hoa hồng
-        // dự kiến hiện ngay. Nhiều model thì không đoán, để nhân viên tự chọn.
+        // Chỉ có đúng một model đang bán thì điền sẵn giá gợi ý để hoa hồng dự
+        // kiến hiện ngay. Nhiều model thì không đoán, để nhân viên tự chọn.
         const model = models.length === 1 ? models[0] : null;
-        const unit = model
-          ? Number(account.kind === 'dealer_prospect' && model.dealer_price
-            ? model.dealer_price
-            : model.base_price)
-          : 0;
+        const unit = model ? suggestedUnitPrice(model, account.kind, settings) : 0;
         await createCrmOpportunity({
           accountId: account.id,
           stageId: stage.id,
