@@ -106,21 +106,24 @@ export default function CrmPipelinePage() {
 
       {busy && <p className="text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      {/* items-start: không có nó thì flex kéo mọi cột cao bằng cột nhiều thẻ
+          nhất, tạo ra những hộp rỗng dài thượt. Mỗi cột tự cuộn trong phần
+          thẻ, tiêu đề và số đếm đứng yên nên không bị trôi mất khi cuộn. */}
+      <div className="flex items-start gap-4 overflow-x-auto pb-4">
         {columns.map(col => (
           <div
             key={col.stage.id}
             onDragOver={e => e.preventDefault()}
             onDrop={() => void drop(col.stage)}
-            className="w-[280px] flex-shrink-0 rounded-2xl bg-[var(--crm-s1)] p-3"
+            className="flex max-h-[calc(100vh-300px)] min-h-[200px] w-[280px] flex-shrink-0 flex-col rounded-2xl bg-[var(--crm-s1)] p-3"
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex flex-shrink-0 items-center justify-between">
               <span className="text-sm font-bold text-[var(--crm-text)]">{col.stage.name}</span>
               <span className="rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
                 {col.rows.length} · {col.stage.probability}%
               </span>
             </div>
-            <div className="space-y-2">
+            <div className="portal-scroll flex-1 space-y-2 overflow-y-auto pr-1">
               {col.rows.map(r => (
                 <article
                   key={r.id}
