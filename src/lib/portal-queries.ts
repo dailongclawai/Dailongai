@@ -1,5 +1,5 @@
 import { getSupabaseClient } from './supabase';
-import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings } from './portal-types';
+import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -960,6 +960,16 @@ export async function adminSetStaff(userId: string, segment: StaffSegment): Prom
     p_segment: segment,
   });
   if (error) throw error;
+}
+
+/** Đối soát cho quản trị. Khung nhìn tự lọc theo vai trò nên người khác gọi
+ *  cũng chỉ nhận mảng rỗng. */
+export async function getCrmReconIssues(): Promise<CrmReconIssue[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_recon_issues')
+    .select('*');
+  if (error) throw error;
+  return (data as CrmReconIssue[]) ?? [];
 }
 
 export async function getCrmStaffReport(): Promise<CrmStaffReportRow[]> {

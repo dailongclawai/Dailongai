@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmStaffReport } from '@/lib/portal-queries';
+import { getCrmReconIssues, getCrmStaffReport } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
-import type { CrmStaffReportRow } from '@/lib/portal-types';
+import type { CrmReconIssue, CrmStaffReportRow } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -16,6 +16,7 @@ export default function CrmReportsPage() {
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<CrmStaffReportRow[]>([]);
+  const [issues, setIssues] = useState<CrmReconIssue[]>([]);
   const [busy, setBusy] = useState(true);
 
   useEffect(() => {
@@ -32,7 +33,9 @@ export default function CrmReportsPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      setRows(await getCrmStaffReport());
+      const [report, recon] = await Promise.all([getCrmStaffReport(), getCrmReconIssues()]);
+      setRows(report);
+      setIssues(recon);
     } finally {
       setBusy(false);
     }
@@ -102,6 +105,63 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>
             )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Đối soát: bán ngoài sổ và giá lệch bảng giá */}
+      <div className="mt-8 mb-3 flex flex-wrap items-center gap-3">
+        <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">
+          {t('portal.crm.recon.title')}
+        </h2>
+        <span className={`rounded-full px-3 py-1 text-xs ${issues.length > 0
+          ? 'bg-[#f87171]/10 text-[#f87171]'
+          : 'bg-[#34d399]/10 text-[#34d399]'}`}>
+          {issues.length > 0 ? `${issues.length} ${t('portal.crm.recon.flagged')}` : t('portal.crm.recon.clean')}
+        </span>
+      </div>
+      <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.recon.hint')}</p>
+
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
+        <table className="w-full min-w-[900px] text-left text-sm">
+          <thead className="bg-[var(--crm-s3)] text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">
+            <tr>
+              <th className="px-4 py-3">{t('portal.crm.recon.col_issue')}</th>
+              <th className="px-4 py-3">{t('portal.crm.recon.col_ref')}</th>
+              <th className="px-4 py-3">{t('portal.crm.recon.col_party')}</th>
+              <th className="px-4 py-3">{t('portal.crm.recon.col_who')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.recon.col_amount')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.recon.col_expected')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {busy && (
+              <tr><td colSpan={6} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+            )}
+            {!busy && issues.length === 0 && (
+              <tr><td colSpan={6} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.recon.empty')}</td></tr>
+            )}
+            {issues.map(i => (
+              <tr key={`${i.issue}-${i.ref_id}`} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3">
+                  <span className="rounded-full bg-[#f87171]/10 px-2.5 py-1 text-xs text-[#f87171]">
+                    {t('portal.crm.recon.issue_' + i.issue)}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-[var(--crm-text)]">
+                  {i.title}
+                  {i.ref_code && <span className="ml-2 font-mono text-xs text-[var(--crm-muted)]">{i.ref_code}</span>}
+                </td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{i.party_name ?? '—'}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{i.who ?? '—'}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
+                  {fmtVnd(Number(i.amount))}đ
+                </td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">
+                  {i.expected_amount ? `${fmtVnd(Number(i.expected_amount))}đ` : '—'}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

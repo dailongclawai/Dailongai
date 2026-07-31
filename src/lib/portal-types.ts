@@ -349,6 +349,20 @@ export interface CrmSettings {
   dealer_discount_min: number;
 }
 
+/** Dòng đối soát cho quản trị. `won_no_order` = cơ hội đã thắng nhưng chưa gắn
+ *  đơn nào; `price_mismatch` = đơn ghi giá lệch bảng giá. */
+export interface CrmReconIssue {
+  issue: 'won_no_order' | 'price_mismatch';
+  ref_id: string;
+  ref_code: string | null;
+  title: string;
+  party_name: string | null;
+  who: string | null;
+  amount: string;
+  expected_amount: string | null;
+  at: string | null;
+}
+
 export type CrmCommissionStatus = 'pending' | 'payable' | 'paid' | 'void';
 
 export interface CrmStaffCommission {
