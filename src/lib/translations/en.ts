@@ -1605,6 +1605,9 @@ const en: Record<string, string> = {
     'press.meta': 'Mot The Gioi Magazine · AGENCY OF THE VIETNAM SCIENTIFIC AND TECHNOLOGICAL INFORMATION ASSOCIATION · 20 Jul 2026 · Distributed in Vietnam by Dai Long - healthcare technology',
     'press.cta': 'Read the original',
     'press.image_alt': 'Mot The Gioi Magazine article on the 650nm semiconductor laser device',
+    'press.quote_2': 'A low-power semiconductor laser device that lets people care for their cardiovascular health at home — a non-invasive physical therapy — featured in the Health section.',
+    'press.meta_2': 'VnExpress Newspaper · Health section · 29 Jul 2026 · Distributed in Vietnam by Dai Long - healthcare technology',
+    'press.image_alt_2': 'VnExpress article on caring for cardiovascular health at home with a semiconductor laser',
 
 };
 

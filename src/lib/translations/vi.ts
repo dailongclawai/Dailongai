@@ -1608,6 +1608,9 @@ const vi: Record<string, string> = {
     'press.meta': 'Tạp chí Một Thế Giới · CƠ QUAN CỦA HỘI THÔNG TIN KHOA HỌC VÀ CÔNG NGHỆ VIỆT NAM · 20/07/2026 · Đại Long - công nghệ chăm sóc sức khoẻ phân phối tại Việt Nam',
     'press.cta': 'Đọc bài gốc',
     'press.image_alt': 'Bài báo trên Tạp chí Một Thế Giới về máy laser bán dẫn bước sóng 650nm',
+    'press.quote_2': 'Thiết bị laser bán dẫn công suất thấp hỗ trợ người dùng chủ động chăm sóc sức khoẻ tim mạch tại nhà, là liệu pháp vật lý không xâm lấn, được giới thiệu trên chuyên mục Sức khoẻ.',
+    'press.meta_2': 'Báo VnExpress · Chuyên mục Sức khoẻ · 29/07/2026 · Đại Long - công nghệ chăm sóc sức khoẻ phân phối tại Việt Nam',
+    'press.image_alt_2': 'Bài báo trên Báo VnExpress về chăm sóc sức khoẻ tim mạch tại nhà bằng laser bán dẫn',
 
 };
 

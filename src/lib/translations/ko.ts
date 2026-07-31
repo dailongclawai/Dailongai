@@ -523,6 +523,9 @@ const ko: Record<string, string> = {
     'press.meta': '못테저이 매거진 · 베트남 과학기술정보협회 기관지 · 2026년 7월 20일 · 베트남 유통 Đại Long - 헬스케어 테크놀로지',
     'press.cta': '원문 보기',
     'press.image_alt': '650nm 반도체 레이저 기기에 관한 못테저이 매거진 기사',
+    'press.quote_2': '저출력 반도체 레이저 기기로 집에서 스스로 심혈관 건강을 관리할 수 있는 비침습 물리 요법이 건강 섹션에 소개되었습니다.',
+    'press.meta_2': 'VnExpress 신문 · 건강 섹션 · 2026년 7월 29일 · 베트남 유통 Đại Long - 헬스케어 테크놀로지',
+    'press.image_alt_2': '반도체 레이저를 이용한 가정에서의 심혈관 관리에 관한 VnExpress 기사',
 
 };
 

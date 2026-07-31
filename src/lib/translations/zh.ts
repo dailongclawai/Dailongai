@@ -523,6 +523,9 @@ const zh: Record<string, string> = {
     'press.meta': '《一个世界》杂志 · 越南科学技术信息协会机关刊物 · 2026年7月20日 · 由 Đại Long - 健康护理科技 在越南经销',
     'press.cta': '阅读原文',
     'press.image_alt': '《一个世界》杂志关于650nm半导体激光设备的报道',
+    'press.quote_2': '低功率半导体激光设备让人们在家中自主进行心血管健康护理，属于非侵入式物理疗法，刊登于健康版块。',
+    'press.meta_2': 'VnExpress报 · 健康版块 · 2026年7月29日 · 越南由 Đại Long - 健康护理科技 经销',
+    'press.image_alt_2': '《VnExpress》关于在家使用半导体激光护理心血管健康的报道',
 
 };
 
