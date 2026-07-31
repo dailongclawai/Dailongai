@@ -59,6 +59,7 @@ export function PortalShell({
       { href: '/portal/payout-info', label: t('portal.shell.nav.payout_info'), icon: 'account_balance' },
     ],
     staff: [
+      { href: '/portal/crm', label: t('portal.crm.nav.dashboard'), icon: 'dashboard', exact: true },
       { href: '/portal/crm/accounts', label: t('portal.crm.nav.accounts'), icon: 'contacts' },
       { href: '/portal/crm/pipeline', label: t('portal.crm.nav.pipeline'), icon: 'view_kanban' },
       { href: '/portal/crm/activities', label: t('portal.crm.nav.activities'), icon: 'task_alt' },
@@ -131,8 +132,9 @@ export function PortalShell({
     </div>
   );
 
+  // Chỉ khu CRM đổi sang tông nâu-đồng, các trang portal khác giữ tông xám.
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${pathname.startsWith('/portal/crm') ? 'crm-scope' : ''}`}>
       {/* Desktop sidebar */}
       <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[280px] border-r border-[#1f2937]/40 lg:block">{Sidebar}</aside>
 

@@ -16,7 +16,7 @@ const STATUS_COLOR: Record<CrmCommissionStatus, string> = {
   pending: 'text-[#ff5625]',
   payable: 'text-[#00daf3]',
   paid: 'text-[#34d399]',
-  void: 'text-[#a0a0a8]',
+  void: 'text-[var(--crm-muted)]',
 };
 
 export default function CrmCommissionPage() {
@@ -91,14 +91,14 @@ export default function CrmCommissionPage() {
     { key: 'pending', label: t('portal.crm.commission.pending'), value: totals.pending, tone: 'text-[#ff5625]' },
     { key: 'payable', label: t('portal.crm.commission.payable'), value: totals.payable, tone: 'text-[#00daf3]' },
     { key: 'paid', label: t('portal.crm.commission.paid'), value: totals.paid, tone: 'text-[#34d399]' },
-    { key: 'total', label: t('portal.crm.commission.total'), value: totals.all, tone: 'text-[#e2e2e5]' },
+    { key: 'total', label: t('portal.crm.commission.total'), value: totals.all, tone: 'text-[var(--crm-text)]' },
   ];
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.commission.title')}</h1>
+        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.commission.title')}</h1>
         {isAdmin && (
           <button
             onClick={() => void release()}
@@ -111,16 +111,16 @@ export default function CrmCommissionPage() {
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         {cards.map(c => (
-          <div key={c.key} className="rounded-2xl border border-[#3d3f41] bg-[#1e2022] p-4">
-            <p className="text-xs text-[#a0a0a8]">{c.label}</p>
+          <div key={c.key} className="rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-4">
+            <p className="text-xs text-[var(--crm-muted)]">{c.label}</p>
             <p className={`mt-1 text-lg font-bold ${c.tone}`}>{fmtVnd(c.value)}đ</p>
           </div>
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#3d3f41]">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[860px] text-left text-sm">
-          <thead className="bg-[#282a2c] text-[#a0a0a8]">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.commission.col_date')}</th>
               <th className="px-4 py-3">{t('portal.crm.commission.col_deal')}</th>
@@ -133,22 +133,22 @@ export default function CrmCommissionPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && rows.length === 0 && (
-              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.commission.empty')}</td></tr>
+              <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.commission.empty')}</td></tr>
             )}
             {rows.map(r => (
-              <tr key={r.id} className="border-t border-[#3d3f41]">
-                <td className="px-4 py-3 text-[#a0a0a8]">{new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
+              <tr key={r.id} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
                 <td className="px-4 py-3 font-mono text-[#00daf3]">{r.opportunity_id.slice(0, 8)}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{fmtVnd(Number(r.order_value))}đ</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{(Number(r.rate) * 100).toFixed(1)}%</td>
-                <td className="px-4 py-3 font-bold text-[#e2e2e5]">{fmtVnd(Number(r.amount))}đ</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{fmtVnd(Number(r.order_value))}đ</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{(Number(r.rate) * 100).toFixed(1)}%</td>
+                <td className="px-4 py-3 font-bold text-[var(--crm-text)]">{fmtVnd(Number(r.amount))}đ</td>
                 <td className={`px-4 py-3 ${STATUS_COLOR[r.status]}`}>
                   {t('portal.crm.commission.' + r.status)}
                   {r.status === 'pending' && (
-                    <span className="mt-0.5 block text-xs text-[#a0a0a8]">
+                    <span className="mt-0.5 block text-xs text-[var(--crm-muted)]">
                       {t('portal.crm.commission.waiting_trial')}{' '}
                       {new Date(r.eligible_at).toLocaleDateString('vi-VN')}
                     </span>
@@ -158,7 +158,7 @@ export default function CrmCommissionPage() {
                   <td className="px-4 py-3">
                     {(r.status === 'payable'
                       || (r.status === 'pending' && new Date(r.eligible_at) <= new Date())) && (
-                      <button onClick={() => void pay(r.id)} className="rounded-lg border border-[#3d3f41] px-3 py-1.5 text-xs text-[#e2e2e5] hover:border-[#34d399]">
+                      <button onClick={() => void pay(r.id)} className="rounded-lg border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]">
                         {t('portal.crm.commission.mark_paid')}
                       </button>
                     )}

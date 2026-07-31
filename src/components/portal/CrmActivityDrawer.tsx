@@ -57,15 +57,15 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
-  const label = 'mb-1 block text-xs text-[#a0a0a8]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60" onClick={onClose}>
-      <div className="h-full w-full max-w-md overflow-y-auto bg-[#1e2022] p-6" onClick={e => e.stopPropagation()}>
+      <div className="h-full w-full max-w-md overflow-y-auto bg-[var(--crm-s2)] p-6" onClick={e => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[#e2e2e5]">{t('portal.crm.activity.new')}</h2>
-          <button onClick={onClose} aria-label={t('portal.crm.common.close')} className="text-[#a0a0a8]">
+          <h2 className="text-lg font-bold text-[var(--crm-text)]">{t('portal.crm.activity.new')}</h2>
+          <button onClick={onClose} aria-label={t('portal.crm.common.close')} className="text-[var(--crm-muted)]">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>

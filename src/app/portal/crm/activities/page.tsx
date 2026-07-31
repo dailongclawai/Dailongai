@@ -80,7 +80,7 @@ export default function CrmActivitiesPage() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.activities.title')}</h1>
+        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.activities.title')}</h1>
         <button onClick={() => setDrawerOpen(true)} className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white">
           {t('portal.crm.activity.new')}
         </button>
@@ -91,33 +91,33 @@ export default function CrmActivitiesPage() {
           <button
             key={b}
             onClick={() => setTab(b)}
-            className={`rounded-xl px-4 py-2 text-sm ${tab === b ? 'bg-[#ff5625] text-white' : 'bg-[#282a2c] text-[#a0a0a8]'}`}
+            className={`rounded-xl px-4 py-2 text-sm ${tab === b ? 'bg-[#ff5625] text-white' : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
           >
             {t('portal.crm.activities.' + b)} ({buckets[b].length})
           </button>
         ))}
       </div>
 
-      {busy && <p className="text-[#a0a0a8]">{t('portal.crm.common.loading')}</p>}
+      {busy && <p className="text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
 
       <ul className="space-y-2">
         {buckets[tab].map(a => (
-          <li key={a.id} className="flex items-start gap-3 rounded-2xl border border-[#3d3f41] bg-[#1e2022] p-4">
+          <li key={a.id} className="flex items-start gap-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-4">
             <span className="material-symbols-outlined text-[20px] text-[#00daf3]">
               {a.kind === 'call' ? 'call' : a.kind === 'meeting' ? 'event' : 'task_alt'}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-[#e2e2e5]">{a.subject}</p>
-              <p className="mt-1 text-xs text-[#a0a0a8]">
+              <p className="text-sm font-semibold text-[var(--crm-text)]">{a.subject}</p>
+              <p className="mt-1 text-xs text-[var(--crm-muted)]">
                 {a.account_name ?? a.opportunity_name ?? '—'}
                 {a.due_at ? ` · ${new Date(a.due_at).toLocaleString('vi-VN')}` : ''}
               </p>
-              {a.notes && <p className="mt-2 text-xs text-[#a0a0a8]">{a.notes}</p>}
+              {a.notes && <p className="mt-2 text-xs text-[var(--crm-muted)]">{a.notes}</p>}
             </div>
             {!a.done_at && (
               <button
                 onClick={() => void done(a.id)}
-                className="rounded-xl border border-[#3d3f41] px-3 py-1.5 text-xs text-[#e2e2e5] hover:border-[#ff5625]"
+                className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff5625]"
               >
                 {t('portal.crm.activity.mark_done')}
               </button>
@@ -125,7 +125,7 @@ export default function CrmActivitiesPage() {
           </li>
         ))}
         {!busy && buckets[tab].length === 0 && (
-          <li className="rounded-2xl border border-[#3d3f41] p-6 text-center text-sm text-[#a0a0a8]">
+          <li className="rounded-2xl border border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
             {t('portal.crm.activities.empty')}
           </li>
         )}

@@ -83,7 +83,7 @@ export default function CrmPipelinePage() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.pipeline.title')}</h1>
+        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
           className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
@@ -93,18 +93,18 @@ export default function CrmPipelinePage() {
       </div>
 
       <div className="mb-4 flex flex-wrap gap-4 text-sm">
-        <span className="rounded-xl bg-[#282a2c] px-4 py-2 text-[#a0a0a8]">
-          {t('portal.crm.pipeline.open_count')}: <b className="text-[#e2e2e5]">{openRows.length}</b>
+        <span className="rounded-xl bg-[var(--crm-s3)] px-4 py-2 text-[var(--crm-muted)]">
+          {t('portal.crm.pipeline.open_count')}: <b className="text-[var(--crm-text)]">{openRows.length}</b>
         </span>
-        <span className="rounded-xl bg-[#282a2c] px-4 py-2 text-[#a0a0a8]">
-          {t('portal.crm.pipeline.open_value')}: <b className="text-[#e2e2e5]">{fmtVnd(sumAmount(openRows))}đ</b>
+        <span className="rounded-xl bg-[var(--crm-s3)] px-4 py-2 text-[var(--crm-muted)]">
+          {t('portal.crm.pipeline.open_value')}: <b className="text-[var(--crm-text)]">{fmtVnd(sumAmount(openRows))}đ</b>
         </span>
-        <span className="rounded-xl bg-[#282a2c] px-4 py-2 text-[#a0a0a8]">
+        <span className="rounded-xl bg-[var(--crm-s3)] px-4 py-2 text-[var(--crm-muted)]">
           {t('portal.crm.pipeline.forecast')}: <b className="text-[#00daf3]">{fmtVnd(weightedForecast(openRows))}đ</b>
         </span>
       </div>
 
-      {busy && <p className="text-[#a0a0a8]">{t('portal.crm.common.loading')}</p>}
+      {busy && <p className="text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
 
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map(col => (
@@ -112,11 +112,11 @@ export default function CrmPipelinePage() {
             key={col.stage.id}
             onDragOver={e => e.preventDefault()}
             onDrop={() => void drop(col.stage)}
-            className="w-[280px] flex-shrink-0 rounded-2xl bg-[#1a1c1e] p-3"
+            className="w-[280px] flex-shrink-0 rounded-2xl bg-[var(--crm-s1)] p-3"
           >
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm font-bold text-[#e2e2e5]">{col.stage.name}</span>
-              <span className="rounded-full bg-[#282a2c] px-2 py-0.5 text-xs text-[#a0a0a8]">
+              <span className="text-sm font-bold text-[var(--crm-text)]">{col.stage.name}</span>
+              <span className="rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
                 {col.rows.length} · {col.stage.probability}%
               </span>
             </div>
@@ -127,13 +127,13 @@ export default function CrmPipelinePage() {
                   draggable
                   onDragStart={() => setDragId(r.id)}
                   onClick={() => { setEditing(r); setDrawerOpen(true); }}
-                  className="cursor-grab rounded-xl border border-[#3d3f41] bg-[#1e2022] p-3 hover:border-[#ff5625]"
+                  className="cursor-grab rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#ff5625]"
                 >
-                  <p className="text-sm font-semibold text-[#e2e2e5]">{r.name}</p>
-                  <p className="mt-1 text-xs text-[#a0a0a8]">{r.account_name}</p>
+                  <p className="text-sm font-semibold text-[var(--crm-text)]">{r.name}</p>
+                  <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.account_name}</p>
                   <p className="mt-2 text-sm font-bold text-[#ff5625]">
                     {fmtVnd(Number(r.amount))}đ
-                    <span className="ml-1 text-xs font-normal text-[#a0a0a8]">
+                    <span className="ml-1 text-xs font-normal text-[var(--crm-muted)]">
                       · {r.quantity} {t('portal.crm.opp.machines')}
                     </span>
                   </p>
@@ -147,9 +147,9 @@ export default function CrmPipelinePage() {
                       {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-[#a0a0a8]">{r.expected_close_date}</p>
+                  <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.expected_close_date}</p>
                   {r.lost_reason_name && (
-                    <p className="mt-1 inline-block rounded-full bg-[#282a2c] px-2 py-0.5 text-xs text-[#ff5625]">
+                    <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#ff5625]">
                       {r.lost_reason_name}
                     </p>
                   )}
@@ -162,7 +162,7 @@ export default function CrmPipelinePage() {
                 </article>
               ))}
               {col.rows.length === 0 && (
-                <p className="py-6 text-center text-xs text-[#a0a0a8]">{t('portal.crm.pipeline.empty_stage')}</p>
+                <p className="py-6 text-center text-xs text-[var(--crm-muted)]">{t('portal.crm.pipeline.empty_stage')}</p>
               )}
             </div>
           </div>

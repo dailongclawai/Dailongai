@@ -147,16 +147,16 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
-        className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[#1e2022] p-6"
+        className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-[var(--crm-s2)] p-6"
         onClick={e => e.stopPropagation()}
       >
-        <h3 className="mb-1 text-lg font-bold text-[#e2e2e5]">{t('portal.crm.import.title')}</h3>
-        <p className="mb-4 text-sm text-[#a0a0a8]">{t('portal.crm.import.hint')}</p>
+        <h3 className="mb-1 text-lg font-bold text-[var(--crm-text)]">{t('portal.crm.import.title')}</h3>
+        <p className="mb-4 text-sm text-[var(--crm-muted)]">{t('portal.crm.import.hint')}</p>
 
         {rows.length === 0 ? (
           <input
@@ -171,7 +171,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {FIELDS.map(f => (
                 <div key={f}>
-                  <label className="mb-1 block text-xs text-[#a0a0a8]" htmlFor={`imp-${f}`}>
+                  <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor={`imp-${f}`}>
                     {t('portal.crm.import.field.' + f)}
                   </label>
                   <select
@@ -186,7 +186,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs text-[#a0a0a8]" htmlFor="imp-kind">
+              <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="imp-kind">
                 {t('portal.crm.account.kind')}
               </label>
               <select id="imp-kind" className={field} value={kind} onChange={e => setKind(e.target.value as CrmAccountKind)}>
@@ -196,28 +196,28 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
             </div>
 
             <div className="flex flex-wrap gap-3 text-sm">
-              <span className="rounded-xl bg-[#282a2c] px-3 py-1.5 text-[#a0a0a8]">
-                {t('portal.crm.import.total')}: <b className="text-[#e2e2e5]">{rows.length}</b>
+              <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
+                {t('portal.crm.import.total')}: <b className="text-[var(--crm-text)]">{rows.length}</b>
               </span>
-              <span className="rounded-xl bg-[#282a2c] px-3 py-1.5 text-[#a0a0a8]">
+              <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
                 {t('portal.crm.import.ok')}: <b className="text-[#00daf3]">{importable.length}</b>
               </span>
-              <span className="rounded-xl bg-[#282a2c] px-3 py-1.5 text-[#a0a0a8]">
-                {t('portal.crm.import.no_name')}: <b className="text-[#e2e2e5]">{count('no_name')}</b>
+              <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
+                {t('portal.crm.import.no_name')}: <b className="text-[var(--crm-text)]">{count('no_name')}</b>
               </span>
-              <span className="rounded-xl bg-[#282a2c] px-3 py-1.5 text-[#a0a0a8]">
-                {t('portal.crm.import.dup_in_file')}: <b className="text-[#e2e2e5]">{count('dup_in_file')}</b>
+              <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
+                {t('portal.crm.import.dup_in_file')}: <b className="text-[var(--crm-text)]">{count('dup_in_file')}</b>
               </span>
               {taken && (
-                <span className="rounded-xl bg-[#282a2c] px-3 py-1.5 text-[#a0a0a8]">
+                <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
                   {t('portal.crm.import.taken')}: <b className="text-[#ff5625]">{count('taken')}</b>
                 </span>
               )}
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-[#3d3f41]">
+            <div className="overflow-x-auto rounded-xl border border-[var(--crm-line)]">
               <table className="w-full min-w-[640px] text-left text-sm">
-                <thead className="bg-[#282a2c] text-[#a0a0a8]">
+                <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
                   <tr>
                     <th className="px-3 py-2">{t('portal.crm.account.name')}</th>
                     <th className="px-3 py-2">{t('portal.crm.account.phone')}</th>
@@ -227,10 +227,10 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
                 </thead>
                 <tbody>
                   {classified.slice(0, 12).map((c, i) => (
-                    <tr key={i} className="border-t border-[#3d3f41]">
-                      <td className="px-3 py-2 text-[#e2e2e5]">{cell(c.row, 'name') || '—'}</td>
-                      <td className="px-3 py-2 text-[#a0a0a8]">{cell(c.row, 'phone') || '—'}</td>
-                      <td className="px-3 py-2 text-[#a0a0a8]">{cell(c.row, 'province') || '—'}</td>
+                    <tr key={i} className="border-t border-[var(--crm-line)]">
+                      <td className="px-3 py-2 text-[var(--crm-text)]">{cell(c.row, 'name') || '—'}</td>
+                      <td className="px-3 py-2 text-[var(--crm-muted)]">{cell(c.row, 'phone') || '—'}</td>
+                      <td className="px-3 py-2 text-[var(--crm-muted)]">{cell(c.row, 'province') || '—'}</td>
                       <td className={`px-3 py-2 ${c.status === 'ok' ? 'text-[#00daf3]' : 'text-[#ff5625]'}`}>
                         {t('portal.crm.import.status.' + c.status)}
                         {c.status === 'taken' && taken?.get(c.phone) ? ` · ${taken.get(c.phone)}` : ''}
@@ -240,14 +240,14 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
                 </tbody>
               </table>
               {classified.length > 12 && (
-                <p className="px-3 py-2 text-xs text-[#a0a0a8]">
+                <p className="px-3 py-2 text-xs text-[var(--crm-muted)]">
                   {t('portal.crm.import.more')}: {classified.length - 12}
                 </p>
               )}
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button onClick={reset} className="rounded-xl border border-[#3d3f41] px-4 py-2.5 text-[#e2e2e5]">
+              <button onClick={reset} className="rounded-xl border border-[var(--crm-line)] px-4 py-2.5 text-[var(--crm-text)]">
                 {t('portal.crm.import.other_file')}
               </button>
               <button
@@ -265,7 +265,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
               </button>
             </div>
             {taken === null && (
-              <p className="text-xs text-[#a0a0a8]">{t('portal.crm.import.check_first')}</p>
+              <p className="text-xs text-[var(--crm-muted)]">{t('portal.crm.import.check_first')}</p>
             )}
           </div>
         )}

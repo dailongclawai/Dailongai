@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
 import BackgroundMusic from "@/components/BackgroundMusic";
@@ -19,6 +19,16 @@ const interHeadline = Inter({
   subsets: ["latin", "vietnamese"],
   weight: ["700", "800"],
   display: "swap",
+});
+
+// Chỉ dùng trong portal CRM (tiêu đề + con số tiền). preload: false để trang
+// công khai không phải tải thêm font này.
+const crmDisplay = Space_Grotesk({
+  variable: "--font-crm-display",
+  subsets: ["latin", "vietnamese"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+  preload: false,
 });
 
 export const viewport = {
@@ -66,7 +76,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={cn("dark", "antialiased", interHeadline.variable, inter.variable, "font-body")}>
+    <html lang="vi" className={cn("dark", "antialiased", interHeadline.variable, inter.variable, crmDisplay.variable, "font-body")}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="32x32" />
         <link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192" />

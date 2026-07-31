@@ -20,7 +20,7 @@ function STATUS_STYLE(label: string): string {
   if (label === 'Hoàn thành đơn') return 'text-[#34d399] border-[#34d399]/40';
   if (label === 'Không mua') return 'text-[#f87171] border-[#f87171]/40';
   if (label === 'Chốt đơn') return 'text-[#ff5625] border-[#ff5625]/40';
-  if (label === 'Mới tiếp nhận') return 'text-[#a0a0a8] border-[#3d3f41]';
+  if (label === 'Mới tiếp nhận') return 'text-[var(--crm-muted)] border-[var(--crm-line)]';
   return 'text-[#00daf3] border-[#00daf3]/40';
 }
 
@@ -91,13 +91,13 @@ export default function CrmAccountsPage() {
 
   if (loading || !profile) return null;
 
-  const field = 'rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
+  const field = 'rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[#e2e2e5]">{t('portal.crm.accounts.title')}</h1>
+        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.accounts.title')}</h1>
         <input
           className={field}
           placeholder={t('portal.crm.accounts.search')}
@@ -112,7 +112,7 @@ export default function CrmAccountsPage() {
         </select>
         <button
           onClick={() => setImportOpen(true)}
-          className="flex items-center gap-2 rounded-xl border border-[#3d3f41] px-4 py-2 text-[#e2e2e5]"
+          className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
           <span className="material-symbols-outlined text-[18px]">upload_file</span>
           {t('portal.crm.import.title')}
@@ -125,9 +125,9 @@ export default function CrmAccountsPage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#3d3f41]">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[1040px] text-left text-sm">
-          <thead className="bg-[#282a2c] text-[#a0a0a8]">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_code')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.name')}</th>
@@ -142,29 +142,29 @@ export default function CrmAccountsPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {filtered.map(r => (
               <tr
                 key={r.id}
-                className="cursor-pointer border-t border-[#3d3f41] hover:bg-[#282a2c]"
+                className="cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)]"
                 onClick={() => { setEditing(r); setDrawerOpen(true); }}
               >
                 <td className="px-4 py-3 font-mono text-[#00daf3]">{r.code}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">{r.name}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">
+                <td className="px-4 py-3 text-[var(--crm-text)]">{r.name}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">
                   {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
                 </td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{r.phone ?? '—'}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{r.province ?? '—'}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#e2e2e5]">
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{r.phone ?? '—'}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{r.province ?? '—'}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
                   {r.total_quantity > 0 ? r.total_quantity : '—'}
                   {r.open_deals > 0 && (
-                    <span className="ml-1 text-xs font-sans text-[#a0a0a8]">
+                    <span className="ml-1 text-xs font-sans text-[var(--crm-muted)]">
                       ({r.open_deals} {t('portal.crm.accounts.open_short')})
                     </span>
                   )}
@@ -180,7 +180,7 @@ export default function CrmAccountsPage() {
                     aria-label={t('portal.crm.accounts.col_status')}
                     value={r.stage_id ?? ''}
                     onChange={e => void changeStage(r.id, e.target.value)}
-                    className={`cursor-pointer rounded-full border bg-[#1e2022] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)}`}
+                    className={`cursor-pointer rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)}`}
                   >
                     {stages.map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>

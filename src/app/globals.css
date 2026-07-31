@@ -628,3 +628,24 @@ body {
     @apply font-sans;
   }
 }
+/* ───── Portal CRM: tông nâu-đồng theo bản thiết kế "Đại Long Health Tech B2B" ─────
+   Chỉ các trang /portal/crm dùng bộ biến này. Trang đại lý / giám sát / quản trị
+   giữ nguyên tông xám trung tính. */
+:root {
+  --crm-bg: #1e100c;    /* nền trang */
+  --crm-s1: #271814;    /* thẻ, cột kanban, hàng tổng */
+  --crm-s2: #2c1c17;    /* thẻ nổi trên nền thẻ, ô chọn */
+  --crm-s3: #372621;    /* đầu bảng, chip, trạng thái di chuột */
+  --crm-line: #5b4039;  /* đường viền */
+  --crm-text: #fadcd5;  /* chữ chính */
+  --crm-muted: #ab8980; /* chữ phụ */
+}
+
+.crm-scope {
+  background-color: var(--crm-bg);
+}
+
+/* Space Grotesk cho tiêu đề và số tiền — chữ số đều bề ngang, dễ dóng cột. */
+.crm-display {
+  font-family: var(--font-crm-display), var(--font-headline), sans-serif;
+}

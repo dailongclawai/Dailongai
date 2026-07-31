@@ -29,7 +29,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
 
   const submit = () => {
     if (!reasonId) { toast.error(t('portal.crm.lost.required')); return; }
@@ -38,12 +38,12 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
-      <div className="w-full max-w-md rounded-2xl bg-[#1e2022] p-6" onClick={e => e.stopPropagation()}>
-        <h3 className="mb-1 text-lg font-bold text-[#e2e2e5]">{t('portal.crm.lost.title')}</h3>
-        <p className="mb-4 text-sm text-[#a0a0a8]">{stageName}</p>
+      <div className="w-full max-w-md rounded-2xl bg-[var(--crm-s2)] p-6" onClick={e => e.stopPropagation()}>
+        <h3 className="mb-1 text-lg font-bold text-[var(--crm-text)]">{t('portal.crm.lost.title')}</h3>
+        <p className="mb-4 text-sm text-[var(--crm-muted)]">{stageName}</p>
         <div className="space-y-3">
           <div>
-            <label className="mb-1 block text-xs text-[#a0a0a8]" htmlFor="lost-reason">
+            <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="lost-reason">
               {t('portal.crm.lost.reason')}
             </label>
             <select id="lost-reason" className={field} value={reasonId} onChange={e => setReasonId(e.target.value)}>
@@ -52,7 +52,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-[#a0a0a8]" htmlFor="lost-notes">
+            <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="lost-notes">
               {t('portal.crm.lost.notes')}
             </label>
             <textarea
@@ -62,7 +62,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 rounded-xl border border-[#3d3f41] py-2.5 text-[#e2e2e5]">
+            <button onClick={onClose} className="flex-1 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
               {t('portal.crm.lost.cancel')}
             </button>
             <button onClick={submit} className="flex-1 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white">

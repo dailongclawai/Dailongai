@@ -55,11 +55,11 @@ export default function CrmReportsPage() {
   return (
     <PortalShell variant="admin">
       <CrmNav />
-      <h1 className="mb-5 text-xl font-bold text-[#e2e2e5]">{t('portal.crm.reports.title')}</h1>
+      <h1 className="mb-5 text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.reports.title')}</h1>
 
-      <div className="overflow-x-auto rounded-2xl border border-[#3d3f41]">
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[960px] text-left text-sm">
-          <thead className="bg-[#282a2c] text-[#a0a0a8]">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.reports.col_staff')}</th>
               <th className="px-4 py-3">{t('portal.crm.reports.col_segment')}</th>
@@ -73,31 +73,31 @@ export default function CrmReportsPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && rows.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[#a0a0a8]">{t('portal.crm.reports.empty')}</td></tr>
+              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
             )}
             {rows.map(r => (
-              <tr key={r.staff_id} className="border-t border-[#3d3f41]">
-                <td className="px-4 py-3 text-[#e2e2e5]">{r.staff_name || r.staff_email || r.staff_id.slice(0, 8)}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">
+              <tr key={r.staff_id} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3 text-[var(--crm-text)]">{r.staff_name || r.staff_email || r.staff_id.slice(0, 8)}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">
                   {r.staff_segment ? r.staff_segment.toUpperCase() : '—'}
                 </td>
                 <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{r.deals_open}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(Number(r.commission_total))}đ</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{r.deals_open}</td>
+                <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(Number(r.commission_total))}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(Number(r.amount_payable))}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(Number(r.amount_paid))}đ</td>
               </tr>
             ))}
             {!busy && rows.length > 0 && (
-              <tr className="border-t-2 border-[#3d3f41] bg-[#1a1c1e] font-bold">
-                <td className="px-4 py-3 text-[#e2e2e5]">{t('portal.crm.commission.total')}</td>
+              <tr className="border-t-2 border-[var(--crm-line)] bg-[var(--crm-s1)] font-bold">
+                <td className="px-4 py-3 text-[var(--crm-text)]">{t('portal.crm.commission.total')}</td>
                 <td className="px-4 py-3" />
                 <td className="px-4 py-3 text-[#34d399]">{totals.won}</td>
-                <td className="px-4 py-3 text-[#a0a0a8]">{totals.open}</td>
-                <td className="px-4 py-3 text-[#e2e2e5]">{fmtVnd(totals.total)}đ</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]">{totals.open}</td>
+                <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(totals.total)}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(totals.payable)}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>

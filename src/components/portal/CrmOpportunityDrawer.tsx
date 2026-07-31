@@ -120,17 +120,17 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[#3d3f41] bg-[#1a1c1e] px-3 py-2 text-[#e2e2e5] outline-none focus:border-[#ff5625]';
-  const label = 'mb-1 block text-xs text-[#a0a0a8]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/60" onClick={onClose}>
-      <div className="h-full w-full max-w-lg overflow-y-auto bg-[#1e2022] p-6" onClick={e => e.stopPropagation()}>
+      <div className="h-full w-full max-w-lg overflow-y-auto bg-[var(--crm-s2)] p-6" onClick={e => e.stopPropagation()}>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[#e2e2e5]">
+          <h2 className="text-lg font-bold text-[var(--crm-text)]">
             {row ? t('portal.crm.opp.edit') : t('portal.crm.opp.new')}
           </h2>
-          <button onClick={onClose} aria-label={t('portal.crm.common.close')} className="text-[#a0a0a8]">
+          <button onClick={onClose} aria-label={t('portal.crm.common.close')} className="text-[var(--crm-muted)]">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -206,11 +206,11 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
           </div>
 
           {suggested > 0 && (
-            <p className="text-xs text-[#a0a0a8]">
+            <p className="text-xs text-[var(--crm-muted)]">
               {account?.kind === 'dealer_prospect' && model?.dealer_price
                 ? t('portal.crm.opp.price_dealer')
                 : t('portal.crm.opp.price_list')}
-              : <b className="text-[#e2e2e5]">{fmtVnd(suggested)}đ</b>
+              : <b className="text-[var(--crm-text)]">{fmtVnd(suggested)}đ</b>
               {amount !== suggested && (
                 <button
                   type="button"
@@ -235,11 +235,11 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
               value={trialDays} onChange={e => setTrialDays(e.target.value)}
               placeholder="30"
             />
-            <p className="mt-1 text-xs text-[#a0a0a8]">{t('portal.crm.opp.trial_hint')}</p>
+            <p className="mt-1 text-xs text-[var(--crm-muted)]">{t('portal.crm.opp.trial_hint')}</p>
           </div>
 
           {row && expectedCommission > 0 && (
-            <p className="rounded-xl bg-[#282a2c] px-3 py-2 text-sm text-[#a0a0a8]">
+            <p className="rounded-xl bg-[var(--crm-s3)] px-3 py-2 text-sm text-[var(--crm-muted)]">
               {t('portal.crm.opp.expected_commission')}:{' '}
               <b className="text-[#00daf3]">{fmtVnd(expectedCommission)}đ</b>
               {row.trial_days && (
@@ -264,7 +264,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
                   </option>
                 ))}
               </select>
-              <p className="mt-1 text-xs text-[#a0a0a8]">{t('portal.crm.opp.order_hint')}</p>
+              <p className="mt-1 text-xs text-[var(--crm-muted)]">{t('portal.crm.opp.order_hint')}</p>
             </div>
           )}
           <div>
