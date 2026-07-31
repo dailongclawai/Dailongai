@@ -821,6 +821,28 @@ export async function moveOpportunityStage(
   if (error) throw error;
 }
 
+/** Cơ hội còn đang mở của một khách, cũ nhất lên trước. */
+export async function getOpenOpportunities(accountId: string): Promise<CrmOpportunityBoardRow[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_opportunity_board')
+    .select('*')
+    .eq('account_id', accountId)
+    .eq('forecast', 'open')
+    .order('created_at');
+  if (error) throw error;
+  return (data as CrmOpportunityBoardRow[]) ?? [];
+}
+
+/** Đổi số máy của một cơ hội. Giá đi theo để giữ nguyên đơn giá — nếu để giá cũ
+ *  thì sàn giá đại lý (`crm_opportunity_before_write`) sẽ chặn khi tăng số máy. */
+export async function setOpportunityQuantity(id: string, quantity: number, amount: number): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_opportunities')
+    .update({ quantity, amount })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 /** Đơn hàng chưa cơ hội nào nhận, đơn trùng số điện thoại khách xếp trước.
  *  Đi qua RPC vì nhân viên kinh doanh không có quyền đọc thẳng bảng orders. */
 export async function getOrdersForAccount(accountId: string): Promise<CrmLinkableOrder[]> {

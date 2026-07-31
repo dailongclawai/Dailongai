@@ -5,11 +5,15 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmAccounts, getCrmStages, setCrmAccountStage } from '@/lib/portal-queries';
+import {
+  createCrmOpportunity, getCrmAccounts, getCrmStages, getOpenOpportunities,
+  moveOpportunityStage, setCrmAccountStage, setOpportunityQuantity,
+} from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
+import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
 import type { CrmAccount, CrmAccountKind, CrmAccountListRow, CrmStage } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -36,6 +40,7 @@ export default function CrmAccountsPage() {
   const [editing, setEditing] = useState<CrmAccount | null>(null);
   const [importOpen, setImportOpen] = useState(false);
   const [stages, setStages] = useState<CrmStage[]>([]);
+  const [losing, setLosing] = useState<{ account: CrmAccountListRow; stage: CrmStage } | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -66,17 +71,89 @@ export default function CrmAccountsPage() {
   }, [session]);
 
   // Đổi ngay tại chỗ rồi mới gọi máy chủ, để bảng không giật một nhịp.
-  const changeStage = async (accountId: string, stageId: string) => {
-    const before = rows;
+  // Trigger crm_accounts_stage_sync kéo cơ hội đang mở đi theo, nên tải lại
+  // bảng sau đó để số máy và hoa hồng khớp với trang Cơ hội.
+  const changeStage = async (account: CrmAccountListRow, stageId: string) => {
     const stage = stages.find(s => s.id === stageId);
-    setRows(rs => rs.map(r => r.id === accountId
+    // Chuyển sang "Không mua" thì phải hỏi lý do trước, vì cơ hội đi theo cũng
+    // cần lý do — cơ sở dữ liệu từ chối nếu thiếu.
+    if (stage?.forecast === 'lost' && account.open_deals > 0) {
+      setLosing({ account, stage });
+      return;
+    }
+    const before = rows;
+    setRows(rs => rs.map(r => r.id === account.id
       ? { ...r, stage_id: stageId, status_label: stage?.name ?? r.status_label }
       : r));
     try {
-      await setCrmAccountStage(accountId, stageId);
+      await setCrmAccountStage(account.id, stageId);
+      await load();
     } catch (e) {
       setRows(before);
       toast.error((e as Error).message);
+    }
+  };
+
+  const loseAccount = async (reasonId: string, notes: string) => {
+    const target = losing;
+    setLosing(null);
+    if (!target) return;
+    try {
+      const open = await getOpenOpportunities(target.account.id);
+      for (const o of open) {
+        await moveOpportunityStage(o.id, target.stage.id, reasonId, notes);
+      }
+      await setCrmAccountStage(target.account.id, target.stage.id);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  // Số máy nhập ở đây ghi vào cơ hội, vì máy thuộc cơ hội chứ không thuộc khách.
+  // Chưa có cơ hội nào đang mở thì lập một cơ hội mới cho khách.
+  const saveMachines = async (account: CrmAccountListRow, quantity: number) => {
+    if (!profile) return;
+    if (!Number.isFinite(quantity) || quantity < 1 || quantity === account.total_quantity) {
+      await load();
+      return;
+    }
+    try {
+      const open = await getOpenOpportunities(account.id);
+      if (open.length > 1) {
+        toast.error(t('portal.crm.accounts.machines_multi'));
+        await load();
+        return;
+      }
+      if (open.length === 1) {
+        const o = open[0];
+        // Giữ nguyên đơn giá: giá mới = đơn giá cũ × số máy mới.
+        const unit = o.quantity > 0 ? Number(o.amount) / o.quantity : 0;
+        await setOpportunityQuantity(o.id, quantity, Math.ceil(unit * quantity));
+      } else {
+        const stage = stages.find(s => s.id === account.stage_id && s.forecast === 'open')
+          ?? stages.filter(s => s.forecast === 'open').sort((a, b) => a.sort_order - b.sort_order)[0];
+        if (!stage) { toast.error(t('portal.crm.accounts.machines_no_stage')); return; }
+        await createCrmOpportunity({
+          accountId: account.id,
+          stageId: stage.id,
+          name: `${t('portal.crm.accounts.new_opp_name')} · ${account.name}`,
+          modelId: null,
+          quantity,
+          amount: 0,
+          expectedCloseDate: null,
+          notes: '',
+          ownerId: profile.id,
+          lostReasonId: null,
+          lostNotes: null,
+          trialDays: null,
+        });
+      }
+      toast.success(t('portal.crm.accounts.machines_saved'));
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+      await load();
     }
   };
 
@@ -161,10 +238,22 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.phone ?? '—'}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
-                  {r.total_quantity > 0 ? r.total_quantity : '—'}
+                {/* stopPropagation: gõ số máy không được mở ngăn kéo chi tiết.
+                    key gắn số hiện tại để ô nhập nhận lại giá trị sau khi tải lại. */}
+                <td className="whitespace-nowrap px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
+                  <input
+                    key={`${r.id}-${r.total_quantity}`}
+                    type="number"
+                    min={1}
+                    defaultValue={r.total_quantity > 0 ? r.total_quantity : ''}
+                    aria-label={t('portal.crm.accounts.col_machines')}
+                    title={t('portal.crm.accounts.machines_hint')}
+                    onBlur={e => void saveMachines(r, Number(e.target.value))}
+                    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                    className="w-16 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s2)] px-2 py-1 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+                  />
                   {r.open_deals > 0 && (
-                    <span className="ml-1 text-xs font-sans text-[var(--crm-muted)]">
+                    <span className="ml-1 text-xs text-[var(--crm-muted)]">
                       ({r.open_deals} {t('portal.crm.accounts.open_short')})
                     </span>
                   )}
@@ -179,7 +268,7 @@ export default function CrmAccountsPage() {
                   <select
                     aria-label={t('portal.crm.accounts.col_status')}
                     value={r.stage_id ?? ''}
-                    onChange={e => void changeStage(r.id, e.target.value)}
+                    onChange={e => void changeStage(r, e.target.value)}
                     className={`cursor-pointer rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)}`}
                   >
                     {stages.map(s => (
@@ -206,6 +295,14 @@ export default function CrmAccountsPage() {
         ownerId={profile.id}
         onClose={() => setImportOpen(false)}
         onDone={load}
+      />
+
+      <CrmLostReasonDialog
+        key={losing?.account.id ?? 'none'}
+        open={losing !== null}
+        stageName={losing?.stage.name ?? ''}
+        onClose={() => setLosing(null)}
+        onConfirm={(reasonId, notes) => void loseAccount(reasonId, notes)}
       />
     </PortalShell>
   );
