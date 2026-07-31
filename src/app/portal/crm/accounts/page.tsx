@@ -32,6 +32,14 @@ function STATUS_STYLE(label: string): string {
   return 'text-[#00daf3] border-[#00daf3]/40';
 }
 
+// Nằm ở bước hiện tại bao nhiêu ngày rồi. Đếm theo ngày lịch chứ không theo 24
+// tiếng: đổi lúc 23h hôm qua thì sáng nay phải là 1 ngày, không phải 0.
+function daysInStage(since: string): number {
+  const a = new Date(since); a.setHours(0, 0, 0, 0);
+  const b = new Date(); b.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000));
+}
+
 export default function CrmAccountsPage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -230,7 +238,7 @@ export default function CrmAccountsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
-        <table className="w-full min-w-[1040px] text-left text-sm">
+        <table className="w-full min-w-[1180px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_code')}</th>
@@ -241,15 +249,16 @@ export default function CrmAccountsPage() {
               <th className="px-4 py-3">{t('portal.crm.account.source')}</th>
               <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_machines')}</th>
               <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_commission')}</th>
+              <th className="px-4 py-3">{t('portal.crm.accounts.col_created')}</th>
               <th className="px-4 py-3">{t('portal.crm.accounts.col_status')}</th>
             </tr>
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={10} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={10} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {filtered.map(r => (
               <tr
@@ -293,6 +302,9 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">
                   {Number(r.expected_commission) > 0 ? `${fmtVnd(Number(r.expected_commission))}đ` : '—'}
                 </td>
+                <td className="whitespace-nowrap px-4 py-3 text-[var(--crm-muted)]">
+                  {new Date(r.created_at).toLocaleDateString('vi-VN')}
+                </td>
                 {/* stopPropagation: bấm vào ô chọn không được mở ngăn kéo chi tiết */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,
@@ -300,13 +312,20 @@ export default function CrmAccountsPage() {
                   <select
                     aria-label={t('portal.crm.accounts.col_status')}
                     value={r.stage_id ?? ''}
+                    disabled={r.stage_locked}
+                    title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : undefined}
                     onChange={e => void changeStage(r, e.target.value)}
-                    className={`cursor-pointer rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)}`}
+                    className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)} ${r.stage_locked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                   >
                     {stages.map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
+                  <span className="mt-1 block text-xs text-[var(--crm-muted)]">
+                    {daysInStage(r.stage_since) === 0
+                      ? t('portal.crm.accounts.in_stage_today')
+                      : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
+                  </span>
                 </td>
               </tr>
             ))}

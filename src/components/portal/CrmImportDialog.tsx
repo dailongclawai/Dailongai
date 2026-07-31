@@ -1,17 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
-import { createCrmAccountsBulk, lookupCrmPhones } from '@/lib/portal-queries';
-import type { CrmAccountKind, CrmSource } from '@/lib/portal-types';
+import {
+  createCrmAccountsBulk, createCrmOpportunity, getActiveModels, getCrmSettings, getCrmStages,
+  lookupCrmPhones, setCrmAccountStage, suggestedUnitPrice,
+} from '@/lib/portal-queries';
+import type { CrmAccountKind, CrmSettings, CrmSource, CrmStage, ProductModel } from '@/lib/portal-types';
 
 const SOURCES: CrmSource[] = ['website', 'zalo', 'facebook', 'google_ads', 'tiktok', 'referral', 'hotline', 'event', 'other'];
 
-type FieldKey = 'name' | 'phone' | 'email' | 'zalo' | 'province' | 'address' | 'source' | 'notes';
+type FieldKey = 'name' | 'phone' | 'email' | 'zalo' | 'province' | 'address' | 'source' | 'notes'
+  | 'stage' | 'quantity';
 
-const FIELDS: FieldKey[] = ['name', 'phone', 'email', 'zalo', 'province', 'address', 'source', 'notes'];
+const FIELDS: FieldKey[] = ['name', 'phone', 'email', 'zalo', 'province', 'address', 'source', 'notes',
+  'stage', 'quantity'];
 
 // Từ khoá đoán cột theo tiêu đề file. Đội sales xuất Excel bằng tiếng Việt là chính
 // nên tiếng Việt đứng trước, tiếng Anh để dự phòng.
@@ -24,6 +29,8 @@ const GUESS: Record<FieldKey, string[]> = {
   address:  ['địa chỉ', 'dia chi', 'address'],
   source:   ['nguồn', 'nguon', 'source'],
   notes:    ['ghi chú', 'ghi chu', 'note', 'remark'],
+  stage:    ['trạng thái', 'trang thai', 'giai đoạn', 'giai doan', 'status', 'stage'],
+  quantity: ['số lượng', 'so luong', 'số máy', 'so may', 'quantity', 'units'],
 };
 
 /** Chuẩn hoá cùng quy tắc với crm_normalize_phone dưới DB để đếm trùng khớp nhau.
@@ -59,6 +66,18 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
   const [kind, setKind] = useState<CrmAccountKind>('customer');
   const [taken, setTaken] = useState<Map<string, string> | null>(null);
   const [busy, setBusy] = useState(false);
+  const [stages, setStages] = useState<CrmStage[]>([]);
+  const [models, setModels] = useState<ProductModel[]>([]);
+  const [settings, setSettings] = useState<CrmSettings | null>(null);
+
+  // Cần cho hai cột mới: tên giai đoạn trong file phải đổi ra id, và số máy phải
+  // có giá gợi ý mới lập được cơ hội có giá trị.
+  useEffect(() => {
+    if (!open) return;
+    void getCrmStages().then(setStages).catch(() => setStages([]));
+    void getActiveModels().then(setModels).catch(() => setModels([]));
+    void getCrmSettings().then(setSettings).catch(() => setSettings(null));
+  }, [open]);
 
   const reset = () => { setHeaders([]); setRows([]); setTaken(null); };
 
@@ -113,6 +132,13 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
     }
   };
 
+  // Tên giai đoạn trong file so khớp bỏ dấu cách thừa và không phân biệt hoa thường.
+  const stageByName = (raw: string): CrmStage | null => {
+    const k = raw.trim().toLowerCase();
+    if (!k) return null;
+    return stages.find(s => s.name.trim().toLowerCase() === k) ?? null;
+  };
+
   const run = async () => {
     setBusy(true);
     try {
@@ -131,10 +157,58 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
           ownerId,
         };
       });
+      const ids: string[] = [];
       for (let i = 0; i < payload.length; i += 100) {
-        await createCrmAccountsBulk(payload.slice(i, i + 100));
+        ids.push(...await createCrmAccountsBulk(payload.slice(i, i + 100)));
       }
-      toast.success(`${t('portal.crm.import.done')}: ${payload.length}`);
+
+      // Số máy nằm ở cơ hội chứ không ở khách, nên có số thì phải lập cơ hội —
+      // không lập thì khách không lên bảng Cơ hội và không vào phễu Tổng quan.
+      // Lập trước, đặt trạng thái sau: đặt trạng thái xong trigger mới kéo cơ hội
+      // đi theo, làm ngược lại thì cơ hội vừa lập bị bỏ lại ở bước đầu.
+      const buocDau = stages.filter(s => s.forecast === 'open')
+        .sort((a, b) => a.sort_order - b.sort_order)[0] ?? null;
+      const model = models.length === 1 ? models[0] : null;
+      let soCoHoi = 0;
+      let soTrangThai = 0;
+
+      for (let i = 0; i < importable.length; i++) {
+        const id = ids[i];
+        if (!id) continue;
+        const row = importable[i].row;
+
+        const soMay = Number(cell(row, 'quantity').replace(/[^\d]/g, ''));
+        if (buocDau && Number.isFinite(soMay) && soMay >= 1) {
+          const donGia = model ? suggestedUnitPrice(model, kind, settings) : 0;
+          await createCrmOpportunity({
+            accountId: id,
+            stageId: buocDau.id,
+            name: `${t('portal.crm.accounts.new_opp_name')} · ${cell(row, 'name')}`,
+            modelId: model?.id ?? null,
+            quantity: soMay,
+            amount: donGia * soMay,
+            expectedCloseDate: null,
+            notes: '',
+            ownerId,
+            lostReasonId: null,
+            lostNotes: null,
+            trialDays: null,
+          });
+          soCoHoi++;
+        }
+
+        const stage = stageByName(cell(row, 'stage'));
+        if (stage) {
+          await setCrmAccountStage(id, stage.id);
+          soTrangThai++;
+        }
+      }
+
+      const them = [
+        soCoHoi > 0 ? `${soCoHoi} ${t('portal.crm.import.made_opps')}` : '',
+        soTrangThai > 0 ? `${soTrangThai} ${t('portal.crm.import.set_stages')}` : '',
+      ].filter(Boolean).join(', ');
+      toast.success(`${t('portal.crm.import.done')}: ${payload.length}${them ? ` · ${them}` : ''}`);
       reset();
       onDone();
       onClose();

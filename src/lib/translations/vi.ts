@@ -589,6 +589,10 @@ const vi: Record<string, string> = {
     'portal.crm.accounts.empty': 'Chưa có khách hàng nào',
     'portal.crm.accounts.col_code': 'Mã',
     'portal.crm.accounts.col_status': 'Trạng thái',
+    'portal.crm.accounts.col_created': 'Ngày vào',
+    'portal.crm.accounts.in_stage_today': 'vào hôm nay',
+    'portal.crm.accounts.in_stage_days': 'ngày ở bước này',
+    'portal.crm.accounts.stage_locked': 'Đã chốt sổ, không đổi trạng thái được nữa.',
     'portal.crm.accounts.col_machines': 'Số máy',
     'portal.crm.accounts.col_commission': 'Hoa hồng dự kiến',
     'portal.crm.accounts.open_short': 'đang mở',
@@ -785,6 +789,8 @@ const vi: Record<string, string> = {
     'portal.crm.import.check_first': 'Phải kiểm tra trùng trước khi nhập.',
     'portal.crm.import.run': 'Nhập',
     'portal.crm.import.done': 'Đã nhập số khách',
+    'portal.crm.import.made_opps': 'cơ hội đã lập',
+    'portal.crm.import.set_stages': 'khách đã đặt trạng thái',
 
     // ── Portal pages + components (i18n) ──
     'portal.auth.common.logo_home_aria': 'Đại Long trang chủ',

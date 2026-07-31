@@ -4,7 +4,9 @@ SELECT plan(8);
 -- Boss chốt 29/07/2026: trạng thái khách hàng do NHÂN VIÊN TỰ CHỌN, lấy từ cùng
 -- danh mục giai đoạn với cơ hội. Khách mới mặc định ở đầu chuỗi. Riêng lúc khách
 -- thanh toán xong thì hệ thống đẩy sang giai đoạn hoàn thành — mốc có thật từ
--- bảng đơn hàng, và nhân viên vẫn đổi lại được.
+-- bảng đơn hàng.
+-- Boss sửa luật 01/08/2026: tới "Hoàn thành đơn" hoặc "Không mua" là chốt sổ,
+-- khoá trạng thái, nhân viên KHÔNG đổi lại được nữa (xem test 33).
 
 TRUNCATE public.profiles, public.product_models CASCADE;
 DELETE FROM auth.users;
@@ -105,15 +107,15 @@ SELECT results_eq(
     'khách thanh toán xong thì trạng thái tự sang Hoàn thành đơn'
 );
 
--- 7. nhưng nhân viên vẫn đổi lại được, quyền chọn vẫn thuộc về họ
-UPDATE public.crm_accounts
-   SET stage_id = (SELECT id FROM public.crm_stages WHERE name='Đang tư vấn')
- WHERE id='20000000-0000-0000-0000-0000000000a1';
-SELECT results_eq(
-    $$SELECT status_label FROM public.crm_account_list
-      WHERE id='20000000-0000-0000-0000-0000000000a1'$$,
-    ARRAY['Đang tư vấn'::text],
-    'sau khi hệ thống đẩy, nhân viên vẫn đổi lại được'
+-- 7. Boss đổi luật 01/08/2026: tới "Hoàn thành đơn" hoặc "Không mua" là chốt sổ,
+--    khoá luôn. Trước đó (29/07) nhân viên còn đổi lại được — nay thì không.
+SELECT throws_ok(
+    $$UPDATE public.crm_accounts
+         SET stage_id = (SELECT id FROM public.crm_stages WHERE name='Đang tư vấn')
+       WHERE id='20000000-0000-0000-0000-0000000000a1'$$,
+    '23514',
+    NULL,
+    'đã Hoàn thành đơn thì nhân viên không đổi lại được nữa'
 );
 
 -- 8. nhân viên khác không sửa được trạng thái khách không phải của mình
@@ -130,7 +132,7 @@ SET LOCAL "request.jwt.claim.sub" = '00000000-0000-0000-0000-00000000005c';
 SELECT results_eq(
     $$SELECT status_label FROM public.crm_account_list
       WHERE id='20000000-0000-0000-0000-0000000000a1'$$,
-    ARRAY['Đang tư vấn'::text],
+    ARRAY['Hoàn thành đơn'::text],
     'nhân viên khác không sửa được trạng thái khách của người ta (RLS chặn)'
 );
 

@@ -667,7 +667,12 @@ export async function getCrmStages(): Promise<CrmStage[]> {
 export async function getCrmAccounts(kind?: CrmAccountKind): Promise<CrmAccountListRow[]> {
   // Đọc qua view crm_account_list để có tên người quản lý + người tạo; RLS của
   // crm_accounts vẫn lọc dòng vì view dùng security_invoker.
-  let q = getSupabaseClient().from('crm_account_list').select('*').order('created_at', { ascending: false });
+  // Khoá phụ theo mã: nhiều khách nhập cùng một lô có created_at giống hệt nhau,
+  // Postgres không cam kết thứ tự giữa các dòng bằng nhau nên sau mỗi lần sửa là
+  // dòng nhảy chỗ ngay trước mắt nhân viên.
+  let q = getSupabaseClient().from('crm_account_list').select('*')
+    .order('created_at', { ascending: false })
+    .order('code', { ascending: false });
   if (kind) q = q.eq('kind', kind);
   const { data, error } = await q;
   if (error) throw error;
@@ -716,9 +721,14 @@ export async function createCrmAccount(input: CrmAccountInput): Promise<void> {
 
 /** Nhập hàng loạt. Trigger chống trùng chạy từng dòng nên phải chia lô: một số
  *  trùng lọt lưới sẽ làm hỏng cả lô, chia nhỏ thì phần còn lại vẫn vào được. */
-export async function createCrmAccountsBulk(inputs: CrmAccountInput[]): Promise<void> {
-  const { error } = await getSupabaseClient().from('crm_accounts').insert(inputs.map(crmAccountRow));
+/** Trả id theo ĐÚNG thứ tự đầu vào để bên gọi lập tiếp cơ hội cho từng dòng. */
+export async function createCrmAccountsBulk(inputs: CrmAccountInput[]): Promise<string[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_accounts')
+    .insert(inputs.map(crmAccountRow))
+    .select('id');
   if (error) throw error;
+  return ((data as { id: string }[]) ?? []).map(r => r.id);
 }
 
 /** Tra số điện thoại xuyên RLS để biết khách đã tồn tại và ai đang phụ trách. */
@@ -753,7 +763,9 @@ export async function getCrmBoard(): Promise<CrmOpportunityBoardRow[]> {
     .from('crm_opportunity_board')
     .select('*')
     .order('sort_order')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    // Cùng lý do như bảng khách: thiếu khoá phụ thì thẻ nhảy chỗ trong cột.
+    .order('code', { ascending: false });
   if (error) throw error;
   return (data as CrmOpportunityBoardRow[]) ?? [];
 }

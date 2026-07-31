@@ -586,6 +586,10 @@ const en: Record<string, string> = {
     'portal.crm.accounts.empty': 'No customers yet',
     'portal.crm.accounts.col_code': 'Code',
     'portal.crm.accounts.col_status': 'Status',
+    'portal.crm.accounts.col_created': 'Added on',
+    'portal.crm.accounts.in_stage_today': 'entered today',
+    'portal.crm.accounts.in_stage_days': 'days in this stage',
+    'portal.crm.accounts.stage_locked': 'Closed out — status can no longer change.',
     'portal.crm.accounts.col_machines': 'Units',
     'portal.crm.accounts.col_commission': 'Expected commission',
     'portal.crm.accounts.open_short': 'open',
@@ -782,6 +786,8 @@ const en: Record<string, string> = {
     'portal.crm.import.check_first': 'Run the duplicate check before importing.',
     'portal.crm.import.run': 'Import',
     'portal.crm.import.done': 'Customers imported',
+    'portal.crm.import.made_opps': 'opportunities created',
+    'portal.crm.import.set_stages': 'accounts staged',
 
     // ── Portal pages + components (i18n) ──
     'portal.auth.common.logo_home_aria': 'Đại Long home',

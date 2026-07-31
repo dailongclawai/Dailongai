@@ -271,6 +271,10 @@ export interface CrmAccountListRow extends CrmAccount {
   expected_commission: string;
   /** Số cơ hội còn đang mở của khách. */
   open_deals: number;
+  /** Mốc vào trạng thái hiện tại. Chưa đổi lần nào thì bằng ngày đưa khách vào. */
+  stage_since: string;
+  /** Đã "Hoàn thành đơn" hoặc "Không mua" thì chốt sổ, không đổi trạng thái nữa. */
+  stage_locked: boolean;
 }
 
 export interface CrmContact {
