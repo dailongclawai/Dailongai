@@ -1100,6 +1100,16 @@ export async function getCrmSourceReport(): Promise<CrmSourceReportRow[]> {
   return (data as CrmSourceReportRow[]) ?? [];
 }
 
+/** Nhân viên gửi yêu cầu xác nhận hoàn thành — quản trị duyệt mới vào bước thắng,
+ *  lúc đó KPI máy và hoa hồng mới tính. DB chặn staff tự đẩy vào bước thắng. */
+export async function requestAccountCompletion(accountId: string, staffId: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_accounts')
+    .update({ won_requested_at: new Date().toISOString(), won_requested_by: staffId })
+    .eq('id', accountId);
+  if (error) throw error;
+}
+
 // ── Tháng lịch Việt Nam ──
 
 /** Mùng 1 tháng hiện tại theo giờ Việt Nam, dạng yyyy-mm-dd — trang KPI dùng

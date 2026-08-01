@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmBoard, getCrmStages, moveOpportunityStage } from '@/lib/portal-queries';
+import { getCrmBoard, getCrmStages, moveOpportunityStage, requestAccountCompletion } from '@/lib/portal-queries';
 import { groupByStage, sumAmount, weightedForecast } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
@@ -70,6 +70,21 @@ export default function CrmPipelinePage() {
     if (!dragId) return;
     const id = dragId;
     setDragId(null);
+    // Boss chốt 02/08/2026: nhân viên thả vào cột thắng chỉ gửi yêu cầu xác nhận
+    // — quản trị duyệt mới vào bước thắng, DB cũng chặn nếu lách qua đây.
+    if (stage.forecast === 'won' && profile && profile.role !== 'admin') {
+      const row = rows.find(r => r.id === id);
+      if (!row) return;
+      if (!window.confirm(t('portal.crm.accounts.request_confirm'))) return;
+      try {
+        await requestAccountCompletion(row.account_id, profile.id);
+        toast.success(t('portal.crm.accounts.request_sent'));
+        await load();
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+      return;
+    }
     // Thả vào cột thua thì phải hỏi lý do trước, nếu không DB sẽ từ chối.
     if (stage.forecast === 'lost') {
       setLosing({ id, stage });

@@ -8,8 +8,8 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
   createCrmOpportunity, getActiveModels, getCrmAccounts, getCrmEvidenceCounts, getCrmSettings,
-  getCrmStages, getOpenOpportunities, moveOpportunityStage, setCrmAccountStage,
-  setOpportunityQuantity, suggestedUnitPrice,
+  getCrmStages, getOpenOpportunities, moveOpportunityStage, requestAccountCompletion,
+  setCrmAccountStage, setOpportunityQuantity, suggestedUnitPrice,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
@@ -111,7 +111,21 @@ export default function CrmAccountsPage() {
   // Trigger crm_accounts_stage_sync kéo cơ hội đang mở đi theo, nên tải lại
   // bảng sau đó để số máy và hoa hồng khớp với trang Cơ hội.
   const changeStage = async (account: CrmAccountListRow, stageId: string) => {
+    if (!profile) return;
     const stage = stages.find(s => s.id === stageId);
+    // Boss chốt 02/08/2026: nhân viên không tự chốt "Hoàn thành đơn" — chỉ gửi
+    // yêu cầu; quản trị xác nhận xong mới vào bước thắng, mới tính KPI + hoa hồng.
+    if (stage?.forecast === 'won' && profile.role !== 'admin') {
+      if (!window.confirm(t('portal.crm.accounts.request_confirm'))) return;
+      try {
+        await requestAccountCompletion(account.id, profile.id);
+        toast.success(t('portal.crm.accounts.request_sent'));
+        await load();
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+      return;
+    }
     // Chuyển sang "Không mua" thì phải hỏi lý do trước, vì cơ hội đi theo cũng
     // cần lý do — cơ sở dữ liệu từ chối nếu thiếu.
     if (stage?.forecast === 'lost' && account.open_deals > 0) {
@@ -448,6 +462,33 @@ export default function CrmAccountsPage() {
                       ? t('portal.crm.accounts.in_stage_today')
                       : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
                   </span>
+                  {/* Hai trạng thái hoàn thành: vàng = chờ quản trị, xanh = đã xác nhận */}
+                  {r.won_requested_at && !r.stage_locked && (
+                    <span className="mt-1 flex items-center gap-1">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-[#fbbf24]/40 px-2 py-0.5 text-xs text-[#fbbf24]">
+                        <span className="material-symbols-outlined text-[13px]">hourglass_top</span>
+                        {t('portal.crm.accounts.pending_confirm')}
+                      </span>
+                      {profile.role === 'admin' && (() => {
+                        const won = stages.find(s => s.forecast === 'won');
+                        return won ? (
+                          <button
+                            onClick={() => void changeStage(r, won.id)}
+                            className="inline-flex items-center gap-1 rounded-full border border-[#34d399]/40 px-2 py-0.5 text-xs text-[#34d399] hover:bg-[#34d399]/10"
+                          >
+                            <span className="material-symbols-outlined text-[13px]">check</span>
+                            {t('portal.crm.accounts.confirm_now')}
+                          </button>
+                        ) : null;
+                      })()}
+                    </span>
+                  )}
+                  {r.stage_id != null && stages.find(s => s.id === r.stage_id)?.forecast === 'won' && (
+                    <span className="mt-1 flex items-center gap-1 text-xs text-[#34d399]">
+                      <span className="material-symbols-outlined text-[13px]">verified</span>
+                      {t('portal.crm.accounts.confirmed')}
+                    </span>
+                  )}
                 </td>
                 {/* stopPropagation: bấm nút chứng cứ không được mở trang chi tiết.
                     Có chứng cứ: huy hiệu xanh + số lượng; chưa có: máy ảnh xám. */}

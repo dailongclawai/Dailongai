@@ -275,6 +275,8 @@ export interface CrmAccountListRow extends CrmAccount {
   stage_since: string;
   /** Đã "Hoàn thành đơn" hoặc "Không mua" thì chốt sổ, không đổi trạng thái nữa. */
   stage_locked: boolean;
+  /** Nhân viên đã bấm Hoàn thành, đang chờ quản trị xác nhận. */
+  won_requested_at: string | null;
 }
 
 export interface CrmContact {
