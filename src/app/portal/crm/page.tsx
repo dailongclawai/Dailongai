@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages } from '@/lib/portal-queries';
+import { getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages, getStaffPeers } from '@/lib/portal-queries';
 import { sumAmount, weightedForecast } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
-import type { CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage } from '@/lib/portal-types';
+import type {
+  CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage, StaffPeer,
+} from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 const DAY_MS = 86_400_000;
@@ -32,6 +34,12 @@ export default function CrmDashboardPage() {
   const [accounts, setAccounts] = useState<CrmAccountListRow[]>([]);
   const [busy, setBusy] = useState(true);
   const [loadedAt, setLoadedAt] = useState<string | null>(null);
+  // Quản trị nhìn thấy dữ liệu của mọi nhân viên gộp lại, nên phải có danh sách
+  // nhân viên để tách số liệu ra từng người và lọc cả trang theo một người.
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
+  const [staffFilter, setStaffFilter] = useState<string>('all');
+
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -69,22 +77,74 @@ export default function CrmDashboardPage() {
     if (session) void load();
   }, [session, load]);
 
-  const openRows = useMemo(() => rows.filter(r => r.forecast === 'open'), [rows]);
-  const wonCount = useMemo(() => rows.filter(r => r.forecast === 'won').length, [rows]);
-  const lostCount = useMemo(() => rows.filter(r => r.forecast === 'lost').length, [rows]);
+  useEffect(() => {
+    if (!session || !isAdmin) return;
+    void getStaffPeers()
+      .then(ps => setPeers(ps.filter(p => p.role === 'staff')))
+      .catch(() => setPeers([]));
+  }, [session, isAdmin]);
+
+  // Ba nguồn dữ liệu đều mang owner_id, nên lọc theo nhân viên làm ngay tại
+  // trình duyệt — không cần gọi lại máy chủ.
+  const fRows = useMemo(
+    () => (staffFilter === 'all' ? rows : rows.filter(r => r.owner_id === staffFilter)),
+    [rows, staffFilter],
+  );
+  const fActivities = useMemo(
+    () => (staffFilter === 'all' ? activities : activities.filter(a => a.owner_id === staffFilter)),
+    [activities, staffFilter],
+  );
+  const fAccounts = useMemo(
+    () => (staffFilter === 'all' ? accounts : accounts.filter(a => a.owner_id === staffFilter)),
+    [accounts, staffFilter],
+  );
+
+  const openRows = useMemo(() => fRows.filter(r => r.forecast === 'open'), [fRows]);
+  const wonCount = useMemo(() => fRows.filter(r => r.forecast === 'won').length, [fRows]);
+  const lostCount = useMemo(() => fRows.filter(r => r.forecast === 'lost').length, [fRows]);
   const closedCount = wonCount + lostCount;
   const winRate = closedCount > 0 ? Math.round((wonCount / closedCount) * 1000) / 10 : 0;
 
   const newAccounts = useMemo(() => {
     const from = Date.now() - 30 * DAY_MS;
-    return accounts.filter(a => new Date(a.created_at).getTime() >= from).length;
-  }, [accounts]);
+    return fAccounts.filter(a => new Date(a.created_at).getTime() >= from).length;
+  }, [fAccounts]);
+
+  // Bảng so sánh cho quản trị: tính từ dữ liệu CHƯA lọc để mọi dòng luôn đủ,
+  // kể cả khi đang lọc trang theo một người.
+  const teamStats = useMemo(() => {
+    if (!isAdmin) return [];
+    const now = Date.now();
+    const from30 = now - 30 * DAY_MS;
+    return peers.map(p => {
+      const myRows = rows.filter(r => r.owner_id === p.id);
+      const open = myRows.filter(r => r.forecast === 'open');
+      const won = myRows.filter(r => r.forecast === 'won').length;
+      const lost = myRows.filter(r => r.forecast === 'lost').length;
+      const closed = won + lost;
+      const myAccounts = accounts.filter(a => a.owner_id === p.id);
+      return {
+        peer: p,
+        accounts: myAccounts.length,
+        new30: myAccounts.filter(a => new Date(a.created_at).getTime() >= from30).length,
+        openCount: open.length,
+        openValue: sumAmount(open),
+        forecast: weightedForecast(open),
+        expectedCommission: open.reduce((s, r) => s + Number(r.expected_commission), 0),
+        won,
+        lost,
+        winRate: closed > 0 ? Math.round((won / closed) * 1000) / 10 : 0,
+        overdue: activities.filter(a =>
+          a.owner_id === p.id && !a.done_at && a.due_at && new Date(a.due_at).getTime() < now).length,
+      };
+    });
+  }, [isAdmin, peers, rows, accounts, activities]);
 
   // Phễu: mỗi bậc đếm số cơ hội đã đi qua bậc đó (đang ở bậc này hoặc xa hơn).
   // Cơ hội thua bị loại vì chúng rơi khỏi chuỗi chứ không đi tiếp.
   const funnel = useMemo(() => {
     const order = new Map(stages.map(s => [s.id, s.sort_order]));
-    const alive = rows.filter(r => r.forecast !== 'lost');
+    const alive = fRows.filter(r => r.forecast !== 'lost');
     const steps = [...stages]
       .filter(s => s.forecast !== 'lost')
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -100,17 +160,17 @@ export default function CrmDashboardPage() {
         ? Math.round((step.count / steps[i - 1].count) * 100)
         : null,
     }));
-  }, [stages, rows]);
+  }, [stages, fRows]);
 
   // Việc quá hạn và việc tới hạn hôm nay, sớm nhất lên trước.
   const todayTasks = useMemo(() => {
     const endOfToday = new Date();
     endOfToday.setHours(23, 59, 59, 999);
-    return activities
+    return fActivities
       .filter(a => !a.done_at && a.due_at && new Date(a.due_at) <= endOfToday)
       .sort((a, b) => (a.due_at ?? '').localeCompare(b.due_at ?? ''))
       .slice(0, 5);
-  }, [activities]);
+  }, [fActivities]);
 
   // Cơ hội đang mở tới hạn đóng trong 7 ngày tới hoặc đã quá hạn.
   const urgent = useMemo(() => {
@@ -132,12 +192,102 @@ export default function CrmDashboardPage() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
 
-      <div className="mb-5">
-        <h1 className="crm-display text-xl font-semibold text-[var(--crm-text)]">{t('portal.crm.dash.title')}</h1>
-        <p className="mt-1 text-xs text-[var(--crm-muted)]">
-          {busy ? t('portal.crm.common.loading') : `${t('portal.crm.dash.updated')} ${loadedAt ?? ''}`}
-        </p>
+      <div className="mb-5 flex flex-wrap items-end gap-3">
+        <div className="mr-auto">
+          <h1 className="crm-display text-xl font-semibold text-[var(--crm-text)]">{t('portal.crm.dash.title')}</h1>
+          <p className="mt-1 text-xs text-[var(--crm-muted)]">
+            {busy ? t('portal.crm.common.loading') : `${t('portal.crm.dash.updated')} ${loadedAt ?? ''}`}
+          </p>
+        </div>
+        {isAdmin && peers.length > 0 && (
+          <select
+            aria-label={t('portal.crm.dash.staff_filter')}
+            value={staffFilter}
+            onChange={e => setStaffFilter(e.target.value)}
+            className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#ff5625]"
+          >
+            <option value="all">{t('portal.crm.dash.staff_all')}</option>
+            {peers.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.full_name || p.email}{p.staff_segment ? ` · ${p.staff_segment.toUpperCase()}` : ''}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
+
+      {/* Bảng số liệu từng nhân viên — chỉ quản trị. Tính từ dữ liệu chưa lọc
+          nên vẫn đủ mọi dòng khi trang đang lọc theo một người. */}
+      {isAdmin && (
+        <section className={`${card} mb-6 overflow-hidden`}>
+          <div className="flex flex-wrap items-center gap-3 px-5 py-4">
+            <span className="material-symbols-outlined text-[20px] text-[#00daf3]">groups</span>
+            <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">
+              {t('portal.crm.dash.team_title')}
+            </h2>
+            <span className="text-xs text-[var(--crm-muted)]">{t('portal.crm.dash.team_hint')}</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1080px] text-left text-sm">
+              <thead className="bg-[var(--crm-s3)] text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">
+                <tr>
+                  <th className="px-5 py-3">{t('portal.crm.reports.col_staff')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_accounts')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_new30')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_count')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_value')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.forecast')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.opp.expected_commission')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.won_lost')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.win_rate')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_overdue_tasks')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {busy && (
+                  <tr><td colSpan={10} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+                )}
+                {!busy && teamStats.length === 0 && (
+                  <tr><td colSpan={10} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
+                )}
+                {teamStats.map(s => (
+                  <tr
+                    key={s.peer.id}
+                    onClick={() => setStaffFilter(f => (f === s.peer.id ? 'all' : s.peer.id))}
+                    className={`cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)] ${
+                      staffFilter === s.peer.id ? 'bg-[#ff5625]/10' : ''
+                    }`}
+                  >
+                    <td className="px-5 py-3 text-[var(--crm-text)]">
+                      {s.peer.full_name || s.peer.email}
+                      {s.peer.staff_segment && (
+                        <span className="ml-2 rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
+                          {s.peer.staff_segment.toUpperCase()}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.accounts}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-muted)]">{s.new30}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.openCount}</td>
+                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(s.openValue)}đ</td>
+                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(s.forecast)}đ</td>
+                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(s.expectedCommission)}đ</td>
+                    <td className="px-5 py-3 text-right tabular-nums">
+                      <span className="text-[#34d399]">{s.won}</span>
+                      <span className="text-[var(--crm-muted)]"> / </span>
+                      <span className="text-[#f87171]">{s.lost}</span>
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.winRate}%</td>
+                    <td className={`px-5 py-3 text-right tabular-nums ${s.overdue > 0 ? 'text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>
+                      {s.overdue}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
 
       {/* Ba chỉ số chính */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -181,7 +331,7 @@ export default function CrmDashboardPage() {
               <span className="material-symbols-outlined text-[20px]">person_add</span>
             </span>
             <span className="rounded-full bg-[var(--crm-s3)] px-2.5 py-1 text-xs text-[var(--crm-muted)]">
-              {t('portal.crm.dash.total')}: {accounts.length}
+              {t('portal.crm.dash.total')}: {fAccounts.length}
             </span>
           </div>
           <p className="text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">{t('portal.crm.dash.new_accounts')}</p>
