@@ -3,7 +3,7 @@ import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, 
   CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer, CrmContact,
   CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow,
   CrmTarget, CrmTargetProgress, CrmKpiDeviceMonth, CrmKpiNewAccountsDay,
-  CrmEvidence, CrmEvidenceKind } from './portal-types';
+  CrmEvidence, CrmEvidenceKind, CrmFeedback } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -1194,6 +1194,44 @@ export async function uploadCrmEvidence(
 export async function crmEvidenceSignedUrl(path: string): Promise<string> {
   const { data, error } = await getSupabaseClient()
     .storage.from('crm-evidence').createSignedUrl(path, 600);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+// ── Góp ý xây dựng CRM ──
+
+/** RLS: nhân viên thấy thư mình gửi, admin thấy hết. */
+export async function getCrmFeedbacks(): Promise<CrmFeedback[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_feedbacks')
+    .select('*, staff:profiles(full_name)')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmFeedback[]) ?? [];
+}
+
+export async function createCrmFeedback(staffId: string, content: string, file?: File | null): Promise<void> {
+  const client = getSupabaseClient();
+  let filePath: string | null = null;
+  if (file) {
+    const ext = file.name.split('.').pop() ?? 'dat';
+    filePath = `${staffId}/${Date.now()}.${ext}`;
+    const { error: upErr } = await client.storage.from('crm-feedback').upload(filePath, file, { upsert: false });
+    if (upErr) throw upErr;
+  }
+  const { error } = await client
+    .from('crm_feedbacks')
+    .insert({ staff_id: staffId, content: content.trim(), file_path: filePath });
+  if (error) {
+    // Dòng thư không ghi được thì gỡ luôn file vừa tải, kẻo rơi lại file mồ côi.
+    if (filePath) await client.storage.from('crm-feedback').remove([filePath]);
+    throw error;
+  }
+}
+
+export async function crmFeedbackSignedUrl(path: string): Promise<string> {
+  const { data, error } = await getSupabaseClient()
+    .storage.from('crm-feedback').createSignedUrl(path, 600);
   if (error) throw error;
   return data.signedUrl;
 }

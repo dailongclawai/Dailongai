@@ -508,6 +508,16 @@ export interface CrmKpiNewAccountsDay {
   org_new: number;
 }
 
+/** Thư góp ý xây dựng CRM của nhân viên gửi quản trị, kèm được một ảnh/file. */
+export interface CrmFeedback {
+  id: string;
+  staff_id: string;
+  content: string;
+  file_path: string | null;
+  created_at: string;
+  staff: { full_name: string | null } | null;
+}
+
 export type CrmEvidenceKind = 'giao_dich' | 'co_so' | 'khac';
 
 /** Chứng cứ làm việc thật với khách: màn hình giao dịch, ảnh chụp tại cơ sở. */
