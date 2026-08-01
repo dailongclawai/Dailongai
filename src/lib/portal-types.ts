@@ -20,6 +20,8 @@ export interface Profile {
   bank_account_name: string | null;
   bank_account_number: string | null;
   zalo_phone: string | null;
+  /** Chat ID Telegram — hệ thống gửi việc/nhắc hằng ngày thẳng vào đây. */
+  telegram_chat_id: string | null;
   payout_qr_path: string | null;
   payout_verified_at: string | null;
   province: string | null;

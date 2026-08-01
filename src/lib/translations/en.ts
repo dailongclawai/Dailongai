@@ -1131,6 +1131,8 @@ const en: Record<string, string> = {
     'portal.profile.label.email': 'Email',
     'portal.profile.label.full_name': 'Full name',
     'portal.profile.label.phone': 'Phone number',
+    'portal.profile.label.telegram': 'Telegram ID for daily tasks',
+    'portal.profile.hint.telegram': 'Your numeric Telegram chat ID — message @userinfobot on Telegram to see it. Once filled, the system delivers your daily tasks straight to this Telegram every morning at 8am.',
     'portal.profile.label.new_password': 'New password',
     'portal.profile.btn.save': 'Save',
     'portal.profile.btn.change_password': 'Change password',

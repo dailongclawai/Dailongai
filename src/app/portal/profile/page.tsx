@@ -19,8 +19,10 @@ export default function ProfilePage() {
   // state riêng để không phải đồng bộ từ hồ sơ bằng setState trong effect.
   const [fullNameEdit, setFullNameEdit] = useState<string | null>(null);
   const [phoneEdit, setPhoneEdit] = useState<string | null>(null);
+  const [telegramEdit, setTelegramEdit] = useState<string | null>(null);
   const fullName = fullNameEdit ?? profile?.full_name ?? '';
   const phone = phoneEdit ?? profile?.phone ?? '';
+  const telegram = telegramEdit ?? profile?.telegram_chat_id ?? '';
   const [newPassword, setNewPassword] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -34,7 +36,7 @@ export default function ProfilePage() {
     setBusy(true);
     const { error } = await getSupabaseClient()
       .from('profiles')
-      .update({ full_name: fullName, phone })
+      .update({ full_name: fullName, phone, telegram_chat_id: telegram.trim() || null })
       .eq('id', session!.user.id);
     setBusy(false);
     if (error) toast.error(error.message);
@@ -99,6 +101,17 @@ export default function ProfilePage() {
               onChange={(e) => setPhoneEdit(e.target.value)}
               className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 focus:border-[#ff5625] outline-none"
             />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">{t('portal.profile.label.telegram')}</label>
+            <input
+              value={telegram}
+              onChange={(e) => setTelegramEdit(e.target.value.replace(/[^\d-]/g, ''))}
+              placeholder="6052313595"
+              inputMode="numeric"
+              className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 font-mono text-sm tabular-nums text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 focus:border-[#ff5625] outline-none"
+            />
+            <p className="mt-1 text-xs text-[#e7eaf0]/50">{t('portal.profile.hint.telegram')}</p>
           </div>
           <button
             type="submit"

@@ -1134,6 +1134,8 @@ const vi: Record<string, string> = {
     'portal.profile.label.email': 'Email',
     'portal.profile.label.full_name': 'Họ tên',
     'portal.profile.label.phone': 'Số điện thoại',
+    'portal.profile.label.telegram': 'ID Telegram nhận việc',
+    'portal.profile.hint.telegram': 'Dãy số Chat ID Telegram của mình — lấy nhanh bằng cách nhắn bất kỳ cho bot @userinfobot trên Telegram. Điền xong, mỗi sáng 8h hệ thống gửi việc cần làm thẳng vào Telegram này.',
     'portal.profile.label.new_password': 'Mật khẩu mới',
     'portal.profile.btn.save': 'Lưu',
     'portal.profile.btn.change_password': 'Đổi mật khẩu',
