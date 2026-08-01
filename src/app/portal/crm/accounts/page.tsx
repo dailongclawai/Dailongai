@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
@@ -40,6 +41,9 @@ function daysInStage(since: string): number {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000));
 }
 
+type SortKey = 'code' | 'name' | 'machines' | 'commission' | 'created' | 'status';
+const PAGE_SIZE = 50;
+
 export default function CrmAccountsPage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -56,6 +60,9 @@ export default function CrmAccountsPage() {
   const [losing, setLosing] = useState<{ account: CrmAccountListRow; stage: CrmStage } | null>(null);
   const [models, setModels] = useState<ProductModel[]>([]);
   const [settings, setSettings] = useState<CrmSettings | null>(null);
+  const [sortKey, setSortKey] = useState<SortKey>('created');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -198,9 +205,94 @@ export default function CrmAccountsPage() {
     });
   }, [rows, kind, org, q]);
 
+  const sorted = useMemo(() => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    const val = (r: CrmAccountListRow): string | number => {
+      switch (sortKey) {
+        case 'code': return r.code ?? '';
+        case 'name': return r.name.toLowerCase();
+        case 'machines': return r.total_quantity;
+        case 'commission': return Number(r.expected_commission);
+        case 'status': return r.status_label;
+        default: return r.created_at;
+      }
+    };
+    // sort của JS ổn định nên các dòng bằng nhau giữ nguyên thứ tự từ máy chủ.
+    // Chuỗi so bằng localeCompare tiếng Việt, kẻo "Đỗ" bị đẩy xuống sau "Z".
+    return [...filtered].sort((a, b) => {
+      const va = val(a); const vb = val(b);
+      if (typeof va === 'string' && typeof vb === 'string') {
+        return va.localeCompare(vb, 'vi') * dir;
+      }
+      if (va < vb) return -dir;
+      if (va > vb) return dir;
+      return 0;
+    });
+  }, [filtered, sortKey, sortDir]);
+
+  const pageCount = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pageRows = sorted.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+
+  // Đổi bộ lọc hay cách sắp thì quay về trang đầu, kẻo đứng ở trang không còn dòng nào.
+  useEffect(() => { setPage(0); }, [q, kind, org, sortKey, sortDir]);
+
+  const toggleSort = (k: SortKey) => {
+    if (sortKey === k) {
+      setSortDir(d => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(k);
+      setSortDir(k === 'name' || k === 'code' || k === 'status' ? 'asc' : 'desc');
+    }
+  };
+
+  // Xuất đúng danh sách đang nhìn thấy: theo bộ lọc và thứ tự hiện tại.
+  const exportExcel = () => {
+    const data = sorted.map(r => ({
+      [t('portal.crm.accounts.col_code')]: r.code ?? '',
+      [t('portal.crm.account.name')]: r.name,
+      [t('portal.crm.account.kind')]: t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect'),
+      [t('portal.crm.account.org_type')]: r.org_type ? t('portal.crm.org.' + r.org_type) : '',
+      [t('portal.crm.account.phone')]: r.phone ?? '',
+      Zalo: r.zalo_phone ?? '',
+      Email: r.email ?? '',
+      [t('portal.crm.account.province')]: r.province ?? '',
+      [t('portal.crm.account.address')]: r.address ?? '',
+      [t('portal.crm.account.source')]: r.source ? t('portal.crm.source.' + r.source) : '',
+      [t('portal.crm.accounts.col_machines')]: r.total_quantity || 0,
+      [t('portal.crm.accounts.col_commission')]: Number(r.expected_commission) || 0,
+      [t('portal.crm.accounts.col_status')]: r.status_label,
+      [t('portal.crm.account.owner')]: r.owner_name ?? '',
+      [t('portal.crm.accounts.col_created')]: new Date(r.created_at).toLocaleDateString('vi-VN'),
+      [t('portal.crm.account.notes')]: r.notes ?? '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'KhachHang');
+    const d = new Date();
+    const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    XLSX.writeFile(wb, `khach-hang-crm-${stamp}.xlsx`);
+  };
+
   if (loading || !profile) return null;
 
   const field = 'rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+
+  const sortTh = (k: SortKey, labelKey: string, right = false) => (
+    <th className={`px-4 py-3 ${right ? 'text-right' : ''}`}>
+      <button
+        onClick={() => toggleSort(k)}
+        className="inline-flex items-center gap-1 hover:text-[var(--crm-text)]"
+      >
+        {t(labelKey)}
+        {sortKey === k && (
+          <span className="material-symbols-outlined text-[14px]">
+            {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+          </span>
+        )}
+      </button>
+    </th>
+  );
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
@@ -229,6 +321,14 @@ export default function CrmAccountsPage() {
           {ORG_TYPES.map(o => <option key={o} value={o}>{t('portal.crm.org.' + o)}</option>)}
         </select>
         <button
+          onClick={exportExcel}
+          disabled={sorted.length === 0}
+          className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)] disabled:opacity-50"
+        >
+          <span className="material-symbols-outlined text-[18px]">download</span>
+          {t('portal.crm.accounts.export')}
+        </button>
+        <button
           onClick={() => setImportOpen(true)}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
@@ -247,16 +347,16 @@ export default function CrmAccountsPage() {
         <table className="w-full min-w-[1180px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
-              <th className="px-4 py-3">{t('portal.crm.accounts.col_code')}</th>
-              <th className="px-4 py-3">{t('portal.crm.account.name')}</th>
+              {sortTh('code', 'portal.crm.accounts.col_code')}
+              {sortTh('name', 'portal.crm.account.name')}
               <th className="px-4 py-3">{t('portal.crm.account.kind')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.phone')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.province')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.source')}</th>
-              <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_machines')}</th>
-              <th className="px-4 py-3 text-right">{t('portal.crm.accounts.col_commission')}</th>
-              <th className="px-4 py-3">{t('portal.crm.accounts.col_created')}</th>
-              <th className="px-4 py-3">{t('portal.crm.accounts.col_status')}</th>
+              {sortTh('machines', 'portal.crm.accounts.col_machines', true)}
+              {sortTh('commission', 'portal.crm.accounts.col_commission', true)}
+              {sortTh('created', 'portal.crm.accounts.col_created')}
+              {sortTh('status', 'portal.crm.accounts.col_status')}
             </tr>
           </thead>
           <tbody>
@@ -266,7 +366,7 @@ export default function CrmAccountsPage() {
             {!busy && filtered.length === 0 && (
               <tr><td colSpan={10} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
-            {filtered.map(r => (
+            {pageRows.map(r => (
               <tr
                 key={r.id}
                 className="cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)]"
@@ -344,6 +444,29 @@ export default function CrmAccountsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Chỉ hiện khi vượt một trang — đội 2 nhân viên hiện tại sẽ không thấy nó */}
+      {sorted.length > PAGE_SIZE && (
+        <div className="mt-3 flex items-center justify-end gap-3 text-sm text-[var(--crm-muted)]">
+          <span className="font-mono tabular-nums">
+            {safePage * PAGE_SIZE + 1}–{Math.min((safePage + 1) * PAGE_SIZE, sorted.length)} / {sorted.length}
+          </span>
+          <button
+            disabled={safePage === 0}
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 disabled:opacity-40"
+          >
+            {t('portal.crm.accounts.prev')}
+          </button>
+          <button
+            disabled={safePage >= pageCount - 1}
+            onClick={() => setPage(p => Math.min(pageCount - 1, p + 1))}
+            className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 disabled:opacity-40"
+          >
+            {t('portal.crm.accounts.next')}
+          </button>
+        </div>
+      )}
 
       <CrmAccountDrawer
         open={drawerOpen}

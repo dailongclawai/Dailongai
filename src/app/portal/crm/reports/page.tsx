@@ -5,10 +5,16 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmReconIssues, getCrmSettings, getCrmStaffReport, updateCrmSettings } from '@/lib/portal-queries';
+import {
+  getCrmLostReasonReport, getCrmMonthlyReport, getCrmReconIssues, getCrmSettings,
+  getCrmSourceReport, getCrmStaffReport, updateCrmSettings,
+} from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
-import type { CrmReconIssue, CrmSettings, CrmStaffReportRow } from '@/lib/portal-types';
+import type {
+  CrmLostReasonReportRow, CrmMonthlyReportRow, CrmReconIssue, CrmSettings,
+  CrmSourceReportRow, CrmStaffReportRow,
+} from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -18,6 +24,9 @@ export default function CrmReportsPage() {
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<CrmStaffReportRow[]>([]);
   const [issues, setIssues] = useState<CrmReconIssue[]>([]);
+  const [monthly, setMonthly] = useState<CrmMonthlyReportRow[]>([]);
+  const [lostReasons, setLostReasons] = useState<CrmLostReasonReportRow[]>([]);
+  const [sources, setSources] = useState<CrmSourceReportRow[]>([]);
   const [busy, setBusy] = useState(true);
   // Cấu hình giữ dạng chữ trong ô nhập, chỉ đổi ra số lúc lưu — gõ dở "1"
   // trên đường tới "15" mà ép số ngay thì ô nhảy lung tung.
@@ -40,11 +49,15 @@ export default function CrmReportsPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [report, recon, cfg] = await Promise.all([
+      const [report, recon, cfg, byMonth, byReason, bySource] = await Promise.all([
         getCrmStaffReport(), getCrmReconIssues(), getCrmSettings(),
+        getCrmMonthlyReport(), getCrmLostReasonReport(), getCrmSourceReport(),
       ]);
       setRows(report);
       setIssues(recon);
+      setMonthly(byMonth);
+      setLostReasons(byReason);
+      setSources(bySource);
       if (cfg) {
         setRate(String(Math.round(cfg.staff_rate * 1000) / 10));
         setMinDisc(String(Math.round(cfg.dealer_discount_min * 1000) / 10));
@@ -142,6 +155,110 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>
             )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Doanh số theo tháng — mốc cắt theo giờ Việt Nam, 12 tháng gần nhất */}
+      <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
+        {t('portal.crm.reports.monthly_title')}
+      </h2>
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
+        <table className="w-full min-w-[720px] text-left text-sm">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
+            <tr>
+              <th className="px-4 py-3">{t('portal.crm.reports.col_month')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_new_accounts')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_won')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_won_value')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_commission')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {busy && (
+              <tr><td colSpan={5} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+            )}
+            {/* Tháng nào cũng in kể cả bằng 0, nhưng cả năm trắng thì báo trống */}
+            {!busy && monthly.every(m => m.deals_won === 0 && m.new_accounts === 0 && Number(m.commission_total) === 0) && (
+              <tr><td colSpan={5} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty_data')}</td></tr>
+            )}
+            {!busy && !monthly.every(m => m.deals_won === 0 && m.new_accounts === 0 && Number(m.commission_total) === 0) && monthly.map(m => (
+              <tr key={m.thang} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3 font-mono text-[var(--crm-text)]">
+                  {new Date(m.thang).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums text-[var(--crm-muted)]">{m.new_accounts}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-[#34d399]">{m.deals_won}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(m.won_value))}đ</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(Number(m.commission_total))}đ</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Hiệu quả theo nguồn khách */}
+      <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
+        {t('portal.crm.reports.source_title')}
+      </h2>
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
+            <tr>
+              <th className="px-4 py-3">{t('portal.crm.reports.col_source')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_accounts')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_won')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_won_value')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {busy && (
+              <tr><td colSpan={4} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+            )}
+            {!busy && sources.length === 0 && (
+              <tr><td colSpan={4} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty_data')}</td></tr>
+            )}
+            {sources.map(s => (
+              <tr key={s.source ?? 'none'} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3 text-[var(--crm-text)]">
+                  {s.source ? t('portal.crm.source.' + s.source) : t('portal.crm.reports.no_source')}
+                </td>
+                <td className="px-4 py-3 text-right tabular-nums text-[var(--crm-muted)]">{s.accounts}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-[#34d399]">{s.deals_won}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(s.won_value))}đ</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Lý do không mua */}
+      <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
+        {t('portal.crm.reports.lost_title')}
+      </h2>
+      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
+        <table className="w-full min-w-[560px] text-left text-sm">
+          <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
+            <tr>
+              <th className="px-4 py-3">{t('portal.crm.reports.col_reason')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_count')}</th>
+              <th className="px-4 py-3 text-right">{t('portal.crm.reports.col_lost_value')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {busy && (
+              <tr><td colSpan={3} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+            )}
+            {!busy && lostReasons.length === 0 && (
+              <tr><td colSpan={3} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty_data')}</td></tr>
+            )}
+            {lostReasons.map(r => (
+              <tr key={r.name} className="border-t border-[var(--crm-line)]">
+                <td className="px-4 py-3 text-[var(--crm-text)]">{r.name}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-[#f87171]">{r.deals_lost}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(r.lost_value))}đ</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

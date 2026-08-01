@@ -440,4 +440,29 @@ export interface StaffPeer {
   full_name: string | null;
   email: string | null;
   staff_segment: StaffSegment | null;
+  role: 'staff' | 'admin';
+}
+
+// ── CRM báo cáo quản trị ──
+
+/** crm_report_monthly: 12 tháng gần nhất, mốc cắt theo giờ Việt Nam. */
+export interface CrmMonthlyReportRow {
+  thang: string;
+  deals_won: number;
+  won_value: string;
+  new_accounts: number;
+  commission_total: string;
+}
+
+export interface CrmLostReasonReportRow {
+  name: string;
+  deals_lost: number;
+  lost_value: string;
+}
+
+export interface CrmSourceReportRow {
+  source: CrmSource | null;
+  accounts: number;
+  deals_won: number;
+  won_value: string;
 }

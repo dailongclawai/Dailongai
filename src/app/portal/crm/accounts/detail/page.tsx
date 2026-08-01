@@ -5,21 +5,24 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { toast } from 'sonner';
 import {
-  getAccountOpportunities, getAccountTimeline, getCrmAccountById,
+  deleteCrmContact, getAccountContacts, getAccountOpportunities, getAccountTimeline,
+  getCrmAccountById,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
+import { CrmContactDrawer } from '@/components/portal/CrmContactDrawer';
 import { CrmTransferDialog } from '@/components/portal/CrmTransferDialog';
 import type {
-  CrmAccountListRow, CrmOpportunityBoardRow, CrmTimelineEntry,
+  CrmAccountListRow, CrmContact, CrmOpportunityBoardRow, CrmTimelineEntry,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 const fmtAt = (s: string | null) => (s ? new Date(s).toLocaleString('vi-VN') : '—');
 
-type Tab = 'overview' | 'deals' | 'timeline';
+type Tab = 'overview' | 'contacts' | 'deals' | 'timeline';
 
 function AccountDetail() {
   const router = useRouter();
@@ -30,10 +33,13 @@ function AccountDetail() {
   const [account, setAccount] = useState<CrmAccountListRow | null>(null);
   const [deals, setDeals] = useState<CrmOpportunityBoardRow[]>([]);
   const [timeline, setTimeline] = useState<CrmTimelineEntry[]>([]);
+  const [contacts, setContacts] = useState<CrmContact[]>([]);
   const [tab, setTab] = useState<Tab>('overview');
   const [busy, setBusy] = useState(true);
   const [editing, setEditing] = useState(false);
   const [transferring, setTransferring] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<CrmContact | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -50,14 +56,16 @@ function AccountDetail() {
     if (!id) { setBusy(false); return; }
     setBusy(true);
     try {
-      const [a, d, tl] = await Promise.all([
+      const [a, d, tl, ct] = await Promise.all([
         getCrmAccountById(id),
         getAccountOpportunities(id),
         getAccountTimeline(id),
+        getAccountContacts(id),
       ]);
       setAccount(a);
       setDeals(d);
       setTimeline(tl);
+      setContacts(ct);
     } finally {
       setBusy(false);
     }
@@ -70,7 +78,18 @@ function AccountDetail() {
   if (loading || !profile) return null;
 
   const card = 'rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)]';
-  const TABS: Tab[] = ['overview', 'deals', 'timeline'];
+  const TABS: Tab[] = ['overview', 'contacts', 'deals', 'timeline'];
+
+  const removeContact = async (c: CrmContact) => {
+    if (!window.confirm(t('portal.crm.contact.delete_confirm'))) return;
+    try {
+      await deleteCrmContact(c.id);
+      toast.success(t('portal.crm.contact.deleted'));
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
@@ -149,6 +168,7 @@ function AccountDetail() {
                   : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
               >
                 {t('portal.crm.detail.tab_' + b)}
+                {b === 'contacts' && contacts.length > 0 && ` (${contacts.length})`}
                 {b === 'deals' && deals.length > 0 && ` (${deals.length})`}
                 {b === 'timeline' && timeline.length > 0 && ` (${timeline.length})`}
               </button>
@@ -172,6 +192,82 @@ function AccountDetail() {
                   <p className="mt-1 text-sm text-[var(--crm-text)]">{value || '—'}</p>
                 </div>
               ))}
+            </div>
+          )}
+
+          {tab === 'contacts' && (
+            <div className={`${card} overflow-hidden`}>
+              <div className="flex items-center justify-between px-4 py-3">
+                <p className="text-sm text-[var(--crm-muted)]">{t('portal.crm.contact.hint')}</p>
+                <button
+                  onClick={() => { setEditingContact(null); setContactOpen(true); }}
+                  className="rounded-xl bg-[#ff5625] px-4 py-2 text-sm font-bold text-white"
+                >
+                  {t('portal.crm.contact.new')}
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead className="bg-[var(--crm-s3)] text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">
+                    <tr>
+                      <th className="px-4 py-3">{t('portal.crm.contact.full_name')}</th>
+                      <th className="px-4 py-3">{t('portal.crm.contact.title')}</th>
+                      <th className="px-4 py-3">{t('portal.crm.account.phone')}</th>
+                      <th className="px-4 py-3">Zalo</th>
+                      <th className="px-4 py-3">Email</th>
+                      <th className="px-4 py-3" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {contacts.length === 0 && (
+                      <tr><td colSpan={6} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.contact.empty')}</td></tr>
+                    )}
+                    {contacts.map(c => (
+                      <tr
+                        key={c.id}
+                        className="cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)]"
+                        onClick={() => { setEditingContact(c); setContactOpen(true); }}
+                      >
+                        <td className="px-4 py-3 text-[var(--crm-text)]">
+                          {c.full_name}
+                          {c.is_primary && (
+                            <span className="ml-2 rounded-full bg-[#00daf3]/10 px-2 py-0.5 text-xs text-[#00daf3]">
+                              {t('portal.crm.contact.primary_badge')}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--crm-muted)]">{c.title ?? '—'}</td>
+                        <td className="px-4 py-3 text-[var(--crm-muted)]">
+                          {c.phone ?? '—'}
+                          {c.do_not_call && (
+                            <span className="ml-1 align-middle text-xs text-[#f87171]" title={t('portal.crm.contact.do_not_call')}>
+                              <span className="material-symbols-outlined text-[14px]">phone_disabled</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-[var(--crm-muted)]">{c.zalo_phone ?? '—'}</td>
+                        <td className="px-4 py-3 text-[var(--crm-muted)]">
+                          {c.email ?? '—'}
+                          {c.do_not_email && (
+                            <span className="ml-1 align-middle text-xs text-[#f87171]" title={t('portal.crm.contact.do_not_email')}>
+                              <span className="material-symbols-outlined text-[14px]">unsubscribe</span>
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
+                          <button
+                            onClick={() => void removeContact(c)}
+                            aria-label={t('portal.crm.contact.delete_confirm')}
+                            className="text-[var(--crm-muted)] hover:text-[#f87171]"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -253,6 +349,15 @@ function AccountDetail() {
             currentOwnerId={account.owner_id}
             onClose={() => setTransferring(false)}
             onDone={load}
+          />
+
+          <CrmContactDrawer
+            open={contactOpen}
+            accountId={account.id}
+            contact={editingContact}
+            ownerId={profile.id}
+            onClose={() => setContactOpen(false)}
+            onSaved={load}
           />
         </>
       )}

@@ -35,7 +35,9 @@ export function CrmTransferDialog({ open, accountId, accountName, currentOwnerId
 
   if (!open) return null;
 
-  const candidates = peers.filter(p => p.id !== currentOwnerId);
+  // Ẩn hẳn tài khoản quản trị: RPC vốn từ chối nhận admin, để trong danh sách
+  // chỉ tổ dẫn người dùng vào lỗi.
+  const candidates = peers.filter(p => p.role === 'staff' && p.id !== currentOwnerId);
   const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
 
   const submit = async () => {

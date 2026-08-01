@@ -1,6 +1,7 @@
 import { getSupabaseClient } from './supabase';
 import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue,
-  CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer } from './portal-types';
+  CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer, CrmContact,
+  CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -1076,4 +1077,99 @@ export async function getCrmStaffReport(): Promise<CrmStaffReportRow[]> {
     .order('staff_name');
   if (error) throw error;
   return (data as CrmStaffReportRow[]) ?? [];
+}
+
+/** 12 tháng gần nhất; khung nhìn tự chặn ai không phải admin (trả rỗng). */
+export async function getCrmMonthlyReport(): Promise<CrmMonthlyReportRow[]> {
+  const { data, error } = await getSupabaseClient().from('crm_report_monthly').select('*');
+  if (error) throw error;
+  return (data as CrmMonthlyReportRow[]) ?? [];
+}
+
+export async function getCrmLostReasonReport(): Promise<CrmLostReasonReportRow[]> {
+  const { data, error } = await getSupabaseClient().from('crm_report_lost_reasons').select('*');
+  if (error) throw error;
+  return (data as CrmLostReasonReportRow[]) ?? [];
+}
+
+export async function getCrmSourceReport(): Promise<CrmSourceReportRow[]> {
+  const { data, error } = await getSupabaseClient().from('crm_report_sources').select('*');
+  if (error) throw error;
+  return (data as CrmSourceReportRow[]) ?? [];
+}
+
+// ── CRM danh bạ liên hệ ──
+
+export async function getAccountContacts(accountId: string): Promise<CrmContact[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_contacts')
+    .select('*')
+    .eq('account_id', accountId)
+    .order('is_primary', { ascending: false })
+    .order('created_at');
+  if (error) throw error;
+  return (data as CrmContact[]) ?? [];
+}
+
+export interface CrmContactInput {
+  accountId: string;
+  fullName: string;
+  title?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  zaloPhone?: string | null;
+  isPrimary?: boolean;
+  doNotCall?: boolean;
+  doNotEmail?: boolean;
+  notes?: string | null;
+  ownerId: string;
+}
+
+function crmContactRow(input: CrmContactInput) {
+  return {
+    account_id: input.accountId,
+    full_name: input.fullName.trim(),
+    title: input.title?.trim() || null,
+    phone: input.phone?.trim() || null,
+    email: input.email?.trim() || null,
+    zalo_phone: input.zaloPhone?.trim() || null,
+    is_primary: input.isPrimary ?? false,
+    do_not_call: input.doNotCall ?? false,
+    do_not_email: input.doNotEmail ?? false,
+    notes: input.notes?.trim() || null,
+  };
+}
+
+/** Mỗi khách chỉ một đầu mối chính: đặt chính cho người này thì hạ cờ người khác. */
+async function clearPrimaryContact(accountId: string, exceptId?: string): Promise<void> {
+  let q = getSupabaseClient()
+    .from('crm_contacts')
+    .update({ is_primary: false })
+    .eq('account_id', accountId)
+    .eq('is_primary', true);
+  if (exceptId) q = q.neq('id', exceptId);
+  const { error } = await q;
+  if (error) throw error;
+}
+
+export async function createCrmContact(input: CrmContactInput): Promise<void> {
+  if (input.isPrimary) await clearPrimaryContact(input.accountId);
+  const { error } = await getSupabaseClient()
+    .from('crm_contacts')
+    .insert({ ...crmContactRow(input), owner_id: input.ownerId });
+  if (error) throw error;
+}
+
+export async function updateCrmContact(id: string, input: CrmContactInput): Promise<void> {
+  if (input.isPrimary) await clearPrimaryContact(input.accountId, id);
+  const { error } = await getSupabaseClient()
+    .from('crm_contacts')
+    .update(crmContactRow(input))
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function deleteCrmContact(id: string): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_contacts').delete().eq('id', id);
+  if (error) throw error;
 }
