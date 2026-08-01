@@ -177,6 +177,16 @@ export default function CrmPipelinePage() {
                 >
                   <p className="text-sm font-semibold text-[var(--crm-text)]">{r.name}</p>
                   <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.account_name}</p>
+                  {r.account_phone && (
+                    <a
+                      href={`tel:${r.account_phone}`}
+                      onClick={e => e.stopPropagation()}
+                      className="mt-1 inline-flex items-center gap-1 text-xs text-[#00daf3]"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">call</span>
+                      {r.account_phone}
+                    </a>
+                  )}
                   <p className="mt-2 text-sm font-bold text-[#ff5625]">
                     {fmtVnd(Number(r.amount))}đ
                     <span className="ml-1 text-xs font-normal text-[var(--crm-muted)]">

@@ -339,6 +339,99 @@ export default function CrmAccountsPage() {
     </th>
   );
 
+  // Dùng chung cho bảng (desktop) và thẻ khách (mobile)
+  const renderStatus = (r: CrmAccountListRow) => (
+    r.won_requested_at && !r.stage_locked && profile.role !== 'admin' ? (
+      /* Nhân viên đã bấm Hoàn thành: trạng thái đọc thẳng là "Hoàn thành đơn —
+         chờ xác nhận", thay hẳn ô chọn cho tới khi quản trị duyệt (hoặc huỷ). */
+      <>
+        <span className="inline-flex items-center gap-1 rounded-full border border-[#fbbf24]/50 bg-[#fbbf24]/10 px-2.5 py-1.5 text-xs font-medium text-[#fbbf24]">
+          <span className="material-symbols-outlined text-[14px]">hourglass_top</span>
+          {stages.find(s => s.forecast === 'won')?.name ?? ''} · {t('portal.crm.accounts.pending_short')}
+        </span>
+        <button
+          onClick={() => void cancelRequest(r)}
+          className="mt-1 block text-xs text-[var(--crm-muted)] underline hover:text-[var(--crm-text)]"
+        >
+          {t('portal.crm.accounts.cancel_request')}
+        </button>
+      </>
+    ) : (
+      <>
+        {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,
+            nếu không macOS sẽ vẽ nền sáng và chữ màu bị chìm. */}
+        {/* Khoá với nhân viên; quản trị vẫn đổi được để gỡ chốt sổ khi
+            thao tác nhầm — trigger dưới DB cũng theo đúng luật này. */}
+        <select
+          aria-label={t('portal.crm.accounts.col_status')}
+          value={r.stage_id ?? ''}
+          disabled={r.stage_locked && profile.role !== 'admin'}
+          title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : undefined}
+          onChange={e => void changeStage(r, e.target.value)}
+          className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)} ${r.stage_locked && profile.role !== 'admin' ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+        >
+          {stages.map(s => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+        <span className="mt-1 block text-xs text-[var(--crm-muted)]">
+          {daysInStage(r.stage_since) === 0
+            ? t('portal.crm.accounts.in_stage_today')
+            : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
+        </span>
+        {/* Quản trị thấy badge vàng + nút duyệt ngay tại chỗ */}
+        {r.won_requested_at && !r.stage_locked && profile.role === 'admin' && (
+          <span className="mt-1 flex items-center gap-1">
+            <span className="inline-flex items-center gap-1 rounded-full border border-[#fbbf24]/40 px-2 py-0.5 text-xs text-[#fbbf24]">
+              <span className="material-symbols-outlined text-[13px]">hourglass_top</span>
+              {t('portal.crm.accounts.pending_confirm')}
+            </span>
+            {(() => {
+              const won = stages.find(s => s.forecast === 'won');
+              return won ? (
+                <button
+                  onClick={() => void changeStage(r, won.id)}
+                  className="inline-flex items-center gap-1 rounded-full border border-[#34d399]/40 px-2 py-0.5 text-xs text-[#34d399] hover:bg-[#34d399]/10"
+                >
+                  <span className="material-symbols-outlined text-[13px]">check</span>
+                  {t('portal.crm.accounts.confirm_now')}
+                </button>
+              ) : null;
+            })()}
+          </span>
+        )}
+        {r.stage_id != null && stages.find(s => s.id === r.stage_id)?.forecast === 'won' && (
+          <span className="mt-1 flex items-center gap-1 text-xs text-[#34d399]">
+            <span className="material-symbols-outlined text-[13px]">verified</span>
+            {t('portal.crm.accounts.confirmed')}
+          </span>
+        )}
+      </>
+    )
+  );
+
+  const renderEvidence = (r: CrmAccountListRow) => (
+    <button
+      onClick={() => setEvidencing(r)}
+      title={(evidCounts[r.id] ?? 0) > 0
+        ? `${evidCounts[r.id]} ${t('portal.crm.evidence.count_hint')}`
+        : t('portal.crm.evidence.none_hint')}
+      aria-label={t('portal.crm.evidence.title')}
+      className={`inline-flex items-center gap-1 rounded-lg border p-2 ${
+        (evidCounts[r.id] ?? 0) > 0
+          ? 'border-[#34d399]/40 text-[#34d399]'
+          : 'border-[var(--crm-line)] text-[var(--crm-muted)] hover:text-[var(--crm-text)]'
+      }`}
+    >
+      <span className="material-symbols-outlined text-[18px]">
+        {(evidCounts[r.id] ?? 0) > 0 ? 'verified' : 'photo_camera'}
+      </span>
+      {(evidCounts[r.id] ?? 0) > 0 && (
+        <span className="font-mono text-xs tabular-nums">{evidCounts[r.id]}</span>
+      )}
+    </button>
+  );
+
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
@@ -397,7 +490,7 @@ export default function CrmAccountsPage() {
         </button>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
+      <div className="hidden overflow-x-auto rounded-2xl border border-[var(--crm-line)] md:block">
         <table className="w-full min-w-[1240px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
@@ -437,7 +530,11 @@ export default function CrmAccountsPage() {
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-[var(--crm-muted)]">{r.phone ?? '—'}</td>
+                <td className="px-4 py-3 text-[var(--crm-muted)]" onClick={e => e.stopPropagation()}>
+                  {r.phone
+                    ? <a href={`tel:${r.phone}`} className="hover:text-[#00daf3]">{r.phone}</a>
+                    : '—'}
+                </td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
                 {/* stopPropagation: gõ số máy không được mở ngăn kéo chi tiết.
@@ -472,102 +569,72 @@ export default function CrmAccountsPage() {
                 </td>
                 {/* stopPropagation: bấm vào ô chọn không được mở ngăn kéo chi tiết */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                  {r.won_requested_at && !r.stage_locked && profile.role !== 'admin' ? (
-                    /* Nhân viên đã bấm Hoàn thành: trạng thái đọc thẳng là "Hoàn
-                       thành đơn — chờ xác nhận", thay hẳn ô chọn cho tới khi quản
-                       trị duyệt (hoặc nhân viên huỷ yêu cầu). */
-                    <>
-                      <span className="inline-flex items-center gap-1 rounded-full border border-[#fbbf24]/50 bg-[#fbbf24]/10 px-2.5 py-1.5 text-xs font-medium text-[#fbbf24]">
-                        <span className="material-symbols-outlined text-[14px]">hourglass_top</span>
-                        {stages.find(s => s.forecast === 'won')?.name ?? ''} · {t('portal.crm.accounts.pending_short')}
-                      </span>
-                      <button
-                        onClick={() => void cancelRequest(r)}
-                        className="mt-1 block text-xs text-[var(--crm-muted)] underline hover:text-[var(--crm-text)]"
-                      >
-                        {t('portal.crm.accounts.cancel_request')}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,
-                          nếu không macOS sẽ vẽ nền sáng và chữ màu bị chìm. */}
-                      {/* Khoá với nhân viên; quản trị vẫn đổi được để gỡ chốt sổ khi
-                          thao tác nhầm — trigger dưới DB cũng theo đúng luật này. */}
-                      <select
-                        aria-label={t('portal.crm.accounts.col_status')}
-                        value={r.stage_id ?? ''}
-                        disabled={r.stage_locked && profile.role !== 'admin'}
-                        title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : undefined}
-                        onChange={e => void changeStage(r, e.target.value)}
-                        className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)} ${r.stage_locked && profile.role !== 'admin' ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
-                      >
-                        {stages.map(s => (
-                          <option key={s.id} value={s.id}>{s.name}</option>
-                        ))}
-                      </select>
-                      <span className="mt-1 block text-xs text-[var(--crm-muted)]">
-                        {daysInStage(r.stage_since) === 0
-                          ? t('portal.crm.accounts.in_stage_today')
-                          : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
-                      </span>
-                      {/* Quản trị thấy badge vàng + nút duyệt ngay tại chỗ */}
-                      {r.won_requested_at && !r.stage_locked && profile.role === 'admin' && (
-                        <span className="mt-1 flex items-center gap-1">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-[#fbbf24]/40 px-2 py-0.5 text-xs text-[#fbbf24]">
-                            <span className="material-symbols-outlined text-[13px]">hourglass_top</span>
-                            {t('portal.crm.accounts.pending_confirm')}
-                          </span>
-                          {(() => {
-                            const won = stages.find(s => s.forecast === 'won');
-                            return won ? (
-                              <button
-                                onClick={() => void changeStage(r, won.id)}
-                                className="inline-flex items-center gap-1 rounded-full border border-[#34d399]/40 px-2 py-0.5 text-xs text-[#34d399] hover:bg-[#34d399]/10"
-                              >
-                                <span className="material-symbols-outlined text-[13px]">check</span>
-                                {t('portal.crm.accounts.confirm_now')}
-                              </button>
-                            ) : null;
-                          })()}
-                        </span>
-                      )}
-                      {r.stage_id != null && stages.find(s => s.id === r.stage_id)?.forecast === 'won' && (
-                        <span className="mt-1 flex items-center gap-1 text-xs text-[#34d399]">
-                          <span className="material-symbols-outlined text-[13px]">verified</span>
-                          {t('portal.crm.accounts.confirmed')}
-                        </span>
-                      )}
-                    </>
-                  )}
+                  {renderStatus(r)}
                 </td>
                 {/* stopPropagation: bấm nút chứng cứ không được mở trang chi tiết.
                     Có chứng cứ: huy hiệu xanh + số lượng; chưa có: máy ảnh xám. */}
                 <td className="whitespace-nowrap px-2 py-3 text-center" onClick={e => e.stopPropagation()}>
-                  <button
-                    onClick={() => setEvidencing(r)}
-                    title={(evidCounts[r.id] ?? 0) > 0
-                      ? `${evidCounts[r.id]} ${t('portal.crm.evidence.count_hint')}`
-                      : t('portal.crm.evidence.none_hint')}
-                    aria-label={t('portal.crm.evidence.title')}
-                    className={`inline-flex items-center gap-1 rounded-lg border p-1.5 ${
-                      (evidCounts[r.id] ?? 0) > 0
-                        ? 'border-[#34d399]/40 text-[#34d399]'
-                        : 'border-[var(--crm-line)] text-[var(--crm-muted)] hover:text-[var(--crm-text)]'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">
-                      {(evidCounts[r.id] ?? 0) > 0 ? 'verified' : 'photo_camera'}
-                    </span>
-                    {(evidCounts[r.id] ?? 0) > 0 && (
-                      <span className="font-mono text-xs tabular-nums">{evidCounts[r.id]}</span>
-                    )}
-                  </button>
+                  {renderEvidence(r)}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+      {/* Mobile: mỗi khách một thẻ — gọi/Zalo/trạng thái/chứng cứ trong tầm ngón tay */}
+      <div className="space-y-3 md:hidden">
+        {busy && (
+          <p className="py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>
+        )}
+        {!busy && filtered.length === 0 && (
+          <p className="py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</p>
+        )}
+        {pageRows.map(r => (
+          <article
+            key={r.id}
+            onClick={() => router.push(`/portal/crm/accounts/detail?id=${r.id}`)}
+            className="cursor-pointer rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-[var(--crm-text)]">{r.name}</p>
+                <p className="mt-0.5 text-xs text-[var(--crm-muted)]">
+                  <span className="font-mono text-[#00daf3]">{r.code}</span>
+                  {' · '}
+                  {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
+                  {r.total_quantity > 0 && <> · {r.total_quantity} {t('portal.crm.opp.machines')}</>}
+                </p>
+              </div>
+              <span onClick={e => e.stopPropagation()}>{renderEvidence(r)}</span>
+            </div>
+            {(r.phone || r.zalo_phone) && (
+              <div className="mt-3 flex flex-wrap gap-2" onClick={e => e.stopPropagation()}>
+                {r.phone && (
+                  <a
+                    href={`tel:${r.phone}`}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#00daf3]/40 px-3 py-2 text-sm text-[#00daf3]"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">call</span>
+                    {r.phone}
+                  </a>
+                )}
+                {(r.zalo_phone || r.phone) && (
+                  <a
+                    href={`https://zalo.me/${(r.zalo_phone || r.phone || '').replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--crm-line)] px-3 py-2 text-sm text-[var(--crm-text)]"
+                  >
+                    Zalo
+                  </a>
+                )}
+              </div>
+            )}
+            <div className="mt-3" onClick={e => e.stopPropagation()}>
+              {renderStatus(r)}
+            </div>
+          </article>
+        ))}
       </div>
 
       {/* Chỉ hiện khi vượt một trang — đội 2 nhân viên hiện tại sẽ không thấy nó */}
