@@ -231,11 +231,19 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
 
           <div>
             <label className={label} htmlFor="crm-opp-trial">{t('portal.crm.opp.trial_days')}</label>
-            <input
-              id="crm-opp-trial" type="number" min={0} max={365} className={field}
+            {/* Không phải dùng thử: khách mua đứt, đây là chương trình cam kết hoàn
+                tiền theo phiếu CS-HT30 — chỉ có hai mốc 30 ngày và gia hạn 60 ngày. */}
+            <select
+              id="crm-opp-trial" className={field}
               value={trialDays} onChange={e => setTrialDays(e.target.value)}
-              placeholder="30"
-            />
+            >
+              <option value="">{t('portal.crm.opp.companion_none')}</option>
+              <option value="30">{t('portal.crm.opp.companion_30')}</option>
+              <option value="60">{t('portal.crm.opp.companion_60')}</option>
+              {trialDays !== '' && trialDays !== '30' && trialDays !== '60' && (
+                <option value={trialDays}>{trialDays} {t('portal.crm.opp.days')}</option>
+              )}
+            </select>
             <p className="mt-1 text-xs text-[var(--crm-muted)]">{t('portal.crm.opp.trial_hint')}</p>
           </div>
 
