@@ -1110,6 +1110,15 @@ export async function requestAccountCompletion(accountId: string, staffId: strin
   if (error) throw error;
 }
 
+/** Nhân viên rút lại yêu cầu hoàn thành khi khách đổi ý. */
+export async function cancelAccountCompletionRequest(accountId: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_accounts')
+    .update({ won_requested_at: null, won_requested_by: null })
+    .eq('id', accountId);
+  if (error) throw error;
+}
+
 // ── Tháng lịch Việt Nam ──
 
 /** Mùng 1 tháng hiện tại theo giờ Việt Nam, dạng yyyy-mm-dd — trang KPI dùng
