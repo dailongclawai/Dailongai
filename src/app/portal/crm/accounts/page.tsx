@@ -43,7 +43,7 @@ function daysInStage(since: string): number {
   return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86400000));
 }
 
-type SortKey = 'code' | 'name' | 'machines' | 'commission' | 'created' | 'status';
+type SortKey = 'code' | 'name' | 'machines' | 'commission' | 'created' | 'status' | 'owner';
 const PAGE_SIZE = 50;
 
 export default function CrmAccountsPage() {
@@ -67,6 +67,9 @@ export default function CrmAccountsPage() {
   const [sortKey, setSortKey] = useState<SortKey>('created');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(0);
+  // Admin lọc bảng theo nhân viên phụ trách; nhân viên thường chỉ thấy khách mình.
+  const [ownerFilter, setOwnerFilter] = useState<string>('all');
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -229,15 +232,26 @@ export default function CrmAccountsPage() {
     }
   };
 
+  // Danh sách nhân viên cho ô lọc — gom từ chính dữ liệu bảng, khỏi gọi thêm API.
+  const owners = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const r of rows) {
+      if (r.owner_id && !m.has(r.owner_id)) m.set(r.owner_id, r.owner_name ?? r.owner_email ?? '—');
+    }
+    return [...m.entries()].map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  }, [rows]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return rows.filter(r => {
       if (kind !== 'all' && r.kind !== kind) return false;
       if (org !== 'all' && r.org_type !== org) return false;
+      if (isAdmin && ownerFilter !== 'all' && r.owner_id !== ownerFilter) return false;
       if (!needle) return true;
       return [r.name, r.phone, r.code, r.province].some(v => (v ?? '').toLowerCase().includes(needle));
     });
-  }, [rows, kind, org, q]);
+  }, [rows, kind, org, q, isAdmin, ownerFilter]);
 
   const sorted = useMemo(() => {
     const dir = sortDir === 'asc' ? 1 : -1;
@@ -248,6 +262,7 @@ export default function CrmAccountsPage() {
         case 'machines': return r.total_quantity;
         case 'commission': return Number(r.expected_commission);
         case 'status': return r.status_label;
+        case 'owner': return (r.owner_name ?? '').toLowerCase();
         default: return r.created_at;
       }
     };
@@ -269,7 +284,7 @@ export default function CrmAccountsPage() {
   const pageRows = sorted.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   // Đổi bộ lọc hay cách sắp thì quay về trang đầu, kẻo đứng ở trang không còn dòng nào.
-  useEffect(() => { setPage(0); }, [q, kind, org, sortKey, sortDir]);
+  useEffect(() => { setPage(0); }, [q, kind, org, ownerFilter, sortKey, sortDir]);
 
   const toggleSort = (k: SortKey) => {
     if (sortKey === k) {
@@ -458,6 +473,17 @@ export default function CrmAccountsPage() {
           <option value="all">{t('portal.crm.accounts.all_orgs')}</option>
           {ORG_TYPES.map(o => <option key={o} value={o}>{t('portal.crm.org.' + o)}</option>)}
         </select>
+        {isAdmin && (
+          <select
+            className={field}
+            value={ownerFilter}
+            onChange={e => setOwnerFilter(e.target.value)}
+            aria-label={t('portal.crm.account.owner')}
+          >
+            <option value="all">{t('portal.crm.accounts.all_owners')}</option>
+            {owners.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+          </select>
+        )}
         <button
           onClick={exportExcel}
           disabled={sorted.length === 0}
@@ -500,6 +526,7 @@ export default function CrmAccountsPage() {
               <th className="px-4 py-3">{t('portal.crm.account.phone')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.province')}</th>
               <th className="px-4 py-3">{t('portal.crm.account.source')}</th>
+              {isAdmin && sortTh('owner', 'portal.crm.account.owner')}
               {sortTh('machines', 'portal.crm.accounts.col_machines', true)}
               {sortTh('commission', 'portal.crm.accounts.col_commission', true)}
               {sortTh('created', 'portal.crm.accounts.col_created')}
@@ -509,10 +536,10 @@ export default function CrmAccountsPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={isAdmin ? 12 : 11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={isAdmin ? 12 : 11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {pageRows.map(r => (
               <tr
@@ -537,6 +564,9 @@ export default function CrmAccountsPage() {
                 </td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.province ?? '—'}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.source ? t('portal.crm.source.' + r.source) : '—'}</td>
+                {isAdmin && (
+                  <td className="whitespace-nowrap px-4 py-3 text-[#00daf3]">{r.owner_name ?? '—'}</td>
+                )}
                 {/* stopPropagation: gõ số máy không được mở ngăn kéo chi tiết.
                     key gắn số hiện tại để ô nhập nhận lại giá trị sau khi tải lại. */}
                 <td className="whitespace-nowrap px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
@@ -603,6 +633,7 @@ export default function CrmAccountsPage() {
                   {' · '}
                   {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
                   {r.total_quantity > 0 && <> · {r.total_quantity} {t('portal.crm.opp.machines')}</>}
+                  {isAdmin && r.owner_name && <> · <span className="text-[#00daf3]">{r.owner_name}</span></>}
                 </p>
               </div>
               <span onClick={e => e.stopPropagation()}>{renderEvidence(r)}</span>
