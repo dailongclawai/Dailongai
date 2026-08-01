@@ -75,7 +75,10 @@ export function PortalShell({
     if (tokens.length === 1) return tokens[0].slice(0, 2).toUpperCase();
     return (tokens[0][0] + tokens[tokens.length - 1][0]).toUpperCase();
   })();
-  const roleLabel = variant === 'admin' ? t('portal.shell.role.admin') : variant === 'supervisor' ? t('portal.shell.role.supervisor') : t('portal.shell.role.dealer');
+  const roleLabel = variant === 'admin' ? t('portal.shell.role.admin')
+    : variant === 'supervisor' ? t('portal.shell.role.supervisor')
+    : variant === 'staff' ? t('portal.shell.role.staff')
+    : t('portal.shell.role.dealer');
 
   const handleSignOut = async () => { await signOut(); router.replace('/portal/login'); };
 

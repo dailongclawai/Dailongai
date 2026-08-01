@@ -55,6 +55,7 @@ export default function CrmPipelinePage() {
 
   const columns = useMemo(() => groupByStage(stages, rows), [stages, rows]);
   const openRows = rows.filter(r => r.forecast === 'open');
+  const isAdmin = profile?.role === 'admin';
 
   const move = async (id: string, stageId: string, reasonId?: string, notes?: string) => {
     try {
@@ -125,12 +126,15 @@ export default function CrmPipelinePage() {
             </div>
             <div className="portal-scroll flex-1 space-y-2 overflow-y-auto pr-1">
               {col.rows.map(r => (
+                // Thẻ đã thắng/thua là sổ đã gấp: nhân viên không kéo lại được,
+                // quản trị kéo được để sửa thao tác nhầm (DB cũng chặn tầng dưới).
                 <article
                   key={r.id}
-                  draggable
-                  onDragStart={() => setDragId(r.id)}
+                  draggable={r.forecast === 'open' || isAdmin}
+                  title={r.forecast !== 'open' && !isAdmin ? t('portal.crm.pipeline.closed_card') : undefined}
+                  onDragStart={() => { if (r.forecast === 'open' || isAdmin) setDragId(r.id); }}
                   onClick={() => { setEditing(r); setDrawerOpen(true); }}
-                  className="cursor-grab rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#ff5625]"
+                  className={`rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#ff5625] ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
                 >
                   <p className="text-sm font-semibold text-[var(--crm-text)]">{r.name}</p>
                   <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.account_name}</p>

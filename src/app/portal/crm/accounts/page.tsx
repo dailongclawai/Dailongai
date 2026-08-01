@@ -102,6 +102,12 @@ export default function CrmAccountsPage() {
       setLosing({ account, stage });
       return;
     }
+    // Bước thắng/thua là chốt sổ: sau đó chỉ quản trị đổi lại được, nên hỏi
+    // lại một câu trước khi khoá. Nhánh trên đã có hộp lý do làm việc này rồi.
+    if (stage && stage.forecast !== 'open'
+      && !window.confirm(`${stage.name} — ${t('portal.crm.accounts.close_confirm')}`)) {
+      return;
+    }
     const before = rows;
     setRows(rs => rs.map(r => r.id === account.id
       ? { ...r, stage_id: stageId, status_label: stage?.name ?? r.status_label }
@@ -313,13 +319,15 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                   {/* color-scheme dark: bắt trình duyệt vẽ hộp thả xuống theo nền tối,
                       nếu không macOS sẽ vẽ nền sáng và chữ màu bị chìm. */}
+                  {/* Khoá với nhân viên; quản trị vẫn đổi được để gỡ chốt sổ khi
+                      thao tác nhầm — trigger dưới DB cũng theo đúng luật này. */}
                   <select
                     aria-label={t('portal.crm.accounts.col_status')}
                     value={r.stage_id ?? ''}
-                    disabled={r.stage_locked}
+                    disabled={r.stage_locked && profile.role !== 'admin'}
                     title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : undefined}
                     onChange={e => void changeStage(r, e.target.value)}
-                    className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)} ${r.stage_locked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                    className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff5625] ${STATUS_STYLE(r.status_label)} ${r.stage_locked && profile.role !== 'admin' ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                   >
                     {stages.map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>

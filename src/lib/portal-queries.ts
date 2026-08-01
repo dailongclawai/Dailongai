@@ -1,6 +1,6 @@
 import { getSupabaseClient } from './supabase';
 import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue,
-  CrmTimelineEntry, CrmFollowupRow, CrmOrgType } from './portal-types';
+  CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -741,7 +741,10 @@ export async function lookupCrmPhones(phones: string[]): Promise<CrmPhoneMatch[]
 }
 
 export async function updateCrmAccount(id: string, input: CrmAccountInput): Promise<void> {
-  const { error } = await getSupabaseClient().from('crm_accounts').update(crmAccountRow(input)).eq('id', id);
+  // KHÔNG ghi đè owner_id khi sửa: admin sửa hộ mà mang theo owner_id của mình
+  // là cướp luôn khách của nhân viên. Đổi chủ đi đường bàn giao chính thức.
+  const { owner_id: _owner, ...row } = crmAccountRow(input);
+  const { error } = await getSupabaseClient().from('crm_accounts').update(row).eq('id', id);
   if (error) throw error;
 }
 
@@ -810,7 +813,10 @@ export async function createCrmOpportunity(input: CrmOpportunityInput): Promise<
 }
 
 export async function updateCrmOpportunity(id: string, input: CrmOpportunityInput): Promise<void> {
-  const { error } = await getSupabaseClient().from('crm_opportunities').update(crmOpportunityRow(input)).eq('id', id);
+  // Cùng lý do với updateCrmAccount: sửa hộ không được đổi chủ, kẻo hoa hồng
+  // về sau tính cho nhầm người.
+  const { owner_id: _owner, ...row } = crmOpportunityRow(input);
+  const { error } = await getSupabaseClient().from('crm_opportunities').update(row).eq('id', id);
   if (error) throw error;
 }
 
@@ -841,10 +847,44 @@ export async function moveOpportunityStage(
 export async function getCrmSettings(): Promise<CrmSettings | null> {
   const { data, error } = await getSupabaseClient()
     .from('crm_settings')
-    .select('staff_rate, dealer_discount_min')
+    .select('staff_rate, dealer_discount_min, followup_stale_days')
     .maybeSingle();
   if (error) throw error;
   return (data as CrmSettings) ?? null;
+}
+
+/** Chỉ admin qua được RLS; người khác gọi sẽ nhận lỗi từ chính sách ghi. */
+export async function updateCrmSettings(input: CrmSettings): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_settings')
+    .update({
+      staff_rate: input.staff_rate,
+      dealer_discount_min: input.dealer_discount_min,
+      followup_stale_days: input.followup_stale_days,
+    })
+    .eq('id', true);
+  if (error) throw error;
+}
+
+/** Danh bạ nhân viên kinh doanh, dùng cho ô chọn người nhận bàn giao. */
+export async function getStaffPeers(): Promise<StaffPeer[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_staff_directory')
+    .select('*')
+    .order('full_name');
+  if (error) throw error;
+  return (data as StaffPeer[]) ?? [];
+}
+
+/** Bàn giao khách: khách + liên hệ + cơ hội đang mở + việc chưa xong sang người
+ *  nhận. RPC dưới DB kiểm quyền (người phụ trách hoặc admin). */
+export async function transferCrmAccount(accountId: string, toStaffId: string, note: string): Promise<void> {
+  const { error } = await getSupabaseClient().rpc('staff_handover_account', {
+    p_account_id: accountId,
+    p_to_staff: toStaffId,
+    p_note: note.trim() || null,
+  });
+  if (error) throw error;
 }
 
 /** Đơn giá gợi ý cho một model theo loại khách: đại lý phải được chiết khấu ít

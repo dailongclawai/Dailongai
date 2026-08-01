@@ -11,6 +11,7 @@ import {
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
+import { CrmTransferDialog } from '@/components/portal/CrmTransferDialog';
 import type {
   CrmAccountListRow, CrmOpportunityBoardRow, CrmTimelineEntry,
 } from '@/lib/portal-types';
@@ -32,6 +33,7 @@ function AccountDetail() {
   const [tab, setTab] = useState<Tab>('overview');
   const [busy, setBusy] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [transferring, setTransferring] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -99,6 +101,16 @@ function AccountDetail() {
                   {account.province && ` · ${account.province}`}
                 </p>
               </div>
+              {/* Bàn giao chỉ hiện với người đang phụ trách hoặc quản trị —
+                  đúng nhóm mà RPC dưới DB sẽ cho qua. */}
+              {(profile.role === 'admin' || account.owner_id === profile.id) && (
+                <button
+                  onClick={() => setTransferring(true)}
+                  className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#00daf3]"
+                >
+                  {t('portal.crm.transfer.title')}
+                </button>
+              )}
               <button
                 onClick={() => setEditing(true)}
                 className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#ff5625]"
@@ -232,6 +244,15 @@ function AccountDetail() {
             ownerId={profile.id}
             onClose={() => setEditing(false)}
             onSaved={load}
+          />
+
+          <CrmTransferDialog
+            open={transferring}
+            accountId={account.id}
+            accountName={account.name}
+            currentOwnerId={account.owner_id}
+            onClose={() => setTransferring(false)}
+            onDone={load}
           />
         </>
       )}

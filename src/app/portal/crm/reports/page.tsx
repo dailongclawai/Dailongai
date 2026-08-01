@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmReconIssues, getCrmStaffReport } from '@/lib/portal-queries';
+import { getCrmReconIssues, getCrmSettings, getCrmStaffReport, updateCrmSettings } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
-import type { CrmReconIssue, CrmStaffReportRow } from '@/lib/portal-types';
+import type { CrmReconIssue, CrmSettings, CrmStaffReportRow } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -18,6 +19,12 @@ export default function CrmReportsPage() {
   const [rows, setRows] = useState<CrmStaffReportRow[]>([]);
   const [issues, setIssues] = useState<CrmReconIssue[]>([]);
   const [busy, setBusy] = useState(true);
+  // Cấu hình giữ dạng chữ trong ô nhập, chỉ đổi ra số lúc lưu — gõ dở "1"
+  // trên đường tới "15" mà ép số ngay thì ô nhảy lung tung.
+  const [rate, setRate] = useState('');
+  const [minDisc, setMinDisc] = useState('');
+  const [staleDays, setStaleDays] = useState('');
+  const [savingCfg, setSavingCfg] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -33,13 +40,40 @@ export default function CrmReportsPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [report, recon] = await Promise.all([getCrmStaffReport(), getCrmReconIssues()]);
+      const [report, recon, cfg] = await Promise.all([
+        getCrmStaffReport(), getCrmReconIssues(), getCrmSettings(),
+      ]);
       setRows(report);
       setIssues(recon);
+      if (cfg) {
+        setRate(String(Math.round(cfg.staff_rate * 1000) / 10));
+        setMinDisc(String(Math.round(cfg.dealer_discount_min * 1000) / 10));
+        setStaleDays(String(cfg.followup_stale_days));
+      }
     } finally {
       setBusy(false);
     }
   }, []);
+
+  const saveCfg = async () => {
+    const staffRate = Number(rate) / 100;
+    const discMin = Number(minDisc) / 100;
+    const days = Math.round(Number(staleDays));
+    if (!(staffRate > 0 && staffRate <= 1) || !(discMin >= 0 && discMin < 1) || !(days >= 1 && days <= 90)) {
+      toast.error(t('portal.crm.settings.invalid'));
+      return;
+    }
+    setSavingCfg(true);
+    try {
+      await updateCrmSettings({ staff_rate: staffRate, dealer_discount_min: discMin, followup_stale_days: days });
+      toast.success(t('portal.crm.settings.saved'));
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSavingCfg(false);
+    }
+  };
 
   useEffect(() => {
     if (session && profile?.role === 'admin') void load();
@@ -49,6 +83,7 @@ export default function CrmReportsPage() {
     won: rows.reduce((a, r) => a + Number(r.deals_won), 0),
     open: rows.reduce((a, r) => a + Number(r.deals_open), 0),
     total: rows.reduce((a, r) => a + Number(r.commission_total), 0),
+    pending: rows.reduce((a, r) => a + Number(r.amount_pending), 0),
     payable: rows.reduce((a, r) => a + Number(r.amount_payable), 0),
     paid: rows.reduce((a, r) => a + Number(r.amount_paid), 0),
   }), [rows]);
@@ -76,10 +111,10 @@ export default function CrmReportsPage() {
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={8} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && rows.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
+              <tr><td colSpan={8} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
             )}
             {rows.map(r => (
               <tr key={r.staff_id} className="border-t border-[var(--crm-line)]">
@@ -90,6 +125,7 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.deals_open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(Number(r.commission_total))}đ</td>
+                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(Number(r.amount_pending))}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(Number(r.amount_payable))}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(Number(r.amount_paid))}đ</td>
               </tr>
@@ -101,6 +137,7 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{totals.won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{totals.open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(totals.total)}đ</td>
+                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(totals.pending)}đ</td>
                 <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(totals.payable)}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>
@@ -164,6 +201,53 @@ export default function CrmReportsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Cấu hình CRM — trước đây chỉ sửa được bằng SQL tay */}
+      <div className="mt-8 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-5">
+        <h2 className="crm-display mb-1 text-[18px] font-medium text-[var(--crm-text)]">
+          {t('portal.crm.settings.title')}
+        </h2>
+        <p className="mb-4 text-xs text-[var(--crm-muted)]">{t('portal.crm.settings.hint')}</p>
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="cfg-rate">
+              {t('portal.crm.settings.staff_rate')}
+            </label>
+            <input
+              id="cfg-rate" type="number" min={0.1} max={100} step={0.1} value={rate}
+              onChange={e => setRate(e.target.value)}
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="cfg-disc">
+              {t('portal.crm.settings.dealer_discount_min')}
+            </label>
+            <input
+              id="cfg-disc" type="number" min={0} max={99} step={0.1} value={minDisc}
+              onChange={e => setMinDisc(e.target.value)}
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor="cfg-stale">
+              {t('portal.crm.settings.followup_stale_days')}
+            </label>
+            <input
+              id="cfg-stale" type="number" min={1} max={90} step={1} value={staleDays}
+              onChange={e => setStaleDays(e.target.value)}
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+            />
+          </div>
+          <button
+            onClick={() => void saveCfg()}
+            disabled={savingCfg}
+            className="rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+          >
+            {savingCfg ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
+          </button>
+        </div>
       </div>
     </PortalShell>
   );

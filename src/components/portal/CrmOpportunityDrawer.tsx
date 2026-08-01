@@ -70,7 +70,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     setQuantity(row?.quantity ?? 1);
     setAmount(row ? Number(row.amount) : 0);
     setCloseDate(row?.expected_close_date ?? '');
-    setNotes('');
+    setNotes(row?.notes ?? '');
     setLostReasonId(row?.lost_reason_id ?? '');
     setLostNotes(row?.lost_notes ?? '');
     setOrderId(row?.order_id ?? '');

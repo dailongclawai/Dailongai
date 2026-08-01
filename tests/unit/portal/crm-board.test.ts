@@ -16,7 +16,7 @@ const row = (id: string, stage_id: string, amount: number, probability: number):
   account_id: 'a1', account_name: 'Cô Lan', account_phone: null, account_kind: 'customer',
   contact_id: null, model_id: null, order_id: null, closed_at: null,
   lost_reason_id: null, lost_reason_name: null, lost_notes: null,
-  created_at: '2026-07-27T00:00:00Z',
+  created_at: '2026-07-27T00:00:00Z', notes: null,
 });
 
 describe('groupByStage', () => {

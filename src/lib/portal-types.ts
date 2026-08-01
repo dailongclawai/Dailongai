@@ -326,6 +326,7 @@ export interface CrmOpportunityBoardRow {
   lost_reason_name: string | null;
   lost_notes: string | null;
   created_at: string;
+  notes: string | null;
 }
 
 /** Danh mục lý do mất, dùng chung cho mọi cơ hội. */
@@ -383,6 +384,8 @@ export interface CrmSettings {
   staff_rate: number;
   /** Chiết khấu tối thiểu phải dành cho đại lý. Boss chốt 01/08/2026: 15%. */
   dealer_discount_min: number;
+  /** Bao nhiêu ngày không ai động tới thì cơ hội bị coi là đứng yên. */
+  followup_stale_days: number;
 }
 
 /** Dòng đối soát cho quản trị. `won_no_order` = cơ hội đã thắng nhưng chưa gắn
@@ -427,6 +430,7 @@ export interface CrmStaffReportRow {
   deals_won: number;
   deals_open: number;
   commission_total: string;
+  amount_pending: string;
   amount_payable: string;
   amount_paid: string;
 }

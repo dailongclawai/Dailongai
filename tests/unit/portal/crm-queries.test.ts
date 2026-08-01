@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createCrmAccount, moveOpportunityStage, completeActivity } from '@/lib/portal-queries';
+import {
+  createCrmAccount, moveOpportunityStage, completeActivity,
+  updateCrmAccount, updateCrmOpportunity,
+} from '@/lib/portal-queries';
 
 const insertMock = vi.fn().mockResolvedValue({ data: null, error: null });
 const updateEqMock = vi.fn().mockResolvedValue({ data: null, error: null });
+const updateMock = vi.fn((..._args: unknown[]) => ({ eq: updateEqMock }));
 const fromMock = vi.fn(() => ({
   insert: insertMock,
-  update: vi.fn(() => ({ eq: updateEqMock })),
+  update: updateMock,
 }));
 
 vi.mock('@/lib/supabase', () => ({
@@ -15,6 +19,7 @@ vi.mock('@/lib/supabase', () => ({
 beforeEach(() => {
   fromMock.mockClear();
   insertMock.mockClear();
+  updateMock.mockClear();
   updateEqMock.mockClear();
 });
 
@@ -31,6 +36,26 @@ describe('createCrmAccount', () => {
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Cô Lan', owner_id: 'owner-1', source: 'zalo' }),
     );
+  });
+});
+
+// Sửa hộ không được đổi chủ: payload UPDATE tuyệt đối không mang owner_id,
+// kẻo admin mở drawer sửa giúp là cướp luôn khách/hoa hồng của nhân viên.
+describe('updateCrmAccount', () => {
+  it('không ghi đè owner_id khi sửa khách', async () => {
+    await updateCrmAccount('acc-1', { name: 'Cô Lan', kind: 'customer', ownerId: 'editor-9' });
+    expect(updateMock.mock.calls[0][0]).not.toHaveProperty('owner_id');
+    expect(updateEqMock).toHaveBeenCalledWith('id', 'acc-1');
+  });
+});
+
+describe('updateCrmOpportunity', () => {
+  it('không ghi đè owner_id khi sửa cơ hội', async () => {
+    await updateCrmOpportunity('opp-1', {
+      accountId: 'a1', stageId: 's1', name: 'Đơn máy', amount: 1_000_000, ownerId: 'editor-9',
+    });
+    expect(updateMock.mock.calls[0][0]).not.toHaveProperty('owner_id');
+    expect(updateEqMock).toHaveBeenCalledWith('id', 'opp-1');
   });
 });
 
