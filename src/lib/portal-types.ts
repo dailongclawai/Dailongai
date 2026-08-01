@@ -466,3 +466,22 @@ export interface CrmSourceReportRow {
   deals_won: number;
   won_value: string;
 }
+
+/** Mục tiêu tháng của một nhân viên. thang luôn là mùng 1. */
+export interface CrmTarget {
+  id: string;
+  staff_id: string;
+  thang: string;
+  target_won_value: string;
+  target_won_deals: number;
+}
+
+/** crm_target_progress: mục tiêu + thực đạt THÁNG HIỆN TẠI (tháng lịch giờ VN). */
+export interface CrmTargetProgress {
+  staff_id: string;
+  thang: string;
+  target_won_value: string;
+  target_won_deals: number;
+  actual_won_value: string;
+  actual_won_deals: number;
+}

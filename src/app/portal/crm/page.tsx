@@ -5,12 +5,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages, getStaffPeers } from '@/lib/portal-queries';
+import {
+  getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages, getCrmTargetProgress, getStaffPeers,
+} from '@/lib/portal-queries';
 import { staffPeriodStats, sumAmount, weightedForecast, type TeamPeriod } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import type {
-  CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage, StaffPeer,
+  CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage, CrmTargetProgress, StaffPeer,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -58,6 +60,8 @@ export default function CrmDashboardPage() {
   const [peers, setPeers] = useState<StaffPeer[]>([]);
   const [staffFilter, setStaffFilter] = useState<string>('all');
   const [period, setPeriod] = useState<TeamPeriod>('today');
+  // RLS tự cắt: nhân viên nhận đúng dòng của mình, quản trị nhận cả đội.
+  const [targetProgress, setTargetProgress] = useState<CrmTargetProgress[]>([]);
 
   const isAdmin = profile?.role === 'admin';
 
@@ -83,16 +87,18 @@ export default function CrmDashboardPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [s, r, a, c] = await Promise.all([
+      const [s, r, a, c, tp] = await Promise.all([
         getCrmStages(),
         getCrmBoard(),
         getCrmActivities(),
         getCrmAccounts(),
+        getCrmTargetProgress().catch(() => [] as CrmTargetProgress[]),
       ]);
       setStages(s);
       setRows(r);
       setActivities(a);
       setAccounts(c);
+      setTargetProgress(tp);
       setLoadedAt(new Date().toLocaleString('vi-VN', {
         hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric',
       }));
@@ -231,6 +237,36 @@ export default function CrmDashboardPage() {
         )}
       </div>
 
+      {/* Nhân viên thấy tiến độ mục tiêu tháng của chính mình ngay đầu trang */}
+      {!isAdmin && targetProgress.length > 0 && Number(targetProgress[0].target_won_value) > 0 && (() => {
+        const pr = targetProgress[0];
+        const target = Number(pr.target_won_value);
+        const actual = Number(pr.actual_won_value);
+        const pct = Math.round((actual / target) * 100);
+        return (
+          <div className={`${card} mb-6 p-4`}>
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="material-symbols-outlined text-[20px] text-[#00daf3]">flag</span>
+              <p className="mr-auto text-sm text-[var(--crm-text)]">
+                {t('portal.crm.dash.col_target')}:{' '}
+                <b className="font-mono tabular-nums">{fmtVnd(actual)}đ</b>
+                <span className="text-[var(--crm-muted)]"> / {fmtVnd(target)}đ</span>
+                <span className={`ml-2 ${pct >= 100 ? 'text-[#34d399]' : 'text-[#00daf3]'}`}>({pct}%)</span>
+                <span className="ml-2 text-xs text-[var(--crm-muted)]">
+                  · {pr.actual_won_deals}/{pr.target_won_deals} deal
+                </span>
+              </p>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${Math.min(100, pct)}%`, backgroundColor: pct >= 100 ? '#34d399' : '#00daf3' }}
+              />
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Bảng số liệu từng nhân viên — chỉ quản trị. Tính từ dữ liệu chưa lọc
           nên vẫn đủ mọi dòng khi trang đang lọc theo một người. */}
       {isAdmin && (
@@ -266,6 +302,7 @@ export default function CrmDashboardPage() {
                   <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_new_accounts')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_won')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_won_value')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_target')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_done_tasks')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_count')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_value')}</th>
@@ -275,10 +312,10 @@ export default function CrmDashboardPage() {
               </thead>
               <tbody>
                 {busy && (
-                  <tr><td colSpan={10} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+                  <tr><td colSpan={11} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
                 )}
                 {!busy && teamStats.length === 0 && (
-                  <tr><td colSpan={10} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
+                  <tr><td colSpan={11} className="px-5 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</td></tr>
                 )}
                 {teamStats.map(s => (
                   <tr
@@ -308,6 +345,29 @@ export default function CrmDashboardPage() {
                     <td className="px-5 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
                       {fmtVnd(s.wonValue)}đ
                       <Delta cur={s.wonValue} prev={s.wonValuePrev} money />
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      {(() => {
+                        const pr = targetProgress.find(x => x.staff_id === s.peer.id);
+                        const target = pr ? Number(pr.target_won_value) : 0;
+                        if (!pr || target <= 0) return <span className="text-[var(--crm-muted)]">—</span>;
+                        const actual = Number(pr.actual_won_value);
+                        const pct = Math.round((actual / target) * 100);
+                        return (
+                          <span className="inline-block min-w-28">
+                            <span className="font-mono text-xs tabular-nums text-[var(--crm-text)]">
+                              {fmtShort(actual)} / {fmtShort(target)}
+                            </span>
+                            <span className={`ml-1 text-xs ${pct >= 100 ? 'text-[#34d399]' : 'text-[#00daf3]'}`}>{pct}%</span>
+                            <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+                              <span
+                                className="block h-full rounded-full"
+                                style={{ width: `${Math.min(100, pct)}%`, backgroundColor: pct >= 100 ? '#34d399' : '#00daf3' }}
+                              />
+                            </span>
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">
                       {s.doneTasks}

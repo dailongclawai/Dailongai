@@ -7,13 +7,15 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
   getCrmLostReasonReport, getCrmMonthlyReport, getCrmReconIssues, getCrmSettings,
-  getCrmSourceReport, getCrmStaffReport, updateCrmSettings,
+  getCrmSourceReport, getCrmStaffReport, getCrmTargetProgress, getCrmTargets,
+  getStaffPeers, updateCrmSettings, upsertCrmTarget,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
+import { HBarList, MonthlyBarChart } from '@/components/portal/CrmReportCharts';
 import type {
   CrmLostReasonReportRow, CrmMonthlyReportRow, CrmReconIssue, CrmSettings,
-  CrmSourceReportRow, CrmStaffReportRow,
+  CrmSourceReportRow, CrmStaffReportRow, CrmTargetProgress, StaffPeer,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -34,6 +36,11 @@ export default function CrmReportsPage() {
   const [minDisc, setMinDisc] = useState('');
   const [staleDays, setStaleDays] = useState('');
   const [savingCfg, setSavingCfg] = useState(false);
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
+  const [progress, setProgress] = useState<CrmTargetProgress[]>([]);
+  // Ô nhập giữ dạng chữ (triệu đồng / số deal), chỉ đổi ra số lúc lưu.
+  const [targetDraft, setTargetDraft] = useState<Record<string, { value: string; deals: string }>>({});
+  const [savingTargets, setSavingTargets] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -49,15 +56,27 @@ export default function CrmReportsPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [report, recon, cfg, byMonth, byReason, bySource] = await Promise.all([
+      const [report, recon, cfg, byMonth, byReason, bySource, staffList, targets, prog] = await Promise.all([
         getCrmStaffReport(), getCrmReconIssues(), getCrmSettings(),
         getCrmMonthlyReport(), getCrmLostReasonReport(), getCrmSourceReport(),
+        getStaffPeers(), getCrmTargets(), getCrmTargetProgress(),
       ]);
       setRows(report);
       setIssues(recon);
       setMonthly(byMonth);
       setLostReasons(byReason);
       setSources(bySource);
+      const staffOnly = staffList.filter(p => p.role === 'staff');
+      setPeers(staffOnly);
+      setProgress(prog);
+      const byStaff = new Map(targets.map(x => [x.staff_id, x]));
+      setTargetDraft(Object.fromEntries(staffOnly.map(p => {
+        const cur = byStaff.get(p.id);
+        return [p.id, {
+          value: cur ? String(Math.round(Number(cur.target_won_value) / 1e6)) : '',
+          deals: cur ? String(cur.target_won_deals) : '',
+        }];
+      })));
       if (cfg) {
         setRate(String(Math.round(cfg.staff_rate * 1000) / 10));
         setMinDisc(String(Math.round(cfg.dealer_discount_min * 1000) / 10));
@@ -67,6 +86,25 @@ export default function CrmReportsPage() {
       setBusy(false);
     }
   }, []);
+
+  const saveTargets = async () => {
+    setSavingTargets(true);
+    try {
+      for (const p of peers) {
+        const d = targetDraft[p.id];
+        if (!d) continue;
+        const value = Math.round((Number(d.value) || 0) * 1e6);
+        const deals = Math.round(Number(d.deals) || 0);
+        await upsertCrmTarget(p.id, value, deals);
+      }
+      toast.success(t('portal.crm.reports.target_saved'));
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSavingTargets(false);
+    }
+  };
 
   const saveCfg = async () => {
     const staffRate = Number(rate) / 100;
@@ -163,6 +201,19 @@ export default function CrmReportsPage() {
       <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
         {t('portal.crm.reports.monthly_title')}
       </h2>
+      {!busy && monthly.some(m => Number(m.won_value) > 0) && (
+        <div className="mb-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <MonthlyBarChart
+            ariaLabel={t('portal.crm.reports.monthly_title')}
+            data={[...monthly].reverse().map(m => ({
+              label: new Date(m.thang).toLocaleDateString('vi-VN', { month: '2-digit', year: '2-digit' }),
+              value: Number(m.won_value),
+              hint: `${new Date(m.thang).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}: `
+                + `${fmtVnd(Number(m.won_value))}đ · ${m.deals_won} deal · ${m.new_accounts} khách mới`,
+            }))}
+          />
+        </div>
+      )}
       <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
@@ -201,6 +252,18 @@ export default function CrmReportsPage() {
       <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
         {t('portal.crm.reports.source_title')}
       </h2>
+      {!busy && sources.length > 0 && (
+        <div className="mb-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <HBarList
+            color="#00daf3"
+            data={sources.map(s => ({
+              label: s.source ? t('portal.crm.source.' + s.source) : t('portal.crm.reports.no_source'),
+              value: s.accounts,
+              hint: `${s.deals_won} deal thắng · ${fmtVnd(Number(s.won_value))}đ`,
+            }))}
+          />
+        </div>
+      )}
       <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
@@ -236,6 +299,18 @@ export default function CrmReportsPage() {
       <h2 className="crm-display mt-8 mb-3 text-[18px] font-medium text-[var(--crm-text)]">
         {t('portal.crm.reports.lost_title')}
       </h2>
+      {!busy && lostReasons.length > 0 && (
+        <div className="mb-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <HBarList
+            color="#f87171"
+            data={lostReasons.map(r => ({
+              label: r.name,
+              value: r.deals_lost,
+              hint: `${fmtVnd(Number(r.lost_value))}đ`,
+            }))}
+          />
+        </div>
+      )}
       <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
         <table className="w-full min-w-[560px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
@@ -318,6 +393,83 @@ export default function CrmReportsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mục tiêu tháng cho từng nhân viên — thực đạt đo theo tháng lịch VN */}
+      <div className="mt-8 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-5">
+        <h2 className="crm-display mb-1 text-[18px] font-medium text-[var(--crm-text)]">
+          {t('portal.crm.reports.target_title')} · {new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}
+        </h2>
+        <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.reports.target_hint')}</p>
+        <div className="divide-y divide-[var(--crm-line)]">
+          {peers.map(p => {
+            const d = targetDraft[p.id] ?? { value: '', deals: '' };
+            const pr = progress.find(x => x.staff_id === p.id);
+            const target = pr ? Number(pr.target_won_value) : 0;
+            const actual = pr ? Number(pr.actual_won_value) : 0;
+            const pct = target > 0 ? Math.round((actual / target) * 100) : null;
+            return (
+              <div key={p.id} className="flex flex-wrap items-end gap-4 py-3">
+                <span className="w-52 text-sm text-[var(--crm-text)]">
+                  {p.full_name || p.email}
+                  {p.staff_segment && (
+                    <span className="ml-2 rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
+                      {p.staff_segment.toUpperCase()}
+                    </span>
+                  )}
+                </span>
+                <div>
+                  <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor={`tg-v-${p.id}`}>
+                    {t('portal.crm.reports.target_value')}
+                  </label>
+                  <input
+                    id={`tg-v-${p.id}`} type="number" min={0} step={10} value={d.value}
+                    onChange={e => setTargetDraft(prev => ({ ...prev, [p.id]: { ...d, value: e.target.value } }))}
+                    className="w-28 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs text-[var(--crm-muted)]" htmlFor={`tg-d-${p.id}`}>
+                    {t('portal.crm.reports.target_deals')}
+                  </label>
+                  <input
+                    id={`tg-d-${p.id}`} type="number" min={0} step={1} value={d.deals}
+                    onChange={e => setTargetDraft(prev => ({ ...prev, [p.id]: { ...d, deals: e.target.value } }))}
+                    className="w-20 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+                  />
+                </div>
+                {pr && target > 0 && (
+                  <div className="min-w-56 flex-1">
+                    <p className="text-xs text-[var(--crm-muted)]">
+                      {t('portal.crm.reports.target_actual')}:{' '}
+                      <span className="font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(actual)}đ</span>
+                      {' / '}
+                      <span className="font-mono tabular-nums">{fmtVnd(target)}đ</span>
+                      {pct !== null && <span className="ml-1 text-[#00daf3]">({pct}%)</span>}
+                      <span className="ml-2">· {pr.actual_won_deals}/{pr.target_won_deals} deal</span>
+                    </p>
+                    <div className="mt-1 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${Math.min(100, pct ?? 0)}%`, backgroundColor: (pct ?? 0) >= 100 ? '#34d399' : '#00daf3' }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {peers.length === 0 && !busy && (
+            <p className="py-4 text-sm text-[var(--crm-muted)]">{t('portal.crm.reports.empty')}</p>
+          )}
+        </div>
+        <button
+          onClick={() => void saveTargets()}
+          disabled={savingTargets || peers.length === 0}
+          className="mt-4 rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+        >
+          {savingTargets ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
+        </button>
       </div>
 
       {/* Cấu hình CRM — trước đây chỉ sửa được bằng SQL tay */}

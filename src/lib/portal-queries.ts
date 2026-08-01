@@ -1,7 +1,8 @@
 import { getSupabaseClient } from './supabase';
 import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue,
   CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer, CrmContact,
-  CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow } from './portal-types';
+  CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow,
+  CrmTarget, CrmTargetProgress } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -1096,6 +1097,42 @@ export async function getCrmSourceReport(): Promise<CrmSourceReportRow[]> {
   const { data, error } = await getSupabaseClient().from('crm_report_sources').select('*');
   if (error) throw error;
   return (data as CrmSourceReportRow[]) ?? [];
+}
+
+// ── Mục tiêu tháng ──
+
+/** Mùng 1 tháng hiện tại theo giờ Việt Nam, dạng yyyy-mm-dd. */
+export function currentMonthVn(): string {
+  const vn = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+  return `${vn.getFullYear()}-${String(vn.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+/** Mục tiêu tháng hiện tại. RLS: nhân viên thấy của mình, admin thấy hết. */
+export async function getCrmTargets(): Promise<CrmTarget[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_targets')
+    .select('*')
+    .eq('thang', currentMonthVn());
+  if (error) throw error;
+  return (data as CrmTarget[]) ?? [];
+}
+
+/** Tiến độ tháng hiện tại (mục tiêu + thực đạt theo tháng lịch VN). */
+export async function getCrmTargetProgress(): Promise<CrmTargetProgress[]> {
+  const { data, error } = await getSupabaseClient().from('crm_target_progress').select('*');
+  if (error) throw error;
+  return (data as CrmTargetProgress[]) ?? [];
+}
+
+/** Admin đặt mục tiêu; RLS chặn người khác. */
+export async function upsertCrmTarget(staffId: string, wonValue: number, wonDeals: number): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_targets')
+    .upsert(
+      { staff_id: staffId, thang: currentMonthVn(), target_won_value: wonValue, target_won_deals: wonDeals },
+      { onConflict: 'staff_id,thang' },
+    );
+  if (error) throw error;
 }
 
 // ── CRM danh bạ liên hệ ──
