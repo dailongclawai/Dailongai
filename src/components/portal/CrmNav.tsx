@@ -11,6 +11,7 @@ const ITEMS = [
   { href: '/portal/crm/pipeline', key: 'portal.crm.nav.pipeline', icon: 'view_kanban', adminOnly: false },
   { href: '/portal/crm/activities', key: 'portal.crm.nav.activities', icon: 'task_alt', adminOnly: false },
   { href: '/portal/crm/commission', key: 'portal.crm.nav.commission', icon: 'payments', adminOnly: false },
+  { href: '/portal/crm/kpi', key: 'portal.crm.nav.kpi', icon: 'military_tech', adminOnly: false },
   // Boss chốt 28/07/2026: báo cáo tổng hợp chỉ admin xem được
   { href: '/portal/crm/reports', key: 'portal.crm.nav.reports', icon: 'bar_chart', adminOnly: true },
 ];

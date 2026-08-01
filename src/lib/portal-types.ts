@@ -485,3 +485,38 @@ export interface CrmTargetProgress {
   actual_won_value: string;
   actual_won_deals: number;
 }
+
+/** crm_kpi_device_month: KPI máy theo tháng, 12 tháng gần nhất (tháng lịch giờ VN).
+ *  Ngưỡng đạt/xuất sắc do DB tính theo tháng làm việc — Boss chốt 01/08/2026. */
+export interface CrmKpiDeviceMonth {
+  staff_id: string;
+  full_name: string | null;
+  thang: string;
+  tenure_month: number;
+  kpi_target: number;
+  kpi_excellent: number;
+  devices_won: number;
+  won_deals: number;
+  won_value: string;
+}
+
+/** crm_kpi_new_accounts_day: khách mới lập theo ngày, 14 ngày gần nhất (giờ VN). */
+export interface CrmKpiNewAccountsDay {
+  staff_id: string;
+  ngay: string;
+  retail_new: number;
+  org_new: number;
+}
+
+export type CrmEvidenceKind = 'giao_dich' | 'co_so' | 'khac';
+
+/** Chứng cứ làm việc thật với khách: màn hình giao dịch, ảnh chụp tại cơ sở. */
+export interface CrmEvidence {
+  id: string;
+  account_id: string;
+  uploaded_by: string;
+  kind: CrmEvidenceKind;
+  file_path: string;
+  note: string | null;
+  created_at: string;
+}

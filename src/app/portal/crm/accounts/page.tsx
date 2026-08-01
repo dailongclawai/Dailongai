@@ -16,6 +16,7 @@ import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmAccountDrawer } from '@/components/portal/CrmAccountDrawer';
 import { CrmImportDialog } from '@/components/portal/CrmImportDialog';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
+import { CrmEvidenceDialog } from '@/components/portal/CrmEvidenceDialog';
 import type {
   CrmAccount, CrmAccountKind, CrmAccountListRow, CrmOrgType, CrmSettings, CrmStage, ProductModel,
 } from '@/lib/portal-types';
@@ -58,6 +59,7 @@ export default function CrmAccountsPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [stages, setStages] = useState<CrmStage[]>([]);
   const [losing, setLosing] = useState<{ account: CrmAccountListRow; stage: CrmStage } | null>(null);
+  const [evidencing, setEvidencing] = useState<CrmAccountListRow | null>(null);
   const [models, setModels] = useState<ProductModel[]>([]);
   const [settings, setSettings] = useState<CrmSettings | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('created');
@@ -344,7 +346,7 @@ export default function CrmAccountsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--crm-line)]">
-        <table className="w-full min-w-[1180px] text-left text-sm">
+        <table className="w-full min-w-[1240px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
             <tr>
               {sortTh('code', 'portal.crm.accounts.col_code')}
@@ -357,14 +359,15 @@ export default function CrmAccountsPage() {
               {sortTh('commission', 'portal.crm.accounts.col_commission', true)}
               {sortTh('created', 'portal.crm.accounts.col_created')}
               {sortTh('status', 'portal.crm.accounts.col_status')}
+              <th className="px-2 py-3">{t('portal.crm.evidence.col')}</th>
             </tr>
           </thead>
           <tbody>
             {busy && (
-              <tr><td colSpan={10} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
+              <tr><td colSpan={11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</td></tr>
             )}
             {!busy && filtered.length === 0 && (
-              <tr><td colSpan={10} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
+              <tr><td colSpan={11} className="px-4 py-6 text-center text-[var(--crm-muted)]">{t('portal.crm.accounts.empty')}</td></tr>
             )}
             {pageRows.map(r => (
               <tr
@@ -439,6 +442,17 @@ export default function CrmAccountsPage() {
                       : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
                   </span>
                 </td>
+                {/* stopPropagation: bấm nút chứng cứ không được mở trang chi tiết */}
+                <td className="px-2 py-3 text-center" onClick={e => e.stopPropagation()}>
+                  <button
+                    onClick={() => setEvidencing(r)}
+                    title={t('portal.crm.evidence.title')}
+                    aria-label={t('portal.crm.evidence.title')}
+                    className="rounded-lg border border-[var(--crm-line)] p-1.5 text-[var(--crm-muted)] hover:text-[var(--crm-text)]"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -489,6 +503,15 @@ export default function CrmAccountsPage() {
         stageName={losing?.stage.name ?? ''}
         onClose={() => setLosing(null)}
         onConfirm={(reasonId, notes) => void loseAccount(reasonId, notes)}
+      />
+
+      <CrmEvidenceDialog
+        key={evidencing?.id ?? 'none'}
+        open={evidencing !== null}
+        accountId={evidencing?.id ?? null}
+        accountName={evidencing?.name ?? ''}
+        uploaderId={profile.id}
+        onClose={() => setEvidencing(null)}
       />
     </PortalShell>
   );

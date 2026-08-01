@@ -2,7 +2,8 @@ import { getSupabaseClient } from './supabase';
 import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, ProductModel, CommissionPlan, DealerCurrentCommission, PortalMessage, PayoutRow, AdminPayoutRow, AuditEntry, CrmStage, CrmAccount, CrmAccountKind, CrmSource, CrmOpportunityBoardRow, CrmActivityRow, CrmActivityKind, CrmAccountListRow, StaffSegment, CrmStaffCommission, CrmStaffReportRow, CrmLostReason, CrmPhoneMatch, CrmLinkableOrder, CrmSettings, CrmReconIssue,
   CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer, CrmContact,
   CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow,
-  CrmTarget, CrmTargetProgress } from './portal-types';
+  CrmTarget, CrmTargetProgress, CrmKpiDeviceMonth, CrmKpiNewAccountsDay,
+  CrmEvidence, CrmEvidenceKind } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -1133,6 +1134,68 @@ export async function upsertCrmTarget(staffId: string, wonValue: number, wonDeal
       { onConflict: 'staff_id,thang' },
     );
   if (error) throw error;
+}
+
+// ── KPI nhân viên ──
+
+/** KPI máy 12 tháng gần nhất. RLS: nhân viên thấy của mình, admin thấy cả đội. */
+export async function getCrmKpiDeviceMonths(): Promise<CrmKpiDeviceMonth[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_kpi_device_month')
+    .select('*')
+    .order('thang');
+  if (error) throw error;
+  return (data as CrmKpiDeviceMonth[]) ?? [];
+}
+
+/** Khách mới lập theo ngày, 14 ngày gần nhất (giờ VN). */
+export async function getCrmKpiNewAccountsDays(): Promise<CrmKpiNewAccountsDay[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_kpi_new_accounts_day')
+    .select('*')
+    .order('ngay');
+  if (error) throw error;
+  return (data as CrmKpiNewAccountsDay[]) ?? [];
+}
+
+// ── Chứng cứ khách hàng ──
+
+export async function getCrmEvidences(accountId: string): Promise<CrmEvidence[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_evidences')
+    .select('*')
+    .eq('account_id', accountId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data as CrmEvidence[]) ?? [];
+}
+
+/** Tải file vào bucket riêng rồi ghi dòng chứng cứ. File xếp theo thư mục người
+ *  tải lên — policy storage chỉ cho ghi vào thư mục của chính mình. */
+export async function uploadCrmEvidence(
+  userId: string, accountId: string, file: File, kind: CrmEvidenceKind, note: string,
+): Promise<void> {
+  const ext = file.name.split('.').pop() ?? 'jpg';
+  const path = `${userId}/${accountId}-${Date.now()}.${ext}`;
+  const client = getSupabaseClient();
+  const { error: upErr } = await client.storage.from('crm-evidence').upload(path, file, { upsert: false });
+  if (upErr) throw upErr;
+  const { error } = await client.from('crm_evidences').insert({
+    account_id: accountId, uploaded_by: userId, kind, file_path: path, note: note.trim() || null,
+  });
+  if (error) {
+    // Dòng bị RLS chặn (vd. khách đã bàn giao) thì gỡ luôn file vừa tải,
+    // kẻo rơi lại file mồ côi trong bucket.
+    await client.storage.from('crm-evidence').remove([path]);
+    throw error;
+  }
+}
+
+export async function crmEvidenceSignedUrl(path: string): Promise<string> {
+  const { data, error } = await getSupabaseClient()
+    .storage.from('crm-evidence').createSignedUrl(path, 600);
+  if (error) throw error;
+  return data.signedUrl;
 }
 
 // ── CRM danh bạ liên hệ ──
