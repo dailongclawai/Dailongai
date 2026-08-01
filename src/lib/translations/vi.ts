@@ -827,6 +827,8 @@ const vi: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Mở tệp',
     'portal.crm.evidence.upload': 'Đăng tải',
     'portal.crm.evidence.uploading': 'Đang tải lên…',
+    'portal.crm.import.template': 'Tải file mẫu',
+    'portal.crm.import.template_hint': 'File Excel mẫu đúng cột — điền xong dùng nút Nhập để đưa khách vào hệ thống',
     'portal.crm.opp.discount_hint': 'Giảm so với giá đề nghị — hoa hồng tính trên giá đơn sau giảm khi thanh toán',
     'portal.crm.accounts.request_confirm': 'Gửi yêu cầu xác nhận hoàn thành cho quản trị? Khách sẽ hiện "Chờ xác nhận" tới khi quản trị duyệt.',
     'portal.crm.accounts.request_sent': 'Đã gửi yêu cầu — quản trị xác nhận xong mới tính KPI và hoa hồng',

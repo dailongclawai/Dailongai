@@ -825,6 +825,8 @@ const en: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Open file',
     'portal.crm.evidence.upload': 'Upload',
     'portal.crm.evidence.uploading': 'Uploading…',
+    'portal.crm.import.template': 'Download template',
+    'portal.crm.import.template_hint': 'Sample Excel with the right columns — fill it in, then use Import to load customers',
     'portal.crm.opp.discount_hint': 'Discount vs suggested price — commission is computed on the discounted amount when the order is paid',
     'portal.crm.accounts.request_confirm': 'Send a completion-confirmation request to the admin? The customer will show "Awaiting confirmation" until approved.',
     'portal.crm.accounts.request_sent': 'Request sent — KPI and commission count once the admin confirms',
