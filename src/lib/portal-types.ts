@@ -497,6 +497,8 @@ export interface CrmFeedback {
   staff_id: string;
   content: string;
   file_path: string | null;
+  /** NULL = quản trị chưa xem. */
+  read_at: string | null;
   created_at: string;
   staff: { full_name: string | null } | null;
 }

@@ -1232,6 +1232,15 @@ export async function createCrmFeedback(staffId: string, content: string, file?:
   }
 }
 
+/** Quản trị đánh dấu đã xem — RLS chỉ cho admin cập nhật. */
+export async function markCrmFeedbackRead(id: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_feedbacks')
+    .update({ read_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 export async function crmFeedbackSignedUrl(path: string): Promise<string> {
   const { data, error } = await getSupabaseClient()
     .storage.from('crm-feedback').createSignedUrl(path, 600);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { createCrmFeedback, crmFeedbackSignedUrl, getCrmFeedbacks } from '@/lib/portal-queries';
+import { createCrmFeedback, crmFeedbackSignedUrl, getCrmFeedbacks, markCrmFeedbackRead } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import type { CrmFeedback } from '@/lib/portal-types';
@@ -60,6 +60,18 @@ export default function CrmFeedbackPage() {
 
   const isAdmin = profile.role === 'admin';
   const card = 'rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-5';
+  const unreadCount = items.filter(f => !f.read_at).length;
+
+  // Admin bấm vào thư là coi như đã đọc — đổi tại chỗ, không cần tải lại trang.
+  const markRead = async (f: CrmFeedback) => {
+    if (!isAdmin || f.read_at) return;
+    try {
+      await markCrmFeedbackRead(f.id);
+      setItems(prev => prev.map(x => (x.id === f.id ? { ...x, read_at: new Date().toISOString() } : x)));
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
   const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
 
   const submit = async () => {
@@ -125,8 +137,13 @@ export default function CrmFeedbackPage() {
       )}
 
       <section>
-        <h2 className="mb-3 font-bold text-[var(--crm-text)]">
+        <h2 className="mb-3 flex items-center gap-2 font-bold text-[var(--crm-text)]">
           {t(isAdmin ? 'portal.crm.feedback.inbox_title' : 'portal.crm.feedback.mine_title')}
+          {isAdmin && unreadCount > 0 && (
+            <span className="rounded-full bg-[#ff5625] px-2 py-0.5 text-xs font-bold text-white">
+              {unreadCount} {t('portal.crm.feedback.unread')}
+            </span>
+          )}
         </h2>
         {busy && <p className="text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
         {!busy && items.length === 0 && (
@@ -134,13 +151,42 @@ export default function CrmFeedbackPage() {
         )}
         <div className="space-y-3">
           {items.map(f => (
-            <article key={f.id} className={card}>
+            <article
+              key={f.id}
+              onClick={() => void markRead(f)}
+              title={isAdmin && !f.read_at ? t('portal.crm.feedback.mark_read') : undefined}
+              className={`rounded-2xl border bg-[var(--crm-s1)] p-5 ${
+                !f.read_at && isAdmin
+                  ? 'cursor-pointer border-[#ff5625]/60 hover:border-[#ff5625]'
+                  : 'border-[var(--crm-line)]'
+              }`}
+            >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--crm-muted)]">
-                {isAdmin && (
-                  <span className="rounded-full border border-[#00daf3]/40 px-2 py-0.5 text-[#00daf3]">
-                    {f.staff?.full_name ?? '—'}
-                  </span>
-                )}
+                <span className="flex items-center gap-2">
+                  {isAdmin && (
+                    <span className="rounded-full border border-[#00daf3]/40 px-2 py-0.5 text-[#00daf3]">
+                      {f.staff?.full_name ?? '—'}
+                    </span>
+                  )}
+                  {/* Badge đọc/chưa đọc: admin thấy thư mới, nhân viên biết thư mình đã được xem */}
+                  {f.read_at ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-[#34d399]/40 px-2 py-0.5 text-[#34d399]">
+                      <span className="material-symbols-outlined text-[13px]">done_all</span>
+                      {t(isAdmin ? 'portal.crm.feedback.read' : 'portal.crm.feedback.seen_by_admin')}
+                    </span>
+                  ) : (
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
+                      isAdmin
+                        ? 'bg-[#ff5625] font-bold text-white'
+                        : 'border border-[var(--crm-line)] text-[var(--crm-muted)]'
+                    }`}>
+                      <span className="material-symbols-outlined text-[13px]">
+                        {isAdmin ? 'mark_email_unread' : 'schedule'}
+                      </span>
+                      {t(isAdmin ? 'portal.crm.feedback.unread' : 'portal.crm.feedback.not_seen')}
+                    </span>
+                  )}
+                </span>
                 <span>{new Date(f.created_at).toLocaleString('vi-VN')}</span>
               </div>
               <p className="whitespace-pre-wrap text-sm text-[var(--crm-text)]">{f.content}</p>
