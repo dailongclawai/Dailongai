@@ -47,21 +47,39 @@ export default function AdminUpgradePage() {
 
   if (loading || profile?.role !== 'admin') return null;
 
+  // Ô nhập tay nhận cả số tài khoản 6 chữ số lẫn UUID — nút copy trong bảng
+  // copy số ngắn, nên chuỗi toàn chữ số phải tra profiles.account_no lấy UUID
+  // trước khi gọi RPC (RPC chỉ nhận uuid).
+  const resolveProfileId = async (raw: string): Promise<string> => {
+    if (!/^\d+$/.test(raw)) return raw;
+    const { data, error } = await getSupabaseClient()
+      .from('profiles')
+      .select('id')
+      .eq('account_no', Number(raw))
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error(t('portal.admin.upgrade.toast.not_found').replace('{id}', raw));
+    return (data as { id: string }).id;
+  };
+
   const upgrade = async (id: string) => {
     if (!id.trim()) {
       toast.error(t('portal.admin.upgrade.toast.missing_id'));
       return;
     }
     setBusy(true);
-    const { error } = await getSupabaseClient().rpc('admin_set_supervisor', { p_user_id: id.trim() });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const pid = await resolveProfileId(id.trim());
+      const { error } = await getSupabaseClient().rpc('admin_set_supervisor', { p_user_id: pid });
+      if (error) throw error;
+      toast.success(t('portal.admin.upgrade.toast.upgraded'));
+      setUserId('');
+      await refresh();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
     }
-    toast.success(t('portal.admin.upgrade.toast.upgraded'));
-    setUserId('');
-    await refresh();
   };
 
   const assignStaff = async () => {
@@ -71,7 +89,8 @@ export default function AdminUpgradePage() {
     }
     setBusy(true);
     try {
-      await adminSetStaff(staffId.trim(), staffSegment);
+      const pid = await resolveProfileId(staffId.trim());
+      await adminSetStaff(pid, staffSegment);
       toast.success(t('portal.admin.upgrade.staff_done'));
       setStaffId('');
       await refresh();
