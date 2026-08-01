@@ -299,33 +299,15 @@ export default function CrmAccountsPage() {
 
   if (loading || !profile) return null;
 
-  // File mẫu sinh tại chỗ, tiêu đề cột khớp đúng bộ từ khoá đoán cột của chức năng
-  // Nhập — nhân viên điền xong kéo thẳng vào nút Nhập là cột tự khớp hết.
+  // MỘT file mẫu chuẩn dùng chung web + bot Telegram (public/templates/, có
+  // dropdown Nguồn/Trạng thái + tooltip từng cột — xlsx community không tạo
+  // được nên file dựng sẵn bằng openpyxl). Đổi mẫu thì thay file đó và bản
+  // trên VPS /opt/staff-assets/ cùng lúc.
   const downloadTemplate = () => {
-    const sample = [
-      {
-        'Tên khách hàng': 'Nguyễn Văn A', 'Điện thoại': '0912345678', 'Email': 'vana@gmail.com',
-        'Zalo': '0912345678', 'Tỉnh/Thành phố': 'Hà Nội', 'Địa chỉ': '12 Phố Huế, Hai Bà Trưng',
-        'Nguồn': 'zalo', 'Ghi chú': 'Khách lẻ quan tâm máy laser', 'Trạng thái': 'Mới tiếp nhận', 'Số máy': 1,
-      },
-      {
-        'Tên khách hàng': 'Phòng khám Đông y B', 'Điện thoại': '0987654321', 'Email': 'phongkhamb@gmail.com',
-        'Zalo': '', 'Tỉnh/Thành phố': 'Thành phố Hồ Chí Minh', 'Địa chỉ': '45 Nguyễn Trãi, Quận 5',
-        'Nguồn': 'referral', 'Ghi chú': 'Khách tổ chức — phòng khám', 'Trạng thái': 'Đang tư vấn', 'Số máy': 2,
-      },
-    ];
-    const ws = XLSX.utils.json_to_sheet(sample);
-    const guide = XLSX.utils.aoa_to_sheet([
-      ['Cột', 'Giá trị hợp lệ'],
-      ['Điện thoại', 'Bắt buộc — hệ thống dùng số này để chống trùng khách'],
-      ['Nguồn', 'website, zalo, facebook, google_ads, tiktok, referral, hotline, event, other'],
-      ['Trạng thái', stages.length > 0 ? stages.map(s => s.name).join(', ') : 'Để trống sẽ vào bước đầu chuỗi'],
-      ['Số máy', 'Số nguyên từ 1 trở lên — có số máy sẽ tự lập cơ hội cho khách'],
-    ]);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'KhachHang');
-    XLSX.utils.book_append_sheet(wb, guide, 'HuongDan');
-    XLSX.writeFile(wb, 'mau-nhap-khach-hang-crm.xlsx');
+    const a = document.createElement('a');
+    a.href = '/templates/mau-nhap-khach-hang-crm.xlsx';
+    a.download = 'mau-nhap-khach-hang-crm.xlsx';
+    a.click();
   };
 
   const field = 'rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
