@@ -799,6 +799,8 @@ const vi: Record<string, string> = {
     'portal.crm.kpi.daily_missed': 'Chưa đạt chỉ tiêu ngày',
     'portal.crm.kpi.chart_devices': 'Máy bán theo tháng',
     'portal.crm.kpi.chart_team_devices': 'Máy cả đội theo tháng',
+    'portal.crm.kpi.daily_strip_title': 'Đạt chỉ tiêu khách mới — 14 ngày gần nhất',
+    'portal.crm.kpi.daily_strip_hint': 'Đạt khi trong ngày có từ 3 khách bán lẻ mới HOẶC từ 1 khách tổ chức mới. Xanh = đạt, đỏ = chưa đạt — rê chuột xem số khách từng ngày.',
     'portal.crm.kpi.chart_retail14': 'Khách bán lẻ mới 14 ngày',
     'portal.crm.kpi.chart_org14': 'Khách tổ chức mới 14 ngày',
     'portal.crm.kpi.team_devices_title': 'Máy tháng này theo nhân viên',

@@ -108,6 +108,29 @@ export default function CrmKpiPage() {
 
   const deviceHint = (label: string, n: number) => `${label}: ${n} ${t('portal.crm.kpi.devices')}`;
 
+  // Dải 14 ô đạt/trượt chỉ tiêu khách mới theo ngày — xanh ✓ đạt, đỏ ✗ trượt.
+  const dailyStrip = (list: CrmKpiNewAccountsDay[]) => (
+    <div className="flex flex-wrap items-end gap-1.5">
+      {list.map(d => {
+        const met = dailyKpiMet(d.retail_new, d.org_new);
+        return (
+          <div
+            key={d.ngay}
+            className="flex flex-col items-center gap-1"
+            title={`${dayLabel(d.ngay)}: ${d.retail_new} ${t('portal.crm.kpi.daily_retail')} · ${d.org_new} ${t('portal.crm.kpi.daily_org')} — ${t(met ? 'portal.crm.kpi.daily_met' : 'portal.crm.kpi.daily_missed')}`}
+          >
+            <span className={`material-symbols-outlined flex h-7 w-7 items-center justify-center rounded-md text-[15px] ${
+              met ? 'bg-[#34d399]/20 text-[#34d399]' : 'bg-[#f87171]/10 text-[#f87171]/70'
+            }`}>
+              {met ? 'check' : 'close'}
+            </span>
+            <span className="text-[10px] text-[var(--crm-muted)]">{dayLabel(d.ngay)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
@@ -217,6 +240,12 @@ export default function CrmKpiPage() {
             />
           </section>
 
+          <section className={`${card} mb-6`}>
+            <h2 className="mb-1 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.daily_strip_title')}</h2>
+            <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.kpi.daily_strip_hint')}</p>
+            {dailyStrip(days)}
+          </section>
+
           <div className="grid gap-4 md:grid-cols-2">
             <section className={card}>
               <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_retail14')}</h2>
@@ -321,6 +350,19 @@ export default function CrmKpiPage() {
               />
             </section>
           </div>
+
+          <section className={`${card} mt-4`}>
+            <h2 className="mb-1 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.daily_strip_title')}</h2>
+            <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.kpi.daily_strip_hint')}</p>
+            <div className="space-y-4">
+              {curRows.map(r => (
+                <div key={r.staff_id}>
+                  <p className="mb-1.5 text-sm text-[var(--crm-text)]">{r.full_name ?? '—'}</p>
+                  {dailyStrip(days.filter(d => d.staff_id === r.staff_id))}
+                </div>
+              ))}
+            </div>
+          </section>
         </>
       )}
     </PortalShell>

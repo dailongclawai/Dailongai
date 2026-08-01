@@ -797,6 +797,8 @@ const en: Record<string, string> = {
     'portal.crm.kpi.daily_missed': 'Daily goal not met yet',
     'portal.crm.kpi.chart_devices': 'Devices sold by month',
     'portal.crm.kpi.chart_team_devices': 'Team devices by month',
+    'portal.crm.kpi.daily_strip_title': 'Daily new-customer goal — last 14 days',
+    'portal.crm.kpi.daily_strip_hint': 'Met when the day has 3+ new retail customers OR 1+ new organisation. Green = met, red = missed — hover a day for its numbers.',
     'portal.crm.kpi.chart_retail14': 'New retail customers — 14 days',
     'portal.crm.kpi.chart_org14': 'New organisations — 14 days',
     'portal.crm.kpi.team_devices_title': 'Devices this month by staff',
