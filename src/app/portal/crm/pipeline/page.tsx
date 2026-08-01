@@ -5,13 +5,16 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmBoard, getCrmStages, moveOpportunityStage, requestAccountCompletion } from '@/lib/portal-queries';
+import {
+  getActiveModels, getCrmBoard, getCrmSettings, getCrmStages, moveOpportunityStage,
+  requestAccountCompletion, suggestedUnitPrice,
+} from '@/lib/portal-queries';
 import { groupByStage, sumAmount, weightedForecast } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmOpportunityDrawer } from '@/components/portal/CrmOpportunityDrawer';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
-import type { CrmOpportunityBoardRow, CrmStage } from '@/lib/portal-types';
+import type { CrmOpportunityBoardRow, CrmSettings, CrmStage, ProductModel } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -26,6 +29,8 @@ export default function CrmPipelinePage() {
   const [editing, setEditing] = useState<CrmOpportunityBoardRow | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [losing, setLosing] = useState<{ id: string; stage: CrmStage } | null>(null);
+  const [models, setModels] = useState<ProductModel[]>([]);
+  const [settings, setSettings] = useState<CrmSettings | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -52,6 +57,24 @@ export default function CrmPipelinePage() {
   useEffect(() => {
     if (session) void load();
   }, [session, load]);
+
+  useEffect(() => {
+    if (!session) return;
+    void getActiveModels().then(setModels).catch(() => setModels([]));
+    void getCrmSettings().then(setSettings).catch(() => setSettings(null));
+  }, [session]);
+
+  // Chip % giảm so với giá đề nghị (niêm yết / giá đại lý) — admin lướt bảng là
+  // biết deal nào đang chiết khấu. Hoa hồng vẫn tính trên giá đơn sau giảm.
+  const discountPct = (r: CrmOpportunityBoardRow): number | null => {
+    if (!r.model_id || !r.account_kind || Number(r.amount) <= 0) return null;
+    const model = models.find(m => m.id === r.model_id);
+    if (!model) return null;
+    const suggested = suggestedUnitPrice(model, r.account_kind, settings) * r.quantity;
+    if (suggested <= 0 || Number(r.amount) >= suggested) return null;
+    const pct = Math.round((1 - Number(r.amount) / suggested) * 100);
+    return pct >= 1 ? pct : null;
+  };
 
   const columns = useMemo(() => groupByStage(stages, rows), [stages, rows]);
   const openRows = rows.filter(r => r.forecast === 'open');
@@ -158,6 +181,17 @@ export default function CrmPipelinePage() {
                     <span className="ml-1 text-xs font-normal text-[var(--crm-muted)]">
                       · {r.quantity} {t('portal.crm.opp.machines')}
                     </span>
+                    {(() => {
+                      const pct = discountPct(r);
+                      return pct !== null ? (
+                        <span
+                          className="ml-1.5 rounded-full border border-[#fbbf24]/40 px-1.5 py-0.5 text-[10px] font-normal text-[#fbbf24]"
+                          title={t('portal.crm.opp.discount_hint')}
+                        >
+                          -{pct}%
+                        </span>
+                      ) : null;
+                    })()}
                   </p>
                   {Number(r.expected_commission) > 0 && (
                     <p className="mt-1 text-xs text-[#00daf3]">

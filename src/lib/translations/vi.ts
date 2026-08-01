@@ -827,6 +827,7 @@ const vi: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Mở tệp',
     'portal.crm.evidence.upload': 'Đăng tải',
     'portal.crm.evidence.uploading': 'Đang tải lên…',
+    'portal.crm.opp.discount_hint': 'Giảm so với giá đề nghị — hoa hồng tính trên giá đơn sau giảm khi thanh toán',
     'portal.crm.accounts.request_confirm': 'Gửi yêu cầu xác nhận hoàn thành cho quản trị? Khách sẽ hiện "Chờ xác nhận" tới khi quản trị duyệt.',
     'portal.crm.accounts.request_sent': 'Đã gửi yêu cầu — quản trị xác nhận xong mới tính KPI và hoa hồng',
     'portal.crm.accounts.pending_confirm': 'Chờ xác nhận hoàn thành',

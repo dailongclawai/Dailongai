@@ -825,6 +825,7 @@ const en: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Open file',
     'portal.crm.evidence.upload': 'Upload',
     'portal.crm.evidence.uploading': 'Uploading…',
+    'portal.crm.opp.discount_hint': 'Discount vs suggested price — commission is computed on the discounted amount when the order is paid',
     'portal.crm.accounts.request_confirm': 'Send a completion-confirmation request to the admin? The customer will show "Awaiting confirmation" until approved.',
     'portal.crm.accounts.request_sent': 'Request sent — KPI and commission count once the admin confirms',
     'portal.crm.accounts.pending_confirm': 'Awaiting confirmation',
