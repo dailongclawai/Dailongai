@@ -102,8 +102,9 @@ export default function CrmCommissionPage() {
         {isAdmin && (
           <button
             onClick={() => void release()}
-            className="rounded-xl border border-[#00daf3] px-4 py-2 text-sm text-[#00daf3]"
+            className="flex items-center gap-2 rounded-xl border border-[#00daf3] px-4 py-2 text-sm text-[#00daf3]"
           >
+            <span className="material-symbols-outlined text-[18px]">lock_open</span>
             {t('portal.crm.commission.release')}
           </button>
         )}
@@ -158,7 +159,8 @@ export default function CrmCommissionPage() {
                   <td className="px-4 py-3">
                     {(r.status === 'payable'
                       || (r.status === 'pending' && new Date(r.eligible_at) <= new Date())) && (
-                      <button onClick={() => void pay(r.id)} className="rounded-lg border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]">
+                      <button onClick={() => void pay(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]">
+                        <span className="material-symbols-outlined text-[15px] text-[#34d399]">paid</span>
                         {t('portal.crm.commission.mark_paid')}
                       </button>
                     )}

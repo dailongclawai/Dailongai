@@ -62,10 +62,12 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+            <button onClick={onClose} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+              <span className="material-symbols-outlined text-[18px]">close</span>
               {t('portal.crm.lost.cancel')}
             </button>
-            <button onClick={submit} className="flex-1 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white">
+            <button onClick={submit} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white">
+              <span className="material-symbols-outlined text-[18px]">check</span>
               {t('portal.crm.lost.confirm')}
             </button>
           </div>

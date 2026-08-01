@@ -359,7 +359,7 @@ export default function CrmAccountsPage() {
           disabled={sorted.length === 0}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)] disabled:opacity-50"
         >
-          <span className="material-symbols-outlined text-[18px]">download</span>
+          <span className="material-symbols-outlined text-[18px] text-[#00daf3]">download</span>
           {t('portal.crm.accounts.export')}
         </button>
         <button
@@ -367,20 +367,21 @@ export default function CrmAccountsPage() {
           title={t('portal.crm.import.template_hint')}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
-          <span className="material-symbols-outlined text-[18px]">description</span>
+          <span className="material-symbols-outlined text-[18px] text-[#34d399]">description</span>
           {t('portal.crm.import.template')}
         </button>
         <button
           onClick={() => setImportOpen(true)}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
-          <span className="material-symbols-outlined text-[18px]">upload_file</span>
+          <span className="material-symbols-outlined text-[18px] text-[#ff5625]">upload_file</span>
           {t('portal.crm.import.title')}
         </button>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
-          className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
+          className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
         >
+          <span className="material-symbols-outlined text-[18px]">person_add</span>
           {t('portal.crm.accounts.new')}
         </button>
       </div>

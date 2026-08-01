@@ -87,7 +87,8 @@ export default function CrmActivitiesPage() {
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.activities.title')}</h1>
-        <button onClick={() => setDrawerOpen(true)} className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white">
+        <button onClick={() => setDrawerOpen(true)} className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white">
+          <span className="material-symbols-outlined text-[18px]">add_task</span>
           {t('portal.crm.activity.new')}
         </button>
       </div>
@@ -163,8 +164,9 @@ export default function CrmActivitiesPage() {
             {!a.done_at && (
               <button
                 onClick={() => void done(a.id)}
-                className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff5625]"
+                className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]"
               >
+                <span className="material-symbols-outlined text-[15px] text-[#34d399]">task_alt</span>
                 {t('portal.crm.activity.mark_done')}
               </button>
             )}

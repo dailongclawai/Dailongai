@@ -339,20 +339,23 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button onClick={reset} className="rounded-xl border border-[var(--crm-line)] px-4 py-2.5 text-[var(--crm-text)]">
+              <button onClick={reset} className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2.5 text-[var(--crm-text)]">
+                <span className="material-symbols-outlined text-[18px]">folder_open</span>
                 {t('portal.crm.import.other_file')}
               </button>
               <button
                 onClick={check} disabled={busy}
-                className="rounded-xl border border-[#00daf3] px-4 py-2.5 text-[#00daf3] disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl border border-[#00daf3] px-4 py-2.5 text-[#00daf3] disabled:opacity-50"
               >
+                <span className="material-symbols-outlined text-[18px]">fact_check</span>
                 {t('portal.crm.import.check')}
               </button>
               <button
                 onClick={run}
                 disabled={busy || taken === null || importable.length === 0}
-                className="ml-auto rounded-xl bg-[#ff5625] px-4 py-2.5 font-bold text-white disabled:opacity-50"
+                className="ml-auto flex items-center gap-2 rounded-xl bg-[#ff5625] px-4 py-2.5 font-bold text-white disabled:opacity-50"
               >
+                <span className="material-symbols-outlined text-[18px]">upload</span>
                 {busy ? t('portal.crm.common.saving') : `${t('portal.crm.import.run')} (${importable.length})`}
               </button>
             </div>

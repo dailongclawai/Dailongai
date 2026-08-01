@@ -125,8 +125,9 @@ export default function CrmPipelinePage() {
         <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
-          className="rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
+          className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
         >
+          <span className="material-symbols-outlined text-[18px]">add_circle</span>
           {t('portal.crm.opp.new')}
         </button>
       </div>

@@ -398,8 +398,9 @@ export default function CrmReportsPage() {
           <button
             onClick={() => void saveCfg()}
             disabled={savingCfg}
-            className="rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
           >
+            <span className="material-symbols-outlined text-[18px]">save</span>
             {savingCfg ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
           </button>
         </div>

@@ -85,14 +85,16 @@ export function CrmTransferDialog({ open, accountId, accountName, currentOwnerId
           </div>
           <p className="text-xs text-[var(--crm-muted)]">{t('portal.crm.transfer.hint')}</p>
           <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+            <button onClick={onClose} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+              <span className="material-symbols-outlined text-[18px]">close</span>
               {t('portal.crm.lost.cancel')}
             </button>
             <button
               onClick={() => void submit()}
               disabled={saving}
-              className="flex-1 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white disabled:opacity-50"
             >
+              <span className="material-symbols-outlined text-[18px]">swap_horiz</span>
               {saving ? t('portal.crm.common.saving') : t('portal.crm.transfer.confirm')}
             </button>
           </div>

@@ -187,8 +187,9 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
           <button
             onClick={save}
             disabled={saving}
-            className="w-full rounded-xl bg-[#ff5625] py-3 font-bold text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3 font-bold text-white disabled:opacity-50"
           >
+            <span className="material-symbols-outlined text-[18px]">save</span>
             {saving ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
           </button>
         </div>

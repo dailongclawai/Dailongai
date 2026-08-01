@@ -115,13 +115,15 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={onClose} className="flex-1 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+            <button onClick={onClose} className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--crm-line)] py-2.5 text-[var(--crm-text)]">
+              <span className="material-symbols-outlined text-[18px]">close</span>
               {t('portal.crm.common.close')}
             </button>
             <button
               onClick={() => void submit()} disabled={busy}
-              className="flex-1 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white disabled:opacity-50"
             >
+              <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
               {busy ? t('portal.crm.evidence.uploading') : t('portal.crm.evidence.upload')}
             </button>
           </div>

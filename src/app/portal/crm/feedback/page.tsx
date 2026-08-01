@@ -115,8 +115,9 @@ export default function CrmFeedbackPage() {
             <button
               onClick={() => void submit()}
               disabled={sending}
-              className="rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
             >
+              <span className="material-symbols-outlined text-[18px]">send</span>
               {sending ? t('portal.crm.feedback.sending') : t('portal.crm.feedback.send')}
             </button>
           </div>
