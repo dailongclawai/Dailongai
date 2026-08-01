@@ -12,6 +12,8 @@ interface Props {
   accountName: string;
   uploaderId: string;
   onClose: () => void;
+  /** Gọi sau mỗi lần lưu thành công — trang khách hàng cập nhật huy hiệu đếm. */
+  onSaved?: () => void;
 }
 
 const KINDS: CrmEvidenceKind[] = ['giao_dich', 'co_so', 'khac'];
@@ -20,7 +22,7 @@ const IMG_EXT = /\.(jpe?g|png|webp|gif|heic)$/i;
 /** Chứng cứ khách hàng thật: màn hình giao dịch với khách, ảnh chụp tại cơ sở
  *  khách tổ chức. Trang khách hàng gắn `key` theo khách đang mở nên mỗi lần mở
  *  là một instance mới, form tự sạch. */
-export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, onClose }: Props) {
+export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, onClose, onSaved }: Props) {
   const { t } = useI18n();
   const [items, setItems] = useState<CrmEvidence[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -61,6 +63,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
       setNote('');
       setFileKey(k => k + 1);
       await load();
+      onSaved?.();
     } catch (e) {
       toast.error((e as Error).message);
     } finally {

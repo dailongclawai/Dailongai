@@ -1198,6 +1198,17 @@ export async function crmEvidenceSignedUrl(path: string): Promise<string> {
   return data.signedUrl;
 }
 
+/** Số chứng cứ theo khách, cho huy hiệu trên bảng Khách hàng. RLS cắt theo quyền nhìn. */
+export async function getCrmEvidenceCounts(): Promise<Record<string, number>> {
+  const { data, error } = await getSupabaseClient().from('crm_evidences').select('account_id');
+  if (error) throw error;
+  const acc: Record<string, number> = {};
+  for (const r of (data as { account_id: string }[]) ?? []) {
+    acc[r.account_id] = (acc[r.account_id] ?? 0) + 1;
+  }
+  return acc;
+}
+
 // ── Góp ý xây dựng CRM ──
 
 /** RLS: nhân viên thấy thư mình gửi, admin thấy hết. */

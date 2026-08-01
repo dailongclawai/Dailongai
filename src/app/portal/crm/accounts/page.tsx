@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
-  createCrmOpportunity, getActiveModels, getCrmAccounts, getCrmSettings, getCrmStages,
-  getOpenOpportunities, moveOpportunityStage, setCrmAccountStage, setOpportunityQuantity,
-  suggestedUnitPrice,
+  createCrmOpportunity, getActiveModels, getCrmAccounts, getCrmEvidenceCounts, getCrmSettings,
+  getCrmStages, getOpenOpportunities, moveOpportunityStage, setCrmAccountStage,
+  setOpportunityQuantity, suggestedUnitPrice,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
@@ -60,6 +60,7 @@ export default function CrmAccountsPage() {
   const [stages, setStages] = useState<CrmStage[]>([]);
   const [losing, setLosing] = useState<{ account: CrmAccountListRow; stage: CrmStage } | null>(null);
   const [evidencing, setEvidencing] = useState<CrmAccountListRow | null>(null);
+  const [evidCounts, setEvidCounts] = useState<Record<string, number>>({});
   const [models, setModels] = useState<ProductModel[]>([]);
   const [settings, setSettings] = useState<CrmSettings | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('created');
@@ -80,7 +81,13 @@ export default function CrmAccountsPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      setRows(await getCrmAccounts());
+      // Số chứng cứ hỏng cũng không được chặn bảng khách — rơi về map rỗng.
+      const [accounts, counts] = await Promise.all([
+        getCrmAccounts(),
+        getCrmEvidenceCounts().catch(() => ({})),
+      ]);
+      setRows(accounts);
+      setEvidCounts(counts);
     } finally {
       setBusy(false);
     }
@@ -442,15 +449,27 @@ export default function CrmAccountsPage() {
                       : `${daysInStage(r.stage_since)} ${t('portal.crm.accounts.in_stage_days')}`}
                   </span>
                 </td>
-                {/* stopPropagation: bấm nút chứng cứ không được mở trang chi tiết */}
-                <td className="px-2 py-3 text-center" onClick={e => e.stopPropagation()}>
+                {/* stopPropagation: bấm nút chứng cứ không được mở trang chi tiết.
+                    Có chứng cứ: huy hiệu xanh + số lượng; chưa có: máy ảnh xám. */}
+                <td className="whitespace-nowrap px-2 py-3 text-center" onClick={e => e.stopPropagation()}>
                   <button
                     onClick={() => setEvidencing(r)}
-                    title={t('portal.crm.evidence.title')}
+                    title={(evidCounts[r.id] ?? 0) > 0
+                      ? `${evidCounts[r.id]} ${t('portal.crm.evidence.count_hint')}`
+                      : t('portal.crm.evidence.none_hint')}
                     aria-label={t('portal.crm.evidence.title')}
-                    className="rounded-lg border border-[var(--crm-line)] p-1.5 text-[var(--crm-muted)] hover:text-[var(--crm-text)]"
+                    className={`inline-flex items-center gap-1 rounded-lg border p-1.5 ${
+                      (evidCounts[r.id] ?? 0) > 0
+                        ? 'border-[#34d399]/40 text-[#34d399]'
+                        : 'border-[var(--crm-line)] text-[var(--crm-muted)] hover:text-[var(--crm-text)]'
+                    }`}
                   >
-                    <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                    <span className="material-symbols-outlined text-[18px]">
+                      {(evidCounts[r.id] ?? 0) > 0 ? 'verified' : 'photo_camera'}
+                    </span>
+                    {(evidCounts[r.id] ?? 0) > 0 && (
+                      <span className="font-mono text-xs tabular-nums">{evidCounts[r.id]}</span>
+                    )}
                   </button>
                 </td>
               </tr>
@@ -512,6 +531,9 @@ export default function CrmAccountsPage() {
         accountName={evidencing?.name ?? ''}
         uploaderId={profile.id}
         onClose={() => setEvidencing(null)}
+        onSaved={() => {
+          void getCrmEvidenceCounts().then(setEvidCounts).catch(() => undefined);
+        }}
       />
     </PortalShell>
   );

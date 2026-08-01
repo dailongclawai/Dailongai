@@ -832,6 +832,8 @@ const en: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Open file',
     'portal.crm.evidence.upload': 'Upload',
     'portal.crm.evidence.uploading': 'Uploading…',
+    'portal.crm.evidence.count_hint': 'evidence item(s) — click to view/add',
+    'portal.crm.evidence.none_hint': 'No evidence yet — click to upload',
     'portal.crm.feedback.title': 'CRM improvement feedback',
     'portal.crm.feedback.hint': 'Anything clunky, missing, or worth improving in the CRM — write it here, the letter goes straight to the admin.',
     'portal.crm.feedback.placeholder': 'Your feedback…',

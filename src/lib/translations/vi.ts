@@ -834,6 +834,8 @@ const vi: Record<string, string> = {
     'portal.crm.evidence.open_file': 'Mở tệp',
     'portal.crm.evidence.upload': 'Đăng tải',
     'portal.crm.evidence.uploading': 'Đang tải lên…',
+    'portal.crm.evidence.count_hint': 'chứng cứ — bấm để xem/đăng thêm',
+    'portal.crm.evidence.none_hint': 'Chưa có chứng cứ — bấm để đăng tải',
     'portal.crm.feedback.title': 'Góp ý xây dựng CRM',
     'portal.crm.feedback.hint': 'Thấy chỗ nào bất tiện, thiếu tính năng hay có ý tưởng làm CRM tốt hơn — viết vào đây, thư gửi thẳng cho quản trị.',
     'portal.crm.feedback.placeholder': 'Nội dung góp ý…',
