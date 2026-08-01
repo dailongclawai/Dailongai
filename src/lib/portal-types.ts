@@ -393,7 +393,7 @@ export interface CrmSettings {
 /** Dòng đối soát cho quản trị. `won_no_order` = cơ hội đã thắng nhưng chưa gắn
  *  đơn nào; `price_mismatch` = đơn ghi giá lệch bảng giá. */
 export interface CrmReconIssue {
-  issue: 'won_no_order' | 'price_mismatch';
+  issue: 'won_no_order' | 'price_mismatch' | 'paid_order_unlinked';
   ref_id: string;
   ref_code: string | null;
   title: string;

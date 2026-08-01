@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
   createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
@@ -25,6 +26,7 @@ interface Props {
 
 export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSaved }: Props) {
   const { t } = useI18n();
+  const { profile } = useAuth();
   const [accounts, setAccounts] = useState<CrmAccount[]>([]);
   const [models, setModels] = useState<ProductModel[]>([]);
   const [accountId, setAccountId] = useState('');
@@ -259,7 +261,10 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
             </p>
           )}
 
-          {row && (
+          {/* Boss chốt 02/08/2026: hệ thống tự gắn đơn theo SĐT khách (trigger lúc
+              tạo đơn + match lần cuối lúc thanh toán). Ô này chỉ còn cho admin làm
+              cần gạt tay khi khách đặt đơn bằng số điện thoại khác. */}
+          {row && profile?.role === 'admin' && (
             <div>
               <label className={label} htmlFor="crm-opp-order">{t('portal.crm.opp.order')}</label>
               <select id="crm-opp-order" className={field} value={orderId} onChange={e => setOrderId(e.target.value)}>
