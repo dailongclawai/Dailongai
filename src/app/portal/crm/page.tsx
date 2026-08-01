@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages, getStaffPeers } from '@/lib/portal-queries';
-import { sumAmount, weightedForecast } from '@/lib/crm-board';
+import { staffPeriodStats, sumAmount, weightedForecast, type TeamPeriod } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import type {
@@ -15,6 +15,25 @@ import type {
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 const DAY_MS = 86_400_000;
+
+/** Viết gọn tiền cho dòng chênh lệch: "29,5 tr" thay vì "29.500.000". */
+function fmtShort(n: number): string {
+  if (n >= 1e9) return `${(n / 1e9).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} tỷ`;
+  if (n >= 1e6) return `${(n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} tr`;
+  return new Intl.NumberFormat('vi-VN').format(Math.round(n));
+}
+
+/** Mũi tên tăng giảm so với kỳ liền trước; bằng nhau thì im lặng cho đỡ nhiễu. */
+function Delta({ cur, prev, money = false }: { cur: number; prev: number; money?: boolean }) {
+  if (cur === prev) return null;
+  const up = cur > prev;
+  const d = Math.abs(cur - prev);
+  return (
+    <span className={`block text-xs ${up ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
+      {up ? '▲' : '▼'} {money ? fmtShort(d) : d}
+    </span>
+  );
+}
 
 /** Số ngày từ hôm nay tới hạn đóng dự kiến. Âm là đã quá hạn. */
 function daysLeft(dateStr: string, today: Date): number {
@@ -38,6 +57,7 @@ export default function CrmDashboardPage() {
   // nhân viên để tách số liệu ra từng người và lọc cả trang theo một người.
   const [peers, setPeers] = useState<StaffPeer[]>([]);
   const [staffFilter, setStaffFilter] = useState<string>('all');
+  const [period, setPeriod] = useState<TeamPeriod>('today');
 
   const isAdmin = profile?.role === 'admin';
 
@@ -119,34 +139,15 @@ export default function CrmDashboardPage() {
   }, [fAccounts]);
 
   // Bảng so sánh cho quản trị: tính từ dữ liệu CHƯA lọc để mọi dòng luôn đủ,
-  // kể cả khi đang lọc trang theo một người.
+  // kể cả khi đang lọc trang theo một người. Ăn theo nhịp `now` nên các cửa sổ
+  // hôm nay / 7 ngày / 30 ngày tự trượt theo đồng hồ.
   const teamStats = useMemo(() => {
     if (!isAdmin) return [];
-    const now = Date.now();
-    const from30 = now - 30 * DAY_MS;
-    return peers.map(p => {
-      const myRows = rows.filter(r => r.owner_id === p.id);
-      const open = myRows.filter(r => r.forecast === 'open');
-      const won = myRows.filter(r => r.forecast === 'won').length;
-      const lost = myRows.filter(r => r.forecast === 'lost').length;
-      const closed = won + lost;
-      const myAccounts = accounts.filter(a => a.owner_id === p.id);
-      return {
-        peer: p,
-        accounts: myAccounts.length,
-        new30: myAccounts.filter(a => new Date(a.created_at).getTime() >= from30).length,
-        openCount: open.length,
-        openValue: sumAmount(open),
-        forecast: weightedForecast(open),
-        expectedCommission: open.reduce((s, r) => s + Number(r.expected_commission), 0),
-        won,
-        lost,
-        winRate: closed > 0 ? Math.round((won / closed) * 1000) / 10 : 0,
-        overdue: activities.filter(a =>
-          a.owner_id === p.id && !a.done_at && a.due_at && new Date(a.due_at).getTime() < now).length,
-      };
-    });
-  }, [isAdmin, peers, rows, accounts, activities]);
+    return peers.map(p => ({
+      peer: p,
+      ...staffPeriodStats(p.id, rows, accounts, activities, period, now),
+    }));
+  }, [isAdmin, peers, rows, accounts, activities, period, now]);
 
   // Phễu: mỗi bậc đếm số cơ hội đã đi qua bậc đó (đang ở bậc này hoặc xa hơn).
   // Cơ hội thua bị loại vì chúng rơi khỏi chuỗi chứ không đi tiếp.
@@ -239,7 +240,22 @@ export default function CrmDashboardPage() {
             <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">
               {t('portal.crm.dash.team_title')}
             </h2>
-            <span className="text-xs text-[var(--crm-muted)]">{t('portal.crm.dash.team_hint')}</span>
+            <div className="flex rounded-xl bg-[var(--crm-s3)] p-1 text-xs">
+              {(['today', '7d', '30d'] as TeamPeriod[]).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={`rounded-lg px-3 py-1.5 ${period === p
+                    ? 'bg-[#ff5625] font-bold text-white'
+                    : 'text-[var(--crm-muted)] hover:text-[var(--crm-text)]'}`}
+                >
+                  {t('portal.crm.dash.period_' + p)}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-[var(--crm-muted)]">
+              {t('portal.crm.dash.vs_prev')} · {t('portal.crm.dash.team_hint')}
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1080px] text-left text-sm">
@@ -247,13 +263,13 @@ export default function CrmDashboardPage() {
                 <tr>
                   <th className="px-5 py-3">{t('portal.crm.reports.col_staff')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_accounts')}</th>
-                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_new30')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_new_accounts')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_won')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.reports.col_won_value')}</th>
+                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_done_tasks')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_count')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.open_value')}</th>
-                  <th className="px-5 py-3 text-right">{t('portal.crm.pipeline.forecast')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.opp.expected_commission')}</th>
-                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.won_lost')}</th>
-                  <th className="px-5 py-3 text-right">{t('portal.crm.dash.win_rate')}</th>
                   <th className="px-5 py-3 text-right">{t('portal.crm.dash.col_overdue_tasks')}</th>
                 </tr>
               </thead>
@@ -280,20 +296,28 @@ export default function CrmDashboardPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.accounts}</td>
-                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-muted)]">{s.new30}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.totalAccounts}</td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">
+                      {s.newAccounts}
+                      <Delta cur={s.newAccounts} prev={s.newAccountsPrev} />
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[#34d399]">
+                      {s.wonDeals}
+                      <Delta cur={s.wonDeals} prev={s.wonDealsPrev} />
+                    </td>
+                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
+                      {fmtVnd(s.wonValue)}đ
+                      <Delta cur={s.wonValue} prev={s.wonValuePrev} money />
+                    </td>
+                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">
+                      {s.doneTasks}
+                      <Delta cur={s.doneTasks} prev={s.doneTasksPrev} />
+                    </td>
                     <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.openCount}</td>
                     <td className="px-5 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(s.openValue)}đ</td>
-                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(s.forecast)}đ</td>
                     <td className="px-5 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(s.expectedCommission)}đ</td>
-                    <td className="px-5 py-3 text-right tabular-nums">
-                      <span className="text-[#34d399]">{s.won}</span>
-                      <span className="text-[var(--crm-muted)]"> / </span>
-                      <span className="text-[#f87171]">{s.lost}</span>
-                    </td>
-                    <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.winRate}%</td>
-                    <td className={`px-5 py-3 text-right tabular-nums ${s.overdue > 0 ? 'text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>
-                      {s.overdue}
+                    <td className={`px-5 py-3 text-right tabular-nums ${s.overdueTasks > 0 ? 'text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>
+                      {s.overdueTasks}
                     </td>
                   </tr>
                 ))}
