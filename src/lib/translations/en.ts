@@ -569,7 +569,7 @@ const en: Record<string, string> = {
     'portal.crm.dash.funnel': 'Conversion funnel',
     'portal.crm.dash.view_all': 'View all',
     'portal.crm.dash.empty': 'No data yet',
-    'portal.crm.dash.today_tasks': "Today's tasks",
+    'portal.crm.dash.today_tasks': 'Overdue & today',
     'portal.crm.dash.no_tasks': 'Nothing due today',
     'portal.crm.dash.urgent': 'Deals needing attention',
     'portal.crm.dash.overdue': 'overdue',

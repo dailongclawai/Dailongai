@@ -41,6 +41,14 @@ export default function CrmDashboardPage() {
 
   const isAdmin = profile?.role === 'admin';
 
+  // Nhịp mỗi phút: các mốc "trễ / hôm nay / còn X ngày" tự nhảy theo đồng hồ.
+  // Không có nó, trang mở từ sáng tới chiều vẫn nói "đến hạn hôm nay" dù đã trễ.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
   }, [loading, session, router]);
@@ -164,23 +172,29 @@ export default function CrmDashboardPage() {
 
   // Việc quá hạn và việc tới hạn hôm nay, sớm nhất lên trước.
   const todayTasks = useMemo(() => {
-    const endOfToday = new Date();
+    const endOfToday = new Date(now);
     endOfToday.setHours(23, 59, 59, 999);
     return fActivities
       .filter(a => !a.done_at && a.due_at && new Date(a.due_at) <= endOfToday)
       .sort((a, b) => (a.due_at ?? '').localeCompare(b.due_at ?? ''))
       .slice(0, 5);
-  }, [fActivities]);
+  }, [fActivities, now]);
+
+  // Đếm trên toàn bộ danh sách chứ không trên 5 dòng đang hiện, để badge nói
+  // đúng tổng số việc trễ.
+  const lateTaskCount = useMemo(
+    () => fActivities.filter(a => !a.done_at && a.due_at && new Date(a.due_at) < now).length,
+    [fActivities, now],
+  );
 
   // Cơ hội đang mở tới hạn đóng trong 7 ngày tới hoặc đã quá hạn.
   const urgent = useMemo(() => {
-    const today = new Date();
     return openRows
-      .map(r => ({ row: r, left: daysLeft(r.expected_close_date, today) }))
+      .map(r => ({ row: r, left: daysLeft(r.expected_close_date, now) }))
       .filter(x => x.left <= 7)
       .sort((a, b) => a.left - b.left)
       .slice(0, 6);
-  }, [openRows]);
+  }, [openRows, now]);
 
   const overdueCount = urgent.filter(x => x.left < 0).length;
 
@@ -380,19 +394,32 @@ export default function CrmDashboardPage() {
         </section>
 
         <section className={`${card} p-5`}>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="crm-display text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.today_tasks')}</h2>
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.today_tasks')}</h2>
+            {lateTaskCount > 0 && (
+              <span className="rounded-full bg-[#f87171]/10 px-3 py-1 text-xs text-[#f87171]">
+                {lateTaskCount} {t('portal.crm.dash.overdue')}
+              </span>
+            )}
             <Link href="/portal/crm/activities" className="text-xs text-[#00daf3] hover:underline">
               {t('portal.crm.dash.view_all')}
             </Link>
           </div>
           <ul className="space-y-2">
             {todayTasks.map(a => {
-              const late = a.due_at ? new Date(a.due_at) < new Date() : false;
+              const due = a.due_at ? new Date(a.due_at) : null;
+              const late = due ? due < now : false;
+              // Việc trễ từ hôm trước phải hiện cả ngày — chỉ in "09:00" đỏ thì
+              // không ai biết nó trễ từ bao giờ.
+              const sameDay = due ? due.toDateString() === now.toDateString() : true;
               return (
                 <li key={a.id} className="flex gap-3 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3">
                   <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#ff5625]'}`}>
-                    {a.due_at ? new Date(a.due_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—'}
+                    {due
+                      ? sameDay
+                        ? due.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                        : due.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                      : '—'}
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-sm text-[var(--crm-text)]">{a.subject}</p>

@@ -572,7 +572,7 @@ const vi: Record<string, string> = {
     'portal.crm.dash.funnel': 'Phễu chuyển đổi',
     'portal.crm.dash.view_all': 'Xem tất cả',
     'portal.crm.dash.empty': 'Chưa có dữ liệu',
-    'portal.crm.dash.today_tasks': 'Việc cần làm hôm nay',
+    'portal.crm.dash.today_tasks': 'Việc trễ & hôm nay',
     'portal.crm.dash.no_tasks': 'Hôm nay không còn việc tới hạn',
     'portal.crm.dash.urgent': 'Cơ hội cần xử lý gấp',
     'portal.crm.dash.overdue': 'quá hạn',
