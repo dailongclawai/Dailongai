@@ -111,7 +111,6 @@ export function PortalShell({
     <div className="flex h-full flex-col bg-[#06080a] py-6">
       <Link href="/portal" className="mb-8 block px-6">
         <h1 className="font-headline text-[22px] font-bold leading-tight text-[#ff5625]">{t('portal.shell.brand')}</h1>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#9ca3af]/70">{t('portal.shell.tagline')}</p>
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto portal-scroll">
         {items.map(navLink)}

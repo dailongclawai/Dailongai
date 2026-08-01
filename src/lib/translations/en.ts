@@ -519,7 +519,6 @@ const en: Record<string, string> = {
 
     // ── Portal shell ──
     'portal.shell.brand': 'Đại Long Tech & Health',
-    'portal.shell.tagline': 'Affiliate Portal',
     'portal.shell.signout': 'Sign out',
     'portal.shell.menu.label': 'Menu',
     'portal.shell.menu.aria': 'Open navigation menu',
