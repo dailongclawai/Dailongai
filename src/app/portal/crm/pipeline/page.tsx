@@ -6,15 +6,15 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
-  getActiveModels, getCrmBoard, getCrmSettings, getCrmStages, moveOpportunityStage,
-  requestAccountCompletion, suggestedUnitPrice,
+  getActiveModels, getCrmBoard, getCrmSettings, getCrmStages, getStaffPeers,
+  moveOpportunityStage, requestAccountCompletion, suggestedUnitPrice,
 } from '@/lib/portal-queries';
 import { groupByStage, sumAmount, weightedForecast } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmOpportunityDrawer } from '@/components/portal/CrmOpportunityDrawer';
 import { CrmLostReasonDialog } from '@/components/portal/CrmLostReasonDialog';
-import type { CrmOpportunityBoardRow, CrmSettings, CrmStage, ProductModel } from '@/lib/portal-types';
+import type { CrmOpportunityBoardRow, CrmSettings, CrmStage, ProductModel, StaffPeer } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -43,6 +43,9 @@ export default function CrmPipelinePage() {
   const [losing, setLosing] = useState<{ id: string; stage: CrmStage } | null>(null);
   const [models, setModels] = useState<ProductModel[]>([]);
   const [settings, setSettings] = useState<CrmSettings | null>(null);
+  // Quản trị lọc bảng theo một nhân viên — lọc tại trình duyệt, không gọi lại máy chủ.
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
+  const [staffFilter, setStaffFilter] = useState<string>('all');
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -76,6 +79,13 @@ export default function CrmPipelinePage() {
     void getCrmSettings().then(setSettings).catch(() => setSettings(null));
   }, [session]);
 
+  useEffect(() => {
+    if (!session || profile?.role !== 'admin') return;
+    void getStaffPeers()
+      .then(ps => setPeers(ps.filter(p => p.role === 'staff')))
+      .catch(() => setPeers([]));
+  }, [session, profile?.role]);
+
   // Chip % giảm so với giá đề nghị (niêm yết / giá đại lý) — admin lướt bảng là
   // biết deal nào đang chiết khấu. Hoa hồng vẫn tính trên giá đơn sau giảm.
   const discountPct = (r: CrmOpportunityBoardRow): number | null => {
@@ -88,8 +98,12 @@ export default function CrmPipelinePage() {
     return pct >= 1 ? pct : null;
   };
 
-  const columns = useMemo(() => groupByStage(stages, rows), [stages, rows]);
-  const openRows = rows.filter(r => r.forecast === 'open');
+  const fRows = useMemo(
+    () => (staffFilter === 'all' ? rows : rows.filter(r => r.owner_id === staffFilter)),
+    [rows, staffFilter],
+  );
+  const columns = useMemo(() => groupByStage(stages, fRows), [stages, fRows]);
+  const openRows = fRows.filter(r => r.forecast === 'open');
   const isAdmin = profile?.role === 'admin';
 
   const move = async (id: string, stageId: string, reasonId?: string, notes?: string) => {
@@ -143,6 +157,21 @@ export default function CrmPipelinePage() {
             <span className="material-symbols-outlined text-[18px]">add_circle</span>
             {t('portal.crm.opp.new')}
           </button>
+          {isAdmin && peers.length > 0 && (
+            <select
+              aria-label={t('portal.crm.dash.staff_filter')}
+              value={staffFilter}
+              onChange={e => setStaffFilter(e.target.value)}
+              className="w-fit rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#8bd6b6]"
+            >
+              <option value="all">{t('portal.crm.dash.staff_all')}</option>
+              {peers.map(p => (
+                <option key={p.id} value={p.id}>
+                  {p.full_name || p.email}{p.staff_segment ? ` · ${t('portal.crm.segment.' + p.staff_segment)}` : ''}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div className="text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--crm-muted)]">
@@ -258,11 +287,17 @@ export default function CrmPipelinePage() {
                         })()}
                       </p>
                       {r.owner_name && (
-                        <span
-                          title={r.owner_name}
-                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#065f46] text-[10px] font-bold text-white"
-                        >
-                          {initials(r.owner_name)}
+                        <span title={r.owner_name} className="flex min-w-0 flex-shrink-0 items-center gap-1.5">
+                          {/* Quản trị xem bảng cả đội nên cần tên chữ, không chỉ avatar
+                              viết tắt — viết tắt dễ trùng và tooltip không chạy trên mobile. */}
+                          {isAdmin && (
+                            <span className="max-w-[88px] truncate text-[11px] text-[var(--crm-muted)]">
+                              {r.owner_name.trim().split(/\s+/).slice(-2).join(' ')}
+                            </span>
+                          )}
+                          <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#065f46] text-[10px] font-bold text-white">
+                            {initials(r.owner_name)}
+                          </span>
                         </span>
                       )}
                     </div>
