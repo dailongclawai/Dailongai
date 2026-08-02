@@ -35,6 +35,15 @@ function STATUS_STYLE(label: string): string {
   return 'text-[#ffb77d] border-[#ffb77d]/40';
 }
 
+// Chữ cái đầu của từ đầu và từ cuối trong tên — "Trần Thị Hoa" → "TH".
+function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '?';
+  const first = words[0][0] ?? '';
+  const last = words.length > 1 ? words[words.length - 1][0] ?? '' : '';
+  return (first + last).toUpperCase();
+}
+
 // Nằm ở bước hiện tại bao nhiêu ngày rồi. Đếm theo ngày lịch chứ không theo 24
 // tiếng: đổi lúc 23h hôm qua thì sáng nay phải là 1 ngày, không phải 0.
 function daysInStage(since: string): number {
@@ -242,6 +251,25 @@ export default function CrmAccountsPage() {
       .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
   }, [rows]);
 
+  // Dải chỉ số trên bảng — tính từ chính mảng đã tải, không gọi thêm API.
+  // "Đang chăm sóc" = chưa chốt sổ (stage_locked đánh dấu thắng/thua).
+  // "Chốt tháng này" = đang ở bước thắng và vào bước đó trong tháng hiện tại
+  // (stage_since là mốc vào trạng thái hiện tại).
+  const stats = useMemo(() => {
+    const wonIds = new Set(stages.filter(s => s.forecast === 'won').map(s => s.id));
+    const now = new Date();
+    const wonThisMonth = rows.filter(r => {
+      if (!r.stage_id || !wonIds.has(r.stage_id)) return false;
+      const d = new Date(r.stage_since);
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+    return {
+      total: rows.length,
+      active: rows.filter(r => !r.stage_locked).length,
+      wonThisMonth,
+    };
+  }, [rows, stages]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return rows.filter(r => {
@@ -425,6 +453,19 @@ export default function CrmAccountsPage() {
     )
   );
 
+  // Badge phân loại: khách cá nhân màu ngọc, khách tổ chức màu vàng đồng.
+  const kindBadge = (r: CrmAccountListRow) => (
+    <span
+      className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${
+        r.kind === 'customer'
+          ? 'border-[#8bd6b6]/30 bg-[#8bd6b6]/10 text-[#8bd6b6]'
+          : 'border-[#ffb77d]/30 bg-[#ffb77d]/10 text-[#ffb77d]'
+      }`}
+    >
+      {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
+    </span>
+  );
+
   const renderEvidence = (r: CrmAccountListRow) => (
     <button
       onClick={() => setEvidencing(r)}
@@ -516,6 +557,37 @@ export default function CrmAccountsPage() {
         </button>
       </div>
 
+      {/* Dải chỉ số nhanh — số thật từ mảng đã tải, không gọi thêm API */}
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="flex items-center justify-between rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-wider text-[var(--crm-muted)]">
+              {t('portal.crm.accounts.stat_total')}
+            </p>
+            <p className="text-2xl font-bold tabular-nums text-[var(--crm-text)]">{stats.total}</p>
+          </div>
+          <span className="material-symbols-outlined text-[28px] text-[#8bd6b6] opacity-50">groups</span>
+        </div>
+        <div className="flex items-center justify-between rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-wider text-[var(--crm-muted)]">
+              {t('portal.crm.accounts.stat_active')}
+            </p>
+            <p className="text-2xl font-bold tabular-nums text-[var(--crm-text)]">{stats.active}</p>
+          </div>
+          <span className="material-symbols-outlined text-[28px] text-[#ffb77d] opacity-50">autorenew</span>
+        </div>
+        <div className="flex items-center justify-between rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-wider text-[var(--crm-muted)]">
+              {t('portal.crm.accounts.stat_won_month')}
+            </p>
+            <p className="text-2xl font-bold tabular-nums text-[#8bd6b6]">{stats.wonThisMonth}</p>
+          </div>
+          <span className="material-symbols-outlined text-[28px] text-[#8bd6b6] opacity-50">task_alt</span>
+        </div>
+      </div>
+
       <div className="hidden overflow-x-auto rounded-2xl border border-[var(--crm-line)] md:block">
         <table className="w-full min-w-[1240px] text-left text-sm">
           <thead className="bg-[var(--crm-s3)] text-[var(--crm-muted)]">
@@ -544,13 +616,20 @@ export default function CrmAccountsPage() {
             {pageRows.map(r => (
               <tr
                 key={r.id}
-                className="cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)]"
+                className="cursor-pointer border-t border-[var(--crm-line)] transition-colors duration-150 hover:bg-[#1e2023]"
                 onClick={() => router.push(`/portal/crm/accounts/detail?id=${r.id}`)}
               >
                 <td className="px-4 py-3 font-mono text-[#ffb77d]">{r.code}</td>
-                <td className="px-4 py-3 text-[var(--crm-text)]">{r.name}</td>
+                <td className="px-4 py-3 text-[var(--crm-text)]">
+                  <span className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#8bd6b6]/25 bg-[#8bd6b6]/15 text-xs font-semibold text-[#8bd6b6]">
+                      {initials(r.name)}
+                    </span>
+                    {r.name}
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">
-                  {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
+                  {kindBadge(r)}
                   {r.org_type && (
                     <span className="mt-0.5 block text-xs text-[var(--crm-muted)]/70">
                       {t('portal.crm.org.' + r.org_type)}
@@ -628,12 +707,11 @@ export default function CrmAccountsPage() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold text-[var(--crm-text)]">{r.name}</p>
-                <p className="mt-0.5 text-xs text-[var(--crm-muted)]">
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-[var(--crm-muted)]">
                   <span className="font-mono text-[#ffb77d]">{r.code}</span>
-                  {' · '}
-                  {t(r.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
-                  {r.total_quantity > 0 && <> · {r.total_quantity} {t('portal.crm.opp.machines')}</>}
-                  {isAdmin && r.owner_name && <> · <span className="text-[#ffb77d]">{r.owner_name}</span></>}
+                  {kindBadge(r)}
+                  {r.total_quantity > 0 && <span>{r.total_quantity} {t('portal.crm.opp.machines')}</span>}
+                  {isAdmin && r.owner_name && <span className="text-[#ffb77d]">{r.owner_name}</span>}
                 </p>
               </div>
               <span onClick={e => e.stopPropagation()}>{renderEvidence(r)}</span>

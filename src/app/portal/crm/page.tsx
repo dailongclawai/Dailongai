@@ -11,6 +11,7 @@ import {
 import { staffPeriodStats, sumAmount, weightedForecast, type TeamPeriod } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
+import { SparklineBar } from '@/components/portal/SparklineBar';
 import type {
   CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage, StaffPeer,
 } from '@/lib/portal-types';
@@ -44,6 +45,48 @@ function daysLeft(dateStr: string, today: Date): number {
   const b = Date.UTC(due.getFullYear(), due.getMonth(), due.getDate());
   return Math.round((b - a) / DAY_MS);
 }
+
+/** Thời gian tương đối kiểu "2 phút trước" cho feed hoạt động. */
+function relTime(ts: string, now: Date, t: (k: string) => string): string {
+  const d = new Date(ts);
+  const diff = now.getTime() - d.getTime();
+  if (diff < 60_000) return t('portal.crm.dash.just_now');
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} ${t('portal.crm.dash.min_ago')}`;
+  const yesterday = new Date(now.getTime() - DAY_MS);
+  if (d.toDateString() === now.toDateString()) {
+    return `${Math.floor(diff / 3_600_000)} ${t('portal.crm.dash.hour_ago')}`;
+  }
+  if (d.toDateString() === yesterday.toDateString()) {
+    return `${t('portal.crm.dash.yesterday')}, ${d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+  return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+/** Vòng progress ring: chu vi ≈100 nên strokeDasharray nhận thẳng số phần trăm. */
+function ProgressRing({ pct, label }: { pct: number; label: string }) {
+  const clamped = Math.max(0, Math.min(100, pct));
+  return (
+    <div className="relative h-12 w-12 shrink-0" role="img" aria-label={`${label}: ${clamped}%`}>
+      <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
+        <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--crm-s3)" strokeWidth="3" />
+        <circle
+          cx="18" cy="18" r="15.9155" fill="none" stroke="#8bd6b6" strokeWidth="3"
+          strokeDasharray={`${clamped}, 100`} strokeLinecap="round"
+          className="drop-shadow-[0_0_4px_rgba(139,214,182,0.6)]"
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] tabular-nums text-[#8bd6b6]">
+        {clamped}%
+      </span>
+    </div>
+  );
+}
+
+const KIND_ICON: Record<CrmActivityRow['kind'], string> = {
+  task: 'task_alt',
+  call: 'call',
+  meeting: 'groups',
+};
 
 export default function CrmDashboardPage() {
   const router = useRouter();
@@ -140,6 +183,37 @@ export default function CrmDashboardPage() {
     return fAccounts.filter(a => new Date(a.created_at).getTime() >= from).length;
   }, [fAccounts]);
 
+  // Số máy đã bán trong tháng dương lịch hiện tại: cộng quantity của các cơ hội
+  // thắng có mốc đóng sổ closed_at rơi vào tháng này.
+  const machinesThisMonth = useMemo(() => {
+    return fRows
+      .filter(r => {
+        if (r.forecast !== 'won' || !r.closed_at) return false;
+        const d = new Date(r.closed_at);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      })
+      .reduce((s, r) => s + (Number(r.quantity) || 0), 0);
+  }, [fRows, now]);
+
+  // Hoa hồng tạm tính = tổng hoa hồng dự kiến của các cơ hội đang mở,
+  // cùng công thức với cột "Hoa hồng dự kiến" trong bảng nhân viên.
+  const commissionOpen = useMemo(
+    () => openRows.reduce((s, r) => s + Number(r.expected_commission), 0),
+    [openRows],
+  );
+
+  // Sparkline khách mới: 10 khoảng × 3 ngày trong 30 ngày gần nhất.
+  const accountSpark = useMemo(() => {
+    const buckets = new Array<number>(10).fill(0);
+    const from = now.getTime() - 30 * DAY_MS;
+    for (const a of fAccounts) {
+      const ts = new Date(a.created_at).getTime();
+      if (ts < from) continue;
+      buckets[Math.min(9, Math.floor((ts - from) / (3 * DAY_MS)))] += 1;
+    }
+    return buckets;
+  }, [fAccounts, now]);
+
   // Bảng so sánh cho quản trị: tính từ dữ liệu CHƯA lọc để mọi dòng luôn đủ,
   // kể cả khi đang lọc trang theo một người. Ăn theo nhịp `now` nên các cửa sổ
   // hôm nay / 7 ngày / 30 ngày tự trượt theo đồng hồ.
@@ -190,6 +264,14 @@ export default function CrmDashboardPage() {
     [fActivities, now],
   );
 
+  // Feed hoạt động gần đây: xếp theo mốc mới nhất (xong lúc nào, hoặc tạo lúc nào).
+  const recentFeed = useMemo(() => {
+    return fActivities
+      .map(a => ({ a, ts: a.done_at ?? a.created_at }))
+      .sort((x, y) => y.ts.localeCompare(x.ts))
+      .slice(0, 6);
+  }, [fActivities]);
+
   // Cơ hội đang mở tới hạn đóng trong 7 ngày tới hoặc đã quá hạn.
   const urgent = useMemo(() => {
     return openRows
@@ -204,6 +286,9 @@ export default function CrmDashboardPage() {
   if (loading || !profile) return null;
 
   const card = 'rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)]';
+  const heroCard = `${card} p-5 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-[var(--crm-s2)]`;
+  const iconChip = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--crm-s3)]';
+  const capsLabel = 'text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]';
 
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
@@ -329,61 +414,89 @@ export default function CrmDashboardPage() {
         </section>
       )}
 
-      {/* Ba chỉ số chính */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className={`${card} p-5`}>
-          <div className="mb-4 flex items-start justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#8bd6b6]">
-              <span className="material-symbols-outlined text-[20px]">payments</span>
-            </span>
-            <span className="rounded-full bg-[#ffb77d]/10 px-2.5 py-1 text-xs text-[#ffb77d]">
-              {t('portal.crm.dash.deals_open')}: {openRows.length}
+      {/* 1. Hàng hero: 4 thẻ chỉ số chính */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* Máy bán tháng này + vòng tỉ lệ chốt */}
+        <div className={heroCard}>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <p className={capsLabel}>{t('portal.crm.dash.machines_month')}</p>
+            <span className={iconChip}>
+              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">precision_manufacturing</span>
             </span>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">{t('portal.crm.dash.open_value')}</p>
-          <p className="crm-display mt-1 text-2xl font-semibold tabular-nums text-[var(--crm-text)]">{fmtVnd(sumAmount(openRows))}đ</p>
-          <p className="mt-2 text-xs text-[var(--crm-muted)]">
+          <div className="flex items-end justify-between gap-4">
+            <p className="crm-display text-4xl font-semibold tabular-nums text-[#8bd6b6]">
+              {machinesThisMonth}
+              <span className="ml-1 text-base font-normal text-[var(--crm-muted)]">{t('portal.crm.dash.machines_unit')}</span>
+            </p>
+            <ProgressRing pct={winRate} label={t('portal.crm.dash.win_rate')} />
+          </div>
+          <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
+            {t('portal.crm.dash.win_rate')} {winRate}% ·{' '}
+            <span className="text-[#34d399]">{wonCount} {t('portal.crm.dash.won')}</span> ·{' '}
+            <span className="text-[#f87171]">{lostCount} {t('portal.crm.dash.lost')}</span>
+          </p>
+        </div>
+
+        {/* Khách hàng mới + sparkline 30 ngày */}
+        <div className={heroCard}>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <p className={capsLabel}>{t('portal.crm.dash.new_accounts')}</p>
+            <span className={iconChip}>
+              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">person_add</span>
+            </span>
+          </div>
+          <div className="flex items-end justify-between gap-4">
+            <p className="crm-display text-4xl font-semibold tabular-nums text-[var(--crm-text)]">{newAccounts}</p>
+            <div className="mb-1">
+              <SparklineBar data={accountSpark} width={96} height={36} gap={3} />
+            </div>
+          </div>
+          <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
+            {t('portal.crm.dash.last_30_days')} · {t('portal.crm.dash.total')}: {fAccounts.length}
+          </p>
+        </div>
+
+        {/* Hoa hồng tạm tính — accent vàng */}
+        <div className={heroCard}>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <p className={capsLabel}>{t('portal.crm.dash.commission_est')}</p>
+            <span className={iconChip}>
+              <span className="material-symbols-outlined text-[20px] text-[#ffb77d]">payments</span>
+            </span>
+          </div>
+          <p className="crm-display text-3xl font-semibold tracking-tight tabular-nums text-[#ffb77d]">
+            {fmtVnd(commissionOpen)}<span className="ml-0.5 text-xl">₫</span>
+          </p>
+          <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
+            {t('portal.crm.opp.expected_commission')} · {openRows.length} {t('portal.crm.dash.open_deals_count')}
+          </p>
+        </div>
+
+        {/* Giá trị đang mở + dự báo */}
+        <div className={heroCard}>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <p className={capsLabel}>{t('portal.crm.dash.open_value')}</p>
+            <span className={iconChip}>
+              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">trending_up</span>
+            </span>
+          </div>
+          <p className="crm-display text-3xl font-semibold tracking-tight tabular-nums text-[var(--crm-text)]">
+            {fmtVnd(sumAmount(openRows))}<span className="ml-0.5 text-xl text-[var(--crm-muted)]">₫</span>
+          </p>
+          <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
             {t('portal.crm.pipeline.forecast')}:{' '}
-            <span className="tabular-nums text-[#ffb77d]">{fmtVnd(weightedForecast(openRows))}đ</span>
+            <span className="text-[#ffb77d]">{fmtVnd(weightedForecast(openRows))}đ</span>
+            {' '}· {t('portal.crm.dash.deals_open')}: {openRows.length}
           </p>
-        </div>
-
-        <div className={`${card} p-5`}>
-          <div className="mb-4 flex items-start justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#34d399]">
-              <span className="material-symbols-outlined text-[20px]">trending_up</span>
-            </span>
-            <span className="rounded-full bg-[var(--crm-s3)] px-2.5 py-1 text-xs text-[var(--crm-muted)]">
-              {closedCount} {t('portal.crm.dash.closed_deals')}
-            </span>
-          </div>
-          <p className="text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">{t('portal.crm.dash.win_rate')}</p>
-          <p className="crm-display mt-1 text-2xl font-semibold tabular-nums text-[var(--crm-text)]">{winRate}%</p>
-          <p className="mt-2 text-xs text-[var(--crm-muted)]">
-            <span className="text-[#34d399]">{wonCount}</span> {t('portal.crm.dash.won')} ·{' '}
-            <span className="text-[#f87171]">{lostCount}</span> {t('portal.crm.dash.lost')}
-          </p>
-        </div>
-
-        <div className={`${card} p-5`}>
-          <div className="mb-4 flex items-start justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#ffb77d]">
-              <span className="material-symbols-outlined text-[20px]">person_add</span>
-            </span>
-            <span className="rounded-full bg-[var(--crm-s3)] px-2.5 py-1 text-xs text-[var(--crm-muted)]">
-              {t('portal.crm.dash.total')}: {fAccounts.length}
-            </span>
-          </div>
-          <p className="text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">{t('portal.crm.dash.new_accounts')}</p>
-          <p className="crm-display mt-1 text-2xl font-semibold tabular-nums text-[var(--crm-text)]">{newAccounts}</p>
-          <p className="mt-2 text-xs text-[var(--crm-muted)]">{t('portal.crm.dash.last_30_days')}</p>
         </div>
       </div>
 
-      {/* Phễu chuyển đổi + việc trong ngày */}
-      <div className="mb-6 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <section className={`${card} p-5`}>
-          <div className="mb-4 flex items-center justify-between">
+      {/* 2. Phễu pipeline + hoạt động gần đây + việc hôm nay */}
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+        {/* Phễu chuyển đổi */}
+        <section className={`${card} flex flex-col p-5 lg:col-span-1`}>
+          <div className="mb-5 flex items-center justify-between">
             <h2 className="crm-display text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.funnel')}</h2>
             <Link href="/portal/crm/pipeline" className="text-xs text-[#ffb77d] hover:underline">
               {t('portal.crm.dash.view_all')}
@@ -393,74 +506,152 @@ export default function CrmDashboardPage() {
           {!busy && funnel.length === 0 && (
             <p className="py-6 text-center text-sm text-[var(--crm-muted)]">{t('portal.crm.dash.empty')}</p>
           )}
-          <div className="space-y-3">
-            {funnel.map(step => (
-              <div key={step.stage.id}>
-                <div className="mb-1 flex items-baseline justify-between text-sm">
-                  <span className="text-[var(--crm-text)]">{step.stage.name}</span>
-                  <span className="crm-display tabular-nums text-[var(--crm-text)]">{step.count}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-7 flex-1 overflow-hidden rounded-lg bg-[var(--crm-s3)]">
+          <div className="flex flex-1 flex-col justify-between gap-3">
+            {funnel.map((step, i) => {
+              const isWon = step.stage.forecast === 'won';
+              const depth = funnel.length > 1 ? i / (funnel.length - 1) : 1;
+              return (
+                <div key={step.stage.id} className="flex items-center gap-3">
+                  <span className={`crm-display w-10 shrink-0 text-right text-sm tabular-nums ${isWon ? 'text-[#ffb77d]' : 'text-[var(--crm-text)]'}`}>
+                    {step.count}
+                  </span>
+                  <div className={`relative h-8 flex-1 overflow-hidden rounded-lg border bg-[var(--crm-s3)] ${isWon ? 'border-[#ffb77d]/30' : 'border-[var(--crm-line)]/60'}`}>
                     <div
-                      className="h-full rounded-lg"
+                      className="absolute left-0 top-0 h-full rounded-lg"
                       style={{
                         width: `${step.width}%`,
-                        backgroundColor: step.stage.forecast === 'won' ? '#d97706' : '#065f46',
+                        backgroundColor: isWon ? '#d97706' : '#065f46',
+                        opacity: isWon ? 1 : 0.45 + depth * 0.55,
                       }}
                     />
+                    <span className="absolute inset-0 flex items-center truncate px-3 text-xs text-[var(--crm-text)]">
+                      {step.stage.name}
+                    </span>
                   </div>
-                  <span className="w-10 shrink-0 text-right font-mono text-xs tabular-nums text-[var(--crm-muted)]">
+                  <span className="w-9 shrink-0 text-right font-mono text-[11px] tabular-nums text-[var(--crm-muted)]">
                     {step.keepPct !== null ? `${step.keepPct}%` : '—'}
                   </span>
                 </div>
+              );
+            })}
+            {!busy && funnel.length > 0 && (
+              <div className="mt-1 flex items-center gap-3 border-t border-[var(--crm-line)]/60 pt-3 opacity-60">
+                <span className="crm-display w-10 shrink-0 text-right text-sm tabular-nums text-[var(--crm-muted)]">{lostCount}</span>
+                <div className="relative h-6 flex-1 overflow-hidden rounded-lg border border-[var(--crm-line)]/60 bg-[var(--crm-s2)]">
+                  <span className="absolute inset-0 flex items-center truncate px-3 text-xs text-[var(--crm-muted)]">
+                    {t('portal.crm.dash.lost')}
+                  </span>
+                </div>
+                <span className="w-9 shrink-0" />
               </div>
-            ))}
+            )}
           </div>
         </section>
 
-        <section className={`${card} p-5`}>
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.today_tasks')}</h2>
-            {lateTaskCount > 0 && (
-              <span className="rounded-full bg-[#f87171]/10 px-3 py-1 text-xs text-[#f87171]">
-                {lateTaskCount} {t('portal.crm.dash.overdue')}
-              </span>
+        <div className="grid gap-4 md:grid-cols-2 lg:col-span-2">
+          {/* Hoạt động gần đây — timeline chấm tròn */}
+          <section className={`${card} flex flex-col p-5`}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="crm-display text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.recent_activity')}</h2>
+              <Link href="/portal/crm/activities" className="text-xs text-[#ffb77d] hover:underline">
+                {t('portal.crm.dash.view_all')}
+              </Link>
+            </div>
+            {busy && <p className="text-sm text-[var(--crm-muted)]">{t('portal.crm.common.loading')}</p>}
+            {!busy && recentFeed.length === 0 && (
+              <p className="rounded-xl border border-dashed border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
+                {t('portal.crm.dash.no_activity')}
+              </p>
             )}
-            <Link href="/portal/crm/activities" className="text-xs text-[#ffb77d] hover:underline">
-              {t('portal.crm.dash.view_all')}
-            </Link>
-          </div>
-          <ul className="space-y-2">
-            {todayTasks.map(a => {
-              const due = a.due_at ? new Date(a.due_at) : null;
-              const late = due ? due < now : false;
-              // Việc trễ từ hôm trước phải hiện cả ngày — chỉ in "09:00" đỏ thì
-              // không ai biết nó trễ từ bao giờ.
-              const sameDay = due ? due.toDateString() === now.toDateString() : true;
-              return (
-                <li key={a.id} className="flex gap-3 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3">
-                  <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#8bd6b6]'}`}>
-                    {due
-                      ? sameDay
-                        ? due.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-                        : due.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-                      : '—'}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm text-[var(--crm-text)]">{a.subject}</p>
-                    <p className="truncate text-xs text-[var(--crm-muted)]">{a.account_name ?? a.opportunity_name ?? '—'}</p>
-                  </div>
+            {recentFeed.length > 0 && (
+              <div className="relative space-y-5">
+                <div aria-hidden="true" className="absolute bottom-2 left-[11px] top-2 w-px bg-[var(--crm-line)]/60" />
+                {recentFeed.map(({ a, ts }) => {
+                  const done = Boolean(a.done_at);
+                  return (
+                    <div key={a.id} className="relative z-10 flex gap-3">
+                      <span
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
+                          done
+                            ? 'border-[#8bd6b6]/50 bg-[#065f46]'
+                            : 'border-[var(--crm-line)] bg-[var(--crm-s3)]'
+                        }`}
+                      >
+                        <span className={`material-symbols-outlined text-[13px] ${done ? 'text-[#8bd6b6]' : 'text-[var(--crm-muted)]'}`}>
+                          {KIND_ICON[a.kind]}
+                        </span>
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm text-[var(--crm-text)]">
+                          {a.subject}
+                          {(a.account_name ?? a.opportunity_name) && (
+                            <span className="text-[#8bd6b6]"> · {a.account_name ?? a.opportunity_name}</span>
+                          )}
+                        </p>
+                        <p className="mt-0.5 font-mono text-[11px] tabular-nums text-[var(--crm-muted)]">
+                          {t('portal.crm.activity.kind_' + a.kind)} · {relTime(ts, now, t)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Việc cần làm hôm nay */}
+          <section className={`${card} flex flex-col p-5`}>
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.today_tasks')}</h2>
+              {lateTaskCount > 0 && (
+                <span className="rounded-full bg-[#f87171]/10 px-3 py-1 text-xs text-[#f87171]">
+                  {lateTaskCount} {t('portal.crm.dash.overdue')}
+                </span>
+              )}
+              <Link href="/portal/crm/activities" className="text-xs text-[#ffb77d] hover:underline">
+                {t('portal.crm.dash.view_all')}
+              </Link>
+            </div>
+            <ul className="space-y-2.5">
+              {todayTasks.map(a => {
+                const due = a.due_at ? new Date(a.due_at) : null;
+                const late = due ? due < now : false;
+                // Việc trễ từ hôm trước phải hiện cả ngày — chỉ in "09:00" đỏ thì
+                // không ai biết nó trễ từ bao giờ.
+                const sameDay = due ? due.toDateString() === now.toDateString() : true;
+                return (
+                  <li
+                    key={a.id}
+                    className={`flex items-start gap-3 rounded-xl border bg-[var(--crm-s2)] p-3 transition-colors hover:bg-[var(--crm-s3)] ${
+                      late ? 'border-[#f87171]/30' : 'border-[var(--crm-line)]'
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`mt-0.5 h-4 w-4 shrink-0 rounded border ${late ? 'border-[#f87171]/60' : 'border-[var(--crm-line)]'}`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className={`truncate text-sm ${late ? 'text-[#f87171]' : 'text-[var(--crm-text)]'}`}>{a.subject}</p>
+                      <p className="truncate text-xs text-[var(--crm-muted)]">{a.account_name ?? a.opportunity_name ?? '—'}</p>
+                    </div>
+                    <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#8bd6b6]'}`}>
+                      {due
+                        ? sameDay
+                          ? due.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                          : due.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                        : '—'}
+                    </span>
+                  </li>
+                );
+              })}
+              {!busy && todayTasks.length === 0 && (
+                <li className="rounded-xl border border-dashed border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
+                  {t('portal.crm.dash.no_tasks')}
                 </li>
-              );
-            })}
-            {!busy && todayTasks.length === 0 && (
-              <li className="rounded-xl border border-dashed border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
-                {t('portal.crm.dash.no_tasks')}
-              </li>
-            )}
-          </ul>
-        </section>
+              )}
+            </ul>
+          </section>
+        </div>
       </div>
 
       {/* Cơ hội cần xử lý gấp */}

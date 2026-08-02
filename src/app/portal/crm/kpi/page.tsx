@@ -30,6 +30,9 @@ function todayVn(): string {
 const monthLabel = (thang: string) => `${Number(thang.slice(5, 7))}/${thang.slice(2, 4)}`;
 const dayLabel = (ngay: string) => `${Number(ngay.slice(8, 10))}/${Number(ngay.slice(5, 7))}`;
 
+// Chu vi vòng gauge r=45 trong viewBox 100×100.
+const GAUGE_C = 2 * Math.PI * 45;
+
 export default function CrmKpiPage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -131,11 +134,56 @@ export default function CrmKpiPage() {
     </div>
   );
 
+  /** Card KPI phụ có progress bar — icon, nhãn, % đạt, số / dải chỉ tiêu. */
+  const activityCard = (icon: string, labelKey: string, value: number, goalMin: number, goalMax: number) => {
+    const pct = Math.min(100, Math.round((value / goalMin) * 100));
+    return (
+      <section className={card}>
+        <div className="flex items-end justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/5 bg-[var(--crm-s3)] text-[#8bd6b6]">
+              <span className="material-symbols-outlined">{icon}</span>
+            </div>
+            <div className="min-w-0">
+              <h3 className="truncate font-medium text-[var(--crm-text)]">{t(labelKey)}</h3>
+              <p className="mt-0.5 text-[11px] uppercase tracking-wider text-[var(--crm-muted)]">
+                {t('portal.crm.kpi.goal_pct_pre')} {pct}{t('portal.crm.kpi.goal_pct_post')}
+              </p>
+            </div>
+          </div>
+          <p className="shrink-0 whitespace-nowrap text-right">
+            <span className="crm-display text-2xl font-bold tabular-nums text-[#8bd6b6]">{value}</span>
+            <span className="font-mono text-sm tabular-nums text-[var(--crm-muted)]">
+              {' '}/ {goalMin}–{goalMax} {t('portal.crm.kpi.daily_goal')}
+            </span>
+          </p>
+        </div>
+        <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+          <div
+            className="relative h-full rounded-full bg-[#8bd6b6] transition-[width] duration-700 ease-out"
+            style={{ width: `${pct}%` }}
+          >
+            <div className="absolute inset-y-0 right-0 w-3 bg-white/20 blur-[2px]" />
+          </div>
+        </div>
+      </section>
+    );
+  };
+
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.title')}</h1>
+      <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--crm-text)]">{t('portal.crm.kpi.title')}</h1>
+          <p className="mt-1 text-sm text-[var(--crm-muted)]">{t('portal.crm.kpi.subtitle')}</p>
+        </div>
+        <div className="flex w-fit items-center gap-2 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2">
+          <span className="material-symbols-outlined text-[18px] text-[#8bd6b6]">calendar_month</span>
+          <span className="font-mono text-sm tabular-nums text-[var(--crm-text)]">
+            {t('portal.crm.kpi.month_chip_pre')} {Number(curMonth.slice(5, 7))}/{curMonth.slice(0, 4)}
+          </span>
+        </div>
       </div>
 
       {/* Luật chung — nhìn một chỗ là biết cả bộ KPI */}
@@ -157,121 +205,182 @@ export default function CrmKpiPage() {
         <p className="text-[var(--crm-muted)]">{t('portal.crm.kpi.empty')}</p>
       )}
 
-      {!busy && !isAdmin && mine && (
-        <>
-          <div className="mb-6 grid gap-4 md:grid-cols-3">
-            <section className={card}>
-              <h2 className="mb-1 text-sm text-[var(--crm-muted)]">{t('portal.crm.kpi.month_title')}</h2>
-              <div className="flex items-end justify-between gap-2">
-                <p className="text-3xl font-bold text-[var(--crm-text)]">
-                  {mine.devices_won}
-                  <span className="ml-1 text-sm font-normal text-[var(--crm-muted)]">
-                    / {mine.kpi_target} {t('portal.crm.kpi.devices')}
-                  </span>
-                </p>
-                {statusBadge(mine.devices_won, mine.tenure_month)}
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+      {!busy && !isAdmin && mine && (() => {
+        const gaugePct = Math.min(1, mine.devices_won / Math.max(mine.kpi_target, 1));
+        const last6 = months.slice(-6);
+        const chartMax = Math.max(...last6.map(m => m.devices_won), mine.kpi_target, 1);
+        const bonusOn = mine.devices_won >= KPI_BONUS_FROM_DEVICE;
+        const retailToday = mineToday?.retail_new ?? 0;
+        const orgToday = mineToday?.org_new ?? 0;
+        return (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            {/* ── Cột trái: gauge + 6 tháng + card thưởng ── */}
+            <div className="flex flex-col gap-4 lg:col-span-5">
+              <section className={`${card} relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden`}>
                 <div
-                  className={`h-full rounded-full ${mine.devices_won >= mine.kpi_target ? 'bg-[#34d399]' : 'bg-[#d97706]'}`}
-                  style={{ width: `${Math.min(100, (mine.devices_won / mine.kpi_target) * 100)}%` }}
+                  className="pointer-events-none absolute inset-0 opacity-10"
+                  style={{ background: 'radial-gradient(circle at center, rgba(139, 214, 182, 0.5) 0%, transparent 70%)' }}
                 />
-              </div>
-              <p className="mt-2 text-xs text-[var(--crm-muted)]">
-                {t('portal.crm.kpi.tenure_pre')} {mine.tenure_month} · {t('portal.crm.kpi.excellent')}: &gt;{mine.kpi_excellent} {t('portal.crm.kpi.devices')}
-              </p>
-            </section>
+                <div className="relative mb-4 h-48 w-48">
+                  <svg viewBox="0 0 100 100" className="h-full w-full" role="img" aria-label={`${mine.devices_won} / ${mine.kpi_target} ${t('portal.crm.kpi.devices')}`}>
+                    <circle cx={50} cy={50} r={45} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={6} />
+                    {/* Vạch mốc chỉ tiêu (gauge chia theo chỉ tiêu → mốc nằm đỉnh vòng) */}
+                    <line x1={50} y1={1.5} x2={50} y2={11} stroke="#d97706" strokeWidth={1.5} strokeDasharray="2,2" opacity={0.7} />
+                    <circle
+                      cx={50} cy={50} r={45} fill="none"
+                      stroke="#8bd6b6" strokeWidth={6} strokeLinecap="round"
+                      strokeDasharray={GAUGE_C}
+                      strokeDashoffset={GAUGE_C * (1 - gaugePct)}
+                      transform="rotate(-90 50 50)"
+                      style={{ transition: 'stroke-dashoffset 800ms ease-out' }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="crm-display text-5xl font-bold tabular-nums text-[#8bd6b6]">{mine.devices_won}</span>
+                    <span className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[var(--crm-muted)]">
+                      / {mine.kpi_target} {t('portal.crm.kpi.devices')}
+                    </span>
+                  </div>
+                </div>
+                <div className="z-10 flex flex-col items-center gap-2 text-center">
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.month_title')}</h2>
+                    {statusBadge(mine.devices_won, mine.tenure_month)}
+                  </div>
+                  <p className="text-xs text-[var(--crm-muted)]">
+                    {t('portal.crm.kpi.tenure_pre')} {mine.tenure_month} · {t('portal.crm.kpi.excellent')}: &gt;{mine.kpi_excellent} {t('portal.crm.kpi.devices')}
+                  </p>
+                </div>
+              </section>
 
-            <section className={card}>
-              <h2 className="mb-1 text-sm text-[var(--crm-muted)]">{t('portal.crm.kpi.bonus_title')}</h2>
-              {mine.devices_won >= KPI_BONUS_FROM_DEVICE ? (
-                <p className="text-sm font-medium text-[#34d399]">{t('portal.crm.kpi.bonus_on')}</p>
-              ) : (
-                <p className="text-sm text-[var(--crm-text)]">
-                  {t('portal.crm.kpi.bonus_left_pre')}{' '}
-                  <b>{KPI_BONUS_FROM_DEVICE - mine.devices_won}</b>{' '}
-                  {t('portal.crm.kpi.bonus_left_post')}
-                </p>
-              )}
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
-                <div
-                  className="h-full rounded-full bg-[#065f46]"
-                  style={{ width: `${Math.min(100, (mine.devices_won / KPI_BONUS_FROM_DEVICE) * 100)}%` }}
-                />
-              </div>
-              <p className="mt-2 text-xs text-[var(--crm-muted)]">
-                {mine.devices_won} / {KPI_BONUS_FROM_DEVICE} {t('portal.crm.kpi.devices')}
-              </p>
-            </section>
+              <section className={card}>
+                <h2 className="mb-4 flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--crm-muted)]">
+                  <span>{t('portal.crm.kpi.chart6_title')}</span>
+                  <span className="material-symbols-outlined text-sm">bar_chart</span>
+                </h2>
+                <div className="relative h-[132px]">
+                  <div
+                    className="pointer-events-none absolute left-0 z-0 flex w-full items-center border-t border-dashed border-[#d97706]/50"
+                    style={{ bottom: `${(mine.kpi_target / chartMax) * 112}px` }}
+                  >
+                    <span className="absolute -top-4 right-0 text-[10px] uppercase tracking-wider text-[#ffb77d]">
+                      {t('portal.crm.kpi.target_short')}: {mine.kpi_target}
+                    </span>
+                  </div>
+                  <div className="flex h-full items-end justify-between gap-2">
+                    {last6.map(m => {
+                      const cur = m.thang === curMonth;
+                      return (
+                        <div
+                          key={m.thang}
+                          className="group z-10 flex flex-1 flex-col items-center justify-end gap-1"
+                          title={deviceHint(monthLabel(m.thang), m.devices_won)}
+                        >
+                          <span className="font-mono text-[10px] tabular-nums text-[var(--crm-muted)] opacity-0 transition-opacity group-hover:opacity-100">
+                            {m.devices_won}
+                          </span>
+                          <div
+                            className={`w-full rounded-t-sm transition-colors ${
+                              cur ? 'bg-[#8bd6b6]' : 'bg-[#8bd6b6]/30 group-hover:bg-[#8bd6b6]/60'
+                            }`}
+                            style={{ height: `${m.devices_won > 0 ? Math.max(6, (m.devices_won / chartMax) * 112) : 2}px` }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="mt-2 flex justify-between gap-2">
+                  {last6.map(m => (
+                    <span
+                      key={m.thang}
+                      className={`flex-1 text-center font-mono text-[10px] tabular-nums ${
+                        m.thang === curMonth ? 'text-[#8bd6b6]' : 'text-[var(--crm-muted)]'
+                      }`}
+                    >
+                      {monthLabel(m.thang)}
+                    </span>
+                  ))}
+                </div>
+              </section>
 
-            <section className={card}>
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <h2 className="text-sm text-[var(--crm-muted)]">{t('portal.crm.kpi.daily_title')}</h2>
-                {dailyBadge(mineToday?.retail_new ?? 0, mineToday?.org_new ?? 0)}
-              </div>
-              <div className="mt-2 space-y-2 text-sm text-[var(--crm-text)]">
-                <p className="flex items-baseline justify-between">
-                  <span>{t('portal.crm.kpi.daily_retail')}</span>
-                  <span className="font-mono tabular-nums">
-                    <b className="text-xl">{mineToday?.retail_new ?? 0}</b>
-                    <span className="text-[var(--crm-muted)]"> / {DAILY_RETAIL_MIN}–{DAILY_RETAIL_MAX} {t('portal.crm.kpi.daily_goal')}</span>
-                  </span>
+              {/* Card ghi chú gold — mốc thưởng +5% từ máy thứ 10 (KPI_BONUS_FROM_DEVICE) */}
+              <section className="rounded-2xl border border-[#d97706]/30 bg-[#d97706]/10 p-5">
+                <div className="flex items-start gap-3">
+                  <span className="material-symbols-outlined mt-0.5 text-[#ffb77d]">stars</span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-bold text-[#ffb77d]">{t('portal.crm.kpi.bonus_title')}</h2>
+                    {bonusOn ? (
+                      <p className="mt-1 text-sm font-medium text-[#34d399]">{t('portal.crm.kpi.bonus_on')}</p>
+                    ) : (
+                      <>
+                        <p className="mt-1 text-sm text-[var(--crm-text)]">
+                          {t('portal.crm.kpi.bonus_left_pre')}{' '}
+                          <b>{KPI_BONUS_FROM_DEVICE - mine.devices_won}</b>{' '}
+                          {t('portal.crm.kpi.bonus_left_post')}
+                        </p>
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--crm-s3)]">
+                          <div
+                            className="h-full rounded-full bg-[#d97706] transition-[width] duration-700 ease-out"
+                            style={{ width: `${Math.min(100, (mine.devices_won / KPI_BONUS_FROM_DEVICE) * 100)}%` }}
+                          />
+                        </div>
+                        <p className="mt-1.5 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
+                          {mine.devices_won} / {KPI_BONUS_FROM_DEVICE} {t('portal.crm.kpi.devices')}
+                        </p>
+                      </>
+                    )}
+                    <p className="mt-2 text-xs text-[#ffb77d]/70">{t('portal.crm.kpi.rule_bonus')}</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* ── Cột phải: chỉ tiêu hoạt động + dải 14 ngày + biểu đồ ngày ── */}
+            <div className="flex flex-col gap-4 lg:col-span-7">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--crm-muted)]">
+                  {t('portal.crm.kpi.activity_caps')}
                 </p>
-                <p className="flex items-baseline justify-between">
-                  <span>{t('portal.crm.kpi.daily_org')}</span>
-                  <span className="font-mono tabular-nums">
-                    <b className="text-xl">{mineToday?.org_new ?? 0}</b>
-                    <span className="text-[var(--crm-muted)]"> / {DAILY_ORG_MIN}–{DAILY_ORG_MAX} {t('portal.crm.kpi.daily_goal')}</span>
-                  </span>
-                </p>
+                {dailyBadge(retailToday, orgToday)}
               </div>
-            </section>
+              {activityCard('group_add', 'portal.crm.kpi.daily_retail', retailToday, DAILY_RETAIL_MIN, DAILY_RETAIL_MAX)}
+              {activityCard('domain', 'portal.crm.kpi.daily_org', orgToday, DAILY_ORG_MIN, DAILY_ORG_MAX)}
+
+              <section className={card}>
+                <h2 className="mb-1 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.daily_strip_title')}</h2>
+                <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.kpi.daily_strip_hint')}</p>
+                {dailyStrip(days)}
+              </section>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <section className={card}>
+                  <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_retail14')}</h2>
+                  <MonthlyBarChart
+                    data={days.map(d => ({
+                      label: dayLabel(d.ngay),
+                      value: d.retail_new,
+                      hint: `${dayLabel(d.ngay)}: ${d.retail_new}`,
+                    }))}
+                    ariaLabel={t('portal.crm.kpi.chart_retail14')}
+                  />
+                </section>
+                <section className={card}>
+                  <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_org14')}</h2>
+                  <MonthlyBarChart
+                    data={days.map(d => ({
+                      label: dayLabel(d.ngay),
+                      value: d.org_new,
+                      hint: `${dayLabel(d.ngay)}: ${d.org_new}`,
+                    }))}
+                    ariaLabel={t('portal.crm.kpi.chart_org14')}
+                  />
+                </section>
+              </div>
+            </div>
           </div>
-
-          <section className={`${card} mb-6`}>
-            <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_devices')}</h2>
-            <MonthlyBarChart
-              data={months.map(m => ({
-                label: monthLabel(m.thang),
-                value: m.devices_won,
-                hint: deviceHint(monthLabel(m.thang), m.devices_won),
-              }))}
-              ariaLabel={t('portal.crm.kpi.chart_devices')}
-            />
-          </section>
-
-          <section className={`${card} mb-6`}>
-            <h2 className="mb-1 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.daily_strip_title')}</h2>
-            <p className="mb-3 text-xs text-[var(--crm-muted)]">{t('portal.crm.kpi.daily_strip_hint')}</p>
-            {dailyStrip(days)}
-          </section>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <section className={card}>
-              <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_retail14')}</h2>
-              <MonthlyBarChart
-                data={days.map(d => ({
-                  label: dayLabel(d.ngay),
-                  value: d.retail_new,
-                  hint: `${dayLabel(d.ngay)}: ${d.retail_new}`,
-                }))}
-                ariaLabel={t('portal.crm.kpi.chart_retail14')}
-              />
-            </section>
-            <section className={card}>
-              <h2 className="mb-3 font-bold text-[var(--crm-text)]">{t('portal.crm.kpi.chart_org14')}</h2>
-              <MonthlyBarChart
-                data={days.map(d => ({
-                  label: dayLabel(d.ngay),
-                  value: d.org_new,
-                  hint: `${dayLabel(d.ngay)}: ${d.org_new}`,
-                }))}
-                ariaLabel={t('portal.crm.kpi.chart_org14')}
-              />
-            </section>
-          </div>
-        </>
-      )}
+        );
+      })()}
 
       {!busy && isAdmin && (
         <>

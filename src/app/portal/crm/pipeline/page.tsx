@@ -18,6 +18,16 @@ import type { CrmOpportunityBoardRow, CrmSettings, CrmStage, ProductModel } from
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
+// Chấm màu đầu cột theo bảng Stitch: thắng = emerald, thua = đỏ mờ,
+// các giai đoạn mở xoay vòng 4 màu để phân biệt nhanh bằng mắt.
+const OPEN_DOTS = ['#e2e2e6', '#60a5fa', '#c084fc', '#ffb77d'];
+const stageDotColor = (forecast: string, openIndex: number) =>
+  forecast === 'won' ? '#8bd6b6' : forecast === 'lost' ? '#f87171' : OPEN_DOTS[openIndex % OPEN_DOTS.length];
+
+// "Nguyễn Văn A" → "VA" — avatar chữ cái cho người phụ trách, không có ảnh thật.
+const initials = (name: string) =>
+  name.trim().split(/\s+/).slice(-2).map(w => w[0]?.toUpperCase() ?? '').join('');
+
 export default function CrmPipelinePage() {
   const router = useRouter();
   const { t } = useI18n();
@@ -28,6 +38,8 @@ export default function CrmPipelinePage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editing, setEditing] = useState<CrmOpportunityBoardRow | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  // Chỉ phục vụ hiệu ứng kéo-thả (viền dashed cột đích), không dính logic dữ liệu.
+  const [overStage, setOverStage] = useState<string | null>(null);
   const [losing, setLosing] = useState<{ id: string; stage: CrmStage } | null>(null);
   const [models, setModels] = useState<ProductModel[]>([]);
   const [settings, setSettings] = useState<CrmSettings | null>(null);
@@ -121,15 +133,25 @@ export default function CrmPipelinePage() {
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
-        <button
-          onClick={() => { setEditing(null); setDrawerOpen(true); }}
-          className="flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white"
-        >
-          <span className="material-symbols-outlined text-[18px]">add_circle</span>
-          {t('portal.crm.opp.new')}
-        </button>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex flex-col gap-3">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
+          <button
+            onClick={() => { setEditing(null); setDrawerOpen(true); }}
+            className="flex w-fit items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white"
+          >
+            <span className="material-symbols-outlined text-[18px]">add_circle</span>
+            {t('portal.crm.opp.new')}
+          </button>
+        </div>
+        <div className="text-right">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--crm-muted)]">
+            {t('portal.crm.pipeline.total_value')}
+          </p>
+          <p className="crm-display mt-1 text-4xl font-bold tracking-tight text-[#8bd6b6] tabular-nums">
+            {fmtVnd(sumAmount(openRows))}₫
+          </p>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-4 text-sm">
@@ -150,90 +172,125 @@ export default function CrmPipelinePage() {
           nhất, tạo ra những hộp rỗng dài thượt. Mỗi cột tự cuộn trong phần
           thẻ, tiêu đề và số đếm đứng yên nên không bị trôi mất khi cuộn. */}
       <div className="flex items-start gap-4 overflow-x-auto pb-4">
-        {columns.map(col => (
-          <div
-            key={col.stage.id}
-            onDragOver={e => e.preventDefault()}
-            onDrop={() => void drop(col.stage)}
-            className="flex max-h-[calc(100vh-300px)] min-h-[200px] w-[280px] flex-shrink-0 flex-col rounded-2xl bg-[var(--crm-s1)] p-3"
-          >
-            <div className="mb-3 flex flex-shrink-0 items-center justify-between">
-              <span className="text-sm font-bold text-[var(--crm-text)]">{col.stage.name}</span>
-              <span className="rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
-                {col.rows.length} · {col.stage.probability}%
-              </span>
-            </div>
-            <div className="portal-scroll flex-1 space-y-2 overflow-y-auto pr-1">
-              {col.rows.map(r => (
-                // Thẻ đã thắng/thua là sổ đã gấp: nhân viên không kéo lại được,
-                // quản trị kéo được để sửa thao tác nhầm (DB cũng chặn tầng dưới).
-                <article
-                  key={r.id}
-                  draggable={r.forecast === 'open' || isAdmin}
-                  title={r.forecast !== 'open' && !isAdmin ? t('portal.crm.pipeline.closed_card') : undefined}
-                  onDragStart={() => { if (r.forecast === 'open' || isAdmin) setDragId(r.id); }}
-                  onClick={() => { setEditing(r); setDrawerOpen(true); }}
-                  className={`rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#8bd6b6] ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
-                >
-                  <p className="text-sm font-semibold text-[var(--crm-text)]">{r.name}</p>
-                  <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.account_name}</p>
-                  {r.account_phone && (
-                    <a
-                      href={`tel:${r.account_phone}`}
-                      onClick={e => e.stopPropagation()}
-                      className="mt-1 inline-flex items-center gap-1 text-xs text-[#ffb77d]"
-                    >
-                      <span className="material-symbols-outlined text-[14px]">call</span>
-                      {r.account_phone}
-                    </a>
-                  )}
-                  <p className="mt-2 text-sm font-bold text-[#8bd6b6]">
-                    {fmtVnd(Number(r.amount))}đ
-                    <span className="ml-1 text-xs font-normal text-[var(--crm-muted)]">
-                      · {r.quantity} {t('portal.crm.opp.machines')}
-                    </span>
-                    {(() => {
-                      const pct = discountPct(r);
-                      return pct !== null ? (
-                        <span
-                          className="ml-1.5 rounded-full border border-[#fbbf24]/40 px-1.5 py-0.5 text-[10px] font-normal text-[#fbbf24]"
-                          title={t('portal.crm.opp.discount_hint')}
-                        >
-                          -{pct}%
+        {columns.map((col, colIdx) => {
+          const dot = stageDotColor(col.stage.forecast, colIdx);
+          const isDropTarget = dragId !== null && overStage === col.stage.id;
+          return (
+            <div
+              key={col.stage.id}
+              onDragOver={e => { e.preventDefault(); setOverStage(col.stage.id); }}
+              onDragLeave={e => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) setOverStage(null);
+              }}
+              onDrop={() => { setOverStage(null); void drop(col.stage); }}
+              className="flex max-h-[calc(100vh-300px)] min-h-[200px] w-[280px] flex-shrink-0 flex-col"
+            >
+              <div className="mb-3 flex flex-shrink-0 items-center gap-2 px-1">
+                <span
+                  className="h-2 w-2 flex-shrink-0 rounded-full"
+                  style={{ backgroundColor: dot, boxShadow: `0 0 8px ${dot}99` }}
+                />
+                <span className="crm-display text-sm font-bold text-[var(--crm-text)]">
+                  {col.stage.name} <span className="font-normal text-[var(--crm-muted)]">({col.rows.length})</span>
+                </span>
+              </div>
+              {/* Nền cột trong hơn thẻ; kéo tới đâu viền dashed emerald sáng tới đó. */}
+              <div
+                className={`portal-scroll flex-1 space-y-2 overflow-y-auto rounded-xl border p-2 transition-colors ${
+                  isDropTarget
+                    ? 'border-dashed border-[#8bd6b6]/70 bg-[#8bd6b6]/10'
+                    : 'border-white/10 bg-[rgba(30,32,35,0.5)]'
+                }`}
+              >
+                {col.rows.map(r => (
+                  // Thẻ đã thắng/thua là sổ đã gấp: nhân viên không kéo lại được,
+                  // quản trị kéo được để sửa thao tác nhầm (DB cũng chặn tầng dưới).
+                  <article
+                    key={r.id}
+                    draggable={r.forecast === 'open' || isAdmin}
+                    title={r.forecast !== 'open' && !isAdmin ? t('portal.crm.pipeline.closed_card') : undefined}
+                    onDragStart={() => { if (r.forecast === 'open' || isAdmin) setDragId(r.id); }}
+                    onDragEnd={() => { setDragId(null); setOverStage(null); }}
+                    onClick={() => { setEditing(r); setDrawerOpen(true); }}
+                    className={`rounded-lg border bg-[var(--crm-s2)] p-3 transition-colors hover:bg-[var(--crm-s3)] ${
+                      dragId === r.id
+                        ? 'border-transparent ring-2 ring-[#8bd6b6] shadow-[0_0_16px_rgba(139,214,182,0.35)]'
+                        : 'border-white/5 hover:border-[#8bd6b6]/60'
+                    } ${r.forecast === 'won' ? 'border-l-[3px] border-l-[#8bd6b6]' : ''} ${
+                      r.forecast === 'lost' ? 'opacity-55' : ''
+                    } ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-bold text-[var(--crm-text)]">{r.account_name ?? r.name}</p>
+                      {r.forecast === 'won' && (
+                        <span className="material-symbols-outlined flex-shrink-0 text-[16px] text-[#8bd6b6]">check_circle</span>
+                      )}
+                    </div>
+                    {r.account_name && <p className="mt-0.5 text-xs text-[var(--crm-muted)]">{r.name}</p>}
+                    {r.account_phone && (
+                      <a
+                        href={`tel:${r.account_phone}`}
+                        onClick={e => e.stopPropagation()}
+                        className="mt-1 inline-flex items-center gap-1 text-xs text-[var(--crm-muted)] tabular-nums hover:text-[#ffb77d]"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">call</span>
+                        {r.account_phone}
+                      </a>
+                    )}
+                    <div className="mt-2 flex items-center justify-between gap-2">
+                      <p className={`text-sm font-bold tabular-nums ${
+                        r.forecast === 'lost' ? 'text-[var(--crm-muted)] line-through' : 'text-[#8bd6b6]'
+                      }`}>
+                        {fmtVnd(Number(r.amount))}đ
+                        <span className="ml-1 text-xs font-normal text-[var(--crm-muted)] no-underline">
+                          · {r.quantity} {t('portal.crm.opp.machines')}
                         </span>
-                      ) : null;
-                    })()}
-                  </p>
-                  {Number(r.expected_commission) > 0 && (
-                    <p className="mt-1 text-xs text-[#ffb77d]">
-                      {t('portal.crm.opp.expected_commission')}: {fmtVnd(Number(r.expected_commission))}đ
-                    </p>
-                  )}
-                  {r.trial_days && (
-                    <p className="mt-1 inline-block rounded-full bg-[#8bd6b6]/15 px-2 py-0.5 text-xs text-[#8bd6b6]">
-                      {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
-                    </p>
-                  )}
-                  <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.expected_close_date}</p>
-                  {r.lost_reason_name && (
-                    <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#8bd6b6]">
-                      {r.lost_reason_name}
-                    </p>
-                  )}
-                  {r.owner_name && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-[#ffb77d]">
-                      <span className="material-symbols-outlined text-[14px]">person</span>
-                      {r.owner_name}
-                    </p>
-                  )}
-                </article>
-              ))}
-              {col.rows.length === 0 && (
-                <p className="py-6 text-center text-xs text-[var(--crm-muted)]">{t('portal.crm.pipeline.empty_stage')}</p>
-              )}
+                        {(() => {
+                          const pct = discountPct(r);
+                          return pct !== null ? (
+                            <span
+                              className="ml-1.5 rounded-full border border-[#fbbf24]/40 px-1.5 py-0.5 text-[10px] font-normal text-[#fbbf24]"
+                              title={t('portal.crm.opp.discount_hint')}
+                            >
+                              -{pct}%
+                            </span>
+                          ) : null;
+                        })()}
+                      </p>
+                      {r.owner_name && (
+                        <span
+                          title={r.owner_name}
+                          className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#065f46] text-[10px] font-bold text-white"
+                        >
+                          {initials(r.owner_name)}
+                        </span>
+                      )}
+                    </div>
+                    {Number(r.expected_commission) > 0 && (
+                      <p className="mt-1 text-xs text-[#ffb77d] tabular-nums">
+                        {t('portal.crm.opp.expected_commission')}: {fmtVnd(Number(r.expected_commission))}đ
+                      </p>
+                    )}
+                    {r.trial_days && (
+                      <p className="mt-1 inline-block rounded-full bg-[#8bd6b6]/15 px-2 py-0.5 text-xs text-[#8bd6b6]">
+                        {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs text-[var(--crm-muted)] tabular-nums">{r.expected_close_date}</p>
+                    {r.lost_reason_name && (
+                      <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#8bd6b6]">
+                        {r.lost_reason_name}
+                      </p>
+                    )}
+                  </article>
+                ))}
+                {col.rows.length === 0 && (
+                  <p className="py-6 text-center text-xs text-[var(--crm-muted)]">{t('portal.crm.pipeline.empty_stage')}</p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <CrmOpportunityDrawer
