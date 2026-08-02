@@ -2,12 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Chakra_Petch } from 'next/font/google';
 import {
   currentMonthVn, getAdminFleet, getCrmAccounts, getCrmActivities, getCrmFeedbacks,
   getCrmKpiDeviceMonths, getCrmKpiNewAccountsDays, getCrmStaffReport, getStaffPeers,
 } from '@/lib/portal-queries';
 import type { FleetSummary } from '@/lib/portal-types';
 import { useI18n } from '@/lib/i18n';
+
+// Chữ hiển thị của riêng phòng điều hành: Chakra Petch — vuông vức, kỹ thuật,
+// có subset tiếng Việt. Thân chữ vẫn theo font portal để không lệch shell.
+const display = Chakra_Petch({ subsets: ['vietnamese', 'latin'], weight: ['500', '700'] });
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -17,9 +23,14 @@ function todayVn(): string {
   return `${vn.getFullYear()}-${String(vn.getMonth() + 1).padStart(2, '0')}-${String(vn.getDate()).padStart(2, '0')}`;
 }
 
-// Boss chốt 02/08/2026: Tổng quan admin đo mô hình nhân viên bán qua CRM thay
-// cho kênh đại lý phân phối đã ngủ đông (khối đợt chi 5-10 + chính sách chi trả
-// đại lý gỡ hẳn; máy móc chi trả đại lý phía sau vẫn nguyên nếu cần dùng lại).
+const rise = (i: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] as const },
+});
+
+// Boss chốt 02/08/2026: Tổng quan admin đo mô hình nhân viên bán qua CRM.
+// Bố cục "phòng điều hành": hàng CẦN XỬ LÝ HÔM NAY đứng trên NHỊP KINH DOANH.
 export function AdminConsole() {
   const { t } = useI18n();
   const [fleet, setFleet] = useState<FleetSummary | null>(null);
@@ -57,60 +68,149 @@ export function AdminConsole() {
 
   const f = fleet ?? { active_dealers: 0, units_ytd: 0, units_month: 0, orders_pending: 0, revenue_ytd: 0, commission_pending: 0 };
 
-  const tiles: { label: string; value: string | number; icon: string; chip: string; tone: string; href?: string }[] = [
-    { label: t('portal.components.adminConsole.kpi_units_month'), value: devMonth, icon: 'sell', chip: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', tone: 'text-emerald-400' },
-    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', chip: 'bg-amber-500/10 text-amber-400 border-amber-500/20', tone: 'text-amber-400' },
-    { label: t('portal.components.adminConsole.kpi_pending_confirm'), value: pendingConfirm, icon: 'hourglass_top', chip: 'bg-[#fbbf24]/10 text-[#fbbf24] border-[#fbbf24]/20', tone: 'text-[#fbbf24]', href: '/portal/crm/accounts' },
-    { label: t('portal.components.adminConsole.kpi_staff_commission'), value: fmtVnd(staffCommission), icon: 'payments', chip: 'bg-[#3b82f6]/10 text-[#3b82f6] border-[#3b82f6]/20', tone: 'text-[#3b82f6]', href: '/portal/crm/commission' },
-    { label: t('portal.components.adminConsole.kpi_new_today'), value: newToday, icon: 'person_add', chip: 'bg-[#00daf3]/10 text-[#00daf3] border-[#00daf3]/20', tone: 'text-[#00daf3]' },
-    { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: unreadFeedback, icon: 'mark_email_unread', chip: 'bg-[#ff5625]/10 text-[#ff5625] border-[#ff5625]/20', tone: 'text-[#ff5625]', href: '/portal/crm/feedback' },
+  // Hàng trên: việc đang chờ tay admin — cả thẻ là nút bấm.
+  const actions = [
+    { label: t('portal.components.adminConsole.kpi_pending_confirm'), value: pendingConfirm, icon: 'hourglass_top', color: '#fbbf24', href: '/portal/crm/accounts' },
+    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', color: '#ff5625', href: '/portal/admin/orders' },
+    { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: unreadFeedback, icon: 'mark_email_unread', color: '#00daf3', href: '/portal/crm/feedback' },
+  ];
+  // Hàng dưới: nhịp số của cỗ máy bán hàng.
+  const pulse = [
+    { label: t('portal.components.adminConsole.kpi_units_month'), value: String(devMonth), icon: 'sell', color: '#34d399' },
+    { label: t('portal.components.adminConsole.kpi_new_today'), value: String(newToday), icon: 'person_add', color: '#00daf3' },
+    { label: t('portal.components.adminConsole.kpi_staff_commission'), value: fmtVnd(staffCommission), icon: 'payments', color: '#3b82f6', href: '/portal/crm/commission' },
   ];
 
-  const tileBody = (k: (typeof tiles)[number]) => (
+  const corner = (
     <>
-      <div className="pointer-events-none absolute -bottom-4 -right-4 opacity-[0.03] transition-opacity group-hover:opacity-[0.08]">
-        <span className="material-symbols-outlined text-[96px]">{k.icon}</span>
-      </div>
-      <span className={`material-symbols-outlined rounded-lg border p-1.5 text-[20px] ${k.chip}`}>{k.icon}</span>
-      <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#e7eaf0]/50">{k.label}</p>
-      <p className={`mt-1 font-mono tabular-nums text-3xl font-medium ${k.tone}`}>{k.value}</p>
+      {/* Ngạnh góc kiểu bảng đồng hồ công nghiệp */}
+      <span className="pointer-events-none absolute left-2 top-2 h-2 w-2 border-l border-t border-[#e7eaf0]/15" />
+      <span className="pointer-events-none absolute bottom-2 right-2 h-2 w-2 border-b border-r border-[#e7eaf0]/15" />
     </>
   );
 
   return (
-    <div className="space-y-12 py-4">
-      <div>
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.adminConsole.header_kicker')}</p>
-        <h1 className="mt-2 font-headline text-5xl leading-none tracking-tight">
-          {t('portal.components.adminConsole.header_title_prefix')} <span>{t('portal.components.adminConsole.header_title_highlight')}</span>.
-        </h1>
-      </div>
+    <div className="relative space-y-10 py-4">
+      {/* Khí quyển: lưới bản vẽ + quầng than hồng, nằm sau toàn bộ nội dung */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-6 -top-8 bottom-0 -z-10 bg-[linear-gradient(rgba(231,234,240,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(231,234,240,0.025)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_75%_60%_at_35%_0%,black,transparent)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 -top-24 -z-10 h-[420px] w-[560px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,86,37,0.16),transparent_62%)]"
+      />
 
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-8">
-        <div className="md:col-span-5">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#e7eaf0]/50">{t('portal.components.adminConsole.revenue_ytd')}</p>
-          <p className="mt-2 font-headline text-[40px] leading-[0.95] tracking-tight md:text-[56px]">
-            {fmtVnd(f.revenue_ytd)}
-            <span className="ml-2 align-top font-mono tabular-nums text-2xl text-[#ff5625]">₫</span>
-          </p>
-          <p className="mt-3 text-sm text-[#e7eaf0]/60">
-            <span className="font-mono tabular-nums">{f.units_ytd}</span> {t('portal.components.adminConsole.sub_orders_ytd')}
-            {' · '}<span className="font-mono tabular-nums">{staffCount}</span> {t('portal.components.adminConsole.sub_staff')}
-            {' · '}<span className="font-mono tabular-nums">{overdueTasks}</span> {t('portal.components.adminConsole.sub_overdue')}
+      <motion.div {...rise(0)}>
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" />
+          </span>
+          <p className={`${display.className} text-[11px] uppercase tracking-[0.35em] text-[#ff5625]`}>
+            {t('portal.components.adminConsole.header_kicker')}
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 md:col-span-7 lg:grid-cols-3">
-          {tiles.map(k => (
-            k.href ? (
-              <Link key={k.label} href={k.href} className="group relative overflow-hidden rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-4 transition-colors hover:border-[#ff5625]/50">
-                {tileBody(k)}
+        <h1 className={`${display.className} mt-3 text-5xl font-bold leading-none tracking-tight md:text-6xl`}>
+          {t('portal.components.adminConsole.header_title_prefix')}{' '}
+          <span className="text-[#ff5625]">{t('portal.components.adminConsole.header_title_highlight')}</span>
+          <span className="text-[#ff5625]">.</span>
+        </h1>
+      </motion.div>
+
+      {/* HERO doanh thu — con số là tấm áp phích */}
+      <motion.section {...rise(1)} className="relative">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-[#e7eaf0]/50">
+          {t('portal.components.adminConsole.revenue_ytd')}
+        </p>
+        <p className={`${display.className} mt-2 text-[56px] font-bold leading-[0.95] tracking-tight tabular-nums md:text-[84px]`}>
+          {fmtVnd(f.revenue_ytd)}
+          <span className="ml-3 align-top text-2xl font-medium text-[#ff5625] md:text-3xl">₫</span>
+        </p>
+        <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#e7eaf0]/60">
+          <span><b className={`${display.className} tabular-nums text-[#e7eaf0]`}>{f.units_ytd}</b> {t('portal.components.adminConsole.sub_orders_ytd')}</span>
+          <span><b className={`${display.className} tabular-nums text-[#e7eaf0]`}>{staffCount}</b> {t('portal.components.adminConsole.sub_staff')}</span>
+          <span className={overdueTasks > 0 ? 'text-[#f87171]' : ''}>
+            <b className={`${display.className} tabular-nums`}>{overdueTasks}</b> {t('portal.components.adminConsole.sub_overdue')}
+          </span>
+        </p>
+      </motion.section>
+
+      {/* CẦN XỬ LÝ HÔM NAY — hàng đợi việc, cả thẻ là nút */}
+      <section>
+        <motion.p {...rise(2)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e7eaf0]/45`}>
+          {t('portal.components.adminConsole.group_action')}
+        </motion.p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {actions.map((k, i) => (
+            <motion.div key={k.label} {...rise(3 + i)}>
+              <Link
+                href={k.href}
+                className="group relative block overflow-hidden rounded-xl border border-[#1f2937]/50 bg-[#11151a]/90 p-5 transition-all hover:-translate-y-0.5"
+                style={{ boxShadow: k.value > 0 ? `inset 3px 0 0 ${k.color}` : 'inset 3px 0 0 #1f2937' }}
+              >
+                {corner}
+                <div className="flex items-start justify-between">
+                  <span
+                    className="material-symbols-outlined rounded-lg border p-1.5 text-[20px]"
+                    style={{ color: k.color, borderColor: `${k.color}33`, backgroundColor: `${k.color}14` }}
+                  >
+                    {k.icon}
+                  </span>
+                  {k.value > 0 && (
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" style={{ backgroundColor: k.color }} />
+                      <span className="relative inline-flex h-2 w-2 rounded-full" style={{ backgroundColor: k.color }} />
+                    </span>
+                  )}
+                </div>
+                <p className={`${display.className} mt-4 text-4xl font-bold tabular-nums`} style={{ color: k.value > 0 ? k.color : '#e7eaf0' }}>
+                  {k.value}
+                </p>
+                <p className="mt-1 flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#e7eaf0]/50">
+                  {k.label}
+                  <span className="material-symbols-outlined text-[14px] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" style={{ color: k.color }}>
+                    arrow_forward
+                  </span>
+                </p>
               </Link>
-            ) : (
-              <div key={k.label} className="group relative overflow-hidden rounded-xl border border-[#1f2937]/40 bg-[#11151a] p-4">
-                {tileBody(k)}
-              </div>
-            )
+            </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* NHỊP KINH DOANH */}
+      <section>
+        <motion.p {...rise(6)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e7eaf0]/45`}>
+          {t('portal.components.adminConsole.group_pulse')}
+        </motion.p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {pulse.map((k, i) => {
+            const body = (
+              <>
+                {corner}
+                <div className="pointer-events-none absolute -bottom-5 -right-4 opacity-[0.05] transition-opacity group-hover:opacity-[0.12]">
+                  <span className="material-symbols-outlined text-[110px]" style={{ color: k.color }}>{k.icon}</span>
+                </div>
+                <span
+                  className="material-symbols-outlined rounded-lg border p-1.5 text-[20px]"
+                  style={{ color: k.color, borderColor: `${k.color}33`, backgroundColor: `${k.color}14` }}
+                >
+                  {k.icon}
+                </span>
+                <p className={`${display.className} mt-4 text-3xl font-bold tabular-nums text-[#e7eaf0]`}>{k.value}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#e7eaf0]/50">{k.label}</p>
+              </>
+            );
+            const cls = 'group relative block overflow-hidden rounded-xl border border-[#1f2937]/50 bg-[#11151a]/90 p-5 transition-all hover:-translate-y-0.5';
+            return (
+              <motion.div key={k.label} {...rise(7 + i)}>
+                {k.href
+                  ? <Link href={k.href} className={cls}>{body}</Link>
+                  : <div className={cls}>{body}</div>}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
     </div>

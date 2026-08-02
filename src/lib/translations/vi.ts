@@ -1806,6 +1806,8 @@ const vi: Record<string, string> = {
     'portal.components.adminConsole.header_title_prefix': 'Bức tranh',
     'portal.components.adminConsole.header_title_highlight': 'tháng này',
     'portal.components.adminConsole.revenue_ytd': 'Doanh thu năm nay (đơn đã duyệt/thanh toán)',
+    'portal.components.adminConsole.group_action': 'Cần xử lý hôm nay',
+    'portal.components.adminConsole.group_pulse': 'Nhịp kinh doanh',
     'portal.components.adminConsole.sub_orders_ytd': 'đơn hàng năm nay',
     'portal.components.adminConsole.sub_staff': 'nhân viên',
     'portal.components.adminConsole.sub_overdue': 'việc quá hạn toàn đội',

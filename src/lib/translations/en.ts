@@ -1803,6 +1803,8 @@ const en: Record<string, string> = {
     'portal.components.adminConsole.header_title_prefix': 'This month,',
     'portal.components.adminConsole.header_title_highlight': 'in one picture',
     'portal.components.adminConsole.revenue_ytd': 'Revenue YTD (approved/paid orders)',
+    'portal.components.adminConsole.group_action': 'Needs your action today',
+    'portal.components.adminConsole.group_pulse': 'Business pulse',
     'portal.components.adminConsole.sub_orders_ytd': 'orders this year',
     'portal.components.adminConsole.sub_staff': 'staff',
     'portal.components.adminConsole.sub_overdue': 'overdue tasks team-wide',
