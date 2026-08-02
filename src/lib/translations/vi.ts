@@ -624,7 +624,6 @@ const vi: Record<string, string> = {
     'portal.crm.accounts.machines_saved': 'Đã cập nhật số máy',
     'portal.crm.accounts.machines_multi': 'Khách có nhiều cơ hội đang mở — sửa số máy ở trang Cơ hội',
     'portal.crm.accounts.machines_no_stage': 'Chưa có giai đoạn nào đang mở để lập cơ hội',
-    'portal.crm.accounts.new_opp_name': 'Đơn máy',
     'portal.crm.recon.title': 'Đối soát',
     'portal.crm.recon.hint': 'Hai dấu hiệu cần soi: cơ hội đã chốt nhưng chưa gắn đơn hàng nào, và đơn ghi giá lệch bảng giá.',
     'portal.crm.recon.flagged': 'điểm cần soi',

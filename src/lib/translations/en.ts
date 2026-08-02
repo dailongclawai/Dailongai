@@ -621,7 +621,6 @@ const en: Record<string, string> = {
     'portal.crm.accounts.machines_saved': 'Unit count updated',
     'portal.crm.accounts.machines_multi': 'This customer has several open opportunities — edit units on the Opportunities page',
     'portal.crm.accounts.machines_no_stage': 'No open stage available to create an opportunity',
-    'portal.crm.accounts.new_opp_name': 'Device order',
     'portal.crm.recon.title': 'Reconciliation',
     'portal.crm.recon.hint': 'Two things worth a look: deals marked won with no order attached, and orders priced off the price list.',
     'portal.crm.recon.flagged': 'to review',

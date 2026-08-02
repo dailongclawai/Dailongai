@@ -1,5 +1,9 @@
 import type { CrmActivityRow, CrmAccountListRow, CrmOpportunityBoardRow, CrmStage } from './portal-types';
 
+/** Tiền tố tên cơ hội tự sinh — cố định tiếng Việt bất kể ngôn ngữ giao diện,
+ *  để dữ liệu trong DB đồng nhất (Boss chốt 02/08/2026). */
+export const OPP_NAME_PREFIX = 'Đơn máy';
+
 export interface BoardColumn {
   stage: CrmStage;
   rows: CrmOpportunityBoardRow[];

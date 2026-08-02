@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
+import { OPP_NAME_PREFIX } from '@/lib/crm-board';
 import {
   createCrmAccountsBulk, createCrmOpportunity, getActiveModels, getCrmSettings, getCrmStages,
   lookupCrmPhones, setCrmAccountStage, suggestedUnitPrice,
@@ -201,7 +202,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
           await createCrmOpportunity({
             accountId: id,
             stageId: buocDau.id,
-            name: `${t('portal.crm.accounts.new_opp_name')} · ${cell(row, 'name')}`,
+            name: `${OPP_NAME_PREFIX} · ${cell(row, 'name')}`,
             modelId: model?.id ?? null,
             quantity: soMay,
             amount: donGia * soMay,

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { OPP_NAME_PREFIX } from '@/lib/crm-board';
 import {
   cancelAccountCompletionRequest, createCrmOpportunity, getActiveModels, getCrmAccounts,
   getCrmEvidenceCounts, getCrmSettings, getCrmStages, getOpenOpportunities,
@@ -221,7 +222,7 @@ export default function CrmAccountsPage() {
         await createCrmOpportunity({
           accountId: account.id,
           stageId: stage.id,
-          name: `${t('portal.crm.accounts.new_opp_name')} · ${account.name}`,
+          name: `${OPP_NAME_PREFIX} · ${account.name}`,
           modelId: model?.id ?? null,
           quantity,
           amount: unit * quantity,

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
+import { OPP_NAME_PREFIX } from '@/lib/crm-board';
 import {
   createCrmOpportunity, updateCrmOpportunity, getCrmAccounts, getActiveModels, getCrmLostReasons,
   getCrmSettings, getOrdersForAccount, linkOrderToOpportunity, suggestedUnitPrice,
@@ -59,6 +60,8 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
   // Hoa hồng dự kiến hiện ngay từ lúc bắt đầu theo khách, không đợi chốt deal.
   const expectedCommission = row ? Number(row.expected_commission) : 0;
 
+  const lastAutoName = useRef('');
+
   useEffect(() => {
     if (!open) return;
     void getCrmAccounts().then(setAccounts).catch(() => setAccounts([]));
@@ -77,7 +80,24 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
     setLostNotes(row?.lost_notes ?? '');
     setOrderId(row?.order_id ?? '');
     setTrialDays(row?.trial_days ? String(row.trial_days) : '');
+    lastAutoName.current = '';
   }, [open, row]);
+
+  // Tạo mới: tên tự sinh "Đơn máy · <khách>", chọn model thì nâng thành
+  // "<model> · <khách>". Chỉ điền đè khi ô còn trống hoặc còn nguyên tên tự
+  // sinh trước đó — người dùng đã gõ tay thì giữ nguyên.
+  useEffect(() => {
+    if (!open || row) return;
+    const acc = accounts.find(a => a.id === accountId);
+    if (!acc) return;
+    const mdl = models.find(m => m.id === modelId);
+    const next = `${mdl?.name ?? OPP_NAME_PREFIX} · ${acc.name}`;
+    // Chốt giá trị ref vào biến trước khi schedule: updater chạy lười ở lần
+    // render sau, lúc đó ref đã bị ghi đè thành `next` nên so trực tiếp sẽ trượt.
+    const prevAuto = lastAutoName.current;
+    lastAutoName.current = next;
+    setName(prev => (prev.trim() === '' || prev === prevAuto ? next : prev));
+  }, [open, row, accountId, modelId, accounts, models]);
 
   // Danh sách đơn phụ thuộc khách đang chọn, nạp lại mỗi khi đổi khách.
   useEffect(() => {
