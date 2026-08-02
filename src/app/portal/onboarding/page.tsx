@@ -50,15 +50,15 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#1f2937]/40 p-10">
+      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#3f4944]/40 p-10">
         <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.auth.onboarding.badge')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.auth.onboarding.badge')}</p>
           <h1 className="mt-3 font-headline text-3xl">{t('portal.auth.onboarding.title')}</h1>
-          <p className="mt-2 text-sm text-[#e7eaf0]/60">{t('portal.auth.onboarding.subtitle')}</p>
+          <p className="mt-2 text-sm text-[#e2e2e6]/60">{t('portal.auth.onboarding.subtitle')}</p>
         </div>
         <form onSubmit={submit} className="space-y-5">
           <div>
-            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/60">
+            <label htmlFor="phone" className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/60">
               {t('portal.auth.onboarding.phone_label')}
             </label>
             <input
@@ -67,17 +67,17 @@ export default function OnboardingPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="0901234567"
-              className="w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 outline-none focus:border-[#ff5625]"
+              className="w-full rounded-lg border border-[#3f4944]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 outline-none focus:border-[#8bd6b6]"
             />
             {phoneError && <p className="mt-1 text-xs text-[#f87171]">{phoneError}</p>}
           </div>
-          <p className="rounded-lg bg-[#11151a] px-4 py-3 text-xs text-[#e7eaf0]/60">
+          <p className="rounded-lg bg-[#1a1c1f] px-4 py-3 text-xs text-[#e2e2e6]/60">
             {t('portal.auth.onboarding.role_note')}
           </p>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-full bg-[#ff5625] py-3 text-sm font-medium text-white hover:bg-[#ff5625]/90 disabled:opacity-50"
+            className="w-full rounded-full bg-[#065f46] py-3 text-sm font-medium text-white hover:bg-[#065f46]/90 disabled:opacity-50"
           >
             {submitting ? t('portal.auth.onboarding.submitting') : t('portal.auth.onboarding.submit')}
           </button>

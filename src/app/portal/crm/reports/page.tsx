@@ -139,8 +139,8 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.deals_open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(Number(r.commission_total))}đ</td>
-                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(Number(r.amount_pending))}đ</td>
-                <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(Number(r.amount_payable))}đ</td>
+                <td className="px-4 py-3 text-[#8bd6b6]">{fmtVnd(Number(r.amount_pending))}đ</td>
+                <td className="px-4 py-3 text-[#ffb77d]">{fmtVnd(Number(r.amount_payable))}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(Number(r.amount_paid))}đ</td>
               </tr>
             ))}
@@ -151,8 +151,8 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[#34d399]">{totals.won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{totals.open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(totals.total)}đ</td>
-                <td className="px-4 py-3 text-[#ff5625]">{fmtVnd(totals.pending)}đ</td>
-                <td className="px-4 py-3 text-[#00daf3]">{fmtVnd(totals.payable)}đ</td>
+                <td className="px-4 py-3 text-[#8bd6b6]">{fmtVnd(totals.pending)}đ</td>
+                <td className="px-4 py-3 text-[#ffb77d]">{fmtVnd(totals.payable)}đ</td>
                 <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
               </tr>
             )}
@@ -204,7 +204,7 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-right tabular-nums text-[var(--crm-muted)]">{m.new_accounts}</td>
                 <td className="px-4 py-3 text-right tabular-nums text-[#34d399]">{m.deals_won}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(m.won_value))}đ</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(Number(m.commission_total))}đ</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#ffb77d]">{fmtVnd(Number(m.commission_total))}đ</td>
               </tr>
             ))}
           </tbody>
@@ -218,7 +218,7 @@ export default function CrmReportsPage() {
       {!busy && sources.length > 0 && (
         <div className="mb-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
           <HBarList
-            color="#00daf3"
+            color="#d97706"
             data={sources.map(s => ({
               label: s.source ? t('portal.crm.source.' + s.source) : t('portal.crm.reports.no_source'),
               value: s.accounts,
@@ -349,7 +349,7 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">
                   {fmtVnd(Number(i.amount))}đ
                 </td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#00daf3]">
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#ffb77d]">
                   {i.expected_amount ? `${fmtVnd(Number(i.expected_amount))}đ` : '—'}
                 </td>
               </tr>
@@ -372,7 +372,7 @@ export default function CrmReportsPage() {
             <input
               id="cfg-rate" type="number" min={0.1} max={100} step={0.1} value={rate}
               onChange={e => setRate(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
             />
           </div>
           <div>
@@ -382,7 +382,7 @@ export default function CrmReportsPage() {
             <input
               id="cfg-disc" type="number" min={0} max={99} step={0.1} value={minDisc}
               onChange={e => setMinDisc(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
             />
           </div>
           <div>
@@ -392,13 +392,13 @@ export default function CrmReportsPage() {
             <input
               id="cfg-stale" type="number" min={1} max={90} step={1} value={staleDays}
               onChange={e => setStaleDays(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff5625]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
             />
           </div>
           <button
             onClick={() => void saveCfg()}
             disabled={savingCfg}
-            className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#065f46] px-5 py-2.5 font-bold text-white disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">save</span>
             {savingCfg ? t('portal.crm.common.saving') : t('portal.crm.common.save')}

@@ -29,7 +29,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
 
   const submit = () => {
     if (!reasonId) { toast.error(t('portal.crm.lost.required')); return; }
@@ -66,7 +66,7 @@ export function CrmLostReasonDialog({ open, stageName, onClose, onConfirm }: Pro
               <span className="material-symbols-outlined text-[18px]">close</span>
               {t('portal.crm.lost.cancel')}
             </button>
-            <button onClick={submit} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white">
+            <button onClick={submit} className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#065f46] py-2.5 font-bold text-white">
               <span className="material-symbols-outlined text-[18px]">check</span>
               {t('portal.crm.lost.confirm')}
             </button>

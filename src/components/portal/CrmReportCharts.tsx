@@ -46,7 +46,7 @@ export function MonthlyBarChart({ data, ariaLabel }: { data: MonthlyDatum[]; ari
           return (
             <g key={d.label}>
               {h > 0 && (
-                <rect x={x} y={y} width={w} height={h} rx={4} fill="#00daf3" opacity={0.9}>
+                <rect x={x} y={y} width={w} height={h} rx={4} fill="#d97706" opacity={0.9}>
                   <title>{d.hint}</title>
                 </rect>
               )}

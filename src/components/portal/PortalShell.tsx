@@ -88,14 +88,14 @@ export function PortalShell({
         onClick={() => setOpen(false)}
         className={`flex items-center gap-3 px-6 py-3 transition-colors duration-200 group ${
           active
-            ? 'text-[#ff5625] border-l-4 border-[#ff5625] bg-[#ff5625]/[0.06] font-semibold'
-            : 'text-[#9ca3af] border-l-4 border-transparent hover:bg-[#1a1f26]'
+            ? 'text-[#8bd6b6] border-l-4 border-[#8bd6b6] bg-[#065f46]/25 font-semibold'
+            : 'text-[#a8b3ac] border-l-4 border-transparent hover:bg-[#1e2023]'
         }`}
       >
-        <span className={`material-symbols-outlined text-[22px] ${active ? 'fill text-[#ff5625]' : 'group-hover:text-[#ff5625]'}`}>{it.icon}</span>
+        <span className={`material-symbols-outlined text-[22px] ${active ? 'fill text-[#8bd6b6]' : 'group-hover:text-[#8bd6b6]'}`}>{it.icon}</span>
         <span className="flex-1 text-[15px]">{it.label}</span>
         {it.href === '/portal/inbox' && unread > 0 && (
-          <span className="mr-4 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#ff5625] px-1.5 font-mono text-[10px] font-bold text-white">
+          <span className="mr-4 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#065f46] px-1.5 font-mono text-[10px] font-bold text-white">
             {unread > 99 ? '99+' : unread}
           </span>
         )}
@@ -104,9 +104,9 @@ export function PortalShell({
   };
 
   const Sidebar = (
-    <div className="flex h-full flex-col bg-[#06080a] py-6">
+    <div className="flex h-full flex-col bg-[#0c0e11] py-6">
       <Link href="/portal" className="mb-8 block px-6">
-        <h1 className="font-headline text-[22px] font-bold leading-tight text-[#ff5625]">{t('portal.shell.brand')}</h1>
+        <h1 className="font-headline text-[22px] font-bold leading-tight text-[#8bd6b6]">{t('portal.shell.brand')}</h1>
       </Link>
       <nav className="flex-1 space-y-1 overflow-y-auto portal-scroll">
         {items.map(navLink)}
@@ -118,7 +118,7 @@ export function PortalShell({
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
       >
         {variant === 'dealer' && (
-          <Link href="/portal/dealer/orders/new" className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3 font-bold text-white transition-transform active:scale-[0.98]">
+          <Link href="/portal/dealer/orders/new" className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3 font-bold text-white transition-transform active:scale-[0.98]">
             <span className="material-symbols-outlined text-[20px]">add_circle</span> {t('portal.shell.cta.new_order')}
           </Link>
         )}
@@ -134,18 +134,18 @@ export function PortalShell({
   return (
     <div className={`min-h-screen ${pathname.startsWith('/portal/crm') ? 'crm-scope' : ''}`}>
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[280px] border-r border-[#1f2937]/40 lg:block">{Sidebar}</aside>
+      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[280px] border-r border-[#3f4944]/40 lg:block">{Sidebar}</aside>
 
       {/* Mobile drawer */}
       {open && <div className="fixed inset-0 z-50 bg-black/50 lg:hidden" onClick={() => setOpen(false)} />}
-      <aside className={`fixed left-0 top-0 z-50 h-[100dvh] w-[280px] border-r border-[#1f2937]/40 transition-transform lg:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}>{Sidebar}</aside>
+      <aside className={`fixed left-0 top-0 z-50 h-[100dvh] w-[280px] border-r border-[#3f4944]/40 transition-transform lg:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}>{Sidebar}</aside>
 
       {/* Topbar */}
-      <header className="fixed top-0 right-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#1f2937]/40 bg-[#0a0c0f] px-4 lg:left-[280px] lg:w-[calc(100%-280px)] lg:px-8">
+      <header className="fixed top-0 right-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#3f4944]/40 bg-[#0c0e11] px-4 lg:left-[280px] lg:w-[calc(100%-280px)] lg:px-8">
         <button
           onClick={() => setOpen(true)}
           aria-label={t('portal.shell.menu.aria')}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#ff5625]/40 bg-[#ff5625]/10 px-3 py-2 text-sm font-semibold text-[#ff5625] transition-colors hover:border-[#ff5625] hover:bg-[#ff5625] hover:text-white active:scale-[0.98] lg:hidden"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#8bd6b6]/40 bg-[#8bd6b6]/10 px-3 py-2 text-sm font-semibold text-[#8bd6b6] transition-colors hover:border-[#8bd6b6] hover:bg-[#065f46] hover:text-white active:scale-[0.98] lg:hidden"
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
           <span className="text-xs">{t('portal.shell.menu.label')}</span>
@@ -153,22 +153,22 @@ export function PortalShell({
         <div className="hidden flex-1 lg:block" />
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <span aria-hidden className="hidden h-6 w-px bg-[#1f2937] sm:block" />
+          <span aria-hidden className="hidden h-6 w-px bg-[#3f4944] sm:block" />
           <Link href="/portal/profile" className="group flex items-center gap-2.5">
             {/* Profile chip: name + role · ID — hidden on mobile to save header space */}
-            <div className="hidden flex-col items-end gap-1 rounded-xl border border-[#1f2937]/60 bg-[#0f1318]/60 px-3 py-1.5 transition-colors group-hover:border-[#ff5625]/40 sm:flex">
-              <p className="text-[13px] font-semibold leading-none text-[#e7eaf0]">{profile?.full_name ?? t('portal.shell.nav.profile')}</p>
+            <div className="hidden flex-col items-end gap-1 rounded-xl border border-[#3f4944]/60 bg-[#16181b]/60 px-3 py-1.5 transition-colors group-hover:border-[#8bd6b6]/40 sm:flex">
+              <p className="text-[13px] font-semibold leading-none text-[#e2e2e6]">{profile?.full_name ?? t('portal.shell.nav.profile')}</p>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] uppercase tracking-[0.15em] text-[#9ca3af]/70">{roleLabel}</span>
+                <span className="text-[10px] uppercase tracking-[0.15em] text-[#a8b3ac]/70">{roleLabel}</span>
                 {profile?.id && (
                   <>
-                    <span aria-hidden className="text-[10px] leading-none text-[#9ca3af]/40">·</span>
+                    <span aria-hidden className="text-[10px] leading-none text-[#a8b3ac]/40">·</span>
                     <AccountIdBadge accountNo={profile.account_no} id={profile.id} />
                   </>
                 )}
               </div>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#ff5625]/30 bg-[#1a1f26] text-xs font-bold text-[#ff5625] transition-colors group-hover:border-[#ff5625]">{initials}</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-xs font-bold text-[#8bd6b6] transition-colors group-hover:border-[#8bd6b6]">{initials}</span>
           </Link>
         </div>
       </header>

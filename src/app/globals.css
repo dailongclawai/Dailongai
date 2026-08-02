@@ -206,44 +206,44 @@ body {
   }
 }
 
-::selection { background: rgba(255, 86, 37, 0.3); color: #fff; }
+::selection { background: #065f46; color: #fff; }
 
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #121416; }
-::-webkit-scrollbar-thumb { background: #ff5625; border-radius: 2px; }
+::-webkit-scrollbar-track { background: #111316; }
+::-webkit-scrollbar-thumb { background: #3f4944; border-radius: 2px; }
 
 /* ───── Glass Panel (Kinetic style) ───── */
 .glass-panel {
   background: rgba(30, 32, 34, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 181, 160, 0.15);
-  border-left: 1px solid rgba(255, 181, 160, 0.1);
+  border-top: 1px solid rgba(139, 214, 182, 0.15);
+  border-left: 1px solid rgba(139, 214, 182, 0.1);
 }
 
 /* ───── Glow ───── */
 .glow-primary {
-  box-shadow: 0 0 20px 2px rgba(255, 86, 37, 0.4);
+  box-shadow: 0 0 20px 2px rgba(139, 214, 182, 0.4);
 }
 
 .glow-primary-hover:hover {
-  box-shadow: 0 0 20px 2px rgba(255, 86, 37, 0.4);
+  box-shadow: 0 0 20px 2px rgba(139, 214, 182, 0.4);
 }
 
 /* ───── Text Glow ───── */
 .text-glow {
-  text-shadow: 0 0 12px rgba(255, 181, 160, 0.6);
+  text-shadow: 0 0 12px rgba(139, 214, 182, 0.6);
 }
 
 /* ───── Laser Grid bg ───── */
 .laser-grid {
-  background-image: radial-gradient(rgba(255, 86, 37, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(139, 214, 182, 0.07) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* ───── Gradient text ───── */
 .text-gradient {
-  background: linear-gradient(135deg, #ffb5a0 0%, #ff5625 100%);
+  background: linear-gradient(135deg, #c9ecdc 0%, #8bd6b6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -628,17 +628,16 @@ body {
     @apply font-sans;
   }
 }
-/* ───── Portal CRM: tông nâu-đồng theo bản thiết kế "Đại Long Health Tech B2B" ─────
-   Chỉ các trang /portal/crm dùng bộ biến này. Trang đại lý / giám sát / quản trị
-   giữ nguyên tông xám trung tính. */
+/* ───── Portal CRM: tông tối "Đại Long Command Center" (Google Stitch, Material-3 dark) ─────
+   Chỉ các trang /portal/crm dùng bộ biến này. */
 :root {
-  --crm-bg: #1e100c;    /* nền trang */
-  --crm-s1: #271814;    /* thẻ, cột kanban, hàng tổng */
-  --crm-s2: #2c1c17;    /* thẻ nổi trên nền thẻ, ô chọn */
-  --crm-s3: #372621;    /* đầu bảng, chip, trạng thái di chuột */
-  --crm-line: #5b4039;  /* đường viền */
-  --crm-text: #fadcd5;  /* chữ chính */
-  --crm-muted: #ab8980; /* chữ phụ */
+  --crm-bg: #111316;    /* nền trang */
+  --crm-s1: #1a1c1f;    /* thẻ, cột kanban, hàng tổng */
+  --crm-s2: #1e2023;    /* thẻ nổi trên nền thẻ, ô chọn */
+  --crm-s3: #282a2d;    /* đầu bảng, chip, trạng thái di chuột */
+  --crm-line: #3f4944;  /* đường viền */
+  --crm-text: #e2e2e6;  /* chữ chính */
+  --crm-muted: #a8b3ac; /* chữ phụ */
 }
 
 .crm-scope {
@@ -648,4 +647,9 @@ body {
 /* Space Grotesk cho tiêu đề và số tiền — chữ số đều bề ngang, dễ dóng cột. */
 .crm-display {
   font-family: var(--font-crm-display), var(--font-headline), sans-serif;
+}
+
+/* Space Grotesk chỉ trong portal — landing giữ Inter. */
+.portal-display :is(h1, h2, h3, h4, .font-headline, .font-heading) {
+  font-family: var(--font-crm-display), "Space Grotesk", sans-serif;
 }

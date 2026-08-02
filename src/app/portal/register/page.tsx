@@ -56,19 +56,19 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-start justify-center px-4 py-12 sm:items-center">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-[#ff5625]/20 bg-gradient-to-br from-[#ff5625]/[0.04] via-[#11151a] to-[#11151a] p-7 sm:p-9">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-[#8bd6b6]/20 bg-gradient-to-br from-[#8bd6b6]/[0.04] via-[#1a1c1f] to-[#1a1c1f] p-7 sm:p-9">
         <div className="flex flex-col items-center text-center">
           <Link href="/" aria-label={t('portal.auth.common.logo_home_aria')}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo-orange.webp" alt={t('portal.auth.common.logo_alt')} className="h-16 w-auto sm:h-20" />
           </Link>
-          <div className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[#ff5625]/40 bg-[#ff5625]/10 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#ff5625] font-bold">
+          <div className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-[#8bd6b6]/40 bg-[#065f46]/10 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#8bd6b6] font-bold">
             <span aria-hidden="true">✦</span>
             {t('portal.auth.register.badge')}
           </div>
-          <h1 className="mt-3 font-headline text-3xl font-bold leading-[1.1] tracking-tight text-[#e7eaf0] sm:text-4xl">
+          <h1 className="mt-3 font-headline text-3xl font-bold leading-[1.1] tracking-tight text-[#e2e2e6] sm:text-4xl">
             {t('portal.auth.register.welcome_prefix')}{' '}
-            <span className="bg-gradient-to-r from-[#ff5625] via-[#ff8a5b] to-[#f59e0b] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#8bd6b6] via-[#ffb77d] to-[#f59e0b] bg-clip-text text-transparent">
               {t('portal.auth.register.welcome_brand')}
             </span>
           </h1>
@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-xs text-[#9ca3af]">{t('portal.auth.common.email_label')}</label>
+            <label htmlFor="email" className="mb-1.5 block text-xs text-[#a8b3ac]">{t('portal.auth.common.email_label')}</label>
             <input
               id="email"
               type="email"
@@ -91,11 +91,11 @@ export default function RegisterPage() {
               required
               autoFocus
               placeholder={t('portal.auth.common.email_placeholder')}
-              className="w-full rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-4 py-3.5 text-sm text-[#e7eaf0] placeholder:text-[#9ca3af]/60 outline-none focus:border-[#ff5625]"
+              className="w-full rounded-xl border border-[#3f4944] bg-[#0c0e11] px-4 py-3.5 text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac]/60 outline-none focus:border-[#8bd6b6]"
             />
           </div>
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs text-[#9ca3af]">{t('portal.auth.common.password_label')}</label>
+            <label htmlFor="password" className="mb-1.5 block text-xs text-[#a8b3ac]">{t('portal.auth.common.password_label')}</label>
             <PasswordInput
               id="password"
               value={password}
@@ -109,17 +109,17 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#ff5625]/90 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#065f46]/90 disabled:opacity-50"
           >
             {busy && <Spinner size={14} />}
             {busy ? t('portal.auth.register.submitting') : t('portal.auth.register.submit')}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 text-[11px] text-[#9ca3af]">
-          <span className="h-px flex-1 bg-[#1f2937]" />
+        <div className="flex items-center gap-3 text-[11px] text-[#a8b3ac]">
+          <span className="h-px flex-1 bg-[#3f4944]" />
           {t('portal.auth.common.or')}
-          <span className="h-px flex-1 bg-[#1f2937]" />
+          <span className="h-px flex-1 bg-[#3f4944]" />
         </div>
 
         <div className="space-y-2.5">
@@ -127,9 +127,9 @@ export default function RegisterPage() {
           <OAuthButton provider="apple" />
         </div>
 
-        <p className="border-t border-[#1f2937] pt-5 text-center text-sm text-[#9ca3af]">
+        <p className="border-t border-[#3f4944] pt-5 text-center text-sm text-[#a8b3ac]">
           {t('portal.auth.register.have_account')}{' '}
-          <Link href="/portal/login" className="font-medium text-[#ff5625] hover:underline">
+          <Link href="/portal/login" className="font-medium text-[#8bd6b6] hover:underline">
             {t('portal.auth.register.signin_link')}
           </Link>
         </p>

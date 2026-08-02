@@ -123,7 +123,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
   const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
 
   return (
@@ -218,13 +218,13 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
                 <button
                   type="button"
                   onClick={() => setAmount(suggested)}
-                  className="ml-2 text-[#00daf3] underline"
+                  className="ml-2 text-[#ffb77d] underline"
                 >
                   {t('portal.crm.opp.price_apply')}
                 </button>
               )}
               {belowSuggested && (
-                <span className="ml-2 text-[#ff5625]">
+                <span className="ml-2 text-[#8bd6b6]">
                   {t('portal.crm.opp.price_below')} {(100 - (amount / suggested) * 100).toFixed(1)}%
                 </span>
               )}
@@ -252,9 +252,9 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
           {row && expectedCommission > 0 && (
             <p className="rounded-xl bg-[var(--crm-s3)] px-3 py-2 text-sm text-[var(--crm-muted)]">
               {t('portal.crm.opp.expected_commission')}:{' '}
-              <b className="text-[#00daf3]">{fmtVnd(expectedCommission)}đ</b>
+              <b className="text-[#ffb77d]">{fmtVnd(expectedCommission)}đ</b>
               {row.trial_days && (
-                <span className="ml-2 text-xs text-[#ff5625]">
+                <span className="ml-2 text-xs text-[#8bd6b6]">
                   {t('portal.crm.opp.trial_hold')} {row.trial_days} {t('portal.crm.opp.days')}
                 </span>
               )}
@@ -285,7 +285,7 @@ export function CrmOpportunityDrawer({ open, stages, row, ownerId, onClose, onSa
             <label className={label} htmlFor="crm-opp-notes">{t('portal.crm.account.notes')}</label>
             <textarea id="crm-opp-notes" rows={3} className={field} value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
-          <button onClick={save} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3 font-bold text-white disabled:opacity-50">
+          <button onClick={save} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3 font-bold text-white disabled:opacity-50">
             <span className="material-symbols-outlined text-[18px]">save</span>
             {saving ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
           </button>

@@ -114,7 +114,7 @@ export function QuickCheckout({
           <h1 className="font-headline text-2xl mt-2">Đã ghi nhận đơn</h1>
           {dealerName && (
             <p className="text-sm text-[#a0a0a8] mt-1">
-              Đơn đã gửi tới <span className="text-[#ff5625] font-bold">{dealerName}</span>
+              Đơn đã gửi tới <span className="text-[#8bd6b6] font-bold">{dealerName}</span>
             </p>
           )}
         </div>
@@ -137,7 +137,7 @@ export function QuickCheckout({
     content = (
       <>
         <div className="text-center mb-8">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625] font-bold">Đại Long Medical</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6] font-bold">Đại Long Medical</p>
           <h1 className="font-headline text-3xl mt-2">Đặt đơn nhanh</h1>
           {dealerName && (
             <p className="text-sm text-[#a0a0a8] mt-2">
@@ -159,11 +159,11 @@ export function QuickCheckout({
 
           <div>
             <label className="block text-[11px] uppercase tracking-wider text-[#a0a0a8] mb-1.5">Số lượng</label>
-            <div className="flex items-stretch overflow-hidden rounded-lg border border-[#3d3f41]/40 bg-[#121416]">
+            <div className="flex items-stretch overflow-hidden rounded-lg border border-[#3d3f41]/40 bg-[#111316]">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#ff5625]"
+                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#8bd6b6]"
                 aria-label="Giảm"
               >
                 −
@@ -183,7 +183,7 @@ export function QuickCheckout({
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(1000, q + 1))}
-                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#ff5625]"
+                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#8bd6b6]"
                 aria-label="Tăng"
               >
                 +
@@ -199,7 +199,7 @@ export function QuickCheckout({
               onChange={(e) => setCustomer(e.target.value)}
               required
               placeholder="Họ tên khách"
-              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#121416] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]"
+              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm outline-none focus:border-[#8bd6b6]"
             />
           </div>
 
@@ -211,19 +211,19 @@ export function QuickCheckout({
               onChange={(e) => setPhone(e.target.value)}
               required
               placeholder="VD: 0903 123 456"
-              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#121416] px-3 py-2.5 text-sm font-mono outline-none focus:border-[#ff5625]"
+              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm font-mono outline-none focus:border-[#8bd6b6]"
             />
           </div>
 
           <div className="rounded-lg border border-[#3d3f41]/30 bg-[#0f1113] p-4">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#ff5625] font-bold">Địa chỉ giao hàng</p>
+            <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#8bd6b6] font-bold">Địa chỉ giao hàng</p>
             <AddressPicker value={address} onChange={setAddress} />
           </div>
 
           <InvoiceFieldsSection value={invoice} onChange={setInvoice} />
 
           {/* Price summary */}
-          <div className="rounded-lg border border-[#3d3f41]/40 bg-[#121416] p-4">
+          <div className="rounded-lg border border-[#3d3f41]/40 bg-[#111316] p-4">
             <div className="flex items-center justify-between text-sm">
               <span className="text-[#a0a0a8]">Đơn giá công bố</span>
               <span className="font-mono tabular-nums text-[#e2e2e5]">{fmtVnd(unitPrice)} ₫</span>
@@ -234,14 +234,14 @@ export function QuickCheckout({
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-[#3d3f41]/30 pt-3">
               <span className="text-[11px] uppercase tracking-wider text-[#a0a0a8]">Thành tiền</span>
-              <span className="font-headline text-2xl text-[#ff5625] tabular-nums">{fmtVnd(totalPrice)} ₫</span>
+              <span className="font-headline text-2xl text-[#8bd6b6] tabular-nums">{fmtVnd(totalPrice)} ₫</span>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-lg bg-[#ff5625] py-3 font-bold text-white shadow-lg shadow-[#ff5625]/20 transition-all hover:bg-[#ff5625]/90 active:scale-95 disabled:opacity-50"
+            className="w-full rounded-lg bg-[#065f46] py-3 font-bold text-white shadow-lg shadow-[#8bd6b6]/20 transition-all hover:bg-[#065f46]/90 active:scale-95 disabled:opacity-50"
           >
             {busy ? 'Đang gửi…' : dealerName ? 'Gửi đơn' : 'Đặt & thanh toán'}
           </button>
@@ -260,7 +260,7 @@ export function QuickCheckout({
       {chromeless ? (
         <div className="text-[#e2e2e5]">{content}</div>
       ) : (
-        <div className="min-h-screen bg-[#121416] text-[#e2e2e5] py-10 px-4">
+        <div className="min-h-screen bg-[#111316] text-[#e2e2e5] py-10 px-4">
           <div className="mx-auto max-w-lg">{content}</div>
         </div>
       )}

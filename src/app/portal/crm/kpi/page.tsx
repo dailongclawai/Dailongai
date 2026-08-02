@@ -17,7 +17,7 @@ import type { CrmKpiDeviceMonth, CrmKpiNewAccountsDay } from '@/lib/portal-types
 // Cùng bảng màu trạng thái với STATUS_STYLE của trang Khách hàng.
 const BADGE_CLASS: Record<KpiStatus, string> = {
   missed: 'text-[#f87171] border-[#f87171]/40',
-  met: 'text-[#00daf3] border-[#00daf3]/40',
+  met: 'text-[#ffb77d] border-[#ffb77d]/40',
   excellent: 'text-[#34d399] border-[#34d399]/40',
 };
 
@@ -144,7 +144,7 @@ export default function CrmKpiPage() {
         <ul className="grid gap-2 text-sm text-[var(--crm-muted)] md:grid-cols-2">
           {(['rule_m1', 'rule_m2', 'rule_bonus', 'rule_daily'] as const).map(k => (
             <li key={k} className="flex items-start gap-2">
-              <span className="material-symbols-outlined mt-0.5 text-[16px] text-[#ff5625]">check_circle</span>
+              <span className="material-symbols-outlined mt-0.5 text-[16px] text-[#8bd6b6]">check_circle</span>
               {t('portal.crm.kpi.' + k)}
             </li>
           ))}
@@ -173,7 +173,7 @@ export default function CrmKpiPage() {
               </div>
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
                 <div
-                  className={`h-full rounded-full ${mine.devices_won >= mine.kpi_target ? 'bg-[#34d399]' : 'bg-[#00daf3]'}`}
+                  className={`h-full rounded-full ${mine.devices_won >= mine.kpi_target ? 'bg-[#34d399]' : 'bg-[#d97706]'}`}
                   style={{ width: `${Math.min(100, (mine.devices_won / mine.kpi_target) * 100)}%` }}
                 />
               </div>
@@ -195,7 +195,7 @@ export default function CrmKpiPage() {
               )}
               <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--crm-s3)]">
                 <div
-                  className="h-full rounded-full bg-[#ff5625]"
+                  className="h-full rounded-full bg-[#065f46]"
                   style={{ width: `${Math.min(100, (mine.devices_won / KPI_BONUS_FROM_DEVICE) * 100)}%` }}
                 />
               </div>
@@ -335,7 +335,7 @@ export default function CrmKpiPage() {
                   value: r.devices_won,
                   hint: deviceHint(r.full_name ?? '—', r.devices_won),
                 }))}
-                color="#00daf3"
+                color="#d97706"
               />
             </section>
             <section className={card}>

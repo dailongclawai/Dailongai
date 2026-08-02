@@ -24,7 +24,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
         ref={ref}
         type={visible ? 'text' : 'password'}
         autoComplete={rest.autoComplete ?? 'current-password'}
-        className={`w-full rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-4 py-3.5 pr-12 text-sm text-[#e7eaf0] placeholder:text-[#9ca3af]/60 outline-none focus:border-[#ff5625] ${className}`}
+        className={`w-full rounded-xl border border-[#3f4944] bg-[#0c0e11] px-4 py-3.5 pr-12 text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac]/60 outline-none focus:border-[#8bd6b6] ${className}`}
         {...rest}
       />
       <button
@@ -32,7 +32,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
         onClick={() => setVisible((v) => !v)}
         aria-label={toggleLabel}
         title={toggleLabel}
-        className="absolute right-1 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg text-[#9ca3af] transition-colors hover:bg-[#1f2937] hover:text-[#ff5625]"
+        className="absolute right-1 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg text-[#a8b3ac] transition-colors hover:bg-[#3f4944] hover:text-[#8bd6b6]"
         tabIndex={-1}
       >
         {visible ? (

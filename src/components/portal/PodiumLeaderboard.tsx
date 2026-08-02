@@ -16,7 +16,7 @@ const LABEL_KEYS: Record<SortKey, string> = {
 
 const PODIUM_META = {
   1: { medal: '🥇', height: 'h-28', bar: 'bg-gradient-to-t from-[#f59e0b] to-[#fde68a]', label: 'text-[#f59e0b]' },
-  2: { medal: '🥈', height: 'h-20', bar: 'bg-gradient-to-t from-[#9ca3af] to-[#e5e7eb]', label: 'text-[#9ca3af]' },
+  2: { medal: '🥈', height: 'h-20', bar: 'bg-gradient-to-t from-[#a8b3ac] to-[#e5e7eb]', label: 'text-[#a8b3ac]' },
   3: { medal: '🥉', height: 'h-14', bar: 'bg-gradient-to-t from-[#cd7f32] to-[#f0b97a]', label: 'text-[#cd7f32]' },
 } as const;
 
@@ -49,7 +49,7 @@ export function PodiumLeaderboard({ rows }: Props) {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#1f2937] bg-[#11151a] p-6 text-center text-sm text-[#9ca3af]">
+      <div className="rounded-2xl border border-dashed border-[#3f4944] bg-[#1a1c1f] p-6 text-center text-sm text-[#a8b3ac]">
         {t('portal.components.podiumLeaderboard.empty')}
       </div>
     );
@@ -61,20 +61,20 @@ export function PodiumLeaderboard({ rows }: Props) {
   const rankByDealer = new Map(top3.map((r, i) => [r.dealer_id, (i + 1) as 1 | 2 | 3]));
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#11151a]">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1f2937] px-5 py-3">
+    <div className="overflow-hidden rounded-2xl border border-[#3f4944] bg-[#1a1c1f]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#3f4944] px-5 py-3">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-[20px] text-[#f59e0b]">leaderboard</span>
           <p className="text-sm font-semibold">{t('portal.components.podiumLeaderboard.title')}</p>
         </div>
-        <div className="inline-flex gap-1 rounded-lg border border-[#1f2937] bg-[#0a0c0f] p-0.5 text-[11px]">
+        <div className="inline-flex gap-1 rounded-lg border border-[#3f4944] bg-[#0c0e11] p-0.5 text-[11px]">
           {(Object.keys(LABEL_KEYS) as SortKey[]).map((k) => (
             <button
               key={k}
               type="button"
               onClick={() => setSortBy(k)}
               className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
-                sortBy === k ? 'bg-[#ff5625] text-white' : 'text-[#9ca3af] hover:text-[#e7eaf0]'
+                sortBy === k ? 'bg-[#065f46] text-white' : 'text-[#a8b3ac] hover:text-[#e2e2e6]'
               }`}
             >
               {t(LABEL_KEYS[k])}
@@ -90,7 +90,7 @@ export function PodiumLeaderboard({ rows }: Props) {
           return (
             <div key={r.dealer_id} className="flex w-20 flex-col items-center sm:w-24">
               <span className="text-2xl">{meta.medal}</span>
-              <p className="mt-1 max-w-full truncate text-center text-[11px] font-semibold text-[#e7eaf0]">
+              <p className="mt-1 max-w-full truncate text-center text-[11px] font-semibold text-[#e2e2e6]">
                 {shortName(r.dealer_name, noNameLabel)}
               </p>
               <p className={`mt-0.5 text-center font-mono text-[10px] font-semibold tabular-nums ${meta.label}`}>
@@ -101,7 +101,7 @@ export function PodiumLeaderboard({ rows }: Props) {
                 aria-hidden="true"
                 style={{ transformOrigin: 'bottom', animation: 'podiumGrow 600ms ease-out' }}
               />
-              <p className="-mt-px w-full rounded-b-md bg-[#0a0c0f] py-1 text-center font-mono text-[10px] font-bold tabular-nums text-[#9ca3af]">
+              <p className="-mt-px w-full rounded-b-md bg-[#0c0e11] py-1 text-center font-mono text-[10px] font-bold tabular-nums text-[#a8b3ac]">
                 #{rank}
               </p>
             </div>
@@ -110,14 +110,14 @@ export function PodiumLeaderboard({ rows }: Props) {
       </div>
 
       {rest.length > 0 && (
-        <ol className="divide-y divide-[#1f2937] border-t border-[#1f2937]">
+        <ol className="divide-y divide-[#3f4944] border-t border-[#3f4944]">
           {rest.map((r, i) => (
             <li key={r.dealer_id} className="flex items-center gap-3 px-5 py-3">
-              <span className="w-8 shrink-0 font-mono text-xs font-bold tabular-nums text-[#9ca3af]">
+              <span className="w-8 shrink-0 font-mono text-xs font-bold tabular-nums text-[#a8b3ac]">
                 #{i + 4}
               </span>
-              <p className="min-w-0 flex-1 truncate text-sm text-[#e7eaf0]">{r.dealer_name ?? noNameLabel}</p>
-              <p className="shrink-0 font-mono text-xs font-semibold tabular-nums text-[#ff5625]">
+              <p className="min-w-0 flex-1 truncate text-sm text-[#e2e2e6]">{r.dealer_name ?? noNameLabel}</p>
+              <p className="shrink-0 font-mono text-xs font-semibold tabular-nums text-[#8bd6b6]">
                 {renderValue(r, sortBy, unitLabel)}
               </p>
             </li>

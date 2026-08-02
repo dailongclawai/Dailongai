@@ -51,7 +51,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
 
   if (!open || !accountId) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
 
   const submit = async () => {
     if (!file) { toast.error(t('portal.crm.evidence.file_required')); return; }
@@ -121,7 +121,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
             </button>
             <button
               onClick={() => void submit()} disabled={busy}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#065f46] py-2.5 font-bold text-white disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
               {busy ? t('portal.crm.evidence.uploading') : t('portal.crm.evidence.upload')}
@@ -136,7 +136,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
           {items.map(e => (
             <div key={e.id} className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-3">
               <div className="mb-2 flex items-center justify-between text-xs text-[var(--crm-muted)]">
-                <span className="rounded-full border border-[#00daf3]/40 px-2 py-0.5 text-[#00daf3]">
+                <span className="rounded-full border border-[#ffb77d]/40 px-2 py-0.5 text-[#ffb77d]">
                   {t('portal.crm.evidence.kind_' + e.kind)}
                 </span>
                 <span>{new Date(e.created_at).toLocaleString('vi-VN')}</span>
@@ -147,7 +147,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
                   <img src={urls[e.id]} alt={e.note ?? t('portal.crm.evidence.title')} className="max-h-48 rounded-lg" />
                 </a>
               ) : urls[e.id] ? (
-                <a href={urls[e.id]} target="_blank" rel="noreferrer" className="text-sm text-[#00daf3] underline">
+                <a href={urls[e.id]} target="_blank" rel="noreferrer" className="text-sm text-[#ffb77d] underline">
                   {t('portal.crm.evidence.open_file')}
                 </a>
               ) : null}

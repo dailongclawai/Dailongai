@@ -6,7 +6,7 @@ const SHIMMER_CSS = `
   100% { background-position: 400px 0; }
 }
 .portal-skeleton {
-  background: linear-gradient(90deg, #1a1f26 25%, #232830 50%, #1a1f26 75%);
+  background: linear-gradient(90deg, #1e2023 25%, #232830 50%, #1e2023 75%);
   background-size: 800px 100%;
   animation: portal-skeleton-shimmer 1.4s infinite linear;
   border-radius: 6px;

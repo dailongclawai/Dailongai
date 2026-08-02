@@ -56,7 +56,7 @@ export default function PortalIndex() {
   }, [loading, session, profile, router, refresh]);
 
   return (
-    <div className="flex h-screen items-center justify-center text-[#e7eaf0]/50">
+    <div className="flex h-screen items-center justify-center text-[#e2e2e6]/50">
       {t('portal.auth.index.checking_session')}
     </div>
   );

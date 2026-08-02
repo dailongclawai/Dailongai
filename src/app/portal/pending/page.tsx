@@ -21,14 +21,14 @@ export default function PendingPage() {
 
   return (
     <PortalShell variant="dealer">
-      <div className="portal-glass mx-auto max-w-xl space-y-6 rounded-3xl border border-[#1f2937]/40 p-10 text-center">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.auth.pending.badge')}</p>
+      <div className="portal-glass mx-auto max-w-xl space-y-6 rounded-3xl border border-[#3f4944]/40 p-10 text-center">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.auth.pending.badge')}</p>
         <h1 className="font-headline text-3xl">{t('portal.auth.pending.title')}</h1>
-        <p className="text-sm text-[#e7eaf0]/70">
+        <p className="text-sm text-[#e2e2e6]/70">
           {t('portal.auth.pending.body')}
         </p>
-        <div className="rounded-xl bg-[#11151a] p-4 text-left text-xs text-[#e7eaf0]/60">
-          <p className="mb-1 font-semibold text-[#e7eaf0]">{t('portal.auth.pending.while_waiting')}</p>
+        <div className="rounded-xl bg-[#1a1c1f] p-4 text-left text-xs text-[#e2e2e6]/60">
+          <p className="mb-1 font-semibold text-[#e2e2e6]">{t('portal.auth.pending.while_waiting')}</p>
           <ul className="list-disc space-y-1 pl-4">
             <li>{t('portal.auth.pending.tip_1')}</li>
             <li>{t('portal.auth.pending.tip_2')}</li>

@@ -54,9 +54,9 @@ const CATEGORY_LABEL_KEY: Record<NotificationCategory, string> = {
 };
 
 const SEVERITY_META: Record<NotificationSeverity, { stripe: string; icon: string; iconBg: string; iconBorder: string }> = {
-  info:     { stripe: '#01daf3', icon: 'info',         iconBg: 'bg-[#01daf3]/10',  iconBorder: 'border-[#01daf3]/30' },
+  info:     { stripe: '#ffb77d', icon: 'info',         iconBg: 'bg-[#ffb77d]/10',  iconBorder: 'border-[#ffb77d]/30' },
   success:  { stripe: '#22c55e', icon: 'check_circle', iconBg: 'bg-emerald-500/10', iconBorder: 'border-emerald-500/30' },
-  warning:  { stripe: '#ff5625', icon: 'warning',      iconBg: 'bg-[#ff5625]/10',  iconBorder: 'border-[#ff5625]/30' },
+  warning:  { stripe: '#8bd6b6', icon: 'warning',      iconBg: 'bg-[#8bd6b6]/10',  iconBorder: 'border-[#8bd6b6]/30' },
   critical: { stripe: '#ffb4ab', icon: 'error',        iconBg: 'bg-[#f87171]/10',  iconBorder: 'border-[#f87171]/30' },
 };
 
@@ -135,13 +135,13 @@ export default function InboxPage() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">{t('portal.inbox.eyebrow')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#a8b3ac]">{t('portal.inbox.eyebrow')}</p>
           <h1 className="mt-2 font-headline text-3xl">{t('portal.inbox.title')}</h1>
         </div>
         <button
           onClick={onMarkAllRead}
           disabled={busy || counts.unread === 0}
-          className="flex items-center gap-2 rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-5 py-2.5 text-sm font-medium text-[#9ca3af] transition-colors hover:bg-[#1a1f26] hover:text-[#e7eaf0] disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg border border-[#3f4944]/40 bg-[#1a1c1f] px-5 py-2.5 text-sm font-medium text-[#a8b3ac] transition-colors hover:bg-[#1e2023] hover:text-[#e2e2e6] disabled:opacity-50"
         >
           <span className="material-symbols-outlined text-[18px]">done_all</span>
           {t('portal.inbox.btn.mark_all_read')}
@@ -150,9 +150,9 @@ export default function InboxPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <aside className="lg:col-span-3">
-          <div className="lg:sticky lg:top-24 overflow-hidden rounded-xl border border-[#1f2937]/40 bg-[#1a1c1e]">
-            <div className="border-b border-[#1f2937]/20 bg-[#1a1f26]/50 px-4 py-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#ff5625]">{t('portal.inbox.filter.header')}</span>
+          <div className="lg:sticky lg:top-24 overflow-hidden rounded-xl border border-[#3f4944]/40 bg-[#1a1c1e]">
+            <div className="border-b border-[#3f4944]/20 bg-[#1e2023]/50 px-4 py-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8bd6b6]">{t('portal.inbox.filter.header')}</span>
             </div>
             <div className="space-y-1 p-2">
               {filterButtons.map((b) => {
@@ -164,8 +164,8 @@ export default function InboxPage() {
                     onClick={() => setFilter(b.key)}
                     className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors ${
                       active
-                        ? 'border-l-2 border-[#ff5625] bg-[#ff5625]/10 text-[#ff5625]'
-                        : 'text-[#9ca3af] hover:bg-[#1a1f26] hover:text-[#e7eaf0]'
+                        ? 'border-l-2 border-[#8bd6b6] bg-[#8bd6b6]/10 text-[#8bd6b6]'
+                        : 'text-[#a8b3ac] hover:bg-[#1e2023] hover:text-[#e2e2e6]'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function InboxPage() {
                     </div>
                     {n > 0 && (
                       <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        active ? 'bg-[#ff5625]/20 text-[#ff5625]' : 'bg-[#3d3f41]/40 text-[#9ca3af]'
+                        active ? 'bg-[#8bd6b6]/20 text-[#8bd6b6]' : 'bg-[#3d3f41]/40 text-[#a8b3ac]'
                       }`}>
                         {n}
                       </span>
@@ -188,9 +188,9 @@ export default function InboxPage() {
 
         <div className="space-y-3 lg:col-span-9">
           {filtered.length === 0 ? (
-            <div className="rounded-xl border border-[#1f2937]/30 bg-[#1a1c1e] py-16 text-center opacity-60">
-              <span className="material-symbols-outlined text-[48px] text-[#9ca3af]">inbox</span>
-              <p className="mt-3 text-sm text-[#9ca3af]">{t('portal.inbox.empty')}</p>
+            <div className="rounded-xl border border-[#3f4944]/30 bg-[#1a1c1e] py-16 text-center opacity-60">
+              <span className="material-symbols-outlined text-[48px] text-[#a8b3ac]">inbox</span>
+              <p className="mt-3 text-sm text-[#a8b3ac]">{t('portal.inbox.empty')}</p>
             </div>
           ) : filtered.map((m) => {
             const sev = SEVERITY_META[m.severity] ?? SEVERITY_META.info;
@@ -201,8 +201,8 @@ export default function InboxPage() {
               <div
                 key={m.id}
                 onClick={() => onCardClick(m)}
-                className={`group relative flex cursor-pointer items-start gap-4 overflow-hidden rounded-xl border p-5 transition-all hover:bg-[#11151a] ${
-                  unread ? 'border-[#1f2937]/40 bg-[#1a1c1e]' : 'border-[#1f2937]/20 bg-[#1a1c1e]/50 opacity-80'
+                className={`group relative flex cursor-pointer items-start gap-4 overflow-hidden rounded-xl border p-5 transition-all hover:bg-[#1a1c1f] ${
+                  unread ? 'border-[#3f4944]/40 bg-[#1a1c1e]' : 'border-[#3f4944]/20 bg-[#1a1c1e]/50 opacity-80'
                 }`}
               >
                 {unread && (
@@ -212,7 +212,7 @@ export default function InboxPage() {
                   />
                 )}
                 <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border ${
-                  unread ? `${sev.iconBg} ${sev.iconBorder}` : 'border-[#1f2937]/30 bg-[#1a1f26]'
+                  unread ? `${sev.iconBg} ${sev.iconBorder}` : 'border-[#3f4944]/30 bg-[#1e2023]'
                 }`}>
                   <span className="material-symbols-outlined text-[24px]" style={{ color: unread ? sev.stripe : '#a0a0a8' }}>
                     {sev.icon}
@@ -220,11 +220,11 @@ export default function InboxPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="mb-1 flex items-center gap-3">
-                    <h3 className={`truncate font-headline text-base ${unread ? 'text-[#e7eaf0]' : 'text-[#9ca3af]'}`}>{m.subject}</h3>
-                    {unread && <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#ff5625]" />}
+                    <h3 className={`truncate font-headline text-base ${unread ? 'text-[#e2e2e6]' : 'text-[#a8b3ac]'}`}>{m.subject}</h3>
+                    {unread && <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#8bd6b6]" />}
                   </div>
-                  <p className={`mb-3 line-clamp-3 text-sm leading-relaxed ${unread ? 'text-[#9ca3af]' : 'text-[#9ca3af]/70'}`}>{m.body}</p>
-                  <div className="flex items-center gap-5 text-[11px] text-[#9ca3af]/80">
+                  <p className={`mb-3 line-clamp-3 text-sm leading-relaxed ${unread ? 'text-[#a8b3ac]' : 'text-[#a8b3ac]/70'}`}>{m.body}</p>
+                  <div className="flex items-center gap-5 text-[11px] text-[#a8b3ac]/80">
                     <span className="flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-[14px]">schedule</span>
                       {timeAgo(m.created_at)}
@@ -242,8 +242,8 @@ export default function InboxPage() {
                       onClick={() => { if (unread) void markRead(m.id); }}
                       className={`inline-block rounded-lg px-4 py-2 text-sm font-bold transition-all active:scale-95 ${
                         unread
-                          ? 'bg-[#ff5625] text-white shadow-lg  hover:bg-[#ff5625]/90'
-                          : 'border border-[#1f2937]/40 bg-[#1a1f26] text-[#9ca3af] hover:bg-[#3d3f41]'
+                          ? 'bg-[#065f46] text-white shadow-lg  hover:bg-[#065f46]/90'
+                          : 'border border-[#3f4944]/40 bg-[#1e2023] text-[#a8b3ac] hover:bg-[#3d3f41]'
                       }`}
                     >
                       {m.action_label}

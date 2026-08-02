@@ -93,27 +93,27 @@ export default function AdminOrdersPage() {
     <PortalShell variant="admin">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.orders.eyebrow')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.admin.orders.eyebrow')}</p>
           <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.admin.orders.title')}</h1>
-          <p className="mt-1 text-sm text-[#9ca3af]">
+          <p className="mt-1 text-sm text-[#a8b3ac]">
             <span className="text-[#f59e0b]">{counts.awaiting} {t('portal.admin.orders.count.awaiting')}</span>
             {' · '}
             <span className="text-[#10b981]">{counts.paid} {t('portal.admin.orders.count.paid')}</span>
             {' · '}
-            <span className="text-[#9ca3af]">{counts.closed} {t('portal.admin.orders.count.closed')}</span>
+            <span className="text-[#a8b3ac]">{counts.closed} {t('portal.admin.orders.count.closed')}</span>
           </p>
         </div>
         <button
             onClick={exportExcel}
-            className="mr-2 inline-flex items-center gap-2 rounded-xl border border-[#1f2937]/60 px-4 py-2 text-sm text-[#e7eaf0] hover:border-[#00daf3]"
+            className="mr-2 inline-flex items-center gap-2 rounded-xl border border-[#3f4944]/60 px-4 py-2 text-sm text-[#e2e2e6] hover:border-[#ffb77d]"
           >
-            <span className="material-symbols-outlined text-[18px] text-[#00daf3]">download</span>
+            <span className="material-symbols-outlined text-[18px] text-[#ffb77d]">download</span>
             {t('portal.admin.reports.export')}
           </button>
           <button
           type="button"
           onClick={() => void refresh()}
-          className="rounded-lg border border-[#1f2937] bg-[#11151a] px-4 py-2 text-sm hover:bg-[#1a1f26]"
+          className="rounded-lg border border-[#3f4944] bg-[#1a1c1f] px-4 py-2 text-sm hover:bg-[#1e2023]"
         >
           {t('portal.admin.orders.refresh')}
         </button>
@@ -122,7 +122,7 @@ export default function AdminOrdersPage() {
       {fetching ? (
         <PortalSkeleton.Cards count={4} />
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#1f2937] p-12 text-center text-sm text-[#9ca3af]">
+        <div className="rounded-2xl border border-dashed border-[#3f4944] p-12 text-center text-sm text-[#a8b3ac]">
           {t('portal.admin.orders.empty')}
         </div>
       ) : (

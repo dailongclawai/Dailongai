@@ -64,9 +64,9 @@ export default function OrderConfirmPage() {
           <h1 className="mt-2 font-headline text-3xl">
             {t('portal.dealer.orders.confirm_title')}
           </h1>
-          <p className="mt-2 text-sm text-[#e7eaf0]/60">
+          <p className="mt-2 text-sm text-[#e2e2e6]/60">
             {count} {t('portal.dealer.orders.units_word')} · {t('portal.dealer.orders.total_word')}{' '}
-            <span className="font-mono font-semibold tabular-nums text-[#e7eaf0]">
+            <span className="font-mono font-semibold tabular-nums text-[#e2e2e6]">
               {fmtVnd(total)} đ
             </span>
           </p>
@@ -75,52 +75,52 @@ export default function OrderConfirmPage() {
         {/* 2-col: instructions + QR */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Left: payment details */}
-          <div className="rounded-2xl border border-[#ff5625]/30 bg-[#ff5625]/5 p-6">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">
+          <div className="rounded-2xl border border-[#8bd6b6]/30 bg-[#8bd6b6]/5 p-6">
+            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">
               {t('portal.dealer.orders.pay_now')}
             </p>
-            <p className="mb-5 text-sm text-[#e7eaf0]/60">
+            <p className="mb-5 text-sm text-[#e2e2e6]/60">
               {t('portal.dealer.orders.pay_instructions')}
             </p>
             <div className="space-y-0 divide-y divide-[#3d3f41]/30 text-sm">
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.bank')}</span>
+                <span className="text-[#e2e2e6]/50">{t('portal.dealer.orders.bank')}</span>
                 <span className="font-medium">{BANK_NAME}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.account_number')}</span>
+                <span className="text-[#e2e2e6]/50">{t('portal.dealer.orders.account_number')}</span>
                 <span className="font-mono font-semibold tracking-wider tabular-nums">
                   {BANK_ACCOUNT}
                 </span>
               </div>
               <div className="flex items-start justify-between gap-4 py-3">
-                <span className="shrink-0 text-[#e7eaf0]/50">{t('portal.dealer.orders.account_holder')}</span>
+                <span className="shrink-0 text-[#e2e2e6]/50">{t('portal.dealer.orders.account_holder')}</span>
                 <span className="text-right text-xs font-medium leading-relaxed">{BANK_OWNER}</span>
               </div>
               <div className="flex justify-between py-3">
-                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.amount')}</span>
-                <span className="font-mono font-semibold tabular-nums text-[#ff5625]">
+                <span className="text-[#e2e2e6]/50">{t('portal.dealer.orders.amount')}</span>
+                <span className="font-mono font-semibold tabular-nums text-[#8bd6b6]">
                   {fmtVnd(total)} đ
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-xl bg-[#1a1f26]/40 px-3 py-3">
-                <span className="text-[#e7eaf0]/50">{t('portal.dealer.orders.transfer_memo')}</span>
-                <span className="font-mono font-bold tracking-widest tabular-nums text-[#e7eaf0]">
+              <div className="flex items-center justify-between rounded-xl bg-[#1e2023]/40 px-3 py-3">
+                <span className="text-[#e2e2e6]/50">{t('portal.dealer.orders.transfer_memo')}</span>
+                <span className="font-mono font-bold tracking-widest tabular-nums text-[#e2e2e6]">
                   {note}
                 </span>
               </div>
             </div>
             <Link
               href="/portal/dashboard"
-              className="mt-6 block text-center text-xs text-[#e7eaf0]/40 hover:text-[#ff5625]"
+              className="mt-6 block text-center text-xs text-[#e2e2e6]/40 hover:text-[#8bd6b6]"
             >
               {t('portal.dealer.orders.back_to_dashboard')}
             </Link>
           </div>
 
           {/* Right: VietQR */}
-          <div className="flex flex-col items-center rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-6">
-            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e7eaf0]/50">
+          <div className="flex flex-col items-center rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6">
+            <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e6]/50">
               {t('portal.dealer.orders.bank_qr_title')}
             </p>
             {total > 0 ? (
@@ -131,9 +131,9 @@ export default function OrderConfirmPage() {
                 className="w-full max-w-[300px] rounded-xl"
               />
             ) : (
-              <div className="h-64 w-64 animate-pulse rounded-xl bg-[#1a1f26]/40" />
+              <div className="h-64 w-64 animate-pulse rounded-xl bg-[#1e2023]/40" />
             )}
-            <p className="mt-5 text-center text-xs text-[#e7eaf0]/40">
+            <p className="mt-5 text-center text-xs text-[#e2e2e6]/40">
               {t('portal.dealer.orders.qr_steps')}
             </p>
           </div>

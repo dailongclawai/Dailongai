@@ -12,7 +12,7 @@ const STATUS_META: Record<Order['status'], { labelKey: string; dot: string; pill
   paid:     { labelKey: 'portal.components.activityFeed.status_paid',        dot: 'bg-[#10b981]', pill: 'text-[#10b981] bg-[#10b981]/10 border-[#10b981]/20' },
   pending:  { labelKey: 'portal.components.activityFeed.status_pending',     dot: 'bg-[#f59e0b]', pill: 'text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/20' },
   rejected: { labelKey: 'portal.components.activityFeed.status_rejected',    dot: 'bg-[#f87171]', pill: 'text-[#f87171] bg-[#f87171]/10 border-[#f87171]/20' },
-  voided:   { labelKey: 'portal.components.activityFeed.status_voided',      dot: 'bg-[#9ca3af]', pill: 'text-[#9ca3af] bg-[#9ca3af]/10 border-[#9ca3af]/20' },
+  voided:   { labelKey: 'portal.components.activityFeed.status_voided',      dot: 'bg-[#a8b3ac]', pill: 'text-[#a8b3ac] bg-[#a8b3ac]/10 border-[#a8b3ac]/20' },
 };
 
 const MAX_DAYS = 5;          // tối đa số ngày hiển thị
@@ -91,12 +91,12 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
 
   return (
     <section>
-      <div className="flex items-baseline justify-between border-b border-[#1f2937] pb-2">
+      <div className="flex items-baseline justify-between border-b border-[#3f4944] pb-2">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.activityFeed.eyebrow')}</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.components.activityFeed.eyebrow')}</p>
           <h2 className="mt-1 font-headline text-2xl md:text-3xl">{t('portal.components.activityFeed.title')}</h2>
         </div>
-        <Link href="/portal/dealer/commission" className="text-xs text-[#9ca3af] hover:text-[#ff5625]">
+        <Link href="/portal/dealer/commission" className="text-xs text-[#a8b3ac] hover:text-[#8bd6b6]">
           {t('portal.components.activityFeed.view_all')}
         </Link>
       </div>
@@ -105,51 +105,51 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
         {groups.map((g) => {
           const isOpen = expanded.has(g.key);
           return (
-            <div key={g.key} className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#11151a]">
+            <div key={g.key} className="overflow-hidden rounded-2xl border border-[#3f4944] bg-[#1a1c1f]">
               <button
                 type="button"
                 onClick={() => toggle(g.key)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[#1a1f26]"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-[#1e2023]"
               >
                 <div className="flex items-baseline gap-2">
-                  <span className="font-headline text-base font-semibold text-[#e7eaf0]">{g.label}</span>
-                  <span className="font-mono text-[10px] tabular-nums text-[#9ca3af]">{g.key.split('-').reverse().join('/')}</span>
+                  <span className="font-headline text-base font-semibold text-[#e2e2e6]">{g.label}</span>
+                  <span className="font-mono text-[10px] tabular-nums text-[#a8b3ac]">{g.key.split('-').reverse().join('/')}</span>
                 </div>
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="font-mono tabular-nums text-[#9ca3af]">
-                    <span className="font-semibold text-[#e7eaf0]">{g.count}</span> {t('portal.components.activityFeed.orders_short')}
+                  <span className="font-mono tabular-nums text-[#a8b3ac]">
+                    <span className="font-semibold text-[#e2e2e6]">{g.count}</span> {t('portal.components.activityFeed.orders_short')}
                   </span>
-                  <span className="font-mono font-semibold tabular-nums text-[#ff5625]">{fmtVnd(g.total)} ₫</span>
+                  <span className="font-mono font-semibold tabular-nums text-[#8bd6b6]">{fmtVnd(g.total)} ₫</span>
                   {g.pending > 0 && (
                     <span className="rounded-full bg-[#f59e0b]/15 px-2 py-0.5 text-[10px] font-bold uppercase text-[#f59e0b]">
                       {g.pending} {t('portal.components.activityFeed.pending_short')}
                     </span>
                   )}
-                  <span className="material-symbols-outlined text-[18px] text-[#9ca3af]" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
+                  <span className="material-symbols-outlined text-[18px] text-[#a8b3ac]" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
                     keyboard_arrow_down
                   </span>
                 </div>
               </button>
 
               {isOpen && (
-                <ol className="relative ml-6 border-l-2 border-[#1f2937] pb-2">
+                <ol className="relative ml-6 border-l-2 border-[#3f4944] pb-2">
                   {g.orders.map((o) => {
                     const meta = STATUS_META[o.status];
                     return (
                       <li key={o.id} className="relative pl-4 pr-3 py-2">
                         <span
-                          className={`absolute -left-[7px] top-3.5 h-3 w-3 rounded-full ring-4 ring-[#11151a] ${meta.dot}`}
+                          className={`absolute -left-[7px] top-3.5 h-3 w-3 rounded-full ring-4 ring-[#1a1c1f] ${meta.dot}`}
                           aria-hidden="true"
                         />
-                        <div className="flex items-baseline justify-between gap-2 rounded-r-lg px-2 py-1 transition-colors hover:bg-[#1a1f26]">
+                        <div className="flex items-baseline justify-between gap-2 rounded-r-lg px-2 py-1 transition-colors hover:bg-[#1e2023]">
                           <div className="min-w-0 flex-1">
                             <p className="flex items-baseline gap-2">
-                              <span className="font-mono text-[10px] tabular-nums text-[#9ca3af]">{formatTime(o.created_at)}</span>
-                              <span className="truncate text-sm font-medium text-[#e7eaf0]">{o.customer_name}</span>
+                              <span className="font-mono text-[10px] tabular-nums text-[#a8b3ac]">{formatTime(o.created_at)}</span>
+                              <span className="truncate text-sm font-medium text-[#e2e2e6]">{o.customer_name}</span>
                             </p>
-                            <p className="mt-0.5 text-[11px] text-[#9ca3af]">
-                              <span className="font-mono tabular-nums text-[#e7eaf0]">{fmtVnd(o.sale_price)} ₫</span>
+                            <p className="mt-0.5 text-[11px] text-[#a8b3ac]">
+                              <span className="font-mono tabular-nums text-[#e2e2e6]">{fmtVnd(o.sale_price)} ₫</span>
                               {o.serial_number && (
                                 <>
                                   {' · '}
@@ -173,9 +173,9 @@ export function ActivityFeed({ orders }: { orders: Order[] }) {
       </div>
 
       {orders.length > groups.reduce((s, g) => s + g.count, 0) && (
-        <p className="mt-3 text-center text-[11px] text-[#9ca3af]">
+        <p className="mt-3 text-center text-[11px] text-[#a8b3ac]">
           {t('portal.components.activityFeed.showing_recent_prefix')} {MAX_DAYS} {t('portal.components.activityFeed.showing_recent_suffix')}{' '}
-          <Link href="/portal/dealer/commission" className="font-semibold text-[#ff5625] hover:underline">
+          <Link href="/portal/dealer/commission" className="font-semibold text-[#8bd6b6] hover:underline">
             {t('portal.components.activityFeed.full_history')}
           </Link>
         </p>

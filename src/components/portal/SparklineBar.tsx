@@ -15,7 +15,7 @@ export function SparklineBar({
   data,
   width = 200,
   height = 36,
-  color = '#ff5625',
+  color = '#8bd6b6',
   gap = 1,
   minBarHeight = 1,
 }: SparklineBarProps) {
@@ -23,7 +23,7 @@ export function SparklineBar({
   if (!data || data.length === 0) {
     return (
       <div
-        className="rounded-md bg-[#1a1f26]"
+        className="rounded-md bg-[#1e2023]"
         style={{ width, height }}
         aria-hidden="true"
       />

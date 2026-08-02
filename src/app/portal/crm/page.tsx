@@ -221,7 +221,7 @@ export default function CrmDashboardPage() {
             aria-label={t('portal.crm.dash.staff_filter')}
             value={staffFilter}
             onChange={e => setStaffFilter(e.target.value)}
-            className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#ff5625]"
+            className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#8bd6b6]"
           >
             <option value="all">{t('portal.crm.dash.staff_all')}</option>
             {peers.map(p => (
@@ -238,7 +238,7 @@ export default function CrmDashboardPage() {
       {isAdmin && (
         <section className={`${card} mb-6 overflow-hidden`}>
           <div className="flex flex-wrap items-center gap-3 px-5 py-4">
-            <span className="material-symbols-outlined text-[20px] text-[#00daf3]">groups</span>
+            <span className="material-symbols-outlined text-[20px] text-[#ffb77d]">groups</span>
             <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">
               {t('portal.crm.dash.team_title')}
             </h2>
@@ -248,7 +248,7 @@ export default function CrmDashboardPage() {
                   key={p}
                   onClick={() => setPeriod(p)}
                   className={`rounded-lg px-3 py-1.5 ${period === p
-                    ? 'bg-[#ff5625] font-bold text-white'
+                    ? 'bg-[#065f46] font-bold text-white'
                     : 'text-[var(--crm-muted)] hover:text-[var(--crm-text)]'}`}
                 >
                   {t('portal.crm.dash.period_' + p)}
@@ -287,7 +287,7 @@ export default function CrmDashboardPage() {
                     key={s.peer.id}
                     onClick={() => setStaffFilter(f => (f === s.peer.id ? 'all' : s.peer.id))}
                     className={`cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)] ${
-                      staffFilter === s.peer.id ? 'bg-[#ff5625]/10' : ''
+                      staffFilter === s.peer.id ? 'bg-[#8bd6b6]/10' : ''
                     }`}
                   >
                     <td className="px-5 py-3 text-[var(--crm-text)]">
@@ -317,7 +317,7 @@ export default function CrmDashboardPage() {
                     </td>
                     <td className="px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{s.openCount}</td>
                     <td className="px-5 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(s.openValue)}đ</td>
-                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[#00daf3]">{fmtVnd(s.expectedCommission)}đ</td>
+                    <td className="px-5 py-3 text-right font-mono tabular-nums text-[#ffb77d]">{fmtVnd(s.expectedCommission)}đ</td>
                     <td className={`px-5 py-3 text-right tabular-nums ${s.overdueTasks > 0 ? 'text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>
                       {s.overdueTasks}
                     </td>
@@ -333,10 +333,10 @@ export default function CrmDashboardPage() {
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className={`${card} p-5`}>
           <div className="mb-4 flex items-start justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#ff5625]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#8bd6b6]">
               <span className="material-symbols-outlined text-[20px]">payments</span>
             </span>
-            <span className="rounded-full bg-[#00daf3]/10 px-2.5 py-1 text-xs text-[#00daf3]">
+            <span className="rounded-full bg-[#ffb77d]/10 px-2.5 py-1 text-xs text-[#ffb77d]">
               {t('portal.crm.dash.deals_open')}: {openRows.length}
             </span>
           </div>
@@ -344,7 +344,7 @@ export default function CrmDashboardPage() {
           <p className="crm-display mt-1 text-2xl font-semibold tabular-nums text-[var(--crm-text)]">{fmtVnd(sumAmount(openRows))}đ</p>
           <p className="mt-2 text-xs text-[var(--crm-muted)]">
             {t('portal.crm.pipeline.forecast')}:{' '}
-            <span className="tabular-nums text-[#00daf3]">{fmtVnd(weightedForecast(openRows))}đ</span>
+            <span className="tabular-nums text-[#ffb77d]">{fmtVnd(weightedForecast(openRows))}đ</span>
           </p>
         </div>
 
@@ -367,7 +367,7 @@ export default function CrmDashboardPage() {
 
         <div className={`${card} p-5`}>
           <div className="mb-4 flex items-start justify-between">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#00daf3]">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--crm-s3)] text-[#ffb77d]">
               <span className="material-symbols-outlined text-[20px]">person_add</span>
             </span>
             <span className="rounded-full bg-[var(--crm-s3)] px-2.5 py-1 text-xs text-[var(--crm-muted)]">
@@ -385,7 +385,7 @@ export default function CrmDashboardPage() {
         <section className={`${card} p-5`}>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="crm-display text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.funnel')}</h2>
-            <Link href="/portal/crm/pipeline" className="text-xs text-[#00daf3] hover:underline">
+            <Link href="/portal/crm/pipeline" className="text-xs text-[#ffb77d] hover:underline">
               {t('portal.crm.dash.view_all')}
             </Link>
           </div>
@@ -406,7 +406,7 @@ export default function CrmDashboardPage() {
                       className="h-full rounded-lg"
                       style={{
                         width: `${step.width}%`,
-                        backgroundColor: step.stage.forecast === 'won' ? '#00daf3' : '#ff5625',
+                        backgroundColor: step.stage.forecast === 'won' ? '#d97706' : '#065f46',
                       }}
                     />
                   </div>
@@ -427,7 +427,7 @@ export default function CrmDashboardPage() {
                 {lateTaskCount} {t('portal.crm.dash.overdue')}
               </span>
             )}
-            <Link href="/portal/crm/activities" className="text-xs text-[#00daf3] hover:underline">
+            <Link href="/portal/crm/activities" className="text-xs text-[#ffb77d] hover:underline">
               {t('portal.crm.dash.view_all')}
             </Link>
           </div>
@@ -440,7 +440,7 @@ export default function CrmDashboardPage() {
               const sameDay = due ? due.toDateString() === now.toDateString() : true;
               return (
                 <li key={a.id} className="flex gap-3 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3">
-                  <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#ff5625]'}`}>
+                  <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#8bd6b6]'}`}>
                     {due
                       ? sameDay
                         ? due.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
@@ -466,7 +466,7 @@ export default function CrmDashboardPage() {
       {/* Cơ hội cần xử lý gấp */}
       <section className={`${card} overflow-hidden`}>
         <div className="flex flex-wrap items-center gap-3 px-5 py-4">
-          <span className="material-symbols-outlined text-[20px] text-[#ff5625]">notifications_active</span>
+          <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">notifications_active</span>
           <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.urgent')}</h2>
           {overdueCount > 0 && (
             <span className="rounded-full bg-[#f87171]/10 px-3 py-1 text-xs text-[#f87171]">
@@ -501,7 +501,7 @@ export default function CrmDashboardPage() {
                   <td className="px-5 py-3 text-[var(--crm-muted)]">{row.account_name ?? '—'}</td>
                   <td className="crm-display px-5 py-3 text-right tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(row.amount))}đ</td>
                   <td className="px-5 py-3">
-                    <span className="rounded-full border border-[#00daf3]/40 px-2.5 py-1 text-xs text-[#00daf3]">{row.stage_name}</span>
+                    <span className="rounded-full border border-[#ffb77d]/40 px-2.5 py-1 text-xs text-[#ffb77d]">{row.stage_name}</span>
                   </td>
                   <td className={`px-5 py-3 text-right tabular-nums ${left < 0 ? 'text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>
                     {left < 0

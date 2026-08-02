@@ -80,62 +80,62 @@ export default function AdminProductsPage() {
     }
   };
 
-  const input = 'w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 outline-none focus:border-[#ff5625]';
+  const input = 'w-full rounded-lg border border-[#3f4944]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 outline-none focus:border-[#8bd6b6]';
 
   return (
     <PortalShell variant="admin">
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.products.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.admin.products.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-4xl">{t('portal.admin.products.title')}</h1>
-        <p className="mt-2 text-sm text-[#e7eaf0]/60">{t('portal.admin.products.subtitle')}</p>
+        <p className="mt-2 text-sm text-[#e2e2e6]/60">{t('portal.admin.products.subtitle')}</p>
       </div>
 
-      <div className="mb-8 rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-6">
+      <div className="mb-8 rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-headline text-xl">{form.id ? t('portal.admin.products.form.title_edit') : t('portal.admin.products.form.title_create')}</h2>
           {form.id && (
-            <button onClick={() => setForm({ ...emptyForm })} className="text-xs text-[#e7eaf0]/60 hover:text-[#ff5625]">{t('portal.admin.products.form.add_new')}</button>
+            <button onClick={() => setForm({ ...emptyForm })} className="text-xs text-[#e2e2e6]/60 hover:text-[#8bd6b6]">{t('portal.admin.products.form.add_new')}</button>
           )}
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.code_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/70">{t('portal.admin.products.form.code_label')}</label>
             <input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} placeholder={t('portal.admin.products.form.code_placeholder')} className={`${input} font-mono`} />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.name_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/70">{t('portal.admin.products.form.name_label')}</label>
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t('portal.admin.products.form.name_placeholder')} className={input} />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.price_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/70">{t('portal.admin.products.form.price_label')}</label>
             <input value={form.base_price} onChange={(e) => setForm({ ...form, base_price: e.target.value })} placeholder="29500000" className={`${input} font-mono tabular-nums`} />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.dealer_price_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/70">{t('portal.admin.products.form.dealer_price_label')}</label>
             <input value={form.dealer_price} onChange={(e) => setForm({ ...form, dealer_price: e.target.value })} placeholder="24000000" className={`${input} font-mono tabular-nums`} />
-            <p className="mt-1 text-[11px] text-[#e7eaf0]/50">{t('portal.admin.products.form.dealer_price_hint')}</p>
+            <p className="mt-1 text-[11px] text-[#e2e2e6]/50">{t('portal.admin.products.form.dealer_price_hint')}</p>
           </div>
           <div className="flex items-end gap-3">
-            <label className="flex items-center gap-2 text-sm text-[#e7eaf0]/80">
-              <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-[#ff5625]" />
+            <label className="flex items-center gap-2 text-sm text-[#e2e2e6]/80">
+              <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-[#8bd6b6]" />
               {t('portal.admin.products.status.active')}
             </label>
           </div>
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e7eaf0]/70">{t('portal.admin.products.form.description_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/70">{t('portal.admin.products.form.description_label')}</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} placeholder={t('portal.admin.products.form.description_placeholder')} className={input} />
           </div>
         </div>
         <div className="mt-4">
-          <button onClick={save} disabled={busy} className="rounded-full bg-[#ff5625] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#ff5625]/90 disabled:opacity-50">
+          <button onClick={save} disabled={busy} className="rounded-full bg-[#065f46] px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#065f46]/90 disabled:opacity-50">
             {form.id ? t('portal.admin.products.form.save_edit') : t('portal.admin.products.form.save_create')}
           </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#1f2937]/40 bg-[#11151a]">
+      <div className="overflow-x-auto overflow-hidden rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f]">
         <table className="w-full min-w-[560px] text-left text-sm">
-          <thead className="border-b border-[#1f2937]/40 bg-[#1a1f26]/40 text-[10px] uppercase tracking-wider text-[#e7eaf0]/60">
+          <thead className="border-b border-[#3f4944]/40 bg-[#1e2023]/40 text-[10px] uppercase tracking-wider text-[#e2e2e6]/60">
             <tr>
               <th className="px-4 py-3">{t('portal.admin.products.table.code')}</th>
               <th className="px-4 py-3">{t('portal.admin.products.table.name')}</th>
@@ -147,21 +147,21 @@ export default function AdminProductsPage() {
           </thead>
           <tbody>
             {models.length === 0 ? (
-              <tr><td colSpan={6} className="px-4 py-10 text-center text-[#e7eaf0]/50">{t('portal.admin.products.table.empty')}</td></tr>
+              <tr><td colSpan={6} className="px-4 py-10 text-center text-[#e2e2e6]/50">{t('portal.admin.products.table.empty')}</td></tr>
             ) : models.map((m) => (
-              <tr key={m.id} className="border-t border-[#1f2937]/40 hover:bg-[#1a1f26]/40">
-                <td className="px-4 py-3 font-mono text-[#e7eaf0]/80">{m.code}</td>
+              <tr key={m.id} className="border-t border-[#3f4944]/40 hover:bg-[#1e2023]/40">
+                <td className="px-4 py-3 font-mono text-[#e2e2e6]/80">{m.code}</td>
                 <td className="px-4 py-3 font-medium">{m.name}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums">{fmtVnd(Number(m.base_price))}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#e7eaf0]/70">{m.dealer_price ? fmtVnd(Number(m.dealer_price)) : '—'}</td>
+                <td className="px-4 py-3 text-right font-mono tabular-nums text-[#e2e2e6]/70">{m.dealer_price ? fmtVnd(Number(m.dealer_price)) : '—'}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${m.active ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#1a1f26] text-[#e7eaf0]/50'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${m.active ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#1e2023] text-[#e2e2e6]/50'}`}>
                     {m.active ? t('portal.admin.products.status.active') : t('portal.admin.products.status.hidden')}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => edit(m)} className="mr-3 text-xs text-[#ff5625] hover:underline">{t('portal.admin.products.action.edit')}</button>
-                  <button onClick={() => toggle(m)} disabled={busy} className="text-xs text-[#e7eaf0]/60 hover:text-[#e7eaf0] disabled:opacity-50">
+                  <button onClick={() => edit(m)} className="mr-3 text-xs text-[#8bd6b6] hover:underline">{t('portal.admin.products.action.edit')}</button>
+                  <button onClick={() => toggle(m)} disabled={busy} className="text-xs text-[#e2e2e6]/60 hover:text-[#e2e2e6] disabled:opacity-50">
                     {m.active ? t('portal.admin.products.action.hide') : t('portal.admin.products.action.show')}
                   </button>
                 </td>

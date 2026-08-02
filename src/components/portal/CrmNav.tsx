@@ -32,7 +32,7 @@ export function CrmNav() {
             href={it.href}
             className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-sm transition-colors ${
               active
-                ? 'border-[#ff5625] bg-[#ff5625]/10 text-[#ff5625]'
+                ? 'border-[#8bd6b6] bg-[#8bd6b6]/10 text-[#8bd6b6]'
                 : 'border-[var(--crm-line)] text-[var(--crm-muted)] hover:text-[var(--crm-text)]'
             }`}
           >

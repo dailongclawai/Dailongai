@@ -41,9 +41,9 @@ export function AccountIdBadge({ accountNo, id, className = '', size = 'xs' }: P
       type="button"
       onClick={copy}
       title={`${t('portal.components.accountIdBadge.title_copy')}: ${copyPayload}`}
-      className={`inline-flex max-w-full items-center gap-1 rounded-md border border-[#1f2937] bg-[#0a0c0f]/60 px-1.5 py-0.5 ${textClass} font-mono tabular-nums text-[#9ca3af] transition-colors hover:border-[#ff5625]/40 hover:text-[#ff5625] ${className}`}
+      className={`inline-flex max-w-full items-center gap-1 rounded-md border border-[#3f4944] bg-[#0c0e11]/60 px-1.5 py-0.5 ${textClass} font-mono tabular-nums text-[#a8b3ac] transition-colors hover:border-[#8bd6b6]/40 hover:text-[#8bd6b6] ${className}`}
     >
-      <span className="text-[#9ca3af]/70">{t('portal.components.accountIdBadge.id_label')}</span>
+      <span className="text-[#a8b3ac]/70">{t('portal.components.accountIdBadge.id_label')}</span>
       <span className="truncate">{display}</span>
       <span className="material-symbols-outlined text-[12px] opacity-60">content_copy</span>
     </button>

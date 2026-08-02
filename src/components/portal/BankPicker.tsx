@@ -72,8 +72,8 @@ export function BankPicker({ value, onChange, required }: Props) {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex w-full items-center gap-3 rounded-lg border bg-[#0a0c0f] px-3 py-2.5 text-left text-sm transition-colors ${
-          open ? 'border-[#ff5625]' : 'border-[#1f2937] hover:border-[#1f2937]'
+        className={`flex w-full items-center gap-3 rounded-lg border bg-[#0c0e11] px-3 py-2.5 text-left text-sm transition-colors ${
+          open ? 'border-[#8bd6b6]' : 'border-[#3f4944] hover:border-[#3f4944]'
         }`}
       >
         {selected ? (
@@ -88,19 +88,19 @@ export function BankPicker({ value, onChange, required }: Props) {
               loading="lazy"
             />
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-semibold text-[#e7eaf0]">{selected.shortName}</span>
-              <span className="block truncate text-[10px] text-[#9ca3af]">{selected.name}</span>
+              <span className="block truncate font-semibold text-[#e2e2e6]">{selected.shortName}</span>
+              <span className="block truncate text-[10px] text-[#a8b3ac]">{selected.name}</span>
             </span>
           </>
         ) : (
           <>
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#1a1f26] text-[#9ca3af]">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#1e2023] text-[#a8b3ac]">
               <span className="material-symbols-outlined text-[16px]">account_balance</span>
             </span>
-            <span className="flex-1 text-[#9ca3af]">{t('portal.components.bankPicker.placeholder_select')}</span>
+            <span className="flex-1 text-[#a8b3ac]">{t('portal.components.bankPicker.placeholder_select')}</span>
           </>
         )}
-        <span className="material-symbols-outlined text-[18px] text-[#9ca3af]">{open ? 'expand_less' : 'expand_more'}</span>
+        <span className="material-symbols-outlined text-[18px] text-[#a8b3ac]">{open ? 'expand_less' : 'expand_more'}</span>
       </button>
 
       {required && !selected && (
@@ -116,28 +116,28 @@ export function BankPicker({ value, onChange, required }: Props) {
       )}
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#1f2937] bg-[#11151a] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
-          <div className="flex items-center gap-2 border-b border-[#1f2937] bg-[#0a0c0f] px-3 py-2">
-            <span className="material-symbols-outlined text-[18px] text-[#9ca3af]">search</span>
+        <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-[#3f4944] bg-[#1a1c1f] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)]">
+          <div className="flex items-center gap-2 border-b border-[#3f4944] bg-[#0c0e11] px-3 py-2">
+            <span className="material-symbols-outlined text-[18px] text-[#a8b3ac]">search</span>
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('portal.components.bankPicker.search_placeholder')}
-              className="flex-1 bg-transparent text-sm text-[#e7eaf0] placeholder:text-[#9ca3af] outline-none"
+              className="flex-1 bg-transparent text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none"
             />
             {query && (
-              <button type="button" onClick={() => setQuery('')} className="text-[#9ca3af] hover:text-[#e7eaf0]" aria-label={t('portal.components.bankPicker.aria_clear_search')}>
+              <button type="button" onClick={() => setQuery('')} className="text-[#a8b3ac] hover:text-[#e2e2e6]" aria-label={t('portal.components.bankPicker.aria_clear_search')}>
                 <span className="material-symbols-outlined text-[16px]">close</span>
               </button>
             )}
           </div>
           <ul className="max-h-[320px] overflow-y-auto portal-scroll" role="listbox">
             {banks.length === 0 ? (
-              <li className="p-4 text-center text-xs text-[#9ca3af]">{t('portal.components.bankPicker.loading')}</li>
+              <li className="p-4 text-center text-xs text-[#a8b3ac]">{t('portal.components.bankPicker.loading')}</li>
             ) : filtered.length === 0 ? (
-              <li className="p-4 text-center text-xs text-[#9ca3af]">{t('portal.components.bankPicker.no_results')}</li>
+              <li className="p-4 text-center text-xs text-[#a8b3ac]">{t('portal.components.bankPicker.no_results')}</li>
             ) : (
               filtered.map((b) => {
                 const isSelected = selected?.code === b.code;
@@ -147,7 +147,7 @@ export function BankPicker({ value, onChange, required }: Props) {
                       type="button"
                       onClick={() => { onChange(b); setOpen(false); setQuery(''); }}
                       className={`flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
-                        isSelected ? 'bg-[#ff5625]/10' : 'hover:bg-[#1a1f26]'
+                        isSelected ? 'bg-[#8bd6b6]/10' : 'hover:bg-[#1e2023]'
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -160,12 +160,12 @@ export function BankPicker({ value, onChange, required }: Props) {
                         loading="lazy"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold text-[#e7eaf0]">{b.shortName}</p>
-                        <p className="truncate text-[11px] text-[#9ca3af]">{b.name}</p>
+                        <p className="truncate font-semibold text-[#e2e2e6]">{b.shortName}</p>
+                        <p className="truncate text-[11px] text-[#a8b3ac]">{b.name}</p>
                       </div>
-                      <span className="shrink-0 font-mono text-[10px] tabular-nums text-[#9ca3af]">{b.bin}</span>
+                      <span className="shrink-0 font-mono text-[10px] tabular-nums text-[#a8b3ac]">{b.bin}</span>
                       {isSelected && (
-                        <span className="material-symbols-outlined text-[18px] text-[#ff5625]">check</span>
+                        <span className="material-symbols-outlined text-[18px] text-[#8bd6b6]">check</span>
                       )}
                     </button>
                   </li>
@@ -173,7 +173,7 @@ export function BankPicker({ value, onChange, required }: Props) {
               })
             )}
           </ul>
-          <div className="border-t border-[#1f2937] bg-[#0a0c0f] px-3 py-2 text-[10px] text-[#9ca3af]">
+          <div className="border-t border-[#3f4944] bg-[#0c0e11] px-3 py-2 text-[10px] text-[#a8b3ac]">
             {filtered.length} / {banks.length} {t('portal.components.bankPicker.footer_count_suffix')}
           </div>
         </div>

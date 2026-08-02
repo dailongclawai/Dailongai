@@ -66,14 +66,14 @@ export default function SupervisorQRPage() {
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.supervisor.qr.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.supervisor.qr.heading')}</h1>
-        <p className="mt-2 text-sm text-[#9ca3af]">
+        <p className="mt-2 text-sm text-[#a8b3ac]">
           {t('portal.supervisor.qr.subhead')}
         </p>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.08] via-[#11151a] to-[#11151a] p-5 sm:p-8">
+      <div className="relative overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.08] via-[#1a1c1f] to-[#1a1c1f] p-5 sm:p-8">
         <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#10b981]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#ff5625]/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#8bd6b6]/5 blur-3xl" />
 
         <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
           <div className="flex w-full max-w-[260px] flex-col items-center sm:w-auto sm:max-w-none sm:shrink-0">
@@ -87,7 +87,7 @@ export default function SupervisorQRPage() {
                   <img src={qr} alt={t('portal.supervisor.qr.image_alt')} className="h-full w-full rounded-lg" />
                 </span>
               ) : (
-                <div className="absolute inset-3 animate-pulse rounded-lg bg-[#11151a]/10" />
+                <div className="absolute inset-3 animate-pulse rounded-lg bg-[#1a1c1f]/10" />
               )}
             </div>
             <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#10b981]/70">
@@ -103,19 +103,19 @@ export default function SupervisorQRPage() {
               </p>
             </div>
 
-            <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-3 py-2.5">
-              <span className="material-symbols-outlined text-[16px] text-[#9ca3af]">link</span>
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5">
+              <span className="material-symbols-outlined text-[16px] text-[#a8b3ac]">link</span>
               <input
                 readOnly
                 value={refLink}
-                className="min-w-0 flex-1 truncate bg-transparent text-xs text-[#e7eaf0] outline-none"
+                className="min-w-0 flex-1 truncate bg-transparent text-xs text-[#e2e2e6] outline-none"
               />
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={copyLink}
-                className="flex items-center justify-center gap-2 rounded-full bg-[#ff5625] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#ff5625]/90 active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-full bg-[#065f46] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#065f46]/90 active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-[16px]">content_copy</span>
                 {t('portal.supervisor.qr.copy_link')}
@@ -130,8 +130,8 @@ export default function SupervisorQRPage() {
               </button>
             </div>
 
-            <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#9ca3af]">
-              <span className="material-symbols-outlined text-[14px] text-[#9ca3af]">tips_and_updates</span>
+            <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#a8b3ac]">
+              <span className="material-symbols-outlined text-[14px] text-[#a8b3ac]">tips_and_updates</span>
               {t('portal.supervisor.qr.tip')}
             </p>
           </div>

@@ -13,8 +13,8 @@ import type { CrmStaffCommission, CrmCommissionStatus } from '@/lib/portal-types
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 const STATUS_COLOR: Record<CrmCommissionStatus, string> = {
-  pending: 'text-[#ff5625]',
-  payable: 'text-[#00daf3]',
+  pending: 'text-[#8bd6b6]',
+  payable: 'text-[#ffb77d]',
   paid: 'text-[#34d399]',
   void: 'text-[var(--crm-muted)]',
 };
@@ -88,8 +88,8 @@ export default function CrmCommissionPage() {
   if (loading || !profile) return null;
 
   const cards: Array<{ key: string; label: string; value: number; tone: string }> = [
-    { key: 'pending', label: t('portal.crm.commission.pending'), value: totals.pending, tone: 'text-[#ff5625]' },
-    { key: 'payable', label: t('portal.crm.commission.payable'), value: totals.payable, tone: 'text-[#00daf3]' },
+    { key: 'pending', label: t('portal.crm.commission.pending'), value: totals.pending, tone: 'text-[#8bd6b6]' },
+    { key: 'payable', label: t('portal.crm.commission.payable'), value: totals.payable, tone: 'text-[#ffb77d]' },
     { key: 'paid', label: t('portal.crm.commission.paid'), value: totals.paid, tone: 'text-[#34d399]' },
     { key: 'total', label: t('portal.crm.commission.total'), value: totals.all, tone: 'text-[var(--crm-text)]' },
   ];
@@ -102,7 +102,7 @@ export default function CrmCommissionPage() {
         {isAdmin && (
           <button
             onClick={() => void release()}
-            className="flex items-center gap-2 rounded-xl border border-[#00daf3] px-4 py-2 text-sm text-[#00daf3]"
+            className="flex items-center gap-2 rounded-xl border border-[#ffb77d] px-4 py-2 text-sm text-[#ffb77d]"
           >
             <span className="material-symbols-outlined text-[18px]">lock_open</span>
             {t('portal.crm.commission.release')}
@@ -142,7 +142,7 @@ export default function CrmCommissionPage() {
             {rows.map(r => (
               <tr key={r.id} className="border-t border-[var(--crm-line)]">
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{new Date(r.created_at).toLocaleDateString('vi-VN')}</td>
-                <td className="px-4 py-3 font-mono text-[#00daf3]">{r.opportunity_id.slice(0, 8)}</td>
+                <td className="px-4 py-3 font-mono text-[#ffb77d]">{r.opportunity_id.slice(0, 8)}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{fmtVnd(Number(r.order_value))}đ</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{(Number(r.rate) * 100).toFixed(1)}%</td>
                 <td className="px-4 py-3 font-bold text-[var(--crm-text)]">{fmtVnd(Number(r.amount))}đ</td>

@@ -33,13 +33,13 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-start justify-center px-4 py-12 sm:items-center">
-      <div className="w-full max-w-md space-y-7 rounded-2xl border border-[#1f2937] bg-[#11151a] p-7 sm:p-9">
+      <div className="w-full max-w-md space-y-7 rounded-2xl border border-[#3f4944] bg-[#1a1c1f] p-7 sm:p-9">
         <div className="flex flex-col items-center text-center">
           <Link href="/" aria-label={t('portal.auth.common.logo_home_aria')}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo-orange.webp" alt={t('portal.auth.common.logo_alt')} className="h-16 w-auto sm:h-20" />
           </Link>
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#1f2937] bg-[#0a0c0f] px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#9ca3af]">
+          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#3f4944] bg-[#0c0e11] px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-[#a8b3ac]">
             <span aria-hidden="true">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="4" y="11" width="16" height="10" rx="2" />
@@ -48,14 +48,14 @@ export default function LoginPage() {
             </span>
             {t('portal.auth.common.portal_badge')}
           </div>
-          <h1 className="mt-3 font-headline text-3xl font-bold leading-tight tracking-tight text-[#e7eaf0] sm:text-4xl">
+          <h1 className="mt-3 font-headline text-3xl font-bold leading-tight tracking-tight text-[#e2e2e6] sm:text-4xl">
             {t('portal.auth.login.title')}
           </h1>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1.5 block text-xs text-[#9ca3af]">{t('portal.auth.common.email_label')}</label>
+            <label htmlFor="email" className="mb-1.5 block text-xs text-[#a8b3ac]">{t('portal.auth.common.email_label')}</label>
             <input
               id="email"
               type="email"
@@ -64,13 +64,13 @@ export default function LoginPage() {
               required
               autoFocus
               placeholder={t('portal.auth.common.email_placeholder')}
-              className="w-full rounded-xl border border-[#1f2937] bg-[#0a0c0f] px-4 py-3.5 text-sm text-[#e7eaf0] placeholder:text-[#9ca3af]/60 outline-none focus:border-[#ff5625]"
+              className="w-full rounded-xl border border-[#3f4944] bg-[#0c0e11] px-4 py-3.5 text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac]/60 outline-none focus:border-[#8bd6b6]"
             />
           </div>
           <div>
             <div className="mb-1.5 flex items-center justify-between">
-              <label htmlFor="password" className="text-xs text-[#9ca3af]">{t('portal.auth.common.password_label')}</label>
-              <Link href="/portal/forgot-password" className="text-xs text-[#9ca3af] hover:text-[#ff5625]">
+              <label htmlFor="password" className="text-xs text-[#a8b3ac]">{t('portal.auth.common.password_label')}</label>
+              <Link href="/portal/forgot-password" className="text-xs text-[#a8b3ac] hover:text-[#8bd6b6]">
                 {t('portal.auth.login.forgot_link')}
               </Link>
             </div>
@@ -86,17 +86,17 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#ff5625]/90 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3.5 text-sm font-bold text-white transition-colors hover:bg-[#065f46]/90 disabled:opacity-50"
           >
             {busy && <Spinner size={14} />}
             {busy ? t('portal.auth.login.submitting') : t('portal.auth.login.submit')}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 text-[11px] text-[#9ca3af]">
-          <span className="h-px flex-1 bg-[#1f2937]" />
+        <div className="flex items-center gap-3 text-[11px] text-[#a8b3ac]">
+          <span className="h-px flex-1 bg-[#3f4944]" />
           {t('portal.auth.common.or')}
-          <span className="h-px flex-1 bg-[#1f2937]" />
+          <span className="h-px flex-1 bg-[#3f4944]" />
         </div>
 
         <div className="space-y-2.5">
@@ -104,9 +104,9 @@ export default function LoginPage() {
           <OAuthButton provider="apple" />
         </div>
 
-        <p className="border-t border-[#1f2937] pt-5 text-center text-sm text-[#9ca3af]">
+        <p className="border-t border-[#3f4944] pt-5 text-center text-sm text-[#a8b3ac]">
           {t('portal.auth.login.no_account')}{' '}
-          <Link href="/portal/register" className="font-medium text-[#ff5625] hover:underline">
+          <Link href="/portal/register" className="font-medium text-[#8bd6b6] hover:underline">
             {t('portal.auth.login.signup_link')}
           </Link>
         </p>

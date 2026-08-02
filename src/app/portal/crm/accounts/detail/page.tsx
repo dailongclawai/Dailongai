@@ -95,7 +95,7 @@ function AccountDetail() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
 
-      <Link href="/portal/crm/accounts" className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--crm-muted)] hover:text-[#ff5625]">
+      <Link href="/portal/crm/accounts" className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--crm-muted)] hover:text-[#8bd6b6]">
         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
         {t('portal.crm.nav.accounts')}
       </Link>
@@ -112,7 +112,7 @@ function AccountDetail() {
           <div className={`${card} mb-5 p-5`}>
             <div className="flex flex-wrap items-start gap-4">
               <div className="mr-auto">
-                <p className="font-mono text-xs text-[#00daf3]">{account.code}</p>
+                <p className="font-mono text-xs text-[#ffb77d]">{account.code}</p>
                 <h1 className="crm-display mt-1 text-xl font-semibold text-[var(--crm-text)]">{account.name}</h1>
                 <p className="mt-1 text-sm text-[var(--crm-muted)]">
                   {t(account.kind === 'customer' ? 'portal.crm.account.kind_customer' : 'portal.crm.account.kind_prospect')}
@@ -125,14 +125,14 @@ function AccountDetail() {
               {(profile.role === 'admin' || account.owner_id === profile.id) && (
                 <button
                   onClick={() => setTransferring(true)}
-                  className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#00daf3]"
+                  className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#ffb77d]"
                 >
                   {t('portal.crm.transfer.title')}
                 </button>
               )}
               <button
                 onClick={() => setEditing(true)}
-                className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#ff5625]"
+                className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#8bd6b6]"
               >
                 {t('portal.crm.detail.edit')}
               </button>
@@ -151,7 +151,7 @@ function AccountDetail() {
               </div>
               <div>
                 <p className="text-[11px] uppercase tracking-[0.05em] text-[var(--crm-muted)]">{t('portal.crm.accounts.col_commission')}</p>
-                <p className="crm-display mt-1 text-sm tabular-nums text-[#00daf3]">
+                <p className="crm-display mt-1 text-sm tabular-nums text-[#ffb77d]">
                   {Number(account.expected_commission) > 0 ? `${fmtVnd(Number(account.expected_commission))}đ` : '—'}
                 </p>
               </div>
@@ -164,7 +164,7 @@ function AccountDetail() {
                 key={b}
                 onClick={() => setTab(b)}
                 className={`rounded-xl px-4 py-2 text-sm ${tab === b
-                  ? 'bg-[#ff5625] text-white'
+                  ? 'bg-[#065f46] text-white'
                   : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
               >
                 {t('portal.crm.detail.tab_' + b)}
@@ -201,7 +201,7 @@ function AccountDetail() {
                 <p className="text-sm text-[var(--crm-muted)]">{t('portal.crm.contact.hint')}</p>
                 <button
                   onClick={() => { setEditingContact(null); setContactOpen(true); }}
-                  className="rounded-xl bg-[#ff5625] px-4 py-2 text-sm font-bold text-white"
+                  className="rounded-xl bg-[#065f46] px-4 py-2 text-sm font-bold text-white"
                 >
                   {t('portal.crm.contact.new')}
                 </button>
@@ -231,7 +231,7 @@ function AccountDetail() {
                         <td className="px-4 py-3 text-[var(--crm-text)]">
                           {c.full_name}
                           {c.is_primary && (
-                            <span className="ml-2 rounded-full bg-[#00daf3]/10 px-2 py-0.5 text-xs text-[#00daf3]">
+                            <span className="ml-2 rounded-full bg-[#ffb77d]/10 px-2 py-0.5 text-xs text-[#ffb77d]">
                               {t('portal.crm.contact.primary_badge')}
                             </span>
                           )}
@@ -295,7 +295,7 @@ function AccountDetail() {
                           {d.code && <span className="ml-2 font-mono text-xs text-[var(--crm-muted)]">{d.code}</span>}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded-full border border-[#00daf3]/40 px-2.5 py-1 text-xs text-[#00daf3]">{d.stage_name}</span>
+                          <span className="rounded-full border border-[#ffb77d]/40 px-2.5 py-1 text-xs text-[#ffb77d]">{d.stage_name}</span>
                         </td>
                         <td className="crm-display px-4 py-3 text-right tabular-nums text-[var(--crm-text)]">{d.quantity}</td>
                         <td className="crm-display px-4 py-3 text-right tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(d.amount))}đ</td>
@@ -317,7 +317,7 @@ function AccountDetail() {
               )}
               {timeline.map((e, i) => (
                 <li key={`${e.entry}-${e.at}-${i}`} className={`${card} flex gap-3 p-4`}>
-                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#ff5625]' : 'text-[#00daf3]'}`}>
+                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#8bd6b6]' : 'text-[#ffb77d]'}`}>
                     {e.entry === 'stage' ? 'trending_up'
                       : e.sub_kind === 'call' ? 'call'
                         : e.sub_kind === 'meeting' ? 'event' : 'task_alt'}

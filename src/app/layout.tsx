@@ -21,14 +21,14 @@ const interHeadline = Inter({
   display: "swap",
 });
 
-// Chỉ dùng trong portal CRM (tiêu đề + con số tiền). preload: false để trang
-// công khai không phải tải thêm font này.
+// Font tiêu đề toàn hệ thống (design system "Đại Long Command Center").
+// Giữ tên var --font-crm-display để không phải sửa các chỗ đang dùng.
 const crmDisplay = Space_Grotesk({
   variable: "--font-crm-display",
   subsets: ["latin", "vietnamese"],
   weight: ["500", "600", "700"],
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 export const viewport = {

@@ -32,8 +32,8 @@ export function AddressPicker({
   value,
   onChange,
   required = true,
-  inputClass = 'w-full rounded-lg border border-[#1f2937]/40 bg-[#0a0c0f] px-3 py-2.5 text-sm outline-none focus:border-[#ff5625]',
-  labelClass = 'block text-[11px] uppercase tracking-wider text-[#9ca3af] mb-1.5',
+  inputClass = 'w-full rounded-lg border border-[#3f4944]/40 bg-[#0c0e11] px-3 py-2.5 text-sm outline-none focus:border-[#8bd6b6]',
+  labelClass = 'block text-[11px] uppercase tracking-wider text-[#a8b3ac] mb-1.5',
 }: {
   value: AddressValue;
   onChange: (v: AddressValue) => void;

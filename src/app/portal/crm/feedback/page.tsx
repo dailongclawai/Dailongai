@@ -72,7 +72,7 @@ export default function CrmFeedbackPage() {
       toast.error((e as Error).message);
     }
   };
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
 
   const submit = async () => {
     if (!content.trim()) {
@@ -127,7 +127,7 @@ export default function CrmFeedbackPage() {
             <button
               onClick={() => void submit()}
               disabled={sending}
-              className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-[#065f46] px-5 py-2.5 font-bold text-white disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">send</span>
               {sending ? t('portal.crm.feedback.sending') : t('portal.crm.feedback.send')}
@@ -140,7 +140,7 @@ export default function CrmFeedbackPage() {
         <h2 className="mb-3 flex items-center gap-2 font-bold text-[var(--crm-text)]">
           {t(isAdmin ? 'portal.crm.feedback.inbox_title' : 'portal.crm.feedback.mine_title')}
           {isAdmin && unreadCount > 0 && (
-            <span className="rounded-full bg-[#ff5625] px-2 py-0.5 text-xs font-bold text-white">
+            <span className="rounded-full bg-[#065f46] px-2 py-0.5 text-xs font-bold text-white">
               {unreadCount} {t('portal.crm.feedback.unread')}
             </span>
           )}
@@ -157,14 +157,14 @@ export default function CrmFeedbackPage() {
               title={isAdmin && !f.read_at ? t('portal.crm.feedback.mark_read') : undefined}
               className={`rounded-2xl border bg-[var(--crm-s1)] p-5 ${
                 !f.read_at && isAdmin
-                  ? 'cursor-pointer border-[#ff5625]/60 hover:border-[#ff5625]'
+                  ? 'cursor-pointer border-[#8bd6b6]/60 hover:border-[#8bd6b6]'
                   : 'border-[var(--crm-line)]'
               }`}
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--crm-muted)]">
                 <span className="flex items-center gap-2">
                   {isAdmin && (
-                    <span className="rounded-full border border-[#00daf3]/40 px-2 py-0.5 text-[#00daf3]">
+                    <span className="rounded-full border border-[#ffb77d]/40 px-2 py-0.5 text-[#ffb77d]">
                       {f.staff?.full_name ?? '—'}
                     </span>
                   )}
@@ -177,7 +177,7 @@ export default function CrmFeedbackPage() {
                   ) : (
                     <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 ${
                       isAdmin
-                        ? 'bg-[#ff5625] font-bold text-white'
+                        ? 'bg-[#065f46] font-bold text-white'
                         : 'border border-[var(--crm-line)] text-[var(--crm-muted)]'
                     }`}>
                       <span className="material-symbols-outlined text-[13px]">
@@ -197,7 +197,7 @@ export default function CrmFeedbackPage() {
                     <img src={urls[f.id]} alt={t('portal.crm.feedback.title')} className="mt-2 max-h-48 rounded-lg" />
                   </a>
                 ) : (
-                  <a href={urls[f.id]} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-[#00daf3] underline">
+                  <a href={urls[f.id]} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-[#ffb77d] underline">
                     {t('portal.crm.evidence.open_file')}
                   </a>
                 )

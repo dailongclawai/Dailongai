@@ -55,7 +55,7 @@ export function OAuthButton({ provider }: { provider: 'google' | 'facebook' | 'a
       type="button"
       onClick={handle}
       disabled={busy}
-      className="flex w-full items-center justify-center gap-3 rounded-full border border-[#1f2937]/60 bg-[#11151a] px-6 py-3 text-sm font-medium text-[#e7eaf0] transition-colors hover:border-[#ff5625] hover:text-[#ff5625] disabled:opacity-50"
+      className="flex w-full items-center justify-center gap-3 rounded-full border border-[#3f4944]/60 bg-[#1a1c1f] px-6 py-3 text-sm font-medium text-[#e2e2e6] transition-colors hover:border-[#8bd6b6] hover:text-[#8bd6b6] disabled:opacity-50"
     >
       {icon}
       {busy ? t('portal.components.oauthButton.redirecting') : label}

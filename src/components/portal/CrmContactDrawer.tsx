@@ -64,7 +64,7 @@ export function CrmContactDrawer({ open, accountId, contact, ownerId, onClose, o
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff5625]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
   const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
   const check = 'flex items-center gap-2 text-sm text-[var(--crm-text)]';
 
@@ -118,7 +118,7 @@ export function CrmContactDrawer({ open, accountId, contact, ownerId, onClose, o
             <label className={label} htmlFor="crm-ct-notes">{t('portal.crm.account.notes')}</label>
             <textarea id="crm-ct-notes" rows={2} className={field} value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
-          <button onClick={() => void save()} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#ff5625] py-3 font-bold text-white disabled:opacity-50">
+          <button onClick={() => void save()} disabled={saving} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3 font-bold text-white disabled:opacity-50">
             <span className="material-symbols-outlined text-[18px]">save</span>
             {saving ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
           </button>

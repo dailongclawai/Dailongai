@@ -23,7 +23,7 @@ export function TierCard({ profileId, audience = 'dealer' }: { profileId: string
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-[#1f2937]/40 bg-[#11151a] p-6">
+      <div className="rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6">
         <div className="h-5 w-40 animate-pulse rounded bg-[#3d3f41]/30" />
         <div className="mt-3 h-9 w-28 animate-pulse rounded bg-[#3d3f41]/20" />
         <div className="mt-6 h-3 w-full animate-pulse rounded-full bg-[#3d3f41]/20" />
@@ -42,12 +42,12 @@ export function TierCard({ profileId, audience = 'dealer' }: { profileId: string
 
   return (
     <div
-      className="relative overflow-hidden rounded-2xl border-l-4 bg-[#11151a] p-6"
+      className="relative overflow-hidden rounded-2xl border-l-4 bg-[#1a1c1f] p-6"
       style={{ borderLeftColor: color }}
     >
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#9ca3af]">{teamLabel}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#a8b3ac]">{teamLabel}</p>
           <p className="mt-2 font-headline text-[32px] font-bold leading-none" style={{ color }}>
             {status.current_name}
           </p>
@@ -65,10 +65,10 @@ export function TierCard({ profileId, audience = 'dealer' }: { profileId: string
       {status.next_slug ? (
         <>
           <div className="mb-2 flex justify-between text-[11px] uppercase tracking-wider">
-            <span className="text-[#9ca3af]">{t('portal.components.tierCard.progress_to')} {status.next_name}</span>
-            <span className="font-bold text-[#e7eaf0]">{status.progress_pct}%</span>
+            <span className="text-[#a8b3ac]">{t('portal.components.tierCard.progress_to')} {status.next_name}</span>
+            <span className="font-bold text-[#e2e2e6]">{status.progress_pct}%</span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-[#0a0c0f]">
+          <div className="h-3 overflow-hidden rounded-full bg-[#0c0e11]">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -78,20 +78,20 @@ export function TierCard({ profileId, audience = 'dealer' }: { profileId: string
               }}
             />
           </div>
-          <p className="mt-3 text-center text-sm italic text-[#9ca3af]">
+          <p className="mt-3 text-center text-sm italic text-[#a8b3ac]">
             {subjectVerb} <span className="font-bold" style={{ color }}>{fmtVnd(status.amount_to_next)} ₫</span> {t('portal.components.tierCard.revenue_to_reach')}{' '}
-            <span className="font-bold text-[#ff5625]">{status.next_name}</span>
+            <span className="font-bold text-[#8bd6b6]">{status.next_name}</span>
           </p>
         </>
       ) : (
-        <p className="text-center text-sm italic text-[#9ca3af]">
-          {t('portal.components.tierCard.max_tier_prefix')} <span className="font-bold text-[#e7eaf0]">{fmtVnd(status.revenue_12m)} ₫</span>
+        <p className="text-center text-sm italic text-[#a8b3ac]">
+          {t('portal.components.tierCard.max_tier_prefix')} <span className="font-bold text-[#e2e2e6]">{fmtVnd(status.revenue_12m)} ₫</span>
         </p>
       )}
 
-      <div className="mt-5 flex items-center justify-between border-t border-[#1f2937]/30 pt-4 text-[11px] uppercase tracking-wider text-[#9ca3af]">
+      <div className="mt-5 flex items-center justify-between border-t border-[#3f4944]/30 pt-4 text-[11px] uppercase tracking-wider text-[#a8b3ac]">
         <span>{t('portal.components.tierCard.revenue_12m')}</span>
-        <span className="font-mono font-bold tabular-nums text-[#e7eaf0]">{fmtVnd(status.revenue_12m)} ₫</span>
+        <span className="font-mono font-bold tabular-nums text-[#e2e2e6]">{fmtVnd(status.revenue_12m)} ₫</span>
       </div>
     </div>
   );

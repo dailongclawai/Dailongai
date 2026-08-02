@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Chakra_Petch } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 import {
   currentMonthVn, getAdminFleet, getCrmAccounts, getCrmActivities, getCrmFeedbacks,
   getCrmKpiDeviceMonths, getCrmKpiNewAccountsDays, getCrmStaffReport, getStaffPeers,
@@ -11,9 +11,9 @@ import {
 import type { FleetSummary } from '@/lib/portal-types';
 import { useI18n } from '@/lib/i18n';
 
-// Chữ hiển thị của riêng phòng điều hành: Chakra Petch — vuông vức, kỹ thuật,
-// có subset tiếng Việt. Thân chữ vẫn theo font portal để không lệch shell.
-const display = Chakra_Petch({ subsets: ['vietnamese', 'latin'], weight: ['500', '700'] });
+// Chữ hiển thị của phòng điều hành: Space Grotesk — theo design system
+// "Đại Long Command Center", có subset tiếng Việt. Thân chữ vẫn theo font portal.
+const display = Space_Grotesk({ subsets: ['vietnamese', 'latin'], weight: ['500', '700'] });
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
@@ -71,21 +71,21 @@ export function AdminConsole() {
   // Hàng trên: việc đang chờ tay admin — cả thẻ là nút bấm.
   const actions = [
     { label: t('portal.components.adminConsole.kpi_pending_confirm'), value: pendingConfirm, icon: 'hourglass_top', color: '#fbbf24', href: '/portal/crm/accounts' },
-    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', color: '#ff5625', href: '/portal/admin/orders' },
-    { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: unreadFeedback, icon: 'mark_email_unread', color: '#00daf3', href: '/portal/crm/feedback' },
+    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', color: '#8bd6b6', href: '/portal/admin/orders' },
+    { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: unreadFeedback, icon: 'mark_email_unread', color: '#ffb77d', href: '/portal/crm/feedback' },
   ];
   // Hàng dưới: nhịp số của cỗ máy bán hàng.
   const pulse = [
     { label: t('portal.components.adminConsole.kpi_units_month'), value: String(devMonth), icon: 'sell', color: '#34d399' },
-    { label: t('portal.components.adminConsole.kpi_new_today'), value: String(newToday), icon: 'person_add', color: '#00daf3' },
+    { label: t('portal.components.adminConsole.kpi_new_today'), value: String(newToday), icon: 'person_add', color: '#ffb77d' },
     { label: t('portal.components.adminConsole.kpi_staff_commission'), value: fmtVnd(staffCommission), icon: 'payments', color: '#3b82f6', href: '/portal/crm/commission' },
   ];
 
   const corner = (
     <>
       {/* Ngạnh góc kiểu bảng đồng hồ công nghiệp */}
-      <span className="pointer-events-none absolute left-2 top-2 h-2 w-2 border-l border-t border-[#e7eaf0]/15" />
-      <span className="pointer-events-none absolute bottom-2 right-2 h-2 w-2 border-b border-r border-[#e7eaf0]/15" />
+      <span className="pointer-events-none absolute left-2 top-2 h-2 w-2 border-l border-t border-[#e2e2e6]/15" />
+      <span className="pointer-events-none absolute bottom-2 right-2 h-2 w-2 border-b border-r border-[#e2e2e6]/15" />
     </>
   );
 
@@ -94,11 +94,11 @@ export function AdminConsole() {
       {/* Khí quyển: lưới bản vẽ + quầng than hồng, nằm sau toàn bộ nội dung */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-x-6 -top-8 bottom-0 -z-10 bg-[linear-gradient(rgba(231,234,240,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(231,234,240,0.025)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_75%_60%_at_35%_0%,black,transparent)]"
+        className="pointer-events-none absolute -inset-x-6 -top-8 bottom-0 -z-10 bg-[linear-gradient(rgba(226,226,230,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(226,226,230,0.025)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:radial-gradient(ellipse_75%_60%_at_35%_0%,black,transparent)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-24 -top-24 -z-10 h-[420px] w-[560px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(255,86,37,0.16),transparent_62%)]"
+        className="pointer-events-none absolute -left-24 -top-24 -z-10 h-[420px] w-[560px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(6,95,70,0.24),transparent_62%)]"
       />
 
       <motion.div {...rise(0)}>
@@ -107,29 +107,29 @@ export function AdminConsole() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" />
           </span>
-          <p className={`${display.className} text-[11px] uppercase tracking-[0.35em] text-[#ff5625]`}>
+          <p className={`${display.className} text-[11px] uppercase tracking-[0.35em] text-[#8bd6b6]`}>
             {t('portal.components.adminConsole.header_kicker')}
           </p>
         </div>
         <h1 className={`${display.className} mt-3 text-5xl font-bold leading-none tracking-tight md:text-6xl`}>
           {t('portal.components.adminConsole.header_title_prefix')}{' '}
-          <span className="text-[#ff5625]">{t('portal.components.adminConsole.header_title_highlight')}</span>
-          <span className="text-[#ff5625]">.</span>
+          <span className="text-[#8bd6b6]">{t('portal.components.adminConsole.header_title_highlight')}</span>
+          <span className="text-[#8bd6b6]">.</span>
         </h1>
       </motion.div>
 
       {/* HERO doanh thu — con số là tấm áp phích */}
       <motion.section {...rise(1)} className="relative">
-        <p className="text-[11px] uppercase tracking-[0.25em] text-[#e7eaf0]/50">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-[#e2e2e6]/50">
           {t('portal.components.adminConsole.revenue_ytd')}
         </p>
         <p className={`${display.className} mt-2 text-[56px] font-bold leading-[0.95] tracking-tight tabular-nums md:text-[84px]`}>
           {fmtVnd(f.revenue_ytd)}
-          <span className="ml-3 align-top text-2xl font-medium text-[#ff5625] md:text-3xl">₫</span>
+          <span className="ml-3 align-top text-2xl font-medium text-[#8bd6b6] md:text-3xl">₫</span>
         </p>
-        <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#e7eaf0]/60">
-          <span><b className={`${display.className} tabular-nums text-[#e7eaf0]`}>{f.units_ytd}</b> {t('portal.components.adminConsole.sub_orders_ytd')}</span>
-          <span><b className={`${display.className} tabular-nums text-[#e7eaf0]`}>{staffCount}</b> {t('portal.components.adminConsole.sub_staff')}</span>
+        <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#e2e2e6]/60">
+          <span><b className={`${display.className} tabular-nums text-[#e2e2e6]`}>{f.units_ytd}</b> {t('portal.components.adminConsole.sub_orders_ytd')}</span>
+          <span><b className={`${display.className} tabular-nums text-[#e2e2e6]`}>{staffCount}</b> {t('portal.components.adminConsole.sub_staff')}</span>
           <span className={overdueTasks > 0 ? 'text-[#f87171]' : ''}>
             <b className={`${display.className} tabular-nums`}>{overdueTasks}</b> {t('portal.components.adminConsole.sub_overdue')}
           </span>
@@ -138,7 +138,7 @@ export function AdminConsole() {
 
       {/* CẦN XỬ LÝ HÔM NAY — hàng đợi việc, cả thẻ là nút */}
       <section>
-        <motion.p {...rise(2)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e7eaf0]/45`}>
+        <motion.p {...rise(2)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e2e2e6]/45`}>
           {t('portal.components.adminConsole.group_action')}
         </motion.p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -146,8 +146,8 @@ export function AdminConsole() {
             <motion.div key={k.label} {...rise(3 + i)}>
               <Link
                 href={k.href}
-                className="group relative block overflow-hidden rounded-xl border border-[#1f2937]/50 bg-[#11151a]/90 p-5 transition-all hover:-translate-y-0.5"
-                style={{ boxShadow: k.value > 0 ? `inset 3px 0 0 ${k.color}` : 'inset 3px 0 0 #1f2937' }}
+                className="group relative block overflow-hidden rounded-xl border border-[#3f4944]/50 bg-[#1a1c1f]/90 p-5 transition-all hover:-translate-y-0.5"
+                style={{ boxShadow: k.value > 0 ? `inset 3px 0 0 ${k.color}` : 'inset 3px 0 0 #3f4944' }}
               >
                 {corner}
                 <div className="flex items-start justify-between">
@@ -164,10 +164,10 @@ export function AdminConsole() {
                     </span>
                   )}
                 </div>
-                <p className={`${display.className} mt-4 text-4xl font-bold tabular-nums`} style={{ color: k.value > 0 ? k.color : '#e7eaf0' }}>
+                <p className={`${display.className} mt-4 text-4xl font-bold tabular-nums`} style={{ color: k.value > 0 ? k.color : '#e2e2e6' }}>
                   {k.value}
                 </p>
-                <p className="mt-1 flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#e7eaf0]/50">
+                <p className="mt-1 flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] text-[#e2e2e6]/50">
                   {k.label}
                   <span className="material-symbols-outlined text-[14px] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" style={{ color: k.color }}>
                     arrow_forward
@@ -181,7 +181,7 @@ export function AdminConsole() {
 
       {/* NHỊP KINH DOANH */}
       <section>
-        <motion.p {...rise(6)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e7eaf0]/45`}>
+        <motion.p {...rise(6)} className={`${display.className} mb-3 text-[11px] uppercase tracking-[0.35em] text-[#e2e2e6]/45`}>
           {t('portal.components.adminConsole.group_pulse')}
         </motion.p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -198,11 +198,11 @@ export function AdminConsole() {
                 >
                   {k.icon}
                 </span>
-                <p className={`${display.className} mt-4 text-3xl font-bold tabular-nums text-[#e7eaf0]`}>{k.value}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#e7eaf0]/50">{k.label}</p>
+                <p className={`${display.className} mt-4 text-3xl font-bold tabular-nums text-[#e2e2e6]`}>{k.value}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#e2e2e6]/50">{k.label}</p>
               </>
             );
-            const cls = 'group relative block overflow-hidden rounded-xl border border-[#1f2937]/50 bg-[#11151a]/90 p-5 transition-all hover:-translate-y-0.5';
+            const cls = 'group relative block overflow-hidden rounded-xl border border-[#3f4944]/50 bg-[#1a1c1f]/90 p-5 transition-all hover:-translate-y-0.5';
             return (
               <motion.div key={k.label} {...rise(7 + i)}>
                 {k.href

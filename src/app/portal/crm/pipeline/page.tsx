@@ -125,7 +125,7 @@ export default function CrmPipelinePage() {
         <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
-          className="flex items-center gap-2 rounded-xl bg-[#ff5625] px-4 py-2 font-bold text-white"
+          className="flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white"
         >
           <span className="material-symbols-outlined text-[18px]">add_circle</span>
           {t('portal.crm.opp.new')}
@@ -140,7 +140,7 @@ export default function CrmPipelinePage() {
           {t('portal.crm.pipeline.open_value')}: <b className="text-[var(--crm-text)]">{fmtVnd(sumAmount(openRows))}đ</b>
         </span>
         <span className="rounded-xl bg-[var(--crm-s3)] px-4 py-2 text-[var(--crm-muted)]">
-          {t('portal.crm.pipeline.forecast')}: <b className="text-[#00daf3]">{fmtVnd(weightedForecast(openRows))}đ</b>
+          {t('portal.crm.pipeline.forecast')}: <b className="text-[#ffb77d]">{fmtVnd(weightedForecast(openRows))}đ</b>
         </span>
       </div>
 
@@ -173,7 +173,7 @@ export default function CrmPipelinePage() {
                   title={r.forecast !== 'open' && !isAdmin ? t('portal.crm.pipeline.closed_card') : undefined}
                   onDragStart={() => { if (r.forecast === 'open' || isAdmin) setDragId(r.id); }}
                   onClick={() => { setEditing(r); setDrawerOpen(true); }}
-                  className={`rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#ff5625] ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
+                  className={`rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-3 hover:border-[#8bd6b6] ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
                 >
                   <p className="text-sm font-semibold text-[var(--crm-text)]">{r.name}</p>
                   <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.account_name}</p>
@@ -181,13 +181,13 @@ export default function CrmPipelinePage() {
                     <a
                       href={`tel:${r.account_phone}`}
                       onClick={e => e.stopPropagation()}
-                      className="mt-1 inline-flex items-center gap-1 text-xs text-[#00daf3]"
+                      className="mt-1 inline-flex items-center gap-1 text-xs text-[#ffb77d]"
                     >
                       <span className="material-symbols-outlined text-[14px]">call</span>
                       {r.account_phone}
                     </a>
                   )}
-                  <p className="mt-2 text-sm font-bold text-[#ff5625]">
+                  <p className="mt-2 text-sm font-bold text-[#8bd6b6]">
                     {fmtVnd(Number(r.amount))}đ
                     <span className="ml-1 text-xs font-normal text-[var(--crm-muted)]">
                       · {r.quantity} {t('portal.crm.opp.machines')}
@@ -205,23 +205,23 @@ export default function CrmPipelinePage() {
                     })()}
                   </p>
                   {Number(r.expected_commission) > 0 && (
-                    <p className="mt-1 text-xs text-[#00daf3]">
+                    <p className="mt-1 text-xs text-[#ffb77d]">
                       {t('portal.crm.opp.expected_commission')}: {fmtVnd(Number(r.expected_commission))}đ
                     </p>
                   )}
                   {r.trial_days && (
-                    <p className="mt-1 inline-block rounded-full bg-[#ff5625]/15 px-2 py-0.5 text-xs text-[#ff5625]">
+                    <p className="mt-1 inline-block rounded-full bg-[#8bd6b6]/15 px-2 py-0.5 text-xs text-[#8bd6b6]">
                       {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
                     </p>
                   )}
                   <p className="mt-1 text-xs text-[var(--crm-muted)]">{r.expected_close_date}</p>
                   {r.lost_reason_name && (
-                    <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#ff5625]">
+                    <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#8bd6b6]">
                       {r.lost_reason_name}
                     </p>
                   )}
                   {r.owner_name && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-[#00daf3]">
+                    <p className="mt-1 flex items-center gap-1 text-xs text-[#ffb77d]">
                       <span className="material-symbols-outlined text-[14px]">person</span>
                       {r.owner_name}
                     </p>
