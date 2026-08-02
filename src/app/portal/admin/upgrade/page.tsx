@@ -169,8 +169,8 @@ export default function AdminUpgradePage() {
               onChange={(e) => setStaffSegment(e.target.value as StaffSegment)}
               className="rounded-lg border border-[#1f2937]/40 bg-[#11151a] px-3 py-2 text-sm outline-none focus:border-[#ff5625]"
             >
-              <option value="b2c">{t('portal.crm.pipeline.b2c_device')}</option>
-              <option value="b2b">{t('portal.crm.pipeline.b2b_dealer')}</option>
+              <option value="b2c">{t('portal.crm.segment.b2c')}</option>
+              <option value="b2b">{t('portal.crm.segment.b2b')}</option>
             </select>
           </div>
           <button

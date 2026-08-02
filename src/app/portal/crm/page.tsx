@@ -226,7 +226,7 @@ export default function CrmDashboardPage() {
             <option value="all">{t('portal.crm.dash.staff_all')}</option>
             {peers.map(p => (
               <option key={p.id} value={p.id}>
-                {p.full_name || p.email}{p.staff_segment ? ` · ${p.staff_segment.toUpperCase()}` : ''}
+                {p.full_name || p.email}{p.staff_segment ? ` · ${t('portal.crm.segment.' + p.staff_segment)}` : ''}
               </option>
             ))}
           </select>
@@ -294,7 +294,7 @@ export default function CrmDashboardPage() {
                       {s.peer.full_name || s.peer.email}
                       {s.peer.staff_segment && (
                         <span className="ml-2 rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[var(--crm-muted)]">
-                          {s.peer.staff_segment.toUpperCase()}
+                          {t('portal.crm.segment.' + s.peer.staff_segment)}
                         </span>
                       )}
                     </td>

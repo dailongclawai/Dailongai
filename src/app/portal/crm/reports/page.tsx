@@ -134,7 +134,7 @@ export default function CrmReportsPage() {
               <tr key={r.staff_id} className="border-t border-[var(--crm-line)]">
                 <td className="px-4 py-3 text-[var(--crm-text)]">{r.staff_name || r.staff_email || r.staff_id.slice(0, 8)}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">
-                  {r.staff_segment ? r.staff_segment.toUpperCase() : '—'}
+                  {r.staff_segment ? t('portal.crm.segment.' + r.staff_segment) : '—'}
                 </td>
                 <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.deals_open}</td>

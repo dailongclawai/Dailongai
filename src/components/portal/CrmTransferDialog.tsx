@@ -69,7 +69,7 @@ export function CrmTransferDialog({ open, accountId, accountName, currentOwnerId
               <option value="">—</option>
               {candidates.map(p => (
                 <option key={p.id} value={p.id}>
-                  {p.full_name || p.email}{p.staff_segment ? ` · ${p.staff_segment.toUpperCase()}` : ''}
+                  {p.full_name || p.email}{p.staff_segment ? ` · ${t('portal.crm.segment.' + p.staff_segment)}` : ''}
                 </option>
               ))}
             </select>
