@@ -522,6 +522,10 @@ const vi: Record<string, string> = {
 
     // ── Portal shell ──
     'portal.shell.brand': 'Đại Long Công nghệ & Sức khoẻ',
+    'portal.shell.brand_name': 'Đại Long',
+    'portal.shell.brand_tag': 'Công nghệ & Sức khoẻ',
+    'portal.shell.section.main': 'Menu chính',
+    'portal.shell.section.system': 'Hệ thống',
     'portal.shell.signout': 'Thoát tài khoản',
     'portal.shell.menu.label': 'Menu',
     'portal.shell.menu.aria': 'Mở menu điều hướng',
