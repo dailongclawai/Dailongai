@@ -552,6 +552,7 @@ const vi: Record<string, string> = {
     'portal.crm.dash.open_value': 'Giá trị cơ hội đang mở',
     'portal.crm.dash.deals_open': 'Đang mở',
     'portal.crm.dash.win_rate': 'Tỉ lệ chốt',
+    'portal.crm.dash.target_progress': 'Tiến độ chỉ tiêu',
     'portal.crm.dash.staff_filter': 'Lọc theo nhân viên',
     'portal.crm.dash.staff_all': 'Tất cả nhân viên',
     'portal.crm.dash.team_title': 'Số liệu theo nhân viên',

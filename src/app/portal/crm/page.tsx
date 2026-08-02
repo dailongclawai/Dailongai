@@ -6,14 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
-  getCrmAccounts, getCrmActivities, getCrmBoard, getCrmStages, getStaffPeers,
+  currentMonthVn, getCrmAccounts, getCrmActivities, getCrmBoard, getCrmKpiDeviceMonths,
+  getCrmStages, getStaffPeers,
 } from '@/lib/portal-queries';
 import { staffPeriodStats, sumAmount, weightedForecast, type TeamPeriod } from '@/lib/crm-board';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { SparklineBar } from '@/components/portal/SparklineBar';
 import type {
-  CrmAccountListRow, CrmActivityRow, CrmOpportunityBoardRow, CrmStage, StaffPeer,
+  CrmAccountListRow, CrmActivityRow, CrmKpiDeviceMonth, CrmOpportunityBoardRow, CrmStage, StaffPeer,
 } from '@/lib/portal-types';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
@@ -96,6 +97,7 @@ export default function CrmDashboardPage() {
   const [rows, setRows] = useState<CrmOpportunityBoardRow[]>([]);
   const [activities, setActivities] = useState<CrmActivityRow[]>([]);
   const [accounts, setAccounts] = useState<CrmAccountListRow[]>([]);
+  const [kpiMonths, setKpiMonths] = useState<CrmKpiDeviceMonth[]>([]);
   const [busy, setBusy] = useState(true);
   const [loadedAt, setLoadedAt] = useState<string | null>(null);
   // Quản trị nhìn thấy dữ liệu của mọi nhân viên gộp lại, nên phải có danh sách
@@ -128,16 +130,19 @@ export default function CrmDashboardPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [s, r, a, c] = await Promise.all([
+      const [s, r, a, c, k] = await Promise.all([
         getCrmStages(),
         getCrmBoard(),
         getCrmActivities(),
         getCrmAccounts(),
+        // Chỉ tiêu tháng cho vòng ring — RLS: nhân viên thấy của mình, admin cả đội.
+        getCrmKpiDeviceMonths().catch(() => [] as CrmKpiDeviceMonth[]),
       ]);
       setStages(s);
       setRows(r);
       setActivities(a);
       setAccounts(c);
+      setKpiMonths(k);
       setLoadedAt(new Date().toLocaleString('vi-VN', {
         hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric',
       }));
@@ -194,6 +199,16 @@ export default function CrmDashboardPage() {
       })
       .reduce((s, r) => s + (Number(r.quantity) || 0), 0);
   }, [fRows, now]);
+
+  // Chỉ tiêu máy tháng này: lọc theo nhân viên đang chọn; "tất cả" thì cộng
+  // chỉ tiêu mọi người nhìn thấy được (staff = của mình, admin = cả đội).
+  const kpiTarget = useMemo(() => {
+    const month = currentMonthVn();
+    return kpiMonths
+      .filter(m => m.thang === month && (staffFilter === 'all' || m.staff_id === staffFilter))
+      .reduce((s, m) => s + (Number(m.kpi_target) || 0), 0);
+  }, [kpiMonths, staffFilter]);
+  const targetPct = kpiTarget > 0 ? Math.round((machinesThisMonth / kpiTarget) * 100) : 0;
 
   // Hoa hồng tạm tính = tổng hoa hồng dự kiến của các cơ hội đang mở,
   // cùng công thức với cột "Hoa hồng dự kiến" trong bảng nhân viên.
@@ -427,9 +442,11 @@ export default function CrmDashboardPage() {
           <div className="flex items-end justify-between gap-4">
             <p className="crm-display text-4xl font-semibold tabular-nums text-[#8bd6b6]">
               {machinesThisMonth}
-              <span className="ml-1 text-base font-normal text-[var(--crm-muted)]">{t('portal.crm.dash.machines_unit')}</span>
+              <span className="ml-1 text-base font-normal text-[var(--crm-muted)]">
+                {kpiTarget > 0 ? `/ ${kpiTarget} ` : ''}{t('portal.crm.dash.machines_unit')}
+              </span>
             </p>
-            <ProgressRing pct={winRate} label={t('portal.crm.dash.win_rate')} />
+            <ProgressRing pct={targetPct} label={t('portal.crm.dash.target_progress')} />
           </div>
           <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
             {t('portal.crm.dash.win_rate')} {winRate}% ·{' '}

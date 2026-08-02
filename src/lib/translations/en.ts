@@ -549,6 +549,7 @@ const en: Record<string, string> = {
     'portal.crm.dash.open_value': 'Open pipeline value',
     'portal.crm.dash.deals_open': 'Open',
     'portal.crm.dash.win_rate': 'Win rate',
+    'portal.crm.dash.target_progress': 'Target progress',
     'portal.crm.dash.staff_filter': 'Filter by salesperson',
     'portal.crm.dash.staff_all': 'All salespeople',
     'portal.crm.dash.team_title': 'By salesperson',
