@@ -1183,6 +1183,27 @@ export async function uploadCrmEvidence(
   }
 }
 
+/** Avatar hồ sơ: bucket công khai `avatars`, mỗi người một thư mục theo user id
+ *  (policy chỉ cho ghi thư mục của mình). Tên file gắn timestamp để né cache CDN;
+ *  sau khi ghi avatar_url thành công, xoá ảnh cũ theo nỗ lực tốt nhất. */
+export async function uploadAvatar(userId: string, file: File, oldUrl: string | null): Promise<string> {
+  const client = getSupabaseClient();
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const path = `${userId}/avatar-${Date.now()}.${ext}`;
+  const { error: upErr } = await client.storage.from('avatars')
+    .upload(path, file, { upsert: false, contentType: file.type, cacheControl: '3600' });
+  if (upErr) throw upErr;
+  const url = client.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  const { error } = await client.from('profiles').update({ avatar_url: url }).eq('id', userId);
+  if (error) {
+    await client.storage.from('avatars').remove([path]).catch(() => {});
+    throw error;
+  }
+  const old = oldUrl?.match(/\/avatars\/(.+)$/);
+  if (old) void client.storage.from('avatars').remove([decodeURIComponent(old[1])]).catch(() => {});
+  return url;
+}
+
 export async function crmEvidenceSignedUrl(path: string): Promise<string> {
   const { data, error } = await getSupabaseClient()
     .storage.from('crm-evidence').createSignedUrl(path, 600);

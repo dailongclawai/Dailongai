@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { getSupabaseClient } from '@/lib/supabase';
+import { uploadAvatar } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { PasswordInput } from '@/components/portal/PasswordInput';
 import { toast } from 'sonner';
@@ -24,6 +25,31 @@ export default function ProfilePage() {
   const telegram = telegramEdit ?? profile?.telegram_chat_id ?? '';
   const [newPassword, setNewPassword] = useState('');
   const [busy, setBusy] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+
+  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !session || !profile) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error(t('portal.profile.avatar.bad_type'));
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(t('portal.profile.avatar.too_big'));
+      return;
+    }
+    setAvatarBusy(true);
+    try {
+      await uploadAvatar(session.user.id, file, profile.avatar_url);
+      toast.success(t('portal.profile.avatar.updated'));
+      await refresh();
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (loading) return;
@@ -73,6 +99,24 @@ export default function ProfilePage() {
       <div className="grid gap-6 md:grid-cols-2">
         <form onSubmit={saveProfile} className="space-y-4 rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6 backdrop-blur">
           <h2 className="text-base font-semibold">{t('portal.profile.section.details')}</h2>
+          <div className="flex items-center gap-4">
+            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-2xl font-bold text-[#8bd6b6]">
+              {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatar_url} alt={t('portal.profile.avatar.label')} className="h-full w-full object-cover" />
+              ) : (
+                (profile.full_name ?? '?').trim().charAt(0).toUpperCase()
+              )}
+            </span>
+            <div>
+              <label className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-[#8bd6b6]/40 px-3 py-2 text-sm font-semibold text-[#8bd6b6] transition-colors hover:bg-[#8bd6b6]/10 ${avatarBusy ? 'pointer-events-none opacity-50' : ''}`}>
+                <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+                {avatarBusy ? t('portal.crm.common.loading') : t('portal.profile.avatar.upload')}
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onAvatarChange} disabled={avatarBusy} />
+              </label>
+              <p className="mt-1.5 text-xs text-[#a8b3ac]">{t('portal.profile.avatar.hint')}</p>
+            </div>
+          </div>
           <div>
             <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/60">{t('portal.profile.label.email')}</label>
             <input

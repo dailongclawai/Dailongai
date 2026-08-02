@@ -168,7 +168,14 @@ export function PortalShell({
                 )}
               </div>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-xs font-bold text-[#8bd6b6] transition-colors group-hover:border-[#8bd6b6]">{initials}</span>
+            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-xs font-bold text-[#8bd6b6] transition-colors group-hover:border-[#8bd6b6]">
+              {profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
+            </span>
           </Link>
         </div>
       </header>
