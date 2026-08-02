@@ -9,7 +9,6 @@ import { getSupabaseClient } from '@/lib/supabase';
 import { adminSetStaff } from '@/lib/portal-queries';
 import type { StaffSegment } from '@/lib/portal-types';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { AccountIdBadge } from '@/components/portal/AccountIdBadge';
 
 interface Row {
@@ -117,7 +116,7 @@ export default function AdminUpgradePage() {
   return (
     <PortalShell
       variant="admin"
-      nav={<AdminNav />}
+     
     >
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.upgrade.eyebrow')}</p>

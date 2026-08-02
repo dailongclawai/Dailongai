@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { getAllModels, createModel, updateModel } from '@/lib/portal-queries';
 import type { ProductModel } from '@/lib/portal-types';
 
@@ -84,7 +83,7 @@ export default function AdminProductsPage() {
   const input = 'w-full rounded-lg border border-[#1f2937]/50 bg-[#11151a] px-3 py-2 text-sm text-[#e7eaf0] placeholder:text-[#e7eaf0]/40 outline-none focus:border-[#ff5625]';
 
   return (
-    <PortalShell variant="admin" nav={<AdminNav />}>
+    <PortalShell variant="admin">
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.products.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-4xl">{t('portal.admin.products.title')}</h1>

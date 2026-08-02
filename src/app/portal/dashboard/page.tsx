@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { DealerNav } from '@/components/portal/DealerNav';
 import { DealerDashboard } from '@/components/portal/DealerDashboard';
 
 export default function DashboardPage() {
@@ -32,7 +31,7 @@ export default function DashboardPage() {
   if (loading || !session || !profile || profile.role !== 'dealer') return null;
 
   return (
-    <PortalShell variant={profile.role} nav={<DealerNav />}>
+    <PortalShell variant={profile.role}>
       <DealerDashboard profile={profile} />
     </PortalShell>
   );

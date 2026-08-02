@@ -7,7 +7,6 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { PasswordInput } from '@/components/portal/PasswordInput';
 import { toast } from 'sonner';
 
@@ -64,13 +63,9 @@ export default function ProfilePage() {
 
   if (loading || !session || !profile) return null;
 
-  const dashHref = profile.role === 'supervisor' ? '/portal/supervisor' : '/portal/dashboard';
-  const nav = profile.role === 'admin'
-    ? <AdminNav />
-    : <Link href={dashHref} className="text-[#e7eaf0]/60 transition-colors hover:text-[#ff5625]">{t('portal.profile.back_to_dashboard')}</Link>;
 
   return (
-    <PortalShell variant={profile.role ?? 'dealer'} nav={nav}>
+    <PortalShell variant={profile.role ?? 'dealer'}>
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.profile.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl">{t('portal.profile.title')}</h1>

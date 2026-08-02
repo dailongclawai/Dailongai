@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { AuditTimeline } from '@/components/portal/AuditTimeline';
 import { PortalSkeleton } from '@/components/portal/PortalSkeleton';
 import { getAuditLog } from '@/lib/portal-queries';
@@ -36,14 +35,14 @@ export default function AdminAuditPage() {
 
   if (loading || profile?.role !== 'admin') {
     return (
-      <PortalShell variant="admin" nav={<AdminNav />}>
+      <PortalShell variant="admin">
         <PortalSkeleton.Timeline />
       </PortalShell>
     );
   }
 
   return (
-    <PortalShell variant="admin" nav={<AdminNav />}>
+    <PortalShell variant="admin">
       <div className="mb-6">
         <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.audit.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.admin.audit.title')}</h1>

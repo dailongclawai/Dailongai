@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { AdminConsole } from '@/components/portal/AdminConsole';
 
 export default function AdminHome() {
@@ -28,7 +27,7 @@ export default function AdminHome() {
   return (
     <PortalShell
       variant="admin"
-      nav={<AdminNav />}
+     
     >
       <AdminConsole />
     </PortalShell>

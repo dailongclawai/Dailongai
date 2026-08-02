@@ -18,7 +18,6 @@ export function PortalShell({
   variant = 'dealer',
 }: {
   children: ReactNode;
-  nav?: ReactNode;
   variant?: Variant;
 }) {
   const router = useRouter();
@@ -40,11 +39,8 @@ export function PortalShell({
       { href: '/portal/admin', label: t('portal.shell.nav.dashboard'), icon: 'dashboard', exact: true },
       { href: '/portal/admin/orders', label: t('portal.shell.nav.orders'), icon: 'shopping_cart' },
       { href: '/portal/crm', label: t('portal.shell.nav.crm'), icon: 'contacts' },
-      { href: '/portal/admin/payouts', label: t('portal.shell.nav.payout_requests'), icon: 'payments' },
       { href: '/portal/admin/products', label: t('portal.shell.nav.products'), icon: 'medical_services' },
-      { href: '/portal/admin/supervisors', label: t('portal.shell.nav.supervisors'), icon: 'groups' },
       { href: '/portal/admin/upgrade', label: t('portal.shell.nav.upgrade'), icon: 'upgrade' },
-      { href: '/portal/admin/reports', label: t('portal.shell.nav.reports'), icon: 'bar_chart' },
       { href: '/portal/admin/audit', label: t('portal.shell.nav.audit'), icon: 'history' },
     ],
     dealer: [

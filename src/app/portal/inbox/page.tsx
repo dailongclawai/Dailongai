@@ -32,6 +32,7 @@ function makeTimeAgo(t: (k: string) => string) {
 type Filter = 'all' | 'unread' | NotificationCategory;
 
 const CATEGORY_ICON: Record<NotificationCategory, string> = {
+  crm:        'contacts',
   order:      'shopping_bag',
   commission: 'payments',
   payout:     'account_balance_wallet',
@@ -42,6 +43,7 @@ const CATEGORY_ICON: Record<NotificationCategory, string> = {
 };
 
 const CATEGORY_LABEL_KEY: Record<NotificationCategory, string> = {
+  crm:        'portal.inbox.category.crm',
   order:      'portal.inbox.category.order',
   commission: 'portal.inbox.category.commission',
   payout:     'portal.inbox.category.payout',
@@ -82,7 +84,7 @@ export default function InboxPage() {
     const c: Record<Filter, number> = {
       all: myMessages.length,
       unread: myMessages.filter((m) => !m.is_read).length,
-      order: 0, commission: 0, payout: 0, legal: 0, policy: 0, system: 0, general: 0,
+      crm: 0, order: 0, commission: 0, payout: 0, legal: 0, policy: 0, system: 0, general: 0,
     };
     for (const m of myMessages) c[m.category] = (c[m.category] ?? 0) + 1;
     return c;

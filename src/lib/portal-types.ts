@@ -126,7 +126,7 @@ export interface DealerCurrentCommission {
   source: 'fixed' | 'tier_auto';
 }
 
-export type NotificationCategory = 'order' | 'commission' | 'payout' | 'legal' | 'policy' | 'system' | 'general';
+export type NotificationCategory = 'order' | 'commission' | 'payout' | 'legal' | 'policy' | 'system' | 'general' | 'crm';
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'critical';
 
 export interface PortalMessage {

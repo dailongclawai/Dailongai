@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import { getRecentOrdersAll } from '@/lib/portal-queries';
 import { getSupabaseClient } from '@/lib/supabase';
 import { PortalShell } from '@/components/portal/PortalShell';
-import { AdminNav } from '@/components/portal/AdminNav';
 import { OrderKanban } from '@/components/portal/OrderKanban';
 import { PortalSkeleton } from '@/components/portal/PortalSkeleton';
 import type { Order, Profile } from '@/lib/portal-types';
@@ -63,14 +64,33 @@ export default function AdminOrdersPage() {
 
   if (loading || profile?.role !== 'admin') {
     return (
-      <PortalShell variant="admin" nav={<AdminNav />}>
+      <PortalShell variant="admin">
         <PortalSkeleton.Cards count={4} />
       </PortalShell>
     );
   }
 
+
+  // Port từ trang Báo cáo admin cũ (đã gỡ 02/08/2026) — xuất lịch sử đơn hàng.
+  const exportExcel = () => {
+    if (orders.length === 0) { toast.error(t('portal.admin.reports.toast.empty')); return; }
+    const rows = orders.map((o) => ({
+      [t('portal.admin.reports.column.serial')]: o.serial_number,
+      [t('portal.admin.reports.column.customer')]: o.customer_name,
+      [t('portal.admin.reports.column.phone')]: o.customer_phone,
+      [t('portal.admin.reports.column.sale_price')]: o.sale_price,
+      [t('portal.admin.reports.column.sale_date')]: o.sale_date,
+      [t('portal.admin.reports.column.status')]: o.status,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, t('portal.admin.reports.sheet_name'));
+    XLSX.writeFile(wb, `dailong-orders-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    toast.success(t('portal.admin.reports.toast.exported'));
+  };
+
   return (
-    <PortalShell variant="admin" nav={<AdminNav />}>
+    <PortalShell variant="admin">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.admin.orders.eyebrow')}</p>
@@ -84,6 +104,13 @@ export default function AdminOrdersPage() {
           </p>
         </div>
         <button
+            onClick={exportExcel}
+            className="mr-2 inline-flex items-center gap-2 rounded-xl border border-[#1f2937]/60 px-4 py-2 text-sm text-[#e7eaf0] hover:border-[#00daf3]"
+          >
+            <span className="material-symbols-outlined text-[18px] text-[#00daf3]">download</span>
+            {t('portal.admin.reports.export')}
+          </button>
+          <button
           type="button"
           onClick={() => void refresh()}
           className="rounded-lg border border-[#1f2937] bg-[#11151a] px-4 py-2 text-sm hover:bg-[#1a1f26]"
