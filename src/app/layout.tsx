@@ -123,6 +123,22 @@ export default function RootLayout({
                     "https://zalo.me/2860930231550407599",
                     "https://maps.google.com/?cid=6086458135801533925",
                   ],
+                  subjectOf: [
+                    {
+                      "@type": "NewsArticle",
+                      headline: "Máy laser bán dẫn Zhi Dun: Đột phá công nghệ y tế gia đình",
+                      url: "https://1thegioi.vn/may-laser-ban-dan-zhi-dun-dot-pha-cong-nghe-y-te-gia-dinh-255179.html",
+                      publisher: { "@type": "Organization", name: "Báo Một Thế Giới" },
+                      datePublished: "2026-07-20",
+                    },
+                    {
+                      "@type": "NewsArticle",
+                      headline: "Chăm sóc sức khỏe tim mạch tại nhà bằng laser bán dẫn",
+                      url: "https://vnexpress.net/cham-soc-suc-khoe-tim-mach-tai-nha-bang-laser-ban-dan-5102139.html",
+                      publisher: { "@type": "Organization", name: "Báo VnExpress" },
+                      datePublished: "2026-07-29",
+                    },
+                  ],
                 },
                 {
                   "@type": "WebSite",
