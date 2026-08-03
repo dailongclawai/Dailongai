@@ -88,15 +88,15 @@ export function PortalShell({
         onClick={() => setOpen(false)}
         className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200 group ${
           active
-            ? 'bg-[#065f46]/20 font-semibold text-[#8bd6b6]'
-            : 'text-[#a8b3ac] hover:bg-white/5 hover:text-[#e2e2e6]'
+            ? 'bg-[#e8692a]/20 font-semibold text-[#ff8a50]'
+            : 'text-[#b3aca8] hover:bg-white/5 hover:text-[#e2e2e6]'
         }`}
       >
         {active && (
-          <span aria-hidden className="absolute left-0 top-[15%] h-[70%] w-[3px] rounded-r bg-[#8bd6b6] shadow-[0_0_8px_#8bd6b6]" />
+          <span aria-hidden className="absolute left-0 top-[15%] h-[70%] w-[3px] rounded-r bg-[#ff8a50] shadow-[0_0_8px_#ff8a50]" />
         )}
-        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${active ? 'bg-[#065f46]/30' : ''}`}>
-          <span className={`material-symbols-outlined text-[20px] ${active ? 'fill' : 'group-hover:text-[#8bd6b6]'}`}>{it.icon}</span>
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${active ? 'bg-[#e8692a]/30' : ''}`}>
+          <span className={`material-symbols-outlined text-[20px] ${active ? 'fill' : 'group-hover:text-[#ff8a50]'}`}>{it.icon}</span>
         </span>
         <span className="flex-1 text-[14px]">{it.label}</span>
         {it.href === '/portal/inbox' && unread > 0 && (
@@ -118,22 +118,22 @@ export function PortalShell({
           <img
             src="/images/logo-orange.webp"
             alt={t('portal.shell.brand')}
-            className="h-10 w-10 shrink-0 rounded-xl border border-[#8bd6b6]/20 bg-[#065f46]/20 object-contain p-0.5 shadow-[0_0_12px_rgba(139,214,182,0.3)]"
+            className="h-10 w-10 shrink-0 rounded-xl border border-[#ff8a50]/20 bg-[#e8692a]/20 object-contain p-0.5 shadow-[0_0_12px_rgba(255,138,80,0.3)]"
           />
           <span className="flex flex-col">
-            <span className="font-headline text-[20px] font-bold leading-tight text-[#8bd6b6]">{t('portal.shell.brand_name')}</span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#a8b3ac]/70">{t('portal.shell.brand_tag')}</span>
+            <span className="font-headline text-[20px] font-bold leading-tight text-[#ff8a50]">{t('portal.shell.brand_name')}</span>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#b3aca8]/70">{t('portal.shell.brand_tag')}</span>
           </span>
         </span>
-        <span aria-hidden className="mt-4 block h-px w-full bg-gradient-to-r from-[#8bd6b6]/40 via-[#8bd6b6]/10 to-transparent" />
+        <span aria-hidden className="mt-4 block h-px w-full bg-gradient-to-r from-[#ff8a50]/40 via-[#ff8a50]/10 to-transparent" />
       </Link>
       <nav className="portal-scroll relative flex-1 space-y-6 overflow-y-auto px-3 py-1">
         <div>
-          <p className="mb-2 px-3 text-[10px] uppercase tracking-[0.25em] text-[#a8b3ac]/50">{t('portal.shell.section.main')}</p>
+          <p className="mb-2 px-3 text-[10px] uppercase tracking-[0.25em] text-[#b3aca8]/50">{t('portal.shell.section.main')}</p>
           <div className="space-y-1">{items.map(navLink)}</div>
         </div>
         <div>
-          <p className="mb-2 px-3 text-[10px] uppercase tracking-[0.25em] text-[#a8b3ac]/50">{t('portal.shell.section.system')}</p>
+          <p className="mb-2 px-3 text-[10px] uppercase tracking-[0.25em] text-[#b3aca8]/50">{t('portal.shell.section.system')}</p>
           <div className="space-y-1">
             {navLink({ href: '/portal/inbox', label: t('portal.shell.nav.inbox'), icon: 'notifications' })}
             {navLink({ href: '/portal/profile', label: t('portal.shell.nav.profile'), icon: 'settings' })}
@@ -145,7 +145,7 @@ export function PortalShell({
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
       >
         {variant === 'dealer' && (
-          <Link href="/portal/dealer/orders/new" className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3 font-bold text-white transition-transform active:scale-[0.98]">
+          <Link href="/portal/dealer/orders/new" className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8692a] py-3 font-bold text-white transition-transform active:scale-[0.98]">
             <span className="material-symbols-outlined text-[20px]">add_circle</span> {t('portal.shell.cta.new_order')}
           </Link>
         )}
@@ -154,7 +154,7 @@ export function PortalShell({
           onClick={() => setOpen(false)}
           className="group flex items-center gap-3 rounded-xl border border-white/5 bg-[#282a2d]/40 p-3 transition-colors hover:bg-[#282a2d]"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#8bd6b6]/20 bg-[#1e2023] text-xs font-bold text-[#8bd6b6]">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#ff8a50]/20 bg-[#1e2023] text-xs font-bold text-[#ff8a50]">
             {profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
@@ -164,9 +164,9 @@ export function PortalShell({
           </span>
           <span className="flex min-w-0 flex-col">
             <span className="truncate text-[13px] font-semibold text-[#e2e2e6]">{profile?.full_name ?? t('portal.shell.nav.profile')}</span>
-            <span className="truncate text-[9px] uppercase tracking-[0.15em] text-[#a8b3ac]/70">{roleLabel}</span>
+            <span className="truncate text-[9px] uppercase tracking-[0.15em] text-[#b3aca8]/70">{roleLabel}</span>
           </span>
-          <span className="material-symbols-outlined ml-auto text-[18px] text-[#a8b3ac] transition-colors group-hover:text-[#8bd6b6]">unfold_more</span>
+          <span className="material-symbols-outlined ml-auto text-[18px] text-[#b3aca8] transition-colors group-hover:text-[#ff8a50]">unfold_more</span>
         </Link>
         <button onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[#f87171]/80 transition-colors hover:bg-[#f87171]/10 hover:text-[#f87171]">
           <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -187,11 +187,11 @@ export function PortalShell({
       <aside className={`fixed left-0 top-0 z-50 h-[100dvh] w-[280px] border-r border-white/5 transition-transform lg:hidden ${open ? 'translate-x-0' : '-translate-x-full'}`}>{Sidebar}</aside>
 
       {/* Topbar */}
-      <header className="fixed top-0 right-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#3f4944]/40 bg-[#0c0e11] px-4 lg:left-[280px] lg:w-[calc(100%-280px)] lg:px-8">
+      <header className="fixed top-0 right-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#49443f]/40 bg-[#0c0e11] px-4 lg:left-[280px] lg:w-[calc(100%-280px)] lg:px-8">
         <button
           onClick={() => setOpen(true)}
           aria-label={t('portal.shell.menu.aria')}
-          className="inline-flex items-center gap-2 rounded-xl border border-[#8bd6b6]/40 bg-[#8bd6b6]/10 px-3 py-2 text-sm font-semibold text-[#8bd6b6] transition-colors hover:border-[#8bd6b6] hover:bg-[#065f46] hover:text-white active:scale-[0.98] lg:hidden"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#ff8a50]/40 bg-[#ff8a50]/10 px-3 py-2 text-sm font-semibold text-[#ff8a50] transition-colors hover:border-[#ff8a50] hover:bg-[#e8692a] hover:text-white active:scale-[0.98] lg:hidden"
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
           <span className="text-xs">{t('portal.shell.menu.label')}</span>
@@ -199,22 +199,22 @@ export function PortalShell({
         <div className="hidden flex-1 lg:block" />
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <span aria-hidden className="hidden h-6 w-px bg-[#3f4944] sm:block" />
+          <span aria-hidden className="hidden h-6 w-px bg-[#49443f] sm:block" />
           <Link href="/portal/profile" className="group flex items-center gap-2.5">
             {/* Profile chip: name + role · ID — hidden on mobile to save header space */}
-            <div className="hidden flex-col items-end gap-1 rounded-xl border border-[#3f4944]/60 bg-[#16181b]/60 px-3 py-1.5 transition-colors group-hover:border-[#8bd6b6]/40 sm:flex">
+            <div className="hidden flex-col items-end gap-1 rounded-xl border border-[#49443f]/60 bg-[#16181b]/60 px-3 py-1.5 transition-colors group-hover:border-[#ff8a50]/40 sm:flex">
               <p className="text-[13px] font-semibold leading-none text-[#e2e2e6]">{profile?.full_name ?? t('portal.shell.nav.profile')}</p>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] uppercase tracking-[0.15em] text-[#a8b3ac]/70">{roleLabel}</span>
+                <span className="text-[10px] uppercase tracking-[0.15em] text-[#b3aca8]/70">{roleLabel}</span>
                 {profile?.id && (
                   <>
-                    <span aria-hidden className="text-[10px] leading-none text-[#a8b3ac]/40">·</span>
+                    <span aria-hidden className="text-[10px] leading-none text-[#b3aca8]/40">·</span>
                     <AccountIdBadge accountNo={profile.account_no} id={profile.id} />
                   </>
                 )}
               </div>
             </div>
-            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-xs font-bold text-[#8bd6b6] transition-colors group-hover:border-[#8bd6b6]">
+            <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border-2 border-[#ff8a50]/30 bg-[#1e2023] text-xs font-bold text-[#ff8a50] transition-colors group-hover:border-[#ff8a50]">
               {profile?.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />

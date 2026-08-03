@@ -23,36 +23,36 @@ export function InvoiceFieldsSection({ value, onChange }: Props) {
   const set = <K extends keyof InvoiceInfo>(k: K, v: InvoiceInfo[K]) => onChange({ ...value, [k]: v });
 
   return (
-    <div className="rounded-xl border border-[#3f4944] bg-[#0c0e11]/60">
+    <div className="rounded-xl border border-[#49443f] bg-[#0c0e11]/60">
       <label className="flex cursor-pointer items-start gap-3 p-4">
         <input
           type="checkbox"
           checked={value.required}
           onChange={(e) => set('required', e.target.checked)}
-          className="mt-0.5 h-4 w-4 cursor-pointer accent-[#065f46]"
+          className="mt-0.5 h-4 w-4 cursor-pointer accent-[#e8692a]"
         />
         <div className="flex-1">
           <p className="text-sm font-semibold text-[#e2e2e6]">{t('portal.components.invoiceFields.toggle_label')}</p>
-          <p className="mt-0.5 text-[11px] text-[#a8b3ac]">{t('portal.components.invoiceFields.toggle_hint')}</p>
+          <p className="mt-0.5 text-[11px] text-[#b3aca8]">{t('portal.components.invoiceFields.toggle_hint')}</p>
         </div>
       </label>
 
       {value.required && (
-        <div className="space-y-4 border-t border-[#3f4944] p-4">
+        <div className="space-y-4 border-t border-[#49443f] p-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                 {t('portal.components.invoiceFields.company_label')} *
               </label>
               <input
                 value={value.company_name}
                 onChange={(e) => set('company_name', e.target.value)}
                 placeholder={t('portal.components.invoiceFields.company_placeholder')}
-                className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+                className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 text-sm text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                 {t('portal.components.invoiceFields.tax_label')} *
               </label>
               <input
@@ -61,13 +61,13 @@ export function InvoiceFieldsSection({ value, onChange }: Props) {
                 inputMode="numeric"
                 pattern="\d{10}(-\d{3})?"
                 placeholder={t('portal.components.invoiceFields.tax_placeholder')}
-                className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+                className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
               />
-              <p className="mt-1 text-[10px] text-[#a8b3ac]">{t('portal.components.invoiceFields.tax_hint')}</p>
+              <p className="mt-1 text-[10px] text-[#b3aca8]">{t('portal.components.invoiceFields.tax_hint')}</p>
             </div>
           </div>
           <div>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
               {t('portal.components.invoiceFields.email_label')}
             </label>
             <input
@@ -75,9 +75,9 @@ export function InvoiceFieldsSection({ value, onChange }: Props) {
               value={value.email}
               onChange={(e) => set('email', e.target.value)}
               placeholder="ketoan@congty.vn"
-              className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 text-sm text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+              className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 text-sm text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
             />
-            <p className="mt-1 text-[10px] text-[#a8b3ac]">{t('portal.components.invoiceFields.email_hint')}</p>
+            <p className="mt-1 text-[10px] text-[#b3aca8]">{t('portal.components.invoiceFields.email_hint')}</p>
           </div>
         </div>
       )}

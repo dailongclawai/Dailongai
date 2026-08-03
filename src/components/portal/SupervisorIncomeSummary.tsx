@@ -58,15 +58,15 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
     : null;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.08] via-[#1e2022] to-[#0c0e10] p-6 sm:p-8">
-      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#10b981]/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#8bd6b6]/[0.04] blur-3xl" />
+    <div className="relative overflow-hidden rounded-3xl border border-[#ff5625]/30 bg-gradient-to-br from-[#ff5625]/[0.08] via-[#1e2022] to-[#0c0e10] p-6 sm:p-8">
+      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#ff5625]/10 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#ff8a50]/[0.04] blur-3xl" />
 
       <div className="relative flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.components.supervisorIncomeSummary.kicker')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.components.supervisorIncomeSummary.kicker')}</p>
           <h2 className="mt-1 font-headline text-2xl leading-tight sm:text-3xl">
-            {t('portal.components.supervisorIncomeSummary.month_prefix')} <span className="text-[#10b981]">{currentMonth.label}</span>
+            {t('portal.components.supervisorIncomeSummary.month_prefix')} <span className="text-[#ff5625]">{currentMonth.label}</span>
           </h2>
           <p className="mt-2 flex items-baseline gap-3 font-headline">
             <span className="text-4xl font-semibold tabular-nums sm:text-5xl">{fmtVnd(currentMonth.total)}</span>
@@ -75,8 +75,8 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
               <span
                 className={`ml-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[11px] font-semibold tabular-nums ${
                   growthPct >= 0
-                    ? 'bg-[#10b981]/15 text-[#10b981]'
-                    : 'bg-[#8bd6b6]/15 text-[#8bd6b6]'
+                    ? 'bg-[#ff5625]/15 text-[#ff5625]'
+                    : 'bg-[#ff8a50]/15 text-[#ff8a50]'
                 }`}
               >
                 <span className="material-symbols-outlined text-[14px]">
@@ -94,13 +94,13 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
         <div className="flex gap-4 text-right sm:gap-6">
           <div>
             <p className="text-[10px] uppercase tracking-wider text-[#e2e2e6]/40">{t('portal.components.supervisorIncomeSummary.paid_6m')}</p>
-            <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#10b981]">
+            <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#ff5625]">
               {fmtVnd(totals.paid)} ₫
             </p>
           </div>
           <div>
             <p className="text-[10px] uppercase tracking-wider text-[#e2e2e6]/40">{t('portal.components.supervisorIncomeSummary.pending')}</p>
-            <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#8bd6b6]">
+            <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-[#ff8a50]">
               {fmtVnd(totals.pending)} ₫
             </p>
           </div>
@@ -121,20 +121,20 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
           const isCurrent = m.key === currentMonth.key;
           return (
             <div key={m.key} className="flex flex-col items-center">
-              <div className="relative flex h-32 w-full items-end overflow-hidden rounded-lg border border-[#3f4944]/30 bg-[#0c0e11]/40">
+              <div className="relative flex h-32 w-full items-end overflow-hidden rounded-lg border border-[#49443f]/30 bg-[#0c0e11]/40">
                 {m.total > 0 ? (
                   <div
                     className={`relative w-full overflow-hidden rounded-md transition-all ${
-                      isCurrent ? 'shadow-[0_0_16px_rgba(52,211,153,0.3)]' : ''
+                      isCurrent ? 'shadow-[0_0_16px_rgba(255,138,80,0.3)]' : ''
                     }`}
                     style={{ height: `${Math.max(8, heightPct)}%` }}
                   >
                     <div
-                      className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#10b981] to-[#10b981]/70"
+                      className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#ff5625] to-[#ff5625]/70"
                       style={{ height: `${paidPct}%` }}
                     />
                     <div
-                      className="absolute inset-x-0 top-0 bg-gradient-to-t from-[#8bd6b6]/60 to-[#8bd6b6]/30"
+                      className="absolute inset-x-0 top-0 bg-gradient-to-t from-[#ff8a50]/60 to-[#ff8a50]/30"
                       style={{ height: `${100 - paidPct}%` }}
                     />
                   </div>
@@ -145,7 +145,7 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
               <p className={`mt-2 font-mono text-[11px] font-semibold tabular-nums ${isCurrent ? 'text-[#e2e2e6]' : 'text-[#e2e2e6]/50'}`}>
                 {m.label}
               </p>
-              <p className={`font-mono text-[10px] tabular-nums ${m.total > 0 ? (isCurrent ? 'text-[#10b981]' : 'text-[#e2e2e6]/60') : 'text-[#e2e2e6]/25'}`}>
+              <p className={`font-mono text-[10px] tabular-nums ${m.total > 0 ? (isCurrent ? 'text-[#ff5625]' : 'text-[#e2e2e6]/60') : 'text-[#e2e2e6]/25'}`}>
                 {m.total > 0 ? fmtVnd(m.total) : '—'}
               </p>
             </div>
@@ -156,10 +156,10 @@ export function SupervisorIncomeSummary({ payouts }: { payouts: PayoutRow[] }) {
       {/* Legend */}
       <div className="relative mt-5 flex items-center justify-end gap-4 text-[10px] text-[#e2e2e6]/45">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#10b981] to-[#10b981]/70" /> {t('portal.components.supervisorIncomeSummary.legend_paid')}
+          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#ff5625] to-[#ff5625]/70" /> {t('portal.components.supervisorIncomeSummary.legend_paid')}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#8bd6b6]/60 to-[#8bd6b6]/30" /> {t('portal.components.supervisorIncomeSummary.legend_pending')}
+          <span className="h-2 w-2 rounded-sm bg-gradient-to-t from-[#ff8a50]/60 to-[#ff8a50]/30" /> {t('portal.components.supervisorIncomeSummary.legend_pending')}
         </span>
       </div>
     </div>

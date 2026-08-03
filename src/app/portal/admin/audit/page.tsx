@@ -44,9 +44,9 @@ export default function AdminAuditPage() {
   return (
     <PortalShell variant="admin">
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.admin.audit.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.admin.audit.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.admin.audit.title')}</h1>
-        <p className="mt-2 text-sm text-[#a8b3ac]">{t('portal.admin.audit.subtitle')}</p>
+        <p className="mt-2 text-sm text-[#b3aca8]">{t('portal.admin.audit.subtitle')}</p>
       </div>
 
       {fetching ? <PortalSkeleton.Timeline /> : <AuditTimeline rows={rows} />}

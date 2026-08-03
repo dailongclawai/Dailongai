@@ -102,19 +102,19 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
 
   if (paidAt) {
     return (
-      <div className="rounded-2xl border-2 border-[#10b981]/50 bg-gradient-to-br from-[#10b981]/10 to-[#1a1c1f] p-6 text-center">
-        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#10b981] shadow-[0_0_40px_rgba(16,185,129,0.6)] animate-[pulse_2s_ease-in-out_infinite]">
+      <div className="rounded-2xl border-2 border-[#ff5625]/50 bg-gradient-to-br from-[#ff5625]/10 to-[#1a1c1f] p-6 text-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-[#ff5625] shadow-[0_0_40px_rgba(255,86,37,0.6)] animate-[pulse_2s_ease-in-out_infinite]">
           <span className="material-symbols-outlined text-[44px] text-white" style={{ fontVariationSettings: "'FILL' 1, 'wght' 700" }}>check</span>
         </div>
-        <h3 className="mt-5 font-headline text-2xl text-[#10b981]">{t('portal.components.paymentQR.paid_title')}</h3>
+        <h3 className="mt-5 font-headline text-2xl text-[#ff5625]">{t('portal.components.paymentQR.paid_title')}</h3>
         <p className="mt-2 text-sm leading-relaxed text-[#cbd5e1]">{t('portal.components.paymentQR.paid_subtitle')}</p>
         <div className="mt-5 grid grid-cols-2 gap-3 text-left text-sm">
-          <div className="rounded-lg border border-[#3f4944] bg-[#0c0e11] p-3">
-            <p className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.components.paymentQR.paid_amount_label')}</p>
-            <p className="mt-1 font-mono tabular-nums text-base font-bold text-[#10b981]">{fmtVnd(amount)} ₫</p>
+          <div className="rounded-lg border border-[#49443f] bg-[#0c0e11] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#b3aca8]">{t('portal.components.paymentQR.paid_amount_label')}</p>
+            <p className="mt-1 font-mono tabular-nums text-base font-bold text-[#ff5625]">{fmtVnd(amount)} ₫</p>
           </div>
-          <div className="rounded-lg border border-[#3f4944] bg-[#0c0e11] p-3">
-            <p className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.components.paymentQR.paid_time_label')}</p>
+          <div className="rounded-lg border border-[#49443f] bg-[#0c0e11] p-3">
+            <p className="text-[10px] uppercase tracking-wider text-[#b3aca8]">{t('portal.components.paymentQR.paid_time_label')}</p>
             <p className="mt-1 font-mono tabular-nums text-base font-bold text-[#e2e2e6]">
               {paidAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </p>
@@ -126,7 +126,7 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
 
   if (!PAYMENT_ENABLED) {
     return (
-      <div className="rounded-2xl border border-[#3f4944] bg-[#1a1c1f] p-5 text-center text-sm text-[#a8b3ac]">
+      <div className="rounded-2xl border border-[#49443f] bg-[#1a1c1f] p-5 text-center text-sm text-[#b3aca8]">
         {t('portal.components.paymentQR.payment_disabled')}
       </div>
     );
@@ -138,11 +138,11 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
 
   return (
     <>
-      <div className="rounded-2xl border-2 border-[#8bd6b6]/40 bg-[#1a1c1f] p-6">
-        <p className="text-center text-[11px] font-bold uppercase tracking-[0.3em] text-[#8bd6b6]">
+      <div className="rounded-2xl border-2 border-[#ff8a50]/40 bg-[#1a1c1f] p-6">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.3em] text-[#ff8a50]">
           {t('portal.components.paymentQR.transfer_title')}
         </p>
-        <p className="mt-1 text-center text-xs text-[#a8b3ac]">
+        <p className="mt-1 text-center text-xs text-[#b3aca8]">
           {t('portal.components.paymentQR.scan_hint')}
         </p>
 
@@ -164,21 +164,21 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
             className="h-full w-full object-contain"
           />
         </button>
-        <p className="mt-1 text-center text-[10px] text-[#a8b3ac]">{t('portal.components.paymentQR.tap_to_zoom')}</p>
+        <p className="mt-1 text-center text-[10px] text-[#b3aca8]">{t('portal.components.paymentQR.tap_to_zoom')}</p>
 
-        <div className="mt-5 space-y-2 rounded-lg border border-[#3f4944] bg-[#0c0e11] p-4 text-sm">
-          <div className="flex justify-between"><span className="text-[#a8b3ac]">{t('portal.components.paymentQR.bank')}</span><span className="font-semibold">{PAYMENT_BANK_CODE}</span></div>
-          <div className="flex justify-between"><span className="text-[#a8b3ac]">{t('portal.components.paymentQR.account_no')}</span><span className="font-mono tabular-nums font-bold text-[#8bd6b6]">{PAYMENT_ACCOUNT}</span></div>
-          <div className="flex justify-between"><span className="text-[#a8b3ac]">{t('portal.components.paymentQR.account_name')}</span><span className="text-right text-xs font-semibold">{PAYMENT_NAME}</span></div>
-          <div className="flex justify-between border-t border-[#3f4944] pt-2 mt-1"><span className="text-[#a8b3ac]">{t('portal.components.paymentQR.amount')}</span><span className="font-mono tabular-nums font-bold text-[#8bd6b6]">{fmtVnd(amount)} ₫</span></div>
-          <div className="flex justify-between"><span className="text-[#a8b3ac]">{t('portal.components.paymentQR.memo')}</span><span className="font-mono tabular-nums font-bold">{memo}</span></div>
+        <div className="mt-5 space-y-2 rounded-lg border border-[#49443f] bg-[#0c0e11] p-4 text-sm">
+          <div className="flex justify-between"><span className="text-[#b3aca8]">{t('portal.components.paymentQR.bank')}</span><span className="font-semibold">{PAYMENT_BANK_CODE}</span></div>
+          <div className="flex justify-between"><span className="text-[#b3aca8]">{t('portal.components.paymentQR.account_no')}</span><span className="font-mono tabular-nums font-bold text-[#ff8a50]">{PAYMENT_ACCOUNT}</span></div>
+          <div className="flex justify-between"><span className="text-[#b3aca8]">{t('portal.components.paymentQR.account_name')}</span><span className="text-right text-xs font-semibold">{PAYMENT_NAME}</span></div>
+          <div className="flex justify-between border-t border-[#49443f] pt-2 mt-1"><span className="text-[#b3aca8]">{t('portal.components.paymentQR.amount')}</span><span className="font-mono tabular-nums font-bold text-[#ff8a50]">{fmtVnd(amount)} ₫</span></div>
+          <div className="flex justify-between"><span className="text-[#b3aca8]">{t('portal.components.paymentQR.memo')}</span><span className="font-mono tabular-nums font-bold">{memo}</span></div>
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
           <button
             type="button"
             onClick={() => setFullscreen(true)}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#065f46] py-2.5 text-xs font-bold uppercase text-white hover:bg-[#0a7a5a] active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#e8692a] py-2.5 text-xs font-bold uppercase text-white hover:bg-[#ff5625] active:scale-[0.98]"
           >
             <span className="material-symbols-outlined text-[16px]">qr_code_2</span>
             {t('portal.components.paymentQR.zoom_button')}
@@ -190,7 +190,7 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
               toastSuccess: t('portal.components.paymentQR.toast_download_success'),
               toastFallback: t('portal.components.paymentQR.toast_download_fallback'),
             })}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#10b981]/40 bg-[#10b981]/10 py-2.5 text-xs font-bold uppercase text-[#10b981] hover:bg-[#10b981] hover:text-white"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#ff5625]/40 bg-[#ff5625]/10 py-2.5 text-xs font-bold uppercase text-[#ff5625] hover:bg-[#ff5625] hover:text-white"
           >
             <span className="material-symbols-outlined text-[16px]">photo_library</span>
             {t('portal.components.paymentQR.save_to_photos')}
@@ -198,7 +198,7 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
           <button
             type="button"
             onClick={copyMemo}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#3f4944] bg-[#0c0e11] py-2.5 text-xs font-bold uppercase text-[#e2e2e6] hover:bg-[#1e2023]"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#49443f] bg-[#0c0e11] py-2.5 text-xs font-bold uppercase text-[#e2e2e6] hover:bg-[#1e2023]"
           >
             <span className="material-symbols-outlined text-[16px]">content_copy</span>
             {t('portal.components.paymentQR.copy_memo')}
@@ -214,7 +214,7 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
         </div>
 
         {dealerName && (
-          <p className="mt-3 text-center text-[11px] leading-relaxed text-[#a8b3ac]">
+          <p className="mt-3 text-center text-[11px] leading-relaxed text-[#b3aca8]">
             {t('portal.components.paymentQR.after_transfer_prefix')}{' '}
             <span className="font-semibold text-[#e2e2e6]">{dealerName}</span>.
           </p>
@@ -239,9 +239,9 @@ export function PaymentQRCard({ orderId, amount, dealerName, surface = 'portal' 
           </button>
 
           <div className="mb-3 text-center text-white">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.components.paymentQR.transfer_label')}</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.components.paymentQR.transfer_label')}</p>
             <p className="mt-1 font-headline text-3xl tabular-nums">{fmtVnd(amount)} ₫</p>
-            <p className="mt-1 font-mono text-sm tabular-nums text-[#a8b3ac]">{t('portal.components.paymentQR.memo')}: {memo}</p>
+            <p className="mt-1 font-mono text-sm tabular-nums text-[#b3aca8]">{t('portal.components.paymentQR.memo')}: {memo}</p>
           </div>
 
           <div

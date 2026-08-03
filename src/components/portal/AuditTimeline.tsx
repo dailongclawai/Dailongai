@@ -24,7 +24,7 @@ interface IconMeta {
 
 function iconFor(action: string): IconMeta {
   if (action.includes('approve') || action.includes('mark_paid')) {
-    return { symbol: 'check', ring: 'bg-[#10b981]/15 ring-[#10b981]/40', fg: 'text-[#10b981]' };
+    return { symbol: 'check', ring: 'bg-[#ff5625]/15 ring-[#ff5625]/40', fg: 'text-[#ff5625]' };
   }
   if (action.includes('reject') || action.includes('void')) {
     return { symbol: 'close', ring: 'bg-[#f87171]/15 ring-[#f87171]/40', fg: 'text-[#f87171]' };
@@ -35,7 +35,7 @@ function iconFor(action: string): IconMeta {
   if (action.includes('profile') || action.includes('registration')) {
     return { symbol: 'person', ring: 'bg-[#3b82f6]/15 ring-[#3b82f6]/40', fg: 'text-[#3b82f6]' };
   }
-  return { symbol: 'settings', ring: 'bg-[#a8b3ac]/15 ring-[#a8b3ac]/40', fg: 'text-[#a8b3ac]' };
+  return { symbol: 'settings', ring: 'bg-[#b3aca8]/15 ring-[#b3aca8]/40', fg: 'text-[#b3aca8]' };
 }
 
 function dayKey(iso: string): string {
@@ -83,7 +83,7 @@ export function AuditTimeline({ rows }: Props) {
 
   if (rows.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#3f4944] bg-[#1a1c1f] p-10 text-center text-sm text-[#a8b3ac]">
+      <div className="rounded-2xl border border-dashed border-[#49443f] bg-[#1a1c1f] p-10 text-center text-sm text-[#b3aca8]">
         {t('portal.components.auditTimeline.empty')}
       </div>
     );
@@ -93,10 +93,10 @@ export function AuditTimeline({ rows }: Props) {
     <div className="space-y-8">
       {grouped.map(([day, items]) => (
         <section key={day}>
-          <h3 className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">
-            {dayLabel(items[0].created_at, t, locale)} · <span className="text-[#a8b3ac]">{day}</span>
+          <h3 className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">
+            {dayLabel(items[0].created_at, t, locale)} · <span className="text-[#b3aca8]">{day}</span>
           </h3>
-          <ol className="relative ml-3 border-l-2 border-[#3f4944]">
+          <ol className="relative ml-3 border-l-2 border-[#49443f]">
             {items.map((r) => {
               const icon = iconFor(r.action);
               const label = actionLabels[r.action] ?? r.action;
@@ -115,24 +115,24 @@ export function AuditTimeline({ rows }: Props) {
                       type="button"
                       onClick={() => hasDiff && setOpenId(isOpen ? null : r.id)}
                       disabled={!hasDiff}
-                      className={`w-full rounded-xl border border-[#3f4944] bg-[#1a1c1f] px-4 py-3 text-left transition-colors ${hasDiff ? 'hover:bg-[#1e2023] cursor-pointer' : 'cursor-default'}`}
+                      className={`w-full rounded-xl border border-[#49443f] bg-[#1a1c1f] px-4 py-3 text-left transition-colors ${hasDiff ? 'hover:bg-[#1e2023] cursor-pointer' : 'cursor-default'}`}
                     >
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <p className={`text-sm font-semibold ${icon.fg}`}>{label}</p>
-                        <p className="font-mono text-xs tabular-nums text-[#a8b3ac]">{timeLabel(r.created_at)}</p>
+                        <p className="font-mono text-xs tabular-nums text-[#b3aca8]">{timeLabel(r.created_at)}</p>
                       </div>
-                      <p className="mt-1 font-mono text-[11px] text-[#a8b3ac]">
+                      <p className="mt-1 font-mono text-[11px] text-[#b3aca8]">
                         <span className="text-[#e2e2e6]">{r.target_table}</span>
                         {r.target_id && (
                           <>
                             {' · '}
-                            <span className="text-[#a8b3ac]">{r.target_id.slice(0, 8)}</span>
+                            <span className="text-[#b3aca8]">{r.target_id.slice(0, 8)}</span>
                           </>
                         )}
                       </p>
                     </button>
                     {isOpen && hasDiff && (
-                      <pre className="mt-2 max-h-64 overflow-auto rounded-lg border border-[#3f4944] bg-black/40 p-3 text-[11px] text-[#a8b3ac]">
+                      <pre className="mt-2 max-h-64 overflow-auto rounded-lg border border-[#49443f] bg-black/40 p-3 text-[11px] text-[#b3aca8]">
 {JSON.stringify({ before: r.before, after: r.after }, null, 2)}
                       </pre>
                     )}

@@ -37,9 +37,9 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
 
   if (!slug) {
     return (
-      <div className="rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1e] p-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6] font-bold">{t('portal.components.orderQR.title')}</p>
-        <p className="mt-3 text-sm text-[#a8b3ac]">{t('portal.components.orderQR.generating')}</p>
+      <div className="rounded-2xl border border-[#49443f]/40 bg-[#1a1c1e] p-6">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50] font-bold">{t('portal.components.orderQR.title')}</p>
+        <p className="mt-3 text-sm text-[#b3aca8]">{t('portal.components.orderQR.generating')}</p>
       </div>
     );
   }
@@ -54,13 +54,13 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
   };
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1e] p-6">
+    <div className="mx-auto max-w-md rounded-2xl border border-[#49443f]/40 bg-[#1a1c1e] p-6">
       <div className="mb-5 flex items-start justify-between">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#8bd6b6]">{t('portal.components.orderQR.title')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] font-bold text-[#ff8a50]">{t('portal.components.orderQR.title')}</p>
           <h3 className="mt-1 font-headline text-xl text-[#e2e2e6]">{t('portal.components.orderQR.subtitle')}</h3>
         </div>
-        <span className="material-symbols-outlined text-[28px] text-[#8bd6b6]/30">qr_code_2</span>
+        <span className="material-symbols-outlined text-[28px] text-[#ff8a50]/30">qr_code_2</span>
       </div>
 
       <div className="mb-5 flex justify-center">
@@ -74,14 +74,14 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
       </div>
 
       <div className="mb-4">
-        <p className="mb-1.5 text-[11px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.components.orderQR.link_label')}</p>
-        <code className="block break-all rounded-lg border border-[#3f4944]/40 bg-[#0c0e11] px-3 py-2 text-[11px] font-mono text-[#e2e2e6]">{url}</code>
+        <p className="mb-1.5 text-[11px] uppercase tracking-wider text-[#b3aca8]">{t('portal.components.orderQR.link_label')}</p>
+        <code className="block break-all rounded-lg border border-[#49443f]/40 bg-[#0c0e11] px-3 py-2 text-[11px] font-mono text-[#e2e2e6]">{url}</code>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
         <button
           onClick={copyUrl}
-          className="flex flex-col items-center justify-center gap-1 rounded-lg border border-[#3f4944]/40 bg-[#1e2023] px-2 py-3 text-xs font-medium text-[#e2e2e6] transition-all hover:bg-[#3d3f41] active:scale-95"
+          className="flex flex-col items-center justify-center gap-1 rounded-lg border border-[#49443f]/40 bg-[#1e2023] px-2 py-3 text-xs font-medium text-[#e2e2e6] transition-all hover:bg-[#3d3f41] active:scale-95"
         >
           <span className="material-symbols-outlined text-[20px]">content_copy</span>
           {t('portal.components.orderQR.copy')}
@@ -90,7 +90,7 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
           href={shownDataUrl ?? '#'}
           download={`qr-dat-don-${slug}.png`}
           aria-disabled={!shownDataUrl}
-          className={`flex flex-col items-center justify-center gap-1 rounded-lg bg-[#065f46] px-2 py-3 text-xs font-bold text-white shadow-lg  transition-all hover:bg-[#065f46]/90 active:scale-95 ${!shownDataUrl ? 'pointer-events-none opacity-50' : ''}`}
+          className={`flex flex-col items-center justify-center gap-1 rounded-lg bg-[#e8692a] px-2 py-3 text-xs font-bold text-white shadow-lg  transition-all hover:bg-[#e8692a]/90 active:scale-95 ${!shownDataUrl ? 'pointer-events-none opacity-50' : ''}`}
         >
           <span className="material-symbols-outlined text-[20px]">download</span>
           {t('portal.components.orderQR.download')}
@@ -99,14 +99,14 @@ export function OrderQRCard({ slug }: { slug: string | null }) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center justify-center gap-1 rounded-lg border border-[#3f4944]/40 bg-[#1e2023] px-2 py-3 text-xs font-medium text-[#e2e2e6] transition-all hover:bg-[#3d3f41] active:scale-95"
+          className="flex flex-col items-center justify-center gap-1 rounded-lg border border-[#49443f]/40 bg-[#1e2023] px-2 py-3 text-xs font-medium text-[#e2e2e6] transition-all hover:bg-[#3d3f41] active:scale-95"
         >
           <span className="material-symbols-outlined text-[20px]">open_in_new</span>
           {t('portal.components.orderQR.open_form')}
         </a>
       </div>
 
-      <p className="mt-4 border-t border-[#3f4944]/30 pt-3 text-[11px] leading-relaxed text-[#a8b3ac]/70">
+      <p className="mt-4 border-t border-[#49443f]/30 pt-3 text-[11px] leading-relaxed text-[#b3aca8]/70">
         {t('portal.components.orderQR.footer_note')}
       </p>
     </div>

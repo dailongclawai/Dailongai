@@ -18,11 +18,11 @@ import type { CrmOpportunityBoardRow, CrmSettings, CrmStage, ProductModel, Staff
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
-// Chấm màu đầu cột theo bảng Stitch: thắng = emerald, thua = đỏ mờ,
+// Chấm màu đầu cột theo bảng Stitch: thắng = cam, thua = đỏ mờ,
 // các giai đoạn mở xoay vòng 4 màu để phân biệt nhanh bằng mắt.
 const OPEN_DOTS = ['#e2e2e6', '#60a5fa', '#c084fc', '#ffb77d'];
 const stageDotColor = (forecast: string, openIndex: number) =>
-  forecast === 'won' ? '#8bd6b6' : forecast === 'lost' ? '#f87171' : OPEN_DOTS[openIndex % OPEN_DOTS.length];
+  forecast === 'won' ? '#ff8a50' : forecast === 'lost' ? '#f87171' : OPEN_DOTS[openIndex % OPEN_DOTS.length];
 
 // "Nguyễn Văn A" → "VA" — avatar chữ cái cho người phụ trách, không có ảnh thật.
 const initials = (name: string) =>
@@ -152,7 +152,7 @@ export default function CrmPipelinePage() {
           <h1 className="text-2xl font-bold tracking-tight text-[var(--crm-text)]">{t('portal.crm.pipeline.title')}</h1>
           <button
             onClick={() => { setEditing(null); setDrawerOpen(true); }}
-            className="flex w-fit items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white"
+            className="flex w-fit items-center gap-2 rounded-xl bg-[#e8692a] px-4 py-2 font-bold text-white"
           >
             <span className="material-symbols-outlined text-[18px]">add_circle</span>
             {t('portal.crm.opp.new')}
@@ -162,7 +162,7 @@ export default function CrmPipelinePage() {
               aria-label={t('portal.crm.dash.staff_filter')}
               value={staffFilter}
               onChange={e => setStaffFilter(e.target.value)}
-              className="w-fit rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#8bd6b6]"
+              className="w-fit rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#ff8a50]"
             >
               <option value="all">{t('portal.crm.dash.staff_all')}</option>
               {peers.map(p => (
@@ -177,7 +177,7 @@ export default function CrmPipelinePage() {
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--crm-muted)]">
             {t('portal.crm.pipeline.total_value')}
           </p>
-          <p className="crm-display mt-1 text-4xl font-bold tracking-tight text-[#8bd6b6] tabular-nums">
+          <p className="crm-display mt-1 text-4xl font-bold tracking-tight text-[#ff8a50] tabular-nums">
             {fmtVnd(sumAmount(openRows))}₫
           </p>
         </div>
@@ -223,11 +223,11 @@ export default function CrmPipelinePage() {
                   {col.stage.name} <span className="font-normal text-[var(--crm-muted)]">({col.rows.length})</span>
                 </span>
               </div>
-              {/* Nền cột trong hơn thẻ; kéo tới đâu viền dashed emerald sáng tới đó. */}
+              {/* Nền cột trong hơn thẻ; kéo tới đâu viền dashed cam sáng tới đó. */}
               <div
                 className={`portal-scroll flex-1 space-y-2 overflow-y-auto rounded-xl border p-2 transition-colors ${
                   isDropTarget
-                    ? 'border-dashed border-[#8bd6b6]/70 bg-[#8bd6b6]/10'
+                    ? 'border-dashed border-[#ff8a50]/70 bg-[#ff8a50]/10'
                     : 'border-white/10 bg-[rgba(30,32,35,0.5)]'
                 }`}
               >
@@ -243,16 +243,16 @@ export default function CrmPipelinePage() {
                     onClick={() => { setEditing(r); setDrawerOpen(true); }}
                     className={`rounded-lg border bg-[var(--crm-s2)] p-3 transition-colors hover:bg-[var(--crm-s3)] ${
                       dragId === r.id
-                        ? 'border-transparent ring-2 ring-[#8bd6b6] shadow-[0_0_16px_rgba(139,214,182,0.35)]'
-                        : 'border-white/5 hover:border-[#8bd6b6]/60'
-                    } ${r.forecast === 'won' ? 'border-l-[3px] border-l-[#8bd6b6]' : ''} ${
+                        ? 'border-transparent ring-2 ring-[#ff8a50] shadow-[0_0_16px_rgba(255,138,80,0.35)]'
+                        : 'border-white/5 hover:border-[#ff8a50]/60'
+                    } ${r.forecast === 'won' ? 'border-l-[3px] border-l-[#ff8a50]' : ''} ${
                       r.forecast === 'lost' ? 'opacity-55' : ''
                     } ${r.forecast === 'open' || isAdmin ? 'cursor-grab' : 'cursor-pointer'}`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-bold text-[var(--crm-text)]">{r.account_name ?? r.name}</p>
                       {r.forecast === 'won' && (
-                        <span className="material-symbols-outlined flex-shrink-0 text-[16px] text-[#8bd6b6]">check_circle</span>
+                        <span className="material-symbols-outlined flex-shrink-0 text-[16px] text-[#ff8a50]">check_circle</span>
                       )}
                     </div>
                     {r.account_name && <p className="mt-0.5 text-xs text-[var(--crm-muted)]">{r.name}</p>}
@@ -268,7 +268,7 @@ export default function CrmPipelinePage() {
                     )}
                     <div className="mt-2 flex items-center justify-between gap-2">
                       <p className={`text-sm font-bold tabular-nums ${
-                        r.forecast === 'lost' ? 'text-[var(--crm-muted)] line-through' : 'text-[#8bd6b6]'
+                        r.forecast === 'lost' ? 'text-[var(--crm-muted)] line-through' : 'text-[#ff8a50]'
                       }`}>
                         {fmtVnd(Number(r.amount))}đ
                         <span className="ml-1 text-xs font-normal text-[var(--crm-muted)] no-underline">
@@ -295,7 +295,7 @@ export default function CrmPipelinePage() {
                               {r.owner_name.trim().split(/\s+/).slice(-2).join(' ')}
                             </span>
                           )}
-                          <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#065f46] text-[10px] font-bold text-white">
+                          <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#e8692a] text-[10px] font-bold text-white">
                             {initials(r.owner_name)}
                           </span>
                         </span>
@@ -307,13 +307,13 @@ export default function CrmPipelinePage() {
                       </p>
                     )}
                     {r.trial_days && (
-                      <p className="mt-1 inline-block rounded-full bg-[#8bd6b6]/15 px-2 py-0.5 text-xs text-[#8bd6b6]">
+                      <p className="mt-1 inline-block rounded-full bg-[#ff8a50]/15 px-2 py-0.5 text-xs text-[#ff8a50]">
                         {t('portal.crm.opp.trial_badge')} {r.trial_days} {t('portal.crm.opp.days')}
                       </p>
                     )}
                     <p className="mt-1 text-xs text-[var(--crm-muted)] tabular-nums">{r.expected_close_date}</p>
                     {r.lost_reason_name && (
-                      <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#8bd6b6]">
+                      <p className="mt-1 inline-block rounded-full bg-[var(--crm-s3)] px-2 py-0.5 text-xs text-[#ff8a50]">
                         {r.lost_reason_name}
                       </p>
                     )}

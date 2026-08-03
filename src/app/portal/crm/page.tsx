@@ -33,7 +33,7 @@ function Delta({ cur, prev, money = false }: { cur: number; prev: number; money?
   const up = cur > prev;
   const d = Math.abs(cur - prev);
   return (
-    <span className={`block text-xs ${up ? 'text-[#34d399]' : 'text-[#f87171]'}`}>
+    <span className={`block text-xs ${up ? 'text-[#ff8a50]' : 'text-[#f87171]'}`}>
       {up ? '▲' : '▼'} {money ? fmtShort(d) : d}
     </span>
   );
@@ -71,12 +71,12 @@ function ProgressRing({ pct, label }: { pct: number; label: string }) {
       <svg className="h-full w-full -rotate-90" viewBox="0 0 36 36">
         <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--crm-s3)" strokeWidth="3" />
         <circle
-          cx="18" cy="18" r="15.9155" fill="none" stroke="#8bd6b6" strokeWidth="3"
+          cx="18" cy="18" r="15.9155" fill="none" stroke="#ff8a50" strokeWidth="3"
           strokeDasharray={`${clamped}, 100`} strokeLinecap="round"
-          className="drop-shadow-[0_0_4px_rgba(139,214,182,0.6)]"
+          className="drop-shadow-[0_0_4px_rgba(255,138,80,0.6)]"
         />
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] tabular-nums text-[#8bd6b6]">
+      <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] tabular-nums text-[#ff8a50]">
         {clamped}%
       </span>
     </div>
@@ -321,7 +321,7 @@ export default function CrmDashboardPage() {
             aria-label={t('portal.crm.dash.staff_filter')}
             value={staffFilter}
             onChange={e => setStaffFilter(e.target.value)}
-            className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#8bd6b6]"
+            className="rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#ff8a50]"
           >
             <option value="all">{t('portal.crm.dash.staff_all')}</option>
             {peers.map(p => (
@@ -348,7 +348,7 @@ export default function CrmDashboardPage() {
                   key={p}
                   onClick={() => setPeriod(p)}
                   className={`rounded-lg px-3 py-1.5 ${period === p
-                    ? 'bg-[#065f46] font-bold text-white'
+                    ? 'bg-[#e8692a] font-bold text-white'
                     : 'text-[var(--crm-muted)] hover:text-[var(--crm-text)]'}`}
                 >
                   {t('portal.crm.dash.period_' + p)}
@@ -387,7 +387,7 @@ export default function CrmDashboardPage() {
                     key={s.peer.id}
                     onClick={() => setStaffFilter(f => (f === s.peer.id ? 'all' : s.peer.id))}
                     className={`cursor-pointer border-t border-[var(--crm-line)] hover:bg-[var(--crm-s3)] ${
-                      staffFilter === s.peer.id ? 'bg-[#8bd6b6]/10' : ''
+                      staffFilter === s.peer.id ? 'bg-[#ff8a50]/10' : ''
                     }`}
                   >
                     <td className="px-5 py-3 text-[var(--crm-text)]">
@@ -403,7 +403,7 @@ export default function CrmDashboardPage() {
                       {s.newAccounts}
                       <Delta cur={s.newAccounts} prev={s.newAccountsPrev} />
                     </td>
-                    <td className="px-5 py-3 text-right tabular-nums text-[#34d399]">
+                    <td className="px-5 py-3 text-right tabular-nums text-[#ff8a50]">
                       {s.wonDeals}
                       <Delta cur={s.wonDeals} prev={s.wonDealsPrev} />
                     </td>
@@ -436,11 +436,11 @@ export default function CrmDashboardPage() {
           <div className="mb-4 flex items-start justify-between gap-3">
             <p className={capsLabel}>{t('portal.crm.dash.machines_month')}</p>
             <span className={iconChip}>
-              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">precision_manufacturing</span>
+              <span className="material-symbols-outlined text-[20px] text-[#ff8a50]">precision_manufacturing</span>
             </span>
           </div>
           <div className="flex items-end justify-between gap-4">
-            <p className="crm-display text-4xl font-semibold tabular-nums text-[#8bd6b6]">
+            <p className="crm-display text-4xl font-semibold tabular-nums text-[#ff8a50]">
               {machinesThisMonth}
               <span className="ml-1 text-base font-normal text-[var(--crm-muted)]">
                 {kpiTarget > 0 ? `/ ${kpiTarget} ` : ''}{t('portal.crm.dash.machines_unit')}
@@ -450,7 +450,7 @@ export default function CrmDashboardPage() {
           </div>
           <p className="mt-4 font-mono text-xs tabular-nums text-[var(--crm-muted)]">
             {t('portal.crm.dash.win_rate')} {winRate}% ·{' '}
-            <span className="text-[#34d399]">{wonCount} {t('portal.crm.dash.won')}</span> ·{' '}
+            <span className="text-[#ff8a50]">{wonCount} {t('portal.crm.dash.won')}</span> ·{' '}
             <span className="text-[#f87171]">{lostCount} {t('portal.crm.dash.lost')}</span>
           </p>
         </div>
@@ -460,7 +460,7 @@ export default function CrmDashboardPage() {
           <div className="mb-4 flex items-start justify-between gap-3">
             <p className={capsLabel}>{t('portal.crm.dash.new_accounts')}</p>
             <span className={iconChip}>
-              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">person_add</span>
+              <span className="material-symbols-outlined text-[20px] text-[#ff8a50]">person_add</span>
             </span>
           </div>
           <div className="flex items-end justify-between gap-4">
@@ -495,7 +495,7 @@ export default function CrmDashboardPage() {
           <div className="mb-4 flex items-start justify-between gap-3">
             <p className={capsLabel}>{t('portal.crm.dash.open_value')}</p>
             <span className={iconChip}>
-              <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">trending_up</span>
+              <span className="material-symbols-outlined text-[20px] text-[#ff8a50]">trending_up</span>
             </span>
           </div>
           <p className="crm-display text-3xl font-semibold tracking-tight tabular-nums text-[var(--crm-text)]">
@@ -537,7 +537,7 @@ export default function CrmDashboardPage() {
                       className="absolute left-0 top-0 h-full rounded-lg"
                       style={{
                         width: `${step.width}%`,
-                        backgroundColor: isWon ? '#d97706' : '#065f46',
+                        backgroundColor: isWon ? '#d97706' : '#e8692a',
                         opacity: isWon ? 1 : 0.45 + depth * 0.55,
                       }}
                     />
@@ -590,11 +590,11 @@ export default function CrmDashboardPage() {
                       <span
                         className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
                           done
-                            ? 'border-[#8bd6b6]/50 bg-[#065f46]'
+                            ? 'border-[#ff8a50]/50 bg-[#e8692a]'
                             : 'border-[var(--crm-line)] bg-[var(--crm-s3)]'
                         }`}
                       >
-                        <span className={`material-symbols-outlined text-[13px] ${done ? 'text-[#8bd6b6]' : 'text-[var(--crm-muted)]'}`}>
+                        <span className={`material-symbols-outlined text-[13px] ${done ? 'text-[#ff8a50]' : 'text-[var(--crm-muted)]'}`}>
                           {KIND_ICON[a.kind]}
                         </span>
                       </span>
@@ -602,7 +602,7 @@ export default function CrmDashboardPage() {
                         <p className="truncate text-sm text-[var(--crm-text)]">
                           {a.subject}
                           {(a.account_name ?? a.opportunity_name) && (
-                            <span className="text-[#8bd6b6]"> · {a.account_name ?? a.opportunity_name}</span>
+                            <span className="text-[#ff8a50]"> · {a.account_name ?? a.opportunity_name}</span>
                           )}
                         </p>
                         <p className="mt-0.5 font-mono text-[11px] tabular-nums text-[var(--crm-muted)]">
@@ -651,7 +651,7 @@ export default function CrmDashboardPage() {
                       <p className={`truncate text-sm ${late ? 'text-[#f87171]' : 'text-[var(--crm-text)]'}`}>{a.subject}</p>
                       <p className="truncate text-xs text-[var(--crm-muted)]">{a.account_name ?? a.opportunity_name ?? '—'}</p>
                     </div>
-                    <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#8bd6b6]'}`}>
+                    <span className={`crm-display shrink-0 text-sm tabular-nums ${late ? 'text-[#f87171]' : 'text-[#ff8a50]'}`}>
                       {due
                         ? sameDay
                           ? due.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
@@ -674,7 +674,7 @@ export default function CrmDashboardPage() {
       {/* Cơ hội cần xử lý gấp */}
       <section className={`${card} overflow-hidden`}>
         <div className="flex flex-wrap items-center gap-3 px-5 py-4">
-          <span className="material-symbols-outlined text-[20px] text-[#8bd6b6]">notifications_active</span>
+          <span className="material-symbols-outlined text-[20px] text-[#ff8a50]">notifications_active</span>
           <h2 className="crm-display mr-auto text-[18px] font-medium text-[var(--crm-text)]">{t('portal.crm.dash.urgent')}</h2>
           {overdueCount > 0 && (
             <span className="rounded-full bg-[#f87171]/10 px-3 py-1 text-xs text-[#f87171]">

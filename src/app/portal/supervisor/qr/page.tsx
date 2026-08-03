@@ -64,21 +64,21 @@ export default function SupervisorQRPage() {
   return (
     <PortalShell variant="supervisor">
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.supervisor.qr.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.supervisor.qr.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.supervisor.qr.heading')}</h1>
-        <p className="mt-2 text-sm text-[#a8b3ac]">
+        <p className="mt-2 text-sm text-[#b3aca8]">
           {t('portal.supervisor.qr.subhead')}
         </p>
       </div>
 
-      <div className="relative overflow-hidden rounded-3xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.08] via-[#1a1c1f] to-[#1a1c1f] p-5 sm:p-8">
-        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#10b981]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#8bd6b6]/5 blur-3xl" />
+      <div className="relative overflow-hidden rounded-3xl border border-[#ff5625]/30 bg-gradient-to-br from-[#ff5625]/[0.08] via-[#1a1c1f] to-[#1a1c1f] p-5 sm:p-8">
+        <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#ff5625]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#ff8a50]/5 blur-3xl" />
 
         <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-start sm:gap-8">
           <div className="flex w-full max-w-[260px] flex-col items-center sm:w-auto sm:max-w-none sm:shrink-0">
             <div
-              className="relative rounded-2xl border border-[#10b981]/30 bg-gradient-to-br from-white to-[#f5fdf8] shadow-[0_8px_32px_-8px_rgba(52,211,153,0.4)]"
+              className="relative rounded-2xl border border-[#ff5625]/30 bg-gradient-to-br from-white to-[#fff7f3] shadow-[0_8px_32px_-8px_rgba(255,138,80,0.4)]"
               style={{ width: 'min(220px, 60vw)', aspectRatio: '1 / 1' }}
             >
               {qr ? (
@@ -90,21 +90,21 @@ export default function SupervisorQRPage() {
                 <div className="absolute inset-3 animate-pulse rounded-lg bg-[#1a1c1f]/10" />
               )}
             </div>
-            <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#10b981]/70">
+            <p className="mt-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-[#ff5625]/70">
               {profile?.full_name || t('portal.shell.role.supervisor')}
             </p>
           </div>
 
           <div className="w-full flex-1">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px] text-[#10b981]">share</span>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#10b981]">
+              <span className="material-symbols-outlined text-[18px] text-[#ff5625]">share</span>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-[#ff5625]">
                 {t('portal.supervisor.qr.invite_link_label')}
               </p>
             </div>
 
-            <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5">
-              <span className="material-symbols-outlined text-[16px] text-[#a8b3ac]">link</span>
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#49443f] bg-[#0c0e11] px-3 py-2.5">
+              <span className="material-symbols-outlined text-[16px] text-[#b3aca8]">link</span>
               <input
                 readOnly
                 value={refLink}
@@ -115,7 +115,7 @@ export default function SupervisorQRPage() {
             <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <button
                 onClick={copyLink}
-                className="flex items-center justify-center gap-2 rounded-full bg-[#065f46] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#065f46]/90 active:scale-[0.98]"
+                className="flex items-center justify-center gap-2 rounded-full bg-[#e8692a] px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#e8692a]/90 active:scale-[0.98]"
               >
                 <span className="material-symbols-outlined text-[16px]">content_copy</span>
                 {t('portal.supervisor.qr.copy_link')}
@@ -123,15 +123,15 @@ export default function SupervisorQRPage() {
               <button
                 onClick={downloadQR}
                 disabled={!qr}
-                className="flex items-center justify-center gap-2 rounded-full border border-[#10b981]/40 bg-[#10b981]/10 px-5 py-2.5 text-xs font-semibold text-[#10b981] transition-all hover:bg-[#10b981]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-[#ff5625]/40 bg-[#ff5625]/10 px-5 py-2.5 text-xs font-semibold text-[#ff5625] transition-all hover:bg-[#ff5625]/20 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[16px]">download</span>
                 {t('portal.supervisor.qr.download_qr')}
               </button>
             </div>
 
-            <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#a8b3ac]">
-              <span className="material-symbols-outlined text-[14px] text-[#a8b3ac]">tips_and_updates</span>
+            <p className="mt-4 flex items-start gap-1.5 text-[11px] text-[#b3aca8]">
+              <span className="material-symbols-outlined text-[14px] text-[#b3aca8]">tips_and_updates</span>
               {t('portal.supervisor.qr.tip')}
             </p>
           </div>

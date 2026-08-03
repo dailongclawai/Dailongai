@@ -63,16 +63,16 @@ export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
   const hovered = hoverIdx !== null ? buckets[hoverIdx] : null;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#3f4944]/40 bg-gradient-to-br from-[#1e2022] via-[#1e2022] to-[#0c0e10] p-6">
-      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#8bd6b6]/[0.06] blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#10b981]/[0.04] blur-3xl" />
+    <div className="relative overflow-hidden rounded-2xl border border-[#49443f]/40 bg-gradient-to-br from-[#1e2022] via-[#1e2022] to-[#0c0e10] p-6">
+      <div className="pointer-events-none absolute -right-32 -top-32 h-72 w-72 rounded-full bg-[#ff8a50]/[0.06] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-[#ff5625]/[0.04] blur-3xl" />
 
       <div className="relative flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{resolvedTitle}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{resolvedTitle}</p>
           <h3 className="mt-1 font-headline text-2xl leading-tight">
             {fmtVnd(stats.totalRev)}<span className="ml-1 text-base text-[#e2e2e6]/50">₫</span>
-            <span className="ml-3 font-mono text-base font-normal text-[#10b981]">
+            <span className="ml-3 font-mono text-base font-normal text-[#ff5625]">
               · {stats.totalCnt} {t('portal.components.dailyOrdersChart.orders_short')}
             </span>
           </h3>
@@ -95,7 +95,7 @@ export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
             <p className="text-[10px] uppercase tracking-wider text-[#e2e2e6]/40">{t('portal.components.dailyOrdersChart.today')}</p>
             <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">
               {stats.lastDay.count > 0 ? (
-                <span className="text-[#10b981]">{stats.lastDay.count} · {fmtVnd(stats.lastDay.revenue)}₫</span>
+                <span className="text-[#ff5625]">{stats.lastDay.count} · {fmtVnd(stats.lastDay.revenue)}₫</span>
               ) : (
                 <span className="text-[#e2e2e6]/40">—</span>
               )}
@@ -108,12 +108,12 @@ export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
         {/* Hover tooltip */}
         <div className="mb-2 h-12">
           {hovered && (
-            <div className="inline-flex items-center gap-3 rounded-lg border border-[#8bd6b6]/30 bg-[#0c0e11]/80 px-3 py-1.5 text-xs backdrop-blur-sm">
+            <div className="inline-flex items-center gap-3 rounded-lg border border-[#ff8a50]/30 bg-[#0c0e11]/80 px-3 py-1.5 text-xs backdrop-blur-sm">
               <span className="text-[#e2e2e6]/60">
                 {hovered.date.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit' })}
               </span>
-              <span className="font-mono font-semibold text-[#8bd6b6] tabular-nums">{fmtVnd(hovered.revenue)} ₫</span>
-              <span className="font-mono tabular-nums text-[#10b981]">{hovered.count} {t('portal.components.dailyOrdersChart.orders_short')}</span>
+              <span className="font-mono font-semibold text-[#ff8a50] tabular-nums">{fmtVnd(hovered.revenue)} ₫</span>
+              <span className="font-mono tabular-nums text-[#ff5625]">{hovered.count} {t('portal.components.dailyOrdersChart.orders_short')}</span>
             </div>
           )}
         </div>
@@ -123,7 +123,7 @@ export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
           {/* Grid lines */}
           <div className="pointer-events-none absolute inset-0 flex flex-col justify-between">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="border-t border-dashed border-[#3f4944]/30" />
+              <div key={i} className="border-t border-dashed border-[#49443f]/30" />
             ))}
           </div>
 
@@ -150,8 +150,8 @@ export function DailyOrdersChart({ rows, days = 30, title, subtitle }: Props) {
                     <div
                       className={`relative w-full rounded-t-sm transition-all ${
                         isHovered
-                          ? 'bg-gradient-to-t from-[#065f46] to-[#8bd6b6] shadow-[0_0_12px_rgba(139,214,182,0.4)]'
-                          : 'bg-gradient-to-t from-[#065f46]/70 to-[#065f46]/90 group-hover:from-[#065f46] group-hover:to-[#8bd6b6]'
+                          ? 'bg-gradient-to-t from-[#e8692a] to-[#ff8a50] shadow-[0_0_12px_rgba(255,138,80,0.4)]'
+                          : 'bg-gradient-to-t from-[#e8692a]/70 to-[#e8692a]/90 group-hover:from-[#e8692a] group-hover:to-[#ff8a50]'
                       }`}
                       style={{ height: `${heightPct}%` }}
                     >

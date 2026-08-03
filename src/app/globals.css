@@ -206,44 +206,44 @@ body {
   }
 }
 
-::selection { background: #065f46; color: #fff; }
+::selection { background: #e8692a; color: #fff; }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #111316; }
-::-webkit-scrollbar-thumb { background: #3f4944; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #49443f; border-radius: 2px; }
 
 /* ───── Glass Panel (Kinetic style) ───── */
 .glass-panel {
   background: rgba(30, 32, 34, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(139, 214, 182, 0.15);
-  border-left: 1px solid rgba(139, 214, 182, 0.1);
+  border-top: 1px solid rgba(255, 138, 80, 0.15);
+  border-left: 1px solid rgba(255, 138, 80, 0.1);
 }
 
 /* ───── Glow ───── */
 .glow-primary {
-  box-shadow: 0 0 20px 2px rgba(139, 214, 182, 0.4);
+  box-shadow: 0 0 20px 2px rgba(255, 138, 80, 0.4);
 }
 
 .glow-primary-hover:hover {
-  box-shadow: 0 0 20px 2px rgba(139, 214, 182, 0.4);
+  box-shadow: 0 0 20px 2px rgba(255, 138, 80, 0.4);
 }
 
 /* ───── Text Glow ───── */
 .text-glow {
-  text-shadow: 0 0 12px rgba(139, 214, 182, 0.6);
+  text-shadow: 0 0 12px rgba(255, 138, 80, 0.6);
 }
 
 /* ───── Laser Grid bg ───── */
 .laser-grid {
-  background-image: radial-gradient(rgba(139, 214, 182, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 138, 80, 0.07) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 /* ───── Gradient text ───── */
 .text-gradient {
-  background: linear-gradient(135deg, #c9ecdc 0%, #8bd6b6 100%);
+  background: linear-gradient(135deg, #ffd9c2 0%, #ff8a50 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -635,9 +635,9 @@ body {
   --crm-s1: #1a1c1f;    /* thẻ, cột kanban, hàng tổng */
   --crm-s2: #1e2023;    /* thẻ nổi trên nền thẻ, ô chọn */
   --crm-s3: #282a2d;    /* đầu bảng, chip, trạng thái di chuột */
-  --crm-line: #3f4944;  /* đường viền */
+  --crm-line: #49443f;  /* đường viền */
   --crm-text: #e2e2e6;  /* chữ chính */
-  --crm-muted: #a8b3ac; /* chữ phụ */
+  --crm-muted: #b3aca8; /* chữ phụ */
 }
 
 .crm-scope {

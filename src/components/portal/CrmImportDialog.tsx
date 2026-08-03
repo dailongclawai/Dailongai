@@ -240,7 +240,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
@@ -303,7 +303,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
               </span>
               {taken && (
                 <span className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-[var(--crm-muted)]">
-                  {t('portal.crm.import.taken')}: <b className="text-[#8bd6b6]">{count('taken')}</b>
+                  {t('portal.crm.import.taken')}: <b className="text-[#ff8a50]">{count('taken')}</b>
                 </span>
               )}
             </div>
@@ -324,7 +324,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
                       <td className="px-3 py-2 text-[var(--crm-text)]">{cell(c.row, 'name') || '—'}</td>
                       <td className="px-3 py-2 text-[var(--crm-muted)]">{cell(c.row, 'phone') || '—'}</td>
                       <td className="px-3 py-2 text-[var(--crm-muted)]">{cell(c.row, 'province') || '—'}</td>
-                      <td className={`px-3 py-2 ${c.status === 'ok' ? 'text-[#ffb77d]' : 'text-[#8bd6b6]'}`}>
+                      <td className={`px-3 py-2 ${c.status === 'ok' ? 'text-[#ffb77d]' : 'text-[#ff8a50]'}`}>
                         {t('portal.crm.import.status.' + c.status)}
                         {c.status === 'taken' && taken?.get(c.phone) ? ` · ${taken.get(c.phone)}` : ''}
                       </td>
@@ -354,7 +354,7 @@ export function CrmImportDialog({ open, ownerId, onClose, onDone }: Props) {
               <button
                 onClick={run}
                 disabled={busy || taken === null || importable.length === 0}
-                className="ml-auto flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2.5 font-bold text-white disabled:opacity-50"
+                className="ml-auto flex items-center gap-2 rounded-xl bg-[#e8692a] px-4 py-2.5 font-bold text-white disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[18px]">upload</span>
                 {busy ? t('portal.crm.common.saving') : `${t('portal.crm.import.run')} (${importable.length})`}

@@ -38,7 +38,7 @@ export function CrmTransferDialog({ open, accountId, accountName, currentOwnerId
   // Ẩn hẳn tài khoản quản trị: RPC vốn từ chối nhận admin, để trong danh sách
   // chỉ tổ dẫn người dùng vào lỗi.
   const candidates = peers.filter(p => p.role === 'staff' && p.id !== currentOwnerId);
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
 
   const submit = async () => {
     if (!toStaff) { toast.error(t('portal.crm.transfer.to_required')); return; }
@@ -92,7 +92,7 @@ export function CrmTransferDialog({ open, accountId, accountName, currentOwnerId
             <button
               onClick={() => void submit()}
               disabled={saving}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#065f46] py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#e8692a] py-2.5 font-bold text-white disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">swap_horiz</span>
               {saving ? t('portal.crm.common.saving') : t('portal.crm.transfer.confirm')}

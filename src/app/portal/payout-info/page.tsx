@@ -250,26 +250,26 @@ export default function PayoutInfoPage() {
   return (
     <PortalShell variant={variant}>
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.payout.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.payout.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl md:text-4xl">{t('portal.payout.title')}</h1>
-        <p className="mt-2 text-sm text-[#a8b3ac]">{t('portal.payout.subtitle_v2')}</p>
+        <p className="mt-2 text-sm text-[#b3aca8]">{t('portal.payout.subtitle_v2')}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="overflow-hidden rounded-2xl border border-[#3f4944] bg-[#1a1c1f] shadow-2xl">
+          <div className="overflow-hidden rounded-2xl border border-[#49443f] bg-[#1a1c1f] shadow-2xl">
             {verified ? (
-              <div className="flex items-center justify-between border-b border-emerald-500/20 bg-emerald-500/10 px-5 py-3">
+              <div className="flex items-center justify-between border-b border-orange-500/20 bg-orange-500/10 px-5 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/20 text-orange-400">
                     <span className="material-symbols-outlined fill text-[18px]">check_circle</span>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-emerald-400">{t('portal.payout.status.verified_title')}</p>
-                    <p className="text-[11px] text-emerald-400/70">{t('portal.payout.status.verified_desc')}</p>
+                    <p className="text-sm font-semibold text-orange-400">{t('portal.payout.status.verified_title')}</p>
+                    <p className="text-[11px] text-orange-400/70">{t('portal.payout.status.verified_desc')}</p>
                   </div>
                 </div>
-                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-500/60">VERIFIED</span>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-orange-500/60">VERIFIED</span>
               </div>
             ) : (
               <div className="flex items-center justify-between border-b border-amber-500/20 bg-amber-500/10 px-5 py-3">
@@ -288,21 +288,21 @@ export default function PayoutInfoPage() {
 
             <div className="space-y-5 p-6 md:p-7">
                 {/* Step indicator */}
-                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#a8b3ac]/70">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#b3aca8]/70">
                   {(['upload', 'form', 'otp'] as WizardStep[]).map((s, i) => {
                     const active = s === step;
                     const done = (['upload', 'form', 'otp'] as WizardStep[]).indexOf(step) > i;
                     return (
                       <div key={s} className="flex items-center gap-2">
                         <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                          active ? 'bg-[#065f46] text-white'
-                          : done ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'border border-[#3f4944] text-[#a8b3ac]/50'
+                          active ? 'bg-[#e8692a] text-white'
+                          : done ? 'bg-orange-500/20 text-orange-400'
+                          : 'border border-[#49443f] text-[#b3aca8]/50'
                         }`}>{done ? '✓' : i + 1}</span>
                         <span className={active ? 'text-[#e2e2e6]' : ''}>
                           {s === 'upload' ? 'QR' : s === 'form' ? 'Info' : 'OTP'}
                         </span>
-                        {i < 2 && <span className="w-6 h-px bg-[#3f4944]" />}
+                        {i < 2 && <span className="w-6 h-px bg-[#49443f]" />}
                       </div>
                     );
                   })}
@@ -310,7 +310,7 @@ export default function PayoutInfoPage() {
                     <button
                       type="button"
                       onClick={resetWizard}
-                      className="ml-auto text-[#a8b3ac] underline-offset-4 hover:text-[#8bd6b6] hover:underline"
+                      className="ml-auto text-[#b3aca8] underline-offset-4 hover:text-[#ff8a50] hover:underline"
                     >
                       {t('portal.payout.upgrade_cancel')}
                     </button>
@@ -320,21 +320,21 @@ export default function PayoutInfoPage() {
                 {step === 'upload' && (
                   <div>
                     <h3 className="text-base font-semibold text-[#e2e2e6]">{t('portal.payout.step1_title')}</h3>
-                    <p className="mt-1 text-sm text-[#a8b3ac]">{t('portal.payout.step1_desc')}</p>
+                    <p className="mt-1 text-sm text-[#b3aca8]">{t('portal.payout.step1_desc')}</p>
                     <label
                       htmlFor="qr-upload"
-                      className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#3f4944] bg-[#0c0e11]/60 px-6 py-8 transition-colors hover:border-[#8bd6b6]/40 hover:bg-[#8bd6b6]/[0.04]"
+                      className="mt-4 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[#49443f] bg-[#0c0e11]/60 px-6 py-8 transition-colors hover:border-[#ff8a50]/40 hover:bg-[#ff8a50]/[0.04]"
                     >
                       {qrPreview ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={qrPreview} alt="" className="h-32 w-32 rounded-lg object-contain" />
                       ) : (
-                        <span className="material-symbols-outlined text-[40px] text-[#a8b3ac]/50">qr_code_2</span>
+                        <span className="material-symbols-outlined text-[40px] text-[#b3aca8]/50">qr_code_2</span>
                       )}
                       <div className="text-center">
                         <p className="text-sm font-semibold text-[#e2e2e6]">{t('portal.payout.step1_choose')}</p>
-                        <p className="text-[11px] text-[#a8b3ac]">{t('portal.payout.step1_drag')}</p>
-                        <p className="mt-1 text-[10px] text-[#a8b3ac]/60">{t('portal.payout.step1_format')}</p>
+                        <p className="text-[11px] text-[#b3aca8]">{t('portal.payout.step1_drag')}</p>
+                        <p className="mt-1 text-[10px] text-[#b3aca8]/60">{t('portal.payout.step1_format')}</p>
                       </div>
                       <input
                         id="qr-upload"
@@ -346,7 +346,7 @@ export default function PayoutInfoPage() {
                       />
                     </label>
                     {decoding && (
-                      <p className="mt-3 flex items-center gap-2 text-sm text-[#8bd6b6]">
+                      <p className="mt-3 flex items-center gap-2 text-sm text-[#ff8a50]">
                         <Spinner size={14} /> {t('portal.payout.step1_decoding')}
                       </p>
                     )}
@@ -357,9 +357,9 @@ export default function PayoutInfoPage() {
                       </p>
                     )}
                     <div className="my-5 flex items-center gap-3">
-                      <div className="h-px flex-1 bg-[#3f4944]" />
-                      <span className="text-[10px] uppercase tracking-wider text-[#a8b3ac]/60">{t('portal.payout.step1_or')}</span>
-                      <div className="h-px flex-1 bg-[#3f4944]" />
+                      <div className="h-px flex-1 bg-[#49443f]" />
+                      <span className="text-[10px] uppercase tracking-wider text-[#b3aca8]/60">{t('portal.payout.step1_or')}</span>
+                      <div className="h-px flex-1 bg-[#49443f]" />
                     </div>
                     <button
                       type="button"
@@ -367,18 +367,18 @@ export default function PayoutInfoPage() {
                         if (!zaloPhone && profile?.zalo_phone) setZaloPhone(profile.zalo_phone);
                         setStep('form');
                       }}
-                      className="group flex w-full items-center justify-between gap-3 rounded-xl border border-[#8bd6b6]/40 bg-[#8bd6b6]/[0.06] px-5 py-4 text-left transition-all hover:border-[#8bd6b6] hover:bg-[#8bd6b6]/[0.12]"
+                      className="group flex w-full items-center justify-between gap-3 rounded-xl border border-[#ff8a50]/40 bg-[#ff8a50]/[0.06] px-5 py-4 text-left transition-all hover:border-[#ff8a50] hover:bg-[#ff8a50]/[0.12]"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#8bd6b6]/15 transition-colors group-hover:bg-[#8bd6b6]/25">
-                          <span className="material-symbols-outlined text-[22px] text-[#8bd6b6]">keyboard</span>
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ff8a50]/15 transition-colors group-hover:bg-[#ff8a50]/25">
+                          <span className="material-symbols-outlined text-[22px] text-[#ff8a50]">keyboard</span>
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-[#e2e2e6]">{t('portal.payout.step1_manual')}</p>
-                          <p className="mt-0.5 text-[11px] text-[#a8b3ac]">{t('portal.payout.step1_manual_desc')}</p>
+                          <p className="mt-0.5 text-[11px] text-[#b3aca8]">{t('portal.payout.step1_manual_desc')}</p>
                         </div>
                       </div>
-                      <span className="material-symbols-outlined text-[20px] text-[#8bd6b6] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
+                      <span className="material-symbols-outlined text-[20px] text-[#ff8a50] transition-transform group-hover:translate-x-0.5">arrow_forward</span>
                     </button>
                   </div>
                 )}
@@ -387,13 +387,13 @@ export default function PayoutInfoPage() {
                   <div className="space-y-5">
                     <h3 className="text-base font-semibold text-[#e2e2e6]">{t('portal.payout.step2_title')}</h3>
                     <div>
-                      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+                      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                         {t('portal.payout.label.bank')}
                       </label>
                       <BankPicker value={bankShort} onChange={handleBank} required />
                       {bankCode && (
-                        <p className="mt-1.5 flex items-center gap-1.5 text-[10px] text-[#a8b3ac]">
-                          <span className="material-symbols-outlined text-[12px] text-[#10b981]">verified</span>
+                        <p className="mt-1.5 flex items-center gap-1.5 text-[10px] text-[#b3aca8]">
+                          <span className="material-symbols-outlined text-[12px] text-[#ff5625]">verified</span>
                           BIN: <span className="font-mono tabular-nums text-[#e2e2e6]">{bankBin}</span>
                           <span className="mx-1">·</span>
                           {t('portal.payout.label.code')}: <span className="font-mono tabular-nums text-[#e2e2e6]">{bankCode}</span>
@@ -402,7 +402,7 @@ export default function PayoutInfoPage() {
                     </div>
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+                        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                           {t('portal.payout.label.account_number')}
                         </label>
                         <input
@@ -412,11 +412,11 @@ export default function PayoutInfoPage() {
                           pattern="\d{6,20}"
                           required
                           placeholder={t('portal.payout.placeholder.account_number')}
-                          className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+                          className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
                         />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+                        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                           {t('portal.payout.label.account_holder')}
                         </label>
                         <input
@@ -424,13 +424,13 @@ export default function PayoutInfoPage() {
                           onChange={(e) => setBankHolder(e.target.value.toUpperCase())}
                           required
                           placeholder="NGUYEN VAN A"
-                          className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 text-sm uppercase tracking-wide text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+                          className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 text-sm uppercase tracking-wide text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
                         />
-                        <p className="mt-1 text-[10px] text-[#a8b3ac]">{t('portal.payout.hint.holder_format')}</p>
+                        <p className="mt-1 text-[10px] text-[#b3aca8]">{t('portal.payout.hint.holder_format')}</p>
                       </div>
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#a8b3ac]">
+                      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-[#b3aca8]">
                         {t('portal.payout.step2_zalo_label')}
                       </label>
                       <input
@@ -440,15 +440,15 @@ export default function PayoutInfoPage() {
                         pattern="0\d{9}"
                         required
                         placeholder={t('portal.payout.step2_zalo_placeholder')}
-                        className="w-full rounded-lg border border-[#3f4944] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#a8b3ac] outline-none focus:border-[#8bd6b6]"
+                        className="w-full rounded-lg border border-[#49443f] bg-[#0c0e11] px-3 py-2.5 font-mono text-sm tabular-nums tracking-wider text-[#e2e2e6] placeholder:text-[#b3aca8] outline-none focus:border-[#ff8a50]"
                       />
-                      <p className="mt-1 text-[10px] text-[#a8b3ac]">{t('portal.payout.step2_zalo_hint')}</p>
+                      <p className="mt-1 text-[10px] text-[#b3aca8]">{t('portal.payout.step2_zalo_hint')}</p>
                     </div>
                     <div className="flex items-center justify-between gap-3 pt-1">
                       <button
                         type="button"
                         onClick={() => setStep('upload')}
-                        className="text-sm text-[#a8b3ac] underline-offset-4 hover:text-[#8bd6b6] hover:underline"
+                        className="text-sm text-[#b3aca8] underline-offset-4 hover:text-[#ff8a50] hover:underline"
                       >
                         ← {t('portal.payout.step1_title')}
                       </button>
@@ -456,7 +456,7 @@ export default function PayoutInfoPage() {
                         type="button"
                         onClick={requestOtp}
                         disabled={busy}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#065f46] px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#065f46]/90 active:scale-[0.98] disabled:opacity-50"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e8692a] px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#e8692a]/90 active:scale-[0.98] disabled:opacity-50"
                       >
                         {busy ? <Spinner size={14} /> : <span className="material-symbols-outlined text-[16px]">sms</span>}
                         {busy ? t('portal.payout.step2_sending') : t('portal.payout.step2_send_otp')}
@@ -468,7 +468,7 @@ export default function PayoutInfoPage() {
                 {step === 'otp' && (
                   <div className="space-y-5">
                     <h3 className="text-base font-semibold text-[#e2e2e6]">{t('portal.payout.step3_title')}</h3>
-                    <p className="text-sm text-[#a8b3ac]">
+                    <p className="text-sm text-[#b3aca8]">
                       {t('portal.payout.step3_desc').replace('{phone}', zaloPhone)}
                     </p>
                     {delivered === 'telegram_fallback' && (
@@ -485,13 +485,13 @@ export default function PayoutInfoPage() {
                       maxLength={6}
                       autoFocus
                       placeholder={t('portal.payout.step3_placeholder')}
-                      className="w-full rounded-xl border border-[#3f4944] bg-[#0c0e11] px-4 py-4 text-center font-mono text-3xl font-bold tabular-nums tracking-[0.5em] text-[#e2e2e6] placeholder:text-[#a8b3ac]/40 outline-none focus:border-[#8bd6b6]"
+                      className="w-full rounded-xl border border-[#49443f] bg-[#0c0e11] px-4 py-4 text-center font-mono text-3xl font-bold tabular-nums tracking-[0.5em] text-[#e2e2e6] placeholder:text-[#b3aca8]/40 outline-none focus:border-[#ff8a50]"
                     />
                     <div className="flex items-center justify-between gap-3">
                       <button
                         type="button"
                         onClick={() => setStep('form')}
-                        className="text-sm text-[#a8b3ac] underline-offset-4 hover:text-[#8bd6b6] hover:underline"
+                        className="text-sm text-[#b3aca8] underline-offset-4 hover:text-[#ff8a50] hover:underline"
                       >
                         {t('portal.payout.step3_back')}
                       </button>
@@ -500,7 +500,7 @@ export default function PayoutInfoPage() {
                           type="button"
                           onClick={requestOtp}
                           disabled={busy}
-                          className="text-sm text-[#a8b3ac] underline-offset-4 hover:text-[#8bd6b6] hover:underline disabled:opacity-40"
+                          className="text-sm text-[#b3aca8] underline-offset-4 hover:text-[#ff8a50] hover:underline disabled:opacity-40"
                         >
                           {t('portal.payout.step3_resend')}
                         </button>
@@ -508,7 +508,7 @@ export default function PayoutInfoPage() {
                           type="button"
                           onClick={verifyOtp}
                           disabled={busy || otpCode.length !== 6}
-                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-emerald-500/90 active:scale-[0.98] disabled:opacity-50"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-orange-500/90 active:scale-[0.98] disabled:opacity-50"
                         >
                           {busy ? <Spinner size={14} /> : <span className="material-symbols-outlined text-[16px]">check_circle</span>}
                           {busy ? t('portal.payout.step3_verifying') : t('portal.payout.step3_confirm')}
@@ -523,9 +523,9 @@ export default function PayoutInfoPage() {
 
         <div className="space-y-4 lg:col-span-1">
           {verified && currentBankCode && (
-            <div className="overflow-hidden rounded-2xl border border-[#10b981]/30 bg-gradient-to-br from-[#10b981]/[0.06] to-[#1a1c1f]">
-              <div className="border-b border-[#10b981]/20 bg-[#10b981]/[0.04] px-5 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#10b981]">
+            <div className="overflow-hidden rounded-2xl border border-[#ff5625]/30 bg-gradient-to-br from-[#ff5625]/[0.06] to-[#1a1c1f]">
+              <div className="border-b border-[#ff5625]/20 bg-[#ff5625]/[0.04] px-5 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#ff5625]">
                   {t('portal.payout.verify_card.title')}
                 </p>
               </div>
@@ -541,17 +541,17 @@ export default function PayoutInfoPage() {
                   />
                   <div className="min-w-0">
                     <p className="truncate font-semibold text-[#e2e2e6]">{profile.bank_name}</p>
-                    {currentBankBin && <p className="font-mono text-[10px] tabular-nums text-[#a8b3ac]">BIN {currentBankBin}</p>}
+                    {currentBankBin && <p className="font-mono text-[10px] tabular-nums text-[#b3aca8]">BIN {currentBankBin}</p>}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#3f4944] bg-[#0c0e11] p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.payout.label.account_number')}</p>
+                <div className="rounded-lg border border-[#49443f] bg-[#0c0e11] p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-[#b3aca8]">{t('portal.payout.label.account_number')}</p>
                   <p className="mt-0.5 font-mono text-lg font-semibold tabular-nums tracking-wider text-[#e2e2e6]">
                     {profile.bank_account_number}
                   </p>
                 </div>
-                <div className="rounded-lg border border-[#3f4944] bg-[#0c0e11] p-3">
-                  <p className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.payout.label.account_holder')}</p>
+                <div className="rounded-lg border border-[#49443f] bg-[#0c0e11] p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-[#b3aca8]">{t('portal.payout.label.account_holder')}</p>
                   <p className="mt-0.5 text-sm font-semibold uppercase tracking-wide text-[#e2e2e6]">
                     {profile.bank_account_name}
                   </p>

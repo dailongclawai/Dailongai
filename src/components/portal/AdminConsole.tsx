@@ -43,7 +43,7 @@ const rise = (i: number) => ({
 // Màu huy hiệu hạng 1-2-3: vàng — bạc — đồng (theo design Stitch "Phòng Điều Hành").
 const RANK_COLORS = ['#fbbf24', '#c6c6ca', '#ffb77d'];
 // Chấm trạng thái KPI: chậm — đạt — xuất sắc.
-const STATUS_DOT = { missed: '#f87171', met: '#34d399', excellent: '#ffb77d' } as const;
+const STATUS_DOT = { missed: '#f87171', met: '#ff8a50', excellent: '#ffb77d' } as const;
 
 // Boss chốt 02/08/2026: Tổng quan admin đo mô hình nhân viên bán qua CRM.
 // Bố cục "phòng điều hành" theo design Stitch screen-4: hero numeral máy bán/chỉ tiêu
@@ -104,7 +104,7 @@ export function AdminConsole() {
 
   // Hàng 4 command stat — nhịp số của cỗ máy bán hàng.
   const stats = [
-    { label: t('portal.components.adminConsole.revenue_ytd'), value: `${fmtVnd(f.revenue_ytd)}₫`, color: '#8bd6b6' },
+    { label: t('portal.components.adminConsole.revenue_ytd'), value: `${fmtVnd(f.revenue_ytd)}₫`, color: '#ff8a50' },
     { label: t('portal.crm.pipeline.open_count'), value: String(pipelineOpen), color: '#e2e2e6' },
     { label: t('portal.components.adminConsole.kpi_staff_commission'), value: `${fmtVnd(staffCommission)}₫`, color: '#ffb77d' },
     { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: String(unreadFeedback), color: unreadFeedback > 0 ? '#f87171' : '#e2e2e6' },
@@ -113,7 +113,7 @@ export function AdminConsole() {
   // Rail phải: việc đang chờ tay admin — cả hàng là nút bấm, badge đếm gold.
   const actions = [
     { label: t('portal.components.adminConsole.kpi_pending_confirm'), value: pendingConfirm, icon: 'fact_check', color: '#fbbf24', href: '/portal/crm/accounts' },
-    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', color: '#8bd6b6', href: '/portal/admin/orders' },
+    { label: t('portal.components.adminConsole.kpi_orders_pending'), value: f.orders_pending, icon: 'pending_actions', color: '#ff8a50', href: '/portal/admin/orders' },
     { label: t('portal.components.adminConsole.kpi_unread_feedback'), value: unreadFeedback, icon: 'mark_email_unread', color: '#ffb77d', href: '/portal/crm/feedback' },
     { label: t('portal.components.adminConsole.action_overdue'), value: overdueTasks, icon: 'event_busy', color: '#f87171', href: '/portal/crm/activities' },
   ];
@@ -126,9 +126,9 @@ export function AdminConsole() {
     </>
   );
 
-  const card = 'relative overflow-hidden rounded-xl border border-[#3f4944]/50 bg-[#1a1c1f]/90';
+  const card = 'relative overflow-hidden rounded-xl border border-[#49443f]/50 bg-[#1a1c1f]/90';
 
-  // Donut SVG thuần: 2 cung — Khách lẻ emerald, Khách tổ chức gold.
+  // Donut SVG thuần: 2 cung — Khách lẻ cam đậm, Khách tổ chức gold.
   const R = 52;
   const C = 2 * Math.PI * R;
 
@@ -141,28 +141,28 @@ export function AdminConsole() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-24 -top-24 -z-10 h-[420px] w-[560px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(6,95,70,0.24),transparent_62%)]"
+        className="pointer-events-none absolute -left-24 -top-24 -z-10 h-[420px] w-[560px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(232,105,42,0.24),transparent_62%)]"
       />
 
       {/* HERO — kicker + trạng thái hệ thống + numeral máy bán toàn công ty / chỉ tiêu */}
       <motion.section {...rise(0)} className="relative">
         <div className="flex items-center gap-3">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34d399] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34d399]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff8a50] opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff8a50]" />
           </span>
-          <p className="text-[11px] uppercase tracking-widest text-[#a8b3ac]">
+          <p className="text-[11px] uppercase tracking-widest text-[#b3aca8]">
             {t('portal.components.adminConsole.hero_status')}
           </p>
         </div>
-        <h1 className={`${display.className} mt-4 text-sm font-medium uppercase tracking-[0.35em] text-[#8bd6b6]`}>
+        <h1 className={`${display.className} mt-4 text-sm font-medium uppercase tracking-[0.35em] text-[#ff8a50]`}>
           {t('portal.components.adminConsole.hero_kicker')}
         </h1>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <span className={`${display.className} text-[64px] font-bold leading-none tracking-tight tabular-nums md:text-[84px]`}>
             {devMonth}
           </span>
-          <span className="text-base text-[#a8b3ac]">
+          <span className="text-base text-[#b3aca8]">
             {devTarget > 0 && <span className={`${display.className} tabular-nums`}>/ {devTarget} </span>}
             {t('portal.components.adminConsole.hero_units_label')}
           </span>
@@ -170,7 +170,7 @@ export function AdminConsole() {
         {/* Progress bar mảnh dưới numeral */}
         <div className="mt-4 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-[#1e2023]">
           <div
-            className="h-full rounded-full bg-[#8bd6b6] shadow-[0_0_8px_rgba(139,214,182,0.6)] transition-[width] duration-700"
+            className="h-full rounded-full bg-[#ff8a50] shadow-[0_0_8px_rgba(255,138,80,0.6)] transition-[width] duration-700"
             style={{ width: `${heroPct}%` }}
           />
         </div>
@@ -204,20 +204,20 @@ export function AdminConsole() {
         {/* Hiệu suất nhân viên */}
         <motion.section {...rise(6)} className={`${card} lg:col-span-2`}>
           {corner}
-          <div className="flex items-center justify-between border-b border-[#3f4944]/50 p-5">
+          <div className="flex items-center justify-between border-b border-[#49443f]/50 p-5">
             <h3 className={`${display.className} flex items-center gap-2 text-lg font-medium text-[#e2e2e6]`}>
-              <span className="material-symbols-outlined text-[18px] text-[#8bd6b6]">leaderboard</span>
+              <span className="material-symbols-outlined text-[18px] text-[#ff8a50]">leaderboard</span>
               {t('portal.components.adminConsole.leaderboard_title')}
             </h3>
             <Link
               href="/portal/crm/kpi"
-              className="rounded border border-[#8bd6b6]/20 px-3 py-1 text-[11px] uppercase tracking-widest text-[#8bd6b6] transition-colors hover:border-[#8bd6b6]/50"
+              className="rounded border border-[#ff8a50]/20 px-3 py-1 text-[11px] uppercase tracking-widest text-[#ff8a50] transition-colors hover:border-[#ff8a50]/50"
             >
               {t('portal.crm.dash.view_all')}
             </Link>
           </div>
           {leaderboard.length === 0 ? (
-            <p className="p-8 text-center text-sm text-[#a8b3ac]">
+            <p className="p-8 text-center text-sm text-[#b3aca8]">
               {t('portal.components.adminConsole.leaderboard_empty')}
             </p>
           ) : (
@@ -265,15 +265,15 @@ export function AdminConsole() {
                               {i + 1}
                             </span>
                           ) : (
-                            <span className={`${display.className} text-xs tabular-nums text-[#a8b3ac]`}>{i + 1}</span>
+                            <span className={`${display.className} text-xs tabular-nums text-[#b3aca8]`}>{i + 1}</span>
                           )}
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <span className={`${display.className} flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1e2023] text-xs font-bold text-[#a8b3ac]`}>
+                            <span className={`${display.className} flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1e2023] text-xs font-bold text-[#b3aca8]`}>
                               {initials(r.full_name)}
                             </span>
-                            <span className="whitespace-nowrap font-medium text-[#e2e2e6] transition-colors group-hover:text-[#8bd6b6]">
+                            <span className="whitespace-nowrap font-medium text-[#e2e2e6] transition-colors group-hover:text-[#ff8a50]">
                               {r.full_name ?? '—'}
                             </span>
                           </div>
@@ -283,10 +283,10 @@ export function AdminConsole() {
                             <div className="h-1 flex-1 overflow-hidden rounded-full bg-[#1e2023]">
                               <div
                                 className="h-full rounded-full"
-                                style={{ width: `${pct}%`, backgroundColor: status === 'missed' ? '#3f4944' : '#8bd6b6' }}
+                                style={{ width: `${pct}%`, backgroundColor: status === 'missed' ? '#49443f' : '#ff8a50' }}
                               />
                             </div>
-                            <span className={`${display.className} w-10 text-xs tabular-nums text-[#a8b3ac]`}>
+                            <span className={`${display.className} w-10 text-xs tabular-nums text-[#b3aca8]`}>
                               {r.devices_won}/{r.kpi_target}
                             </span>
                           </div>
@@ -294,7 +294,7 @@ export function AdminConsole() {
                         <td className={`${display.className} p-4 text-right tabular-nums text-[#e2e2e6]`}>
                           {new14ByStaff.get(r.staff_id) ?? 0}
                         </td>
-                        <td className={`${display.className} whitespace-nowrap p-4 text-right tabular-nums text-[#8bd6b6]`}>
+                        <td className={`${display.className} whitespace-nowrap p-4 text-right tabular-nums text-[#ff8a50]`}>
                           {fmtVnd(commissionByStaff.get(r.staff_id) ?? 0)}₫
                         </td>
                         <td className="p-4 text-center">
@@ -317,7 +317,7 @@ export function AdminConsole() {
         <aside className="flex flex-col gap-4">
           <motion.div {...rise(7)} className={card}>
             {corner}
-            <div className="border-b border-[#3f4944]/50 p-4">
+            <div className="border-b border-[#49443f]/50 p-4">
               <h3 className={`${display.className} flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.35em] text-[#ffb77d]`}>
                 <span className="material-symbols-outlined text-[14px]">bolt</span>
                 {t('portal.components.adminConsole.group_action')}
@@ -337,13 +337,13 @@ export function AdminConsole() {
                     >
                       {a.icon}
                     </span>
-                    <span className="text-sm text-[#e2e2e6] transition-colors group-hover:text-[#8bd6b6]">{a.label}</span>
+                    <span className="text-sm text-[#e2e2e6] transition-colors group-hover:text-[#ff8a50]">{a.label}</span>
                   </span>
                   <span
                     className={`${display.className} rounded px-2 py-0.5 text-sm font-bold tabular-nums`}
                     style={a.value > 0
                       ? { color: '#ffb77d', backgroundColor: '#ffb77d1a' }
-                      : { color: '#a8b3ac', backgroundColor: '#3f49444d' }}
+                      : { color: '#b3aca8', backgroundColor: '#49443f4d' }}
                   >
                     {a.value}
                   </span>
@@ -358,34 +358,34 @@ export function AdminConsole() {
               {t('portal.components.adminConsole.donut_title')}
             </h3>
             {accounts.length === 0 ? (
-              <p className="flex-1 content-center text-center text-sm text-[#a8b3ac]">
+              <p className="flex-1 content-center text-center text-sm text-[#b3aca8]">
                 {t('portal.components.adminConsole.donut_empty')}
               </p>
             ) : (
               <>
                 <div className="relative flex min-h-[150px] flex-1 items-center justify-center">
                   <svg width="130" height="130" viewBox="0 0 130 130" role="img" aria-label={t('portal.components.adminConsole.donut_title')}>
-                    {/* Cung Khách tổ chức: vòng nền gold; cung Khách lẻ đè lên bằng emerald */}
+                    {/* Cung Khách tổ chức: vòng nền gold; cung Khách lẻ đè lên bằng cam */}
                     <circle cx="65" cy="65" r={R} fill="none" stroke="#d97706" strokeWidth="12" opacity="0.85" />
                     <circle
-                      cx="65" cy="65" r={R} fill="none" stroke="#8bd6b6" strokeWidth="12" strokeLinecap="butt"
+                      cx="65" cy="65" r={R} fill="none" stroke="#ff8a50" strokeWidth="12" strokeLinecap="butt"
                       strokeDasharray={`${(retailPct / 100) * C} ${C}`}
                       transform="rotate(-90 65 65)"
                     />
                     <text
                       x="65" y="65" textAnchor="middle" dominantBaseline="central"
-                      className={`${display.className} tabular-nums`} fill="#8bd6b6" fontSize="20" fontWeight="700"
+                      className={`${display.className} tabular-nums`} fill="#ff8a50" fontSize="20" fontWeight="700"
                     >
                       {Math.round(retailPct)}%
                     </text>
                   </svg>
                 </div>
                 <div className="mt-4 flex justify-center gap-6">
-                  <span className="flex items-center gap-2 text-xs text-[#a8b3ac]">
-                    <span className="h-2 w-2 rounded-full bg-[#8bd6b6] shadow-[0_0_5px_#8bd6b6]" />
+                  <span className="flex items-center gap-2 text-xs text-[#b3aca8]">
+                    <span className="h-2 w-2 rounded-full bg-[#ff8a50] shadow-[0_0_5px_#ff8a50]" />
                     {t('portal.crm.segment.b2c')} (<b className={`${display.className} tabular-nums`}>{retailCount}</b>)
                   </span>
-                  <span className="flex items-center gap-2 text-xs text-[#a8b3ac]">
+                  <span className="flex items-center gap-2 text-xs text-[#b3aca8]">
                     <span className="h-2 w-2 rounded-full bg-[#d97706] shadow-[0_0_5px_#d97706]" />
                     {t('portal.crm.segment.b2b')} (<b className={`${display.className} tabular-nums`}>{orgCount}</b>)
                   </span>

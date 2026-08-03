@@ -93,14 +93,14 @@ export default function ProfilePage() {
   return (
     <PortalShell variant={profile.role ?? 'dealer'}>
       <div className="mb-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.profile.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.profile.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl">{t('portal.profile.title')}</h1>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
-        <form onSubmit={saveProfile} className="space-y-4 rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6 backdrop-blur">
+        <form onSubmit={saveProfile} className="space-y-4 rounded-2xl border border-[#49443f]/40 bg-[#1a1c1f] p-6 backdrop-blur">
           <h2 className="text-base font-semibold">{t('portal.profile.section.details')}</h2>
           <div className="flex items-center gap-4">
-            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#8bd6b6]/30 bg-[#1e2023] text-2xl font-bold text-[#8bd6b6]">
+            <span className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#ff8a50]/30 bg-[#1e2023] text-2xl font-bold text-[#ff8a50]">
               {profile.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={profile.avatar_url} alt={t('portal.profile.avatar.label')} className="h-full w-full object-cover" />
@@ -109,12 +109,12 @@ export default function ProfilePage() {
               )}
             </span>
             <div>
-              <label className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-[#8bd6b6]/40 px-3 py-2 text-sm font-semibold text-[#8bd6b6] transition-colors hover:bg-[#8bd6b6]/10 ${avatarBusy ? 'pointer-events-none opacity-50' : ''}`}>
+              <label className={`inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-[#ff8a50]/40 px-3 py-2 text-sm font-semibold text-[#ff8a50] transition-colors hover:bg-[#ff8a50]/10 ${avatarBusy ? 'pointer-events-none opacity-50' : ''}`}>
                 <span className="material-symbols-outlined text-[18px]">photo_camera</span>
                 {avatarBusy ? t('portal.crm.common.loading') : t('portal.profile.avatar.upload')}
                 <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onAvatarChange} disabled={avatarBusy} />
               </label>
-              <p className="mt-1.5 text-xs text-[#a8b3ac]">{t('portal.profile.avatar.hint')}</p>
+              <p className="mt-1.5 text-xs text-[#b3aca8]">{t('portal.profile.avatar.hint')}</p>
             </div>
           </div>
           <div>
@@ -122,7 +122,7 @@ export default function ProfilePage() {
             <input
               value={profile.email ?? ''}
               disabled
-              className="w-full rounded-lg border border-[#3f4944]/40 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6]/60"
+              className="w-full rounded-lg border border-[#49443f]/40 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6]/60"
             />
           </div>
           <div>
@@ -130,7 +130,7 @@ export default function ProfilePage() {
             <input
               value={fullName}
               onChange={(e) => setFullNameEdit(e.target.value)}
-              className="w-full rounded-lg border border-[#3f4944]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#8bd6b6] outline-none"
+              className="w-full rounded-lg border border-[#49443f]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#ff8a50] outline-none"
             />
           </div>
           <div>
@@ -138,7 +138,7 @@ export default function ProfilePage() {
             <input
               value={phone}
               onChange={(e) => setPhoneEdit(e.target.value)}
-              className="w-full rounded-lg border border-[#3f4944]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#8bd6b6] outline-none"
+              className="w-full rounded-lg border border-[#49443f]/50 bg-[#1a1c1f] px-3 py-2 text-sm text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#ff8a50] outline-none"
             />
           </div>
           <div>
@@ -148,19 +148,19 @@ export default function ProfilePage() {
               onChange={(e) => setTelegramEdit(e.target.value.replace(/[^\d-]/g, ''))}
               placeholder="6052313595"
               inputMode="numeric"
-              className="w-full rounded-lg border border-[#3f4944]/50 bg-[#1a1c1f] px-3 py-2 font-mono text-sm tabular-nums text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#8bd6b6] outline-none"
+              className="w-full rounded-lg border border-[#49443f]/50 bg-[#1a1c1f] px-3 py-2 font-mono text-sm tabular-nums text-[#e2e2e6] placeholder:text-[#e2e2e6]/40 focus:border-[#ff8a50] outline-none"
             />
             <p className="mt-1 text-xs text-[#e2e2e6]/50">{t('portal.profile.hint.telegram')}</p>
           </div>
           <button
             type="submit"
             disabled={busy}
-            className="rounded-full bg-[#065f46] px-5 py-2 text-sm font-medium text-white hover:bg-[#065f46]/90 disabled:opacity-50"
+            className="rounded-full bg-[#e8692a] px-5 py-2 text-sm font-medium text-white hover:bg-[#e8692a]/90 disabled:opacity-50"
           >
             {t('portal.profile.btn.save')}
           </button>
         </form>
-        <form onSubmit={changePassword} className="space-y-4 rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6 backdrop-blur">
+        <form onSubmit={changePassword} className="space-y-4 rounded-2xl border border-[#49443f]/40 bg-[#1a1c1f] p-6 backdrop-blur">
           <h2 className="text-base font-semibold">{t('portal.profile.section.password')}</h2>
           <div>
             <label className="mb-1 block text-xs uppercase tracking-wider text-[#e2e2e6]/60">{t('portal.profile.label.new_password')}</label>
@@ -173,24 +173,24 @@ export default function ProfilePage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-full bg-[#065f46] px-5 py-2 text-sm font-medium text-white hover:bg-[#065f46]/90 disabled:opacity-50"
+            className="rounded-full bg-[#e8692a] px-5 py-2 text-sm font-medium text-white hover:bg-[#e8692a]/90 disabled:opacity-50"
           >
             {t('portal.profile.btn.change_password')}
           </button>
         </form>
         {profile.role !== 'admin' && (
-          <section className="md:col-span-2 rounded-2xl border border-[#3f4944] bg-[#1a1c1f] p-6">
+          <section className="md:col-span-2 rounded-2xl border border-[#49443f] bg-[#1a1c1f] p-6">
             <div className="flex items-start gap-3">
-              <span className="material-symbols-outlined text-[28px] text-[#8bd6b6]">account_balance</span>
+              <span className="material-symbols-outlined text-[28px] text-[#ff8a50]">account_balance</span>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base font-semibold">{t('portal.profile.payout.title')}</h2>
-                <p className="mt-1 text-xs text-[#a8b3ac]">
+                <p className="mt-1 text-xs text-[#b3aca8]">
                   {t('portal.profile.payout.description')}
                 </p>
               </div>
               <Link
                 href="/portal/payout-info"
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#8bd6b6]/40 bg-[#8bd6b6]/10 px-4 py-2 text-xs font-semibold text-[#8bd6b6] hover:bg-[#065f46] hover:text-white"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#ff8a50]/40 bg-[#ff8a50]/10 px-4 py-2 text-xs font-semibold text-[#ff8a50] hover:bg-[#e8692a] hover:text-white"
               >
                 {t('portal.profile.payout.open')}
                 <span className="material-symbols-outlined text-[14px]">arrow_forward</span>

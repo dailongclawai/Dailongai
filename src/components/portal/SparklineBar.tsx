@@ -15,7 +15,7 @@ export function SparklineBar({
   data,
   width = 200,
   height = 36,
-  color = '#8bd6b6',
+  color = '#ff8a50',
   gap = 1,
   minBarHeight = 1,
 }: SparklineBarProps) {

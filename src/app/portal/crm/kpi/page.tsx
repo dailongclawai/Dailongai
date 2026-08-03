@@ -18,7 +18,7 @@ import type { CrmKpiDeviceMonth, CrmKpiNewAccountsDay } from '@/lib/portal-types
 const BADGE_CLASS: Record<KpiStatus, string> = {
   missed: 'text-[#f87171] border-[#f87171]/40',
   met: 'text-[#ffb77d] border-[#ffb77d]/40',
-  excellent: 'text-[#34d399] border-[#34d399]/40',
+  excellent: 'text-[#ff8a50] border-[#ff8a50]/40',
 };
 
 /** Hôm nay theo giờ Việt Nam, cùng dạng yyyy-mm-dd với cột ngay của view. */
@@ -123,7 +123,7 @@ export default function CrmKpiPage() {
             title={`${dayLabel(d.ngay)}: ${d.retail_new} ${t('portal.crm.kpi.daily_retail')} · ${d.org_new} ${t('portal.crm.kpi.daily_org')} — ${t(met ? 'portal.crm.kpi.daily_met' : 'portal.crm.kpi.daily_missed')}`}
           >
             <span className={`material-symbols-outlined flex h-7 w-7 items-center justify-center rounded-md text-[15px] ${
-              met ? 'bg-[#34d399]/20 text-[#34d399]' : 'bg-[#f87171]/10 text-[#f87171]/70'
+              met ? 'bg-[#ff8a50]/20 text-[#ff8a50]' : 'bg-[#f87171]/10 text-[#f87171]/70'
             }`}>
               {met ? 'check' : 'close'}
             </span>
@@ -141,7 +141,7 @@ export default function CrmKpiPage() {
       <section className={card}>
         <div className="flex items-end justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/5 bg-[var(--crm-s3)] text-[#8bd6b6]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/5 bg-[var(--crm-s3)] text-[#ff8a50]">
               <span className="material-symbols-outlined">{icon}</span>
             </div>
             <div className="min-w-0">
@@ -152,7 +152,7 @@ export default function CrmKpiPage() {
             </div>
           </div>
           <p className="shrink-0 whitespace-nowrap text-right">
-            <span className="crm-display text-2xl font-bold tabular-nums text-[#8bd6b6]">{value}</span>
+            <span className="crm-display text-2xl font-bold tabular-nums text-[#ff8a50]">{value}</span>
             <span className="font-mono text-sm tabular-nums text-[var(--crm-muted)]">
               {' '}/ {goalMin}–{goalMax} {t('portal.crm.kpi.daily_goal')}
             </span>
@@ -160,7 +160,7 @@ export default function CrmKpiPage() {
         </div>
         <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-[var(--crm-s3)]">
           <div
-            className="relative h-full rounded-full bg-[#8bd6b6] transition-[width] duration-700 ease-out"
+            className="relative h-full rounded-full bg-[#ff8a50] transition-[width] duration-700 ease-out"
             style={{ width: `${pct}%` }}
           >
             <div className="absolute inset-y-0 right-0 w-3 bg-white/20 blur-[2px]" />
@@ -179,7 +179,7 @@ export default function CrmKpiPage() {
           <p className="mt-1 text-sm text-[var(--crm-muted)]">{t('portal.crm.kpi.subtitle')}</p>
         </div>
         <div className="flex w-fit items-center gap-2 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2">
-          <span className="material-symbols-outlined text-[18px] text-[#8bd6b6]">calendar_month</span>
+          <span className="material-symbols-outlined text-[18px] text-[#ff8a50]">calendar_month</span>
           <span className="font-mono text-sm tabular-nums text-[var(--crm-text)]">
             {t('portal.crm.kpi.month_chip_pre')} {Number(curMonth.slice(5, 7))}/{curMonth.slice(0, 4)}
           </span>
@@ -192,7 +192,7 @@ export default function CrmKpiPage() {
         <ul className="grid gap-2 text-sm text-[var(--crm-muted)] md:grid-cols-2">
           {(['rule_m1', 'rule_m2', 'rule_bonus', 'rule_daily'] as const).map(k => (
             <li key={k} className="flex items-start gap-2">
-              <span className="material-symbols-outlined mt-0.5 text-[16px] text-[#8bd6b6]">check_circle</span>
+              <span className="material-symbols-outlined mt-0.5 text-[16px] text-[#ff8a50]">check_circle</span>
               {t('portal.crm.kpi.' + k)}
             </li>
           ))}
@@ -219,7 +219,7 @@ export default function CrmKpiPage() {
               <section className={`${card} relative flex min-h-[300px] flex-col items-center justify-center overflow-hidden`}>
                 <div
                   className="pointer-events-none absolute inset-0 opacity-10"
-                  style={{ background: 'radial-gradient(circle at center, rgba(139, 214, 182, 0.5) 0%, transparent 70%)' }}
+                  style={{ background: 'radial-gradient(circle at center, rgba(255, 138, 80, 0.5) 0%, transparent 70%)' }}
                 />
                 <div className="relative mb-4 h-48 w-48">
                   <svg viewBox="0 0 100 100" className="h-full w-full" role="img" aria-label={`${mine.devices_won} / ${mine.kpi_target} ${t('portal.crm.kpi.devices')}`}>
@@ -228,7 +228,7 @@ export default function CrmKpiPage() {
                     <line x1={50} y1={1.5} x2={50} y2={11} stroke="#d97706" strokeWidth={1.5} strokeDasharray="2,2" opacity={0.7} />
                     <circle
                       cx={50} cy={50} r={45} fill="none"
-                      stroke="#8bd6b6" strokeWidth={6} strokeLinecap="round"
+                      stroke="#ff8a50" strokeWidth={6} strokeLinecap="round"
                       strokeDasharray={GAUGE_C}
                       strokeDashoffset={GAUGE_C * (1 - gaugePct)}
                       transform="rotate(-90 50 50)"
@@ -236,7 +236,7 @@ export default function CrmKpiPage() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="crm-display text-5xl font-bold tabular-nums text-[#8bd6b6]">{mine.devices_won}</span>
+                    <span className="crm-display text-5xl font-bold tabular-nums text-[#ff8a50]">{mine.devices_won}</span>
                     <span className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[var(--crm-muted)]">
                       / {mine.kpi_target} {t('portal.crm.kpi.devices')}
                     </span>
@@ -281,7 +281,7 @@ export default function CrmKpiPage() {
                           </span>
                           <div
                             className={`w-full rounded-t-sm transition-colors ${
-                              cur ? 'bg-[#8bd6b6]' : 'bg-[#8bd6b6]/30 group-hover:bg-[#8bd6b6]/60'
+                              cur ? 'bg-[#ff8a50]' : 'bg-[#ff8a50]/30 group-hover:bg-[#ff8a50]/60'
                             }`}
                             style={{ height: `${m.devices_won > 0 ? Math.max(6, (m.devices_won / chartMax) * 112) : 2}px` }}
                           />
@@ -295,7 +295,7 @@ export default function CrmKpiPage() {
                     <span
                       key={m.thang}
                       className={`flex-1 text-center font-mono text-[10px] tabular-nums ${
-                        m.thang === curMonth ? 'text-[#8bd6b6]' : 'text-[var(--crm-muted)]'
+                        m.thang === curMonth ? 'text-[#ff8a50]' : 'text-[var(--crm-muted)]'
                       }`}
                     >
                       {monthLabel(m.thang)}
@@ -311,7 +311,7 @@ export default function CrmKpiPage() {
                   <div className="min-w-0 flex-1">
                     <h2 className="font-bold text-[#ffb77d]">{t('portal.crm.kpi.bonus_title')}</h2>
                     {bonusOn ? (
-                      <p className="mt-1 text-sm font-medium text-[#34d399]">{t('portal.crm.kpi.bonus_on')}</p>
+                      <p className="mt-1 text-sm font-medium text-[#ff8a50]">{t('portal.crm.kpi.bonus_on')}</p>
                     ) : (
                       <>
                         <p className="mt-1 text-sm text-[var(--crm-text)]">
@@ -416,7 +416,7 @@ export default function CrmKpiPage() {
                       <td className="px-4 py-3">{statusBadge(r.devices_won, r.tenure_month)}</td>
                       <td className="px-4 py-3 text-center">
                         {r.devices_won >= KPI_BONUS_FROM_DEVICE
-                          ? <span className="material-symbols-outlined text-[18px] text-[#34d399]">bolt</span>
+                          ? <span className="material-symbols-outlined text-[18px] text-[#ff8a50]">bolt</span>
                           : <span className="text-[var(--crm-muted)]">—</span>}
                       </td>
                       <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">

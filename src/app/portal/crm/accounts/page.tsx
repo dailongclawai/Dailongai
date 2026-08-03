@@ -29,9 +29,9 @@ const ORG_TYPES: CrmOrgType[] = ['benh_vien_cong', 'benh_vien_tu', 'phong_kham',
 // Chỉ đổi màu CHỮ và viền, giữ nền đặc. Nền trong suốt làm hộp thả xuống của
 // native select không đọc được vì trình duyệt bỏ qua style đặt trên <option>.
 function STATUS_STYLE(label: string): string {
-  if (label === 'Hoàn thành đơn') return 'text-[#34d399] border-[#34d399]/40';
+  if (label === 'Hoàn thành đơn') return 'text-[#ff8a50] border-[#ff8a50]/40';
   if (label === 'Không mua') return 'text-[#f87171] border-[#f87171]/40';
-  if (label === 'Chốt đơn') return 'text-[#8bd6b6] border-[#8bd6b6]/40';
+  if (label === 'Chốt đơn') return 'text-[#ff8a50] border-[#ff8a50]/40';
   if (label === 'Mới tiếp nhận') return 'text-[var(--crm-muted)] border-[var(--crm-line)]';
   return 'text-[#ffb77d] border-[#ffb77d]/40';
 }
@@ -365,7 +365,7 @@ export default function CrmAccountsPage() {
     a.click();
   };
 
-  const field = 'rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
 
   const sortTh = (k: SortKey, labelKey: string, right = false) => (
     <th className={`px-4 py-3 ${right ? 'text-right' : ''}`}>
@@ -412,7 +412,7 @@ export default function CrmAccountsPage() {
           disabled={r.stage_locked && profile.role !== 'admin'}
           title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : undefined}
           onChange={e => void changeStage(r, e.target.value)}
-          className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#8bd6b6] ${STATUS_STYLE(r.status_label)} ${r.stage_locked && profile.role !== 'admin' ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+          className={`rounded-full border bg-[var(--crm-s2)] px-2.5 py-1.5 text-xs font-medium outline-none [color-scheme:dark] focus:border-[#ff8a50] ${STATUS_STYLE(r.status_label)} ${r.stage_locked && profile.role !== 'admin' ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
         >
           {stages.map(s => (
             <option key={s.id} value={s.id}>{s.name}</option>
@@ -435,7 +435,7 @@ export default function CrmAccountsPage() {
               return won ? (
                 <button
                   onClick={() => void changeStage(r, won.id)}
-                  className="inline-flex items-center gap-1 rounded-full border border-[#34d399]/40 px-2 py-0.5 text-xs text-[#34d399] hover:bg-[#34d399]/10"
+                  className="inline-flex items-center gap-1 rounded-full border border-[#ff8a50]/40 px-2 py-0.5 text-xs text-[#ff8a50] hover:bg-[#ff8a50]/10"
                 >
                   <span className="material-symbols-outlined text-[13px]">check</span>
                   {t('portal.crm.accounts.confirm_now')}
@@ -445,7 +445,7 @@ export default function CrmAccountsPage() {
           </span>
         )}
         {r.stage_id != null && stages.find(s => s.id === r.stage_id)?.forecast === 'won' && (
-          <span className="mt-1 flex items-center gap-1 text-xs text-[#34d399]">
+          <span className="mt-1 flex items-center gap-1 text-xs text-[#ff8a50]">
             <span className="material-symbols-outlined text-[13px]">verified</span>
             {t('portal.crm.accounts.confirmed')}
           </span>
@@ -459,7 +459,7 @@ export default function CrmAccountsPage() {
     <span
       className={`inline-block rounded-full border px-2 py-0.5 text-xs font-medium ${
         r.kind === 'customer'
-          ? 'border-[#8bd6b6]/30 bg-[#8bd6b6]/10 text-[#8bd6b6]'
+          ? 'border-[#ff8a50]/30 bg-[#ff8a50]/10 text-[#ff8a50]'
           : 'border-[#ffb77d]/30 bg-[#ffb77d]/10 text-[#ffb77d]'
       }`}
     >
@@ -476,7 +476,7 @@ export default function CrmAccountsPage() {
       aria-label={t('portal.crm.evidence.title')}
       className={`inline-flex items-center gap-1 rounded-lg border p-2 ${
         (evidCounts[r.id] ?? 0) > 0
-          ? 'border-[#34d399]/40 text-[#34d399]'
+          ? 'border-[#ff8a50]/40 text-[#ff8a50]'
           : 'border-[var(--crm-line)] text-[var(--crm-muted)] hover:text-[var(--crm-text)]'
       }`}
     >
@@ -539,19 +539,19 @@ export default function CrmAccountsPage() {
           title={t('portal.crm.import.template_hint')}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
-          <span className="material-symbols-outlined text-[18px] text-[#34d399]">description</span>
+          <span className="material-symbols-outlined text-[18px] text-[#ff8a50]">description</span>
           {t('portal.crm.import.template')}
         </button>
         <button
           onClick={() => setImportOpen(true)}
           className="flex items-center gap-2 rounded-xl border border-[var(--crm-line)] px-4 py-2 text-[var(--crm-text)]"
         >
-          <span className="material-symbols-outlined text-[18px] text-[#8bd6b6]">upload_file</span>
+          <span className="material-symbols-outlined text-[18px] text-[#ff8a50]">upload_file</span>
           {t('portal.crm.import.title')}
         </button>
         <button
           onClick={() => { setEditing(null); setDrawerOpen(true); }}
-          className="flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white"
+          className="flex items-center gap-2 rounded-xl bg-[#e8692a] px-4 py-2 font-bold text-white"
         >
           <span className="material-symbols-outlined text-[18px]">person_add</span>
           {t('portal.crm.accounts.new')}
@@ -567,7 +567,7 @@ export default function CrmAccountsPage() {
             </p>
             <p className="text-2xl font-bold tabular-nums text-[var(--crm-text)]">{stats.total}</p>
           </div>
-          <span className="material-symbols-outlined text-[28px] text-[#8bd6b6] opacity-50">groups</span>
+          <span className="material-symbols-outlined text-[28px] text-[#ff8a50] opacity-50">groups</span>
         </div>
         <div className="flex items-center justify-between rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s1)] p-4">
           <div>
@@ -583,9 +583,9 @@ export default function CrmAccountsPage() {
             <p className="mb-1 text-xs uppercase tracking-wider text-[var(--crm-muted)]">
               {t('portal.crm.accounts.stat_won_month')}
             </p>
-            <p className="text-2xl font-bold tabular-nums text-[#8bd6b6]">{stats.wonThisMonth}</p>
+            <p className="text-2xl font-bold tabular-nums text-[#ff8a50]">{stats.wonThisMonth}</p>
           </div>
-          <span className="material-symbols-outlined text-[28px] text-[#8bd6b6] opacity-50">task_alt</span>
+          <span className="material-symbols-outlined text-[28px] text-[#ff8a50] opacity-50">task_alt</span>
         </div>
       </div>
 
@@ -623,7 +623,7 @@ export default function CrmAccountsPage() {
                 <td className="px-4 py-3 font-mono text-[#ffb77d]">{r.code}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">
                   <span className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#8bd6b6]/25 bg-[#8bd6b6]/15 text-xs font-semibold text-[#8bd6b6]">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#ff8a50]/25 bg-[#ff8a50]/15 text-xs font-semibold text-[#ff8a50]">
                       {initials(r.name)}
                     </span>
                     {r.name}
@@ -663,7 +663,7 @@ export default function CrmAccountsPage() {
                     title={r.stage_locked ? t('portal.crm.accounts.stage_locked') : t('portal.crm.accounts.machines_hint')}
                     onBlur={e => void saveMachines(r, Number(e.target.value))}
                     onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                    className={`w-16 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s2)] px-2 py-1 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6] ${r.stage_locked ? 'cursor-not-allowed opacity-70' : ''}`}
+                    className={`w-16 rounded-lg border border-[var(--crm-line)] bg-[var(--crm-s2)] px-2 py-1 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff8a50] ${r.stage_locked ? 'cursor-not-allowed opacity-70' : ''}`}
                   />
                   {r.open_deals > 0 && (
                     <span className="ml-1 text-xs text-[var(--crm-muted)]">

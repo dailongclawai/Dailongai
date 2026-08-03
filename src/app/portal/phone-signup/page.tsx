@@ -7,8 +7,8 @@ export default function PhoneSignupPage() {
   const { t } = useI18n();
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#3f4944]/40 p-10 text-center">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.auth.phone.badge')}</p>
+      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#49443f]/40 p-10 text-center">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.auth.phone.badge')}</p>
         <h1 className="font-headline text-3xl">{t('portal.auth.phone.title')}</h1>
         <p className="text-sm text-[#e2e2e6]/70">
           {t('portal.auth.phone.body_prefix')} <strong>Zalo OA</strong> {t('portal.auth.phone.body_suffix')}
@@ -23,7 +23,7 @@ export default function PhoneSignupPage() {
         </div>
         <Link
           href="/portal/register"
-          className="inline-block rounded-full bg-[#065f46] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#065f46]/90"
+          className="inline-block rounded-full bg-[#e8692a] px-6 py-2.5 text-sm font-medium text-white hover:bg-[#e8692a]/90"
         >
           {t('portal.auth.phone.back_to_register')}
         </Link>

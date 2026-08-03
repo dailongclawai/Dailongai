@@ -21,8 +21,8 @@ export default function PendingPage() {
 
   return (
     <PortalShell variant="dealer">
-      <div className="portal-glass mx-auto max-w-xl space-y-6 rounded-3xl border border-[#3f4944]/40 p-10 text-center">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.auth.pending.badge')}</p>
+      <div className="portal-glass mx-auto max-w-xl space-y-6 rounded-3xl border border-[#49443f]/40 p-10 text-center">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.auth.pending.badge')}</p>
         <h1 className="font-headline text-3xl">{t('portal.auth.pending.title')}</h1>
         <p className="text-sm text-[#e2e2e6]/70">
           {t('portal.auth.pending.body')}

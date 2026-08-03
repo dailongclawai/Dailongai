@@ -24,9 +24,9 @@ export default function DealerQRPage() {
   return (
     <PortalShell variant="dealer">
       <div className="mb-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#a8b3ac]">{t('portal.dealer.qr.eyebrow')}</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-[#b3aca8]">{t('portal.dealer.qr.eyebrow')}</p>
         <h1 className="mt-2 font-headline text-3xl">{t('portal.dealer.qr.title')}</h1>
-        <p className="mt-2 max-w-xl text-sm text-[#a8b3ac]">
+        <p className="mt-2 max-w-xl text-sm text-[#b3aca8]">
           {t('portal.dealer.qr.subtitle')}
         </p>
       </div>

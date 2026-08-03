@@ -110,11 +110,11 @@ export function QuickCheckout({
     content = (
       <>
         <div className="text-center mb-6">
-          <span className="material-symbols-outlined text-emerald-400 text-[56px]">check_circle</span>
+          <span className="material-symbols-outlined text-orange-400 text-[56px]">check_circle</span>
           <h1 className="font-headline text-2xl mt-2">Đã ghi nhận đơn</h1>
           {dealerName && (
             <p className="text-sm text-[#a0a0a8] mt-1">
-              Đơn đã gửi tới <span className="text-[#8bd6b6] font-bold">{dealerName}</span>
+              Đơn đã gửi tới <span className="text-[#ff8a50] font-bold">{dealerName}</span>
             </p>
           )}
         </div>
@@ -137,7 +137,7 @@ export function QuickCheckout({
     content = (
       <>
         <div className="text-center mb-8">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6] font-bold">Đại Long Medical</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50] font-bold">Đại Long Medical</p>
           <h1 className="font-headline text-3xl mt-2">Đặt đơn nhanh</h1>
           {dealerName && (
             <p className="text-sm text-[#a0a0a8] mt-2">
@@ -163,7 +163,7 @@ export function QuickCheckout({
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#8bd6b6]"
+                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#ff8a50]"
                 aria-label="Giảm"
               >
                 −
@@ -183,7 +183,7 @@ export function QuickCheckout({
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(1000, q + 1))}
-                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#8bd6b6]"
+                className="flex w-12 items-center justify-center text-lg font-bold text-[#a0a0a8] hover:bg-[#282a2c] hover:text-[#ff8a50]"
                 aria-label="Tăng"
               >
                 +
@@ -199,7 +199,7 @@ export function QuickCheckout({
               onChange={(e) => setCustomer(e.target.value)}
               required
               placeholder="Họ tên khách"
-              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm outline-none focus:border-[#8bd6b6]"
+              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm outline-none focus:border-[#ff8a50]"
             />
           </div>
 
@@ -211,12 +211,12 @@ export function QuickCheckout({
               onChange={(e) => setPhone(e.target.value)}
               required
               placeholder="VD: 0903 123 456"
-              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm font-mono outline-none focus:border-[#8bd6b6]"
+              className="w-full rounded-lg border border-[#3d3f41]/40 bg-[#111316] px-3 py-2.5 text-sm font-mono outline-none focus:border-[#ff8a50]"
             />
           </div>
 
           <div className="rounded-lg border border-[#3d3f41]/30 bg-[#0f1113] p-4">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#8bd6b6] font-bold">Địa chỉ giao hàng</p>
+            <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#ff8a50] font-bold">Địa chỉ giao hàng</p>
             <AddressPicker value={address} onChange={setAddress} />
           </div>
 
@@ -234,14 +234,14 @@ export function QuickCheckout({
             </div>
             <div className="mt-3 flex items-center justify-between border-t border-[#3d3f41]/30 pt-3">
               <span className="text-[11px] uppercase tracking-wider text-[#a0a0a8]">Thành tiền</span>
-              <span className="font-headline text-2xl text-[#8bd6b6] tabular-nums">{fmtVnd(totalPrice)} ₫</span>
+              <span className="font-headline text-2xl text-[#ff8a50] tabular-nums">{fmtVnd(totalPrice)} ₫</span>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-lg bg-[#065f46] py-3 font-bold text-white shadow-lg shadow-[#8bd6b6]/20 transition-all hover:bg-[#065f46]/90 active:scale-95 disabled:opacity-50"
+            className="w-full rounded-lg bg-[#e8692a] py-3 font-bold text-white shadow-lg shadow-[#ff8a50]/20 transition-all hover:bg-[#e8692a]/90 active:scale-95 disabled:opacity-50"
           >
             {busy ? 'Đang gửi…' : dealerName ? 'Gửi đơn' : 'Đặt & thanh toán'}
           </button>

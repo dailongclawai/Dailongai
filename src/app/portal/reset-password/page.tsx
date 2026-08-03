@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
 
   if (hasSession === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-[#a8b3ac]">
+      <div className="flex min-h-screen items-center justify-center text-sm text-[#b3aca8]">
         {t('portal.auth.reset.checking_link')}
       </div>
     );
@@ -55,13 +55,13 @@ export default function ResetPasswordPage() {
           <span className="material-symbols-outlined text-[40px] text-[#f87171]">link_off</span>
           <div>
             <h1 className="font-headline text-2xl">{t('portal.auth.reset.invalid_title')}</h1>
-            <p className="mt-2 text-sm text-[#a8b3ac]">
+            <p className="mt-2 text-sm text-[#b3aca8]">
               {t('portal.auth.reset.invalid_desc')}
             </p>
           </div>
           <Link
             href="/portal/forgot-password"
-            className="inline-flex items-center gap-2 rounded-full bg-[#065f46] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#065f46]/90"
+            className="inline-flex items-center gap-2 rounded-full bg-[#e8692a] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#e8692a]/90"
           >
             {t('portal.auth.reset.resend_link')}
           </Link>
@@ -72,16 +72,16 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
-      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#3f4944]/40 p-10">
+      <div className="portal-glass w-full max-w-md space-y-6 rounded-3xl border border-[#49443f]/40 p-10">
         <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">{t('portal.auth.common.portal_badge')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">{t('portal.auth.common.portal_badge')}</p>
           <h1 className="mt-3 font-headline text-3xl">{t('portal.auth.reset.title')}</h1>
-          <p className="mt-2 text-sm text-[#a8b3ac]">{t('portal.auth.reset.subtitle')}</p>
+          <p className="mt-2 text-sm text-[#b3aca8]">{t('portal.auth.reset.subtitle')}</p>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#a8b3ac]">{t('portal.auth.reset.new_password_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#b3aca8]">{t('portal.auth.reset.new_password_label')}</label>
             <PasswordInput
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -93,7 +93,7 @@ export default function ResetPasswordPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wider text-[#a8b3ac]">{t('portal.auth.reset.confirm_password_label')}</label>
+            <label className="mb-1 block text-xs uppercase tracking-wider text-[#b3aca8]">{t('portal.auth.reset.confirm_password_label')}</label>
             <PasswordInput
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#065f46] py-3 text-sm font-bold text-white transition-colors hover:bg-[#065f46]/90 disabled:opacity-50"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#e8692a] py-3 text-sm font-bold text-white transition-colors hover:bg-[#e8692a]/90 disabled:opacity-50"
           >
             {busy && <Spinner size={14} />}
             {busy ? t('portal.auth.reset.submitting') : t('portal.auth.reset.submit')}

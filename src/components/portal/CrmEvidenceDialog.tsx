@@ -51,7 +51,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
 
   if (!open || !accountId) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
 
   const submit = async () => {
     if (!file) { toast.error(t('portal.crm.evidence.file_required')); return; }
@@ -121,7 +121,7 @@ export function CrmEvidenceDialog({ open, accountId, accountName, uploaderId, on
             </button>
             <button
               onClick={() => void submit()} disabled={busy}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#065f46] py-2.5 font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#e8692a] py-2.5 font-bold text-white disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
               {busy ? t('portal.crm.evidence.uploading') : t('portal.crm.evidence.upload')}

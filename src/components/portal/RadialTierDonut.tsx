@@ -34,7 +34,7 @@ export function RadialTierDonut({
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <defs>
             <linearGradient id="tier-arc-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8bd6b6" />
+              <stop offset="0%" stopColor="#ff8a50" />
               <stop offset="100%" stopColor="#f59e0b" />
             </linearGradient>
           </defs>
@@ -42,7 +42,7 @@ export function RadialTierDonut({
             cx={center}
             cy={center}
             r={radius}
-            stroke="#3f4944"
+            stroke="#49443f"
             strokeWidth={strokeWidth}
             fill="none"
           />
@@ -61,28 +61,28 @@ export function RadialTierDonut({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8bd6b6]">{tierLabel}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#ff8a50]">{tierLabel}</span>
           <span className="font-mono text-2xl font-semibold tabular-nums text-[#e2e2e6]">{unitsYtd}</span>
-          <span className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">{t('portal.components.radialTierDonut.units_this_month')}</span>
+          <span className="text-[10px] uppercase tracking-wider text-[#b3aca8]">{t('portal.components.radialTierDonut.units_this_month')}</span>
         </div>
       </div>
 
       <div className="mt-4 text-center sm:mt-0 sm:text-left">
         {unitsToNext > 0 && nextTierLabel ? (
           <>
-            <p className="text-xs text-[#a8b3ac]">{t('portal.components.radialTierDonut.remaining')}</p>
+            <p className="text-xs text-[#b3aca8]">{t('portal.components.radialTierDonut.remaining')}</p>
             <p className="font-headline text-2xl text-[#e2e2e6]">
               <span className="font-mono tabular-nums">{unitsToNext}</span> {t('portal.components.radialTierDonut.units')}
             </p>
-            <p className="text-xs text-[#a8b3ac]">
+            <p className="text-xs text-[#b3aca8]">
               {t('portal.components.radialTierDonut.to_reach')} <span className="font-medium text-[#f59e0b]">{nextTierLabel}</span>
             </p>
           </>
         ) : (
           <>
-            <p className="text-xs text-[#a8b3ac]">{t('portal.components.radialTierDonut.reached')}</p>
-            <p className="font-headline text-2xl text-[#10b981]">{t('portal.components.radialTierDonut.top_tier')}</p>
-            <p className="text-xs text-[#a8b3ac]">{t('portal.components.radialTierDonut.maintain')}</p>
+            <p className="text-xs text-[#b3aca8]">{t('portal.components.radialTierDonut.reached')}</p>
+            <p className="font-headline text-2xl text-[#ff5625]">{t('portal.components.radialTierDonut.top_tier')}</p>
+            <p className="text-xs text-[#b3aca8]">{t('portal.components.radialTierDonut.maintain')}</p>
           </>
         )}
       </div>

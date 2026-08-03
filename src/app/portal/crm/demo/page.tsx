@@ -144,14 +144,14 @@ export default function CrmDemoPage() {
 
   if (loading || !profile) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-sm text-[var(--crm-text)] outline-none [color-scheme:dark] focus:border-[#ff8a50]';
   const label = 'mb-1 block text-xs uppercase tracking-wider text-[var(--crm-muted)]';
   const caps = 'text-[11px] uppercase tracking-[0.25em] text-[var(--crm-muted)]/70';
 
   const unitStatus = (u: CrmDemoUnit) => {
     if (!u.active) return <span className="rounded-full bg-[var(--crm-s3)] px-2.5 py-1 text-[11px] text-[var(--crm-muted)]">{t('portal.crm.demo.status_inactive')}</span>;
     const open = openLoanByUnit.get(u.id);
-    if (!open) return <span className="rounded-full bg-[#8bd6b6]/10 px-2.5 py-1 text-[11px] font-semibold text-[#8bd6b6]">{t('portal.crm.demo.status_available')}</span>;
+    if (!open) return <span className="rounded-full bg-[#ff8a50]/10 px-2.5 py-1 text-[11px] font-semibold text-[#ff8a50]">{t('portal.crm.demo.status_available')}</span>;
     if (isOverdue(open)) return <span className="rounded-full bg-[#f87171]/10 px-2.5 py-1 text-[11px] font-semibold text-[#f87171]">{t('portal.crm.demo.status_overdue')}</span>;
     return <span className="rounded-full bg-[#ffb77d]/10 px-2.5 py-1 text-[11px] font-semibold text-[#ffb77d]">{t('portal.crm.demo.status_out')}</span>;
   };
@@ -201,7 +201,7 @@ export default function CrmDemoPage() {
               {isAdmin && (
                 <button
                   onClick={() => setCrmDemoUnitActive(u.id, !u.active).then(load).catch(e => toast.error((e as Error).message))}
-                  className="mt-3 text-xs text-[var(--crm-muted)] underline-offset-2 hover:text-[#8bd6b6] hover:underline"
+                  className="mt-3 text-xs text-[var(--crm-muted)] underline-offset-2 hover:text-[#ff8a50] hover:underline"
                 >
                   {u.active ? t('portal.crm.demo.retire') : t('portal.crm.demo.restore')}
                 </button>
@@ -246,7 +246,7 @@ export default function CrmDemoPage() {
           <button
             type="submit"
             disabled={saving || freeUnits.length === 0}
-            className="flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#e8692a] px-4 py-2 font-bold text-white transition-transform active:scale-[0.98] disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">assignment_add</span>
             {t('portal.crm.demo.submit')}
@@ -277,7 +277,7 @@ export default function CrmDemoPage() {
             <button
               type="submit"
               disabled={saving || !newSerial.trim() || !newLabel.trim()}
-              className="flex items-center gap-2 rounded-xl border border-[#8bd6b6]/40 px-4 py-2 font-semibold text-[#8bd6b6] transition-colors hover:bg-[#8bd6b6]/10 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl border border-[#ff8a50]/40 px-4 py-2 font-semibold text-[#ff8a50] transition-colors hover:bg-[#ff8a50]/10 disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">add_circle</span>
               {t('portal.crm.demo.add_btn')}
@@ -319,7 +319,7 @@ export default function CrmDemoPage() {
                   <td className={`px-4 py-3 tabular-nums ${isOverdue(l) ? 'font-semibold text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>{fmtDate(l.due_date)}</td>
                   <td className="px-4 py-3">
                     {l.returned_at ? (
-                      <span className="text-[#8bd6b6]">{t('portal.crm.demo.returned_on')} {fmtDate(l.returned_at)}</span>
+                      <span className="text-[#ff8a50]">{t('portal.crm.demo.returned_on')} {fmtDate(l.returned_at)}</span>
                     ) : isOverdue(l) ? (
                       <span className="font-semibold text-[#f87171]">{t('portal.crm.demo.status_overdue')}</span>
                     ) : (
@@ -333,8 +333,8 @@ export default function CrmDemoPage() {
                         onBlur={() => setReturningId(null)}
                         className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                           returningId === l.id
-                            ? 'bg-[#065f46] text-white'
-                            : 'border border-[#8bd6b6]/40 text-[#8bd6b6] hover:bg-[#8bd6b6]/10'
+                            ? 'bg-[#e8692a] text-white'
+                            : 'border border-[#ff8a50]/40 text-[#ff8a50] hover:bg-[#ff8a50]/10'
                         }`}
                       >
                         {returningId === l.id ? t('portal.crm.demo.return_confirm') : t('portal.crm.demo.return_btn')}

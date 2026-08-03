@@ -136,24 +136,24 @@ export default function CrmReportsPage() {
                 <td className="px-4 py-3 text-[var(--crm-muted)]">
                   {r.staff_segment ? t('portal.crm.segment.' + r.staff_segment) : '—'}
                 </td>
-                <td className="px-4 py-3 text-[#34d399]">{r.deals_won}</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{r.deals_won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{r.deals_open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(Number(r.commission_total))}đ</td>
-                <td className="px-4 py-3 text-[#8bd6b6]">{fmtVnd(Number(r.amount_pending))}đ</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{fmtVnd(Number(r.amount_pending))}đ</td>
                 <td className="px-4 py-3 text-[#ffb77d]">{fmtVnd(Number(r.amount_payable))}đ</td>
-                <td className="px-4 py-3 text-[#34d399]">{fmtVnd(Number(r.amount_paid))}đ</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{fmtVnd(Number(r.amount_paid))}đ</td>
               </tr>
             ))}
             {!busy && rows.length > 0 && (
               <tr className="border-t-2 border-[var(--crm-line)] bg-[var(--crm-s1)] font-bold">
                 <td className="px-4 py-3 text-[var(--crm-text)]">{t('portal.crm.commission.total')}</td>
                 <td className="px-4 py-3" />
-                <td className="px-4 py-3 text-[#34d399]">{totals.won}</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{totals.won}</td>
                 <td className="px-4 py-3 text-[var(--crm-muted)]">{totals.open}</td>
                 <td className="px-4 py-3 text-[var(--crm-text)]">{fmtVnd(totals.total)}đ</td>
-                <td className="px-4 py-3 text-[#8bd6b6]">{fmtVnd(totals.pending)}đ</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{fmtVnd(totals.pending)}đ</td>
                 <td className="px-4 py-3 text-[#ffb77d]">{fmtVnd(totals.payable)}đ</td>
-                <td className="px-4 py-3 text-[#34d399]">{fmtVnd(totals.paid)}đ</td>
+                <td className="px-4 py-3 text-[#ff8a50]">{fmtVnd(totals.paid)}đ</td>
               </tr>
             )}
           </tbody>
@@ -202,7 +202,7 @@ export default function CrmReportsPage() {
                   {new Date(m.thang).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-[var(--crm-muted)]">{m.new_accounts}</td>
-                <td className="px-4 py-3 text-right tabular-nums text-[#34d399]">{m.deals_won}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-[#ff8a50]">{m.deals_won}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(m.won_value))}đ</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[#ffb77d]">{fmtVnd(Number(m.commission_total))}đ</td>
               </tr>
@@ -250,7 +250,7 @@ export default function CrmReportsPage() {
                   {s.source ? t('portal.crm.source.' + s.source) : t('portal.crm.reports.no_source')}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-[var(--crm-muted)]">{s.accounts}</td>
-                <td className="px-4 py-3 text-right tabular-nums text-[#34d399]">{s.deals_won}</td>
+                <td className="px-4 py-3 text-right tabular-nums text-[#ff8a50]">{s.deals_won}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-[var(--crm-text)]">{fmtVnd(Number(s.won_value))}đ</td>
               </tr>
             ))}
@@ -308,7 +308,7 @@ export default function CrmReportsPage() {
         </h2>
         <span className={`rounded-full px-3 py-1 text-xs ${issues.length > 0
           ? 'bg-[#f87171]/10 text-[#f87171]'
-          : 'bg-[#34d399]/10 text-[#34d399]'}`}>
+          : 'bg-[#ff8a50]/10 text-[#ff8a50]'}`}>
           {issues.length > 0 ? `${issues.length} ${t('portal.crm.recon.flagged')}` : t('portal.crm.recon.clean')}
         </span>
       </div>
@@ -372,7 +372,7 @@ export default function CrmReportsPage() {
             <input
               id="cfg-rate" type="number" min={0.1} max={100} step={0.1} value={rate}
               onChange={e => setRate(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff8a50]"
             />
           </div>
           <div>
@@ -382,7 +382,7 @@ export default function CrmReportsPage() {
             <input
               id="cfg-disc" type="number" min={0} max={99} step={0.1} value={minDisc}
               onChange={e => setMinDisc(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff8a50]"
             />
           </div>
           <div>
@@ -392,13 +392,13 @@ export default function CrmReportsPage() {
             <input
               id="cfg-stale" type="number" min={1} max={90} step={1} value={staleDays}
               onChange={e => setStaleDays(e.target.value)}
-              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]"
+              className="w-32 rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s2)] px-3 py-2 text-right font-mono tabular-nums text-[var(--crm-text)] outline-none focus:border-[#ff8a50]"
             />
           </div>
           <button
             onClick={() => void saveCfg()}
             disabled={savingCfg}
-            className="flex items-center gap-2 rounded-xl bg-[#065f46] px-5 py-2.5 font-bold text-white disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl bg-[#e8692a] px-5 py-2.5 font-bold text-white disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">save</span>
             {savingCfg ? t('portal.crm.common.saving') : t('portal.crm.common.save')}

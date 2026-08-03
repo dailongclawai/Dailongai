@@ -53,36 +53,36 @@ export function SupervisorInviteCard({ supervisorId, supervisorName, teamCount }
   };
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-[#8bd6b6]/30 bg-gradient-to-br from-[#8bd6b6]/[0.05] to-[#1a1c1f]">
-      <div className="flex items-center justify-between gap-3 border-b border-[#8bd6b6]/20 bg-[#8bd6b6]/[0.04] px-5 py-3">
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-[#ff8a50]/30 bg-gradient-to-br from-[#ff8a50]/[0.05] to-[#1a1c1f]">
+      <div className="flex items-center justify-between gap-3 border-b border-[#ff8a50]/20 bg-[#ff8a50]/[0.04] px-5 py-3">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[22px] text-[#8bd6b6]">person_add</span>
+          <span className="material-symbols-outlined text-[22px] text-[#ff8a50]">person_add</span>
           <div>
             <p className="text-sm font-bold text-[#e2e2e6]">{t('portal.components.supervisorInviteCard.title')}</p>
-            <p className="text-[10px] text-[#a8b3ac]">{t('portal.components.supervisorInviteCard.subtitle')}</p>
+            <p className="text-[10px] text-[#b3aca8]">{t('portal.components.supervisorInviteCard.subtitle')}</p>
           </div>
         </div>
-        <p className="font-mono text-[11px] tabular-nums text-[#a8b3ac]">
-          <span className="font-semibold text-[#8bd6b6]">{teamCount}</span> {t('portal.components.supervisorInviteCard.invited_suffix')}
+        <p className="font-mono text-[11px] tabular-nums text-[#b3aca8]">
+          <span className="font-semibold text-[#ff8a50]">{teamCount}</span> {t('portal.components.supervisorInviteCard.invited_suffix')}
         </p>
       </div>
 
       <div className="flex flex-1 items-center gap-5 p-5">
         <div
-          className="flex shrink-0 items-center justify-center rounded-xl border border-[#8bd6b6]/20 bg-white p-2 shadow-[0_4px_18px_-6px_rgba(139,214,182,0.45)]"
+          className="flex shrink-0 items-center justify-center rounded-xl border border-[#ff8a50]/20 bg-white p-2 shadow-[0_4px_18px_-6px_rgba(255,138,80,0.45)]"
           style={{ width: 132, height: 132 }}
         >
           {qr ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={qr} alt="QR" className="h-full w-full rounded-md" />
           ) : (
-            <span className="material-symbols-outlined text-[40px] text-[#a8b3ac]/40">qr_code_2</span>
+            <span className="material-symbols-outlined text-[40px] text-[#b3aca8]/40">qr_code_2</span>
           )}
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div>
-            <p className="text-[10px] uppercase tracking-wider text-[#a8b3ac]">
+            <p className="text-[10px] uppercase tracking-wider text-[#b3aca8]">
               {t('portal.components.supervisorInviteCard.link_label')}
             </p>
             <p className="mt-0.5 truncate font-mono text-[11px] text-[#e2e2e6]/80" title={refLink}>
@@ -94,7 +94,7 @@ export function SupervisorInviteCard({ supervisorId, supervisorName, teamCount }
               type="button"
               onClick={copyLink}
               disabled={!refLink}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#8bd6b6]/40 bg-[#8bd6b6]/10 px-3 py-1.5 text-xs font-semibold text-[#8bd6b6] transition-colors hover:border-[#8bd6b6] hover:bg-[#065f46] hover:text-white active:scale-[0.98] disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#ff8a50]/40 bg-[#ff8a50]/10 px-3 py-1.5 text-xs font-semibold text-[#ff8a50] transition-colors hover:border-[#ff8a50] hover:bg-[#e8692a] hover:text-white active:scale-[0.98] disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-[14px]">content_copy</span>
               {t('portal.supervisor.qr.copy_link')}
@@ -103,14 +103,14 @@ export function SupervisorInviteCard({ supervisorId, supervisorName, teamCount }
               type="button"
               onClick={downloadQR}
               disabled={!qr}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#3f4944] bg-[#0c0e11]/60 px-3 py-1.5 text-xs font-semibold text-[#e2e2e6] transition-colors hover:border-[#8bd6b6]/40 hover:text-[#8bd6b6] active:scale-[0.98] disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#49443f] bg-[#0c0e11]/60 px-3 py-1.5 text-xs font-semibold text-[#e2e2e6] transition-colors hover:border-[#ff8a50]/40 hover:text-[#ff8a50] active:scale-[0.98] disabled:opacity-40"
             >
               <span className="material-symbols-outlined text-[14px]">download</span>
               {t('portal.supervisor.qr.download_qr')}
             </button>
             <Link
               href="/portal/supervisor/qr"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#3f4944] bg-[#0c0e11]/60 px-3 py-1.5 text-xs font-semibold text-[#a8b3ac] transition-colors hover:border-[#8bd6b6]/40 hover:text-[#8bd6b6]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#49443f] bg-[#0c0e11]/60 px-3 py-1.5 text-xs font-semibold text-[#b3aca8] transition-colors hover:border-[#ff8a50]/40 hover:text-[#ff8a50]"
             >
               {t('portal.components.supervisorInviteCard.full_page')}
               <span className="material-symbols-outlined text-[14px]">arrow_forward</span>

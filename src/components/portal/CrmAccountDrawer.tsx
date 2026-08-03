@@ -83,7 +83,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
   const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
 
   return (
@@ -147,8 +147,8 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
             </div>
           </div>
           {dup && (
-            <div className="rounded-xl border border-[#8bd6b6] bg-[#8bd6b6]/10 px-3 py-2">
-              <p className="text-sm font-semibold text-[#8bd6b6]">{t('portal.crm.account.dup_title')}</p>
+            <div className="rounded-xl border border-[#ff8a50] bg-[#ff8a50]/10 px-3 py-2">
+              <p className="text-sm font-semibold text-[#ff8a50]">{t('portal.crm.account.dup_title')}</p>
               <p className="mt-1 text-sm text-[var(--crm-text)]">{dup.name}{dup.code ? ` · ${dup.code}` : ''}</p>
               <p className="mt-0.5 text-xs text-[var(--crm-muted)]">
                 {t('portal.crm.account.dup_owner')}: {dup.owner_name || '—'}
@@ -187,7 +187,7 @@ export function CrmAccountDrawer({ open, account, ownerId, onClose, onSaved }: P
           <button
             onClick={save}
             disabled={saving}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#065f46] py-3 font-bold text-white disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8692a] py-3 font-bold text-white disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">save</span>
             {saving ? t('portal.crm.common.saving') : t('portal.crm.common.save')}

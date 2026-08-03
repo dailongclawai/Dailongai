@@ -90,7 +90,7 @@ export default function CrmActivitiesPage() {
       <CrmNav />
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="mr-auto text-xl font-bold text-[var(--crm-text)]">{t('portal.crm.activities.title')}</h1>
-        <button onClick={() => setDrawerOpen(true)} className="flex items-center gap-2 rounded-xl bg-[#065f46] px-4 py-2 font-bold text-white">
+        <button onClick={() => setDrawerOpen(true)} className="flex items-center gap-2 rounded-xl bg-[#e8692a] px-4 py-2 font-bold text-white">
           <span className="material-symbols-outlined text-[18px]">add_task</span>
           {t('portal.crm.activity.new')}
         </button>
@@ -101,7 +101,7 @@ export default function CrmActivitiesPage() {
           <button
             key={b}
             onClick={() => setTab(b)}
-            className={`rounded-xl px-4 py-2 text-sm ${tab === b ? 'bg-[#065f46] text-white' : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
+            className={`rounded-xl px-4 py-2 text-sm ${tab === b ? 'bg-[#e8692a] text-white' : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
           >
             {t('portal.crm.activities.' + b)} ({b === 'followup' ? followup.length : buckets[b].length})
           </button>
@@ -114,7 +114,7 @@ export default function CrmActivitiesPage() {
         <ul className="space-y-2">
           {followup.map(f => (
             <li key={f.id} className="flex items-start gap-3 rounded-2xl border border-[var(--crm-line)] bg-[var(--crm-s2)] p-4">
-              <span className={`material-symbols-outlined text-[20px] ${f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#8bd6b6]'}`}>
+              <span className={`material-symbols-outlined text-[20px] ${f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#ff8a50]'}`}>
                 {f.reason === 'overdue' ? 'event_busy' : 'hourglass_empty'}
               </span>
               <div className="min-w-0 flex-1">
@@ -126,7 +126,7 @@ export default function CrmActivitiesPage() {
                   {f.account_name} · {f.stage_name} · {fmtVnd(Number(f.amount))}đ
                 </p>
                 <p className="mt-1 text-xs">
-                  <span className={f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#8bd6b6]'}>
+                  <span className={f.reason === 'overdue' ? 'text-[#f87171]' : 'text-[#ff8a50]'}>
                     {t('portal.crm.followup.' + f.reason)}
                   </span>
                   <span className="text-[var(--crm-muted)]">
@@ -136,7 +136,7 @@ export default function CrmActivitiesPage() {
               </div>
               <Link
                 href={`/portal/crm/accounts/detail?id=${f.account_id}`}
-                className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#8bd6b6]"
+                className="rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff8a50]"
               >
                 {t('portal.crm.detail.tab_overview')}
               </Link>
@@ -163,7 +163,7 @@ export default function CrmActivitiesPage() {
                 {a.due_at ? ` · ${new Date(a.due_at).toLocaleString('vi-VN')}` : ''}
               </p>
               {a.companion_id && (
-                <p className="mt-1 text-xs text-[#8bd6b6]">
+                <p className="mt-1 text-xs text-[#ff8a50]">
                   <span className="material-symbols-outlined mr-1 align-middle text-[14px]">group</span>
                   {t('portal.crm.activity.companion_pre')}{' '}
                   {peers.find(p => p.id === a.companion_id)?.full_name ?? '—'}
@@ -174,9 +174,9 @@ export default function CrmActivitiesPage() {
             {!a.done_at && (
               <button
                 onClick={() => void done(a.id)}
-                className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]"
+                className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff8a50]"
               >
-                <span className="material-symbols-outlined text-[15px] text-[#34d399]">task_alt</span>
+                <span className="material-symbols-outlined text-[15px] text-[#ff8a50]">task_alt</span>
                 {t('portal.crm.activity.mark_done')}
               </button>
             )}

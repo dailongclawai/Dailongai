@@ -13,9 +13,9 @@ import type { CrmStaffCommission, CrmCommissionStatus } from '@/lib/portal-types
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
 const STATUS_COLOR: Record<CrmCommissionStatus, string> = {
-  pending: 'text-[#8bd6b6]',
+  pending: 'text-[#ff8a50]',
   payable: 'text-[#ffb77d]',
-  paid: 'text-[#34d399]',
+  paid: 'text-[#ff8a50]',
   void: 'text-[var(--crm-muted)]',
 };
 
@@ -88,9 +88,9 @@ export default function CrmCommissionPage() {
   if (loading || !profile) return null;
 
   const cards: Array<{ key: string; label: string; value: number; tone: string }> = [
-    { key: 'pending', label: t('portal.crm.commission.pending'), value: totals.pending, tone: 'text-[#8bd6b6]' },
+    { key: 'pending', label: t('portal.crm.commission.pending'), value: totals.pending, tone: 'text-[#ff8a50]' },
     { key: 'payable', label: t('portal.crm.commission.payable'), value: totals.payable, tone: 'text-[#ffb77d]' },
-    { key: 'paid', label: t('portal.crm.commission.paid'), value: totals.paid, tone: 'text-[#34d399]' },
+    { key: 'paid', label: t('portal.crm.commission.paid'), value: totals.paid, tone: 'text-[#ff8a50]' },
     { key: 'total', label: t('portal.crm.commission.total'), value: totals.all, tone: 'text-[var(--crm-text)]' },
   ];
 
@@ -159,8 +159,8 @@ export default function CrmCommissionPage() {
                   <td className="px-4 py-3">
                     {(r.status === 'payable'
                       || (r.status === 'pending' && new Date(r.eligible_at) <= new Date())) && (
-                      <button onClick={() => void pay(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#34d399]">
-                        <span className="material-symbols-outlined text-[15px] text-[#34d399]">paid</span>
+                      <button onClick={() => void pay(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff8a50]">
+                        <span className="material-symbols-outlined text-[15px] text-[#ff8a50]">paid</span>
                         {t('portal.crm.commission.mark_paid')}
                       </button>
                     )}

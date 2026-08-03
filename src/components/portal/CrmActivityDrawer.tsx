@@ -63,7 +63,7 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
 
   if (!open) return null;
 
-  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#8bd6b6]';
+  const field = 'w-full rounded-xl border border-[var(--crm-line)] bg-[var(--crm-s1)] px-3 py-2 text-[var(--crm-text)] outline-none focus:border-[#ff8a50]';
   const label = 'mb-1 block text-xs text-[var(--crm-muted)]';
 
   return (
@@ -108,7 +108,7 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
             <label className={label} htmlFor="crm-act-notes">{t('portal.crm.account.notes')}</label>
             <textarea id="crm-act-notes" rows={3} className={field} value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
-          <button onClick={save} disabled={saving} className="w-full rounded-xl bg-[#065f46] py-3 font-bold text-white disabled:opacity-50">
+          <button onClick={save} disabled={saving} className="w-full rounded-xl bg-[#e8692a] py-3 font-bold text-white disabled:opacity-50">
             {saving ? t('portal.crm.common.saving') : t('portal.crm.common.save')}
           </button>
         </div>

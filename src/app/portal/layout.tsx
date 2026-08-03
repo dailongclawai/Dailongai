@@ -8,10 +8,10 @@ const PORTAL_CSS = `
 .material-symbols-outlined.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;}
 .portal-scroll::-webkit-scrollbar{width:4px;height:4px;}
 .portal-scroll::-webkit-scrollbar-track{background:#111316;}
-.portal-scroll::-webkit-scrollbar-thumb{background:#3f4944;border-radius:2px;}
-.portal-scroll::-webkit-scrollbar-thumb:hover{background:#065f46;}
-.portal-glass{background:rgba(26,28,31,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(139,214,182,0.15);border-left:1px solid rgba(139,214,182,0.1);}
-.portal-grid{background-image:radial-gradient(rgba(139,214,182,0.06) 1px, transparent 1px);background-size:40px 40px;}
+.portal-scroll::-webkit-scrollbar-thumb{background:#49443f;border-radius:2px;}
+.portal-scroll::-webkit-scrollbar-thumb:hover{background:#e8692a;}
+.portal-glass{background:rgba(26,28,31,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,138,80,0.15);border-left:1px solid rgba(255,138,80,0.1);}
+.portal-grid{background-image:radial-gradient(rgba(255,138,80,0.06) 1px, transparent 1px);background-size:40px 40px;}
 `;
 
 export default function PortalLayout({ children }: { children: ReactNode }) {

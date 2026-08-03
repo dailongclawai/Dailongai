@@ -49,18 +49,18 @@ export default function OrderConfirmPage() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#10b981]/15">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#ff5625]/15">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
               <path
                 d="M5 13l4 4L19 7"
-                stroke="#34d399"
+                stroke="#ff8a50"
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
             </svg>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.3em] text-[#10b981]">{t('portal.dealer.orders.confirm_eyebrow')}</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-[#ff5625]">{t('portal.dealer.orders.confirm_eyebrow')}</p>
           <h1 className="mt-2 font-headline text-3xl">
             {t('portal.dealer.orders.confirm_title')}
           </h1>
@@ -75,8 +75,8 @@ export default function OrderConfirmPage() {
         {/* 2-col: instructions + QR */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* Left: payment details */}
-          <div className="rounded-2xl border border-[#8bd6b6]/30 bg-[#8bd6b6]/5 p-6">
-            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#8bd6b6]">
+          <div className="rounded-2xl border border-[#ff8a50]/30 bg-[#ff8a50]/5 p-6">
+            <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-[#ff8a50]">
               {t('portal.dealer.orders.pay_now')}
             </p>
             <p className="mb-5 text-sm text-[#e2e2e6]/60">
@@ -99,7 +99,7 @@ export default function OrderConfirmPage() {
               </div>
               <div className="flex justify-between py-3">
                 <span className="text-[#e2e2e6]/50">{t('portal.dealer.orders.amount')}</span>
-                <span className="font-mono font-semibold tabular-nums text-[#8bd6b6]">
+                <span className="font-mono font-semibold tabular-nums text-[#ff8a50]">
                   {fmtVnd(total)} đ
                 </span>
               </div>
@@ -112,14 +112,14 @@ export default function OrderConfirmPage() {
             </div>
             <Link
               href="/portal/dashboard"
-              className="mt-6 block text-center text-xs text-[#e2e2e6]/40 hover:text-[#8bd6b6]"
+              className="mt-6 block text-center text-xs text-[#e2e2e6]/40 hover:text-[#ff8a50]"
             >
               {t('portal.dealer.orders.back_to_dashboard')}
             </Link>
           </div>
 
           {/* Right: VietQR */}
-          <div className="flex flex-col items-center rounded-2xl border border-[#3f4944]/40 bg-[#1a1c1f] p-6">
+          <div className="flex flex-col items-center rounded-2xl border border-[#49443f]/40 bg-[#1a1c1f] p-6">
             <p className="mb-5 text-[11px] uppercase tracking-[0.3em] text-[#e2e2e6]/50">
               {t('portal.dealer.orders.bank_qr_title')}
             </p>

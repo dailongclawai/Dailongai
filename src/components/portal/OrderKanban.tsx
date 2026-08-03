@@ -16,8 +16,8 @@ type ColumnKey = 'awaiting' | 'paid' | 'closed';
 // 'approved' is a transient state from Casso webhook (pending → approved → paid in ~1s) — bucket it with awaiting just in case it stalls.
 const COLUMNS: { key: ColumnKey; labelKey: string; tone: string; statuses: Order['status'][] }[] = [
   { key: 'awaiting', labelKey: 'portal.components.orderKanban.col_awaiting', tone: 'text-[#f59e0b] border-[#f59e0b]/40', statuses: ['pending', 'approved'] },
-  { key: 'paid', labelKey: 'portal.components.orderKanban.col_paid', tone: 'text-[#10b981] border-[#10b981]/40', statuses: ['paid'] },
-  { key: 'closed', labelKey: 'portal.components.orderKanban.col_closed', tone: 'text-[#a8b3ac] border-[#a8b3ac]/40', statuses: ['rejected', 'voided'] },
+  { key: 'paid', labelKey: 'portal.components.orderKanban.col_paid', tone: 'text-[#ff5625] border-[#ff5625]/40', statuses: ['paid'] },
+  { key: 'closed', labelKey: 'portal.components.orderKanban.col_closed', tone: 'text-[#b3aca8] border-[#b3aca8]/40', statuses: ['rejected', 'voided'] },
 ];
 
 interface Props {
@@ -89,11 +89,11 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
           return (
             <section
               key={col.key}
-              className="snap-start flex w-[78vw] shrink-0 flex-col rounded-2xl border border-[#3f4944] bg-[#0c0e11]/60 md:w-auto"
+              className="snap-start flex w-[78vw] shrink-0 flex-col rounded-2xl border border-[#49443f] bg-[#0c0e11]/60 md:w-auto"
             >
               <header className={`sticky top-0 z-10 flex items-baseline justify-between rounded-t-2xl border-b bg-[#1a1c1f] px-3 py-2 ${col.tone}`}>
                 <p className="text-xs font-semibold uppercase tracking-wider">{t(col.labelKey)}</p>
-                <p className="font-mono text-[11px] tabular-nums text-[#a8b3ac]">
+                <p className="font-mono text-[11px] tabular-nums text-[#b3aca8]">
                   <span className="text-[#e2e2e6]">{items.length}</span>
                   {total > 0 && (
                     <>
@@ -105,7 +105,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
               </header>
               <ul className="flex-1 space-y-2 p-2">
                 {items.length === 0 ? (
-                  <li className="rounded-xl border border-dashed border-[#3f4944] p-4 text-center text-[11px] text-[#a8b3ac]">
+                  <li className="rounded-xl border border-dashed border-[#49443f] p-4 text-center text-[11px] text-[#b3aca8]">
                     {t('portal.components.orderKanban.empty_column')}
                   </li>
                 ) : items.slice(0, 30).map((o) => {
@@ -113,17 +113,17 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
                   const isAwaiting = col.key === 'awaiting'; const isPaid = col.key === 'paid';
                   const isBusy = busyId === o.id;
                   return (
-                    <li key={o.id} className="rounded-xl border border-[#3f4944] bg-[#1a1c1f] p-3 text-sm">
+                    <li key={o.id} className="rounded-xl border border-[#49443f] bg-[#1a1c1f] p-3 text-sm">
                       <div className="flex items-baseline justify-between gap-2">
                         <p className="truncate font-medium text-[#e2e2e6]">{o.customer_name}</p>
-                        <p className="font-mono text-[10px] tabular-nums text-[#a8b3ac]">
+                        <p className="font-mono text-[10px] tabular-nums text-[#b3aca8]">
                           {new Date(o.sale_date).toLocaleDateString('vi-VN')}
                         </p>
                       </div>
                       {dealerName && (
-                        <p className="mt-0.5 truncate text-[11px] text-[#a8b3ac]">{t('portal.components.orderKanban.dealer_short')}: {dealerName}</p>
+                        <p className="mt-0.5 truncate text-[11px] text-[#b3aca8]">{t('portal.components.orderKanban.dealer_short')}: {dealerName}</p>
                       )}
-                      <p className="mt-1 font-mono text-xs tabular-nums text-[#8bd6b6]">
+                      <p className="mt-1 font-mono text-xs tabular-nums text-[#ff8a50]">
                         {o.serial_number}
                       </p>
                       {o.invoice_required && (
@@ -150,7 +150,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
                       )}
                       {isAwaiting && (
                         <div className="mt-3 space-y-2">
-                          <p className="rounded-md border border-[#3f4944] bg-[#0c0e11] px-2 py-1.5 text-[10px] leading-relaxed text-[#a8b3ac]">
+                          <p className="rounded-md border border-[#49443f] bg-[#0c0e11] px-2 py-1.5 text-[10px] leading-relaxed text-[#b3aca8]">
                             <span className="material-symbols-outlined align-middle text-[12px] text-[#3b82f6]">sync</span>
                             {' '}{t('portal.components.orderKanban.awaiting_hint')}
                           </p>
@@ -159,7 +159,7 @@ export function OrderKanban({ orders, adminId, dealerNames, onResolved }: Props)
                               type="button"
                               onClick={() => manualMarkPaid(o.id)}
                               disabled={isBusy}
-                              className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#10b981]/40 px-2 py-1.5 text-xs font-medium text-[#10b981] hover:bg-[#10b981]/10 disabled:opacity-50"
+                              className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#ff5625]/40 px-2 py-1.5 text-xs font-medium text-[#ff5625] hover:bg-[#ff5625]/10 disabled:opacity-50"
                             >
                               {isBusy ? <Spinner size={12} /> : <span>✓</span>}
                               {t('portal.components.orderKanban.mark_paid_button')}

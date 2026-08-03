@@ -95,7 +95,7 @@ function AccountDetail() {
     <PortalShell variant={profile.role ?? 'dealer'}>
       <CrmNav />
 
-      <Link href="/portal/crm/accounts" className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--crm-muted)] hover:text-[#8bd6b6]">
+      <Link href="/portal/crm/accounts" className="mb-4 inline-flex items-center gap-1 text-sm text-[var(--crm-muted)] hover:text-[#ff8a50]">
         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
         {t('portal.crm.nav.accounts')}
       </Link>
@@ -132,7 +132,7 @@ function AccountDetail() {
               )}
               <button
                 onClick={() => setEditing(true)}
-                className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#8bd6b6]"
+                className="rounded-xl border border-[var(--crm-line)] px-4 py-2 text-sm text-[var(--crm-text)] hover:border-[#ff8a50]"
               >
                 {t('portal.crm.detail.edit')}
               </button>
@@ -164,7 +164,7 @@ function AccountDetail() {
                 key={b}
                 onClick={() => setTab(b)}
                 className={`rounded-xl px-4 py-2 text-sm ${tab === b
-                  ? 'bg-[#065f46] text-white'
+                  ? 'bg-[#e8692a] text-white'
                   : 'bg-[var(--crm-s3)] text-[var(--crm-muted)]'}`}
               >
                 {t('portal.crm.detail.tab_' + b)}
@@ -201,7 +201,7 @@ function AccountDetail() {
                 <p className="text-sm text-[var(--crm-muted)]">{t('portal.crm.contact.hint')}</p>
                 <button
                   onClick={() => { setEditingContact(null); setContactOpen(true); }}
-                  className="rounded-xl bg-[#065f46] px-4 py-2 text-sm font-bold text-white"
+                  className="rounded-xl bg-[#e8692a] px-4 py-2 text-sm font-bold text-white"
                 >
                   {t('portal.crm.contact.new')}
                 </button>
@@ -317,7 +317,7 @@ function AccountDetail() {
               )}
               {timeline.map((e, i) => (
                 <li key={`${e.entry}-${e.at}-${i}`} className={`${card} flex gap-3 p-4`}>
-                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#8bd6b6]' : 'text-[#ffb77d]'}`}>
+                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#ff8a50]' : 'text-[#ffb77d]'}`}>
                     {e.entry === 'stage' ? 'trending_up'
                       : e.sub_kind === 'call' ? 'call'
                         : e.sub_kind === 'meeting' ? 'event' : 'task_alt'}
