@@ -7,11 +7,11 @@ import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
 import {
   createCrmDemoLoan, createCrmDemoUnit, getActiveModels, getCrmAccounts, getCrmDemoLoans,
-  getCrmDemoUnits, returnCrmDemoLoan, setCrmDemoUnitActive,
+  getCrmDemoUnits, getStaffPeers, returnCrmDemoLoan, setCrmDemoUnitActive,
 } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
-import type { CrmAccount, CrmDemoLoan, CrmDemoUnit, ProductModel } from '@/lib/portal-types';
+import type { CrmAccount, CrmDemoLoan, CrmDemoUnit, ProductModel, StaffPeer } from '@/lib/portal-types';
 
 const fmtDate = (iso: string) => new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const todayVn = () => new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
@@ -25,6 +25,7 @@ export default function CrmDemoPage() {
   const [loans, setLoans] = useState<CrmDemoLoan[]>([]);
   const [accounts, setAccounts] = useState<CrmAccount[]>([]);
   const [models, setModels] = useState<ProductModel[]>([]);
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
   const [busy, setBusy] = useState(true);
   const [saving, setSaving] = useState(false);
   // Form mượn
@@ -56,12 +57,15 @@ export default function CrmDemoPage() {
   const load = useCallback(async () => {
     setBusy(true);
     try {
-      const [u, l, a, m] = await Promise.all([
+      const [u, l, a, m, ps] = await Promise.all([
         getCrmDemoUnits(), getCrmDemoLoans(),
         getCrmAccounts().catch(() => []),
         getActiveModels().catch(() => []),
+        // Danh bạ nhân viên: đổi borrower_id thành tên khi phiếu của người khác
+        // (embed profiles bị RLS chặn chéo staff, danh bạ thì mở cho cả đội).
+        getStaffPeers().catch(() => []),
       ]);
-      setUnits(u); setLoans(l); setAccounts(a); setModels(m);
+      setUnits(u); setLoans(l); setAccounts(a); setModels(m); setPeers(ps);
     } finally {
       setBusy(false);
     }
@@ -83,6 +87,11 @@ export default function CrmDemoPage() {
   );
   const today = isoDate(todayVn());
   const isOverdue = (l: CrmDemoLoan) => !l.returned_at && l.due_date < today;
+  const borrowerName = (l: CrmDemoLoan) => {
+    // Dùng || thay ?? — full_name có thể là chuỗi rỗng (hồ sơ chưa đặt tên).
+    const peer = peers.find(p => p.id === l.borrower_id);
+    return l.borrower?.full_name || peer?.full_name || peer?.email || '—';
+  };
 
   const borrow = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +190,7 @@ export default function CrmDemoPage() {
               </div>
               {open && (
                 <p className="mt-3 text-xs text-[var(--crm-muted)]">
-                  {open.borrower?.full_name ?? '—'}
+                  {borrowerName(open)}
                   {open.account?.name ? ` → ${open.account.name}` : ''}
                   {' · '}
                   <span className={isOverdue(open) ? 'font-semibold text-[#f87171]' : 'text-[#ffb77d]'}>
@@ -304,7 +313,7 @@ export default function CrmDemoPage() {
                     <span className="font-semibold text-[var(--crm-text)]">{l.unit?.label ?? '—'}</span>
                     <span className="ml-1.5 font-mono text-xs text-[var(--crm-muted)]">{l.unit?.serial_number}</span>
                   </td>
-                  <td className="px-4 py-3 text-[var(--crm-text)]">{l.borrower?.full_name ?? '—'}</td>
+                  <td className="px-4 py-3 text-[var(--crm-text)]">{borrowerName(l)}</td>
                   <td className="px-4 py-3 text-[var(--crm-muted)]">{l.account?.name ?? '—'}</td>
                   <td className="px-4 py-3 tabular-nums text-[var(--crm-muted)]">{fmtDate(l.borrowed_at)}</td>
                   <td className={`px-4 py-3 tabular-nums ${isOverdue(l) ? 'font-semibold text-[#f87171]' : 'text-[var(--crm-muted)]'}`}>{fmtDate(l.due_date)}</td>
