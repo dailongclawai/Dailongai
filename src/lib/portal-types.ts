@@ -378,6 +378,7 @@ export interface CrmActivityRow {
   opportunity_name: string | null;
   contact_id: string | null;
   owner_id: string;
+  companion_id: string | null;
   created_at: string;
 }
 

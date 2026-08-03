@@ -1001,6 +1001,7 @@ export interface CrmActivityInput {
   opportunityId?: string | null;
   contactId?: string | null;
   ownerId: string;
+  companionId?: string | null;
 }
 
 export async function createCrmActivity(input: CrmActivityInput): Promise<void> {
@@ -1013,6 +1014,7 @@ export async function createCrmActivity(input: CrmActivityInput): Promise<void> 
     opportunity_id: input.opportunityId ?? null,
     contact_id: input.contactId ?? null,
     owner_id: input.ownerId,
+    companion_id: input.companionId ?? null,
   });
   if (error) throw error;
 }

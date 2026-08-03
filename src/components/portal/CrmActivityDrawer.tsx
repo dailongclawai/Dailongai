@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useI18n } from '@/lib/i18n';
-import { createCrmActivity, getCrmAccounts } from '@/lib/portal-queries';
-import type { CrmAccount, CrmActivityKind } from '@/lib/portal-types';
+import { createCrmActivity, getCrmAccounts, getStaffPeers } from '@/lib/portal-queries';
+import type { CrmAccount, CrmActivityKind, StaffPeer } from '@/lib/portal-types';
 
 interface Props {
   open: boolean;
@@ -23,17 +23,22 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
   const [accountId, setAccountId] = useState('');
   const [dueAt, setDueAt] = useState('');
   const [notes, setNotes] = useState('');
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
+  const [companionId, setCompanionId] = useState('');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     void getCrmAccounts().then(setAccounts).catch(() => setAccounts([]));
+    // Danh bạ nhân viên (view tối thiểu, staff đọc được) — cho trường "người đi cùng".
+    void getStaffPeers().then(ps => setPeers(ps.filter(p => p.role === 'staff' && p.id !== ownerId))).catch(() => setPeers([]));
     setKind('call');
     setSubject('');
     setAccountId('');
     setDueAt('');
     setNotes('');
-  }, [open]);
+    setCompanionId('');
+  }, [open, ownerId]);
 
   const save = async () => {
     if (!accountId) { toast.error(t('portal.crm.activity.account_required')); return; }
@@ -44,6 +49,7 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
         kind, subject, notes,
         dueAt: dueAt ? new Date(dueAt).toISOString() : null,
         accountId, ownerId,
+        companionId: companionId || null,
       });
       toast.success(t('portal.crm.activity.saved'));
       onSaved();
@@ -90,6 +96,13 @@ export function CrmActivityDrawer({ open, ownerId, onClose, onSaved }: Props) {
           <div>
             <label className={label} htmlFor="crm-act-due">{t('portal.crm.activity.due')}</label>
             <input id="crm-act-due" type="datetime-local" className={field} value={dueAt} onChange={e => setDueAt(e.target.value)} />
+          </div>
+          <div>
+            <label className={label} htmlFor="crm-act-companion">{t('portal.crm.activity.companion')}</label>
+            <select id="crm-act-companion" className={field} value={companionId} onChange={e => setCompanionId(e.target.value)}>
+              <option value="">{t('portal.crm.activity.companion_none')}</option>
+              {peers.map(p => <option key={p.id} value={p.id}>{p.full_name || p.email}</option>)}
+            </select>
           </div>
           <div>
             <label className={label} htmlFor="crm-act-notes">{t('portal.crm.account.notes')}</label>

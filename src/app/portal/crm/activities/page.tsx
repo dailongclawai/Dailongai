@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmActivities, completeActivity, getFollowupDue } from '@/lib/portal-queries';
+import { getCrmActivities, completeActivity, getFollowupDue, getStaffPeers } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmActivityDrawer } from '@/components/portal/CrmActivityDrawer';
-import type { CrmActivityRow, CrmFollowupRow } from '@/lib/portal-types';
+import type { CrmActivityRow, CrmFollowupRow, StaffPeer } from '@/lib/portal-types';
 
 type Bucket = 'overdue' | 'today' | 'upcoming' | 'done' | 'followup';
 
@@ -31,6 +31,7 @@ export default function CrmActivitiesPage() {
   const { t } = useI18n();
   const { session, profile, loading } = useAuth();
   const [rows, setRows] = useState<CrmActivityRow[]>([]);
+  const [peers, setPeers] = useState<StaffPeer[]>([]);
   const [busy, setBusy] = useState(true);
   const [tab, setTab] = useState<Bucket>('today');
   const [followup, setFollowup] = useState<CrmFollowupRow[]>([]);
@@ -51,6 +52,8 @@ export default function CrmActivitiesPage() {
     setBusy(true);
     try {
       const [acts, due] = await Promise.all([getCrmActivities(), getFollowupDue()]);
+      // Danh bạ để đổi companion_id thành tên — view staff đọc được, khỏi đụng RLS profiles.
+      void getStaffPeers().then(setPeers).catch(() => setPeers([]));
       setRows(acts);
       setFollowup(due);
     } finally {
@@ -159,6 +162,13 @@ export default function CrmActivitiesPage() {
                 {a.account_name ?? a.opportunity_name ?? '—'}
                 {a.due_at ? ` · ${new Date(a.due_at).toLocaleString('vi-VN')}` : ''}
               </p>
+              {a.companion_id && (
+                <p className="mt-1 text-xs text-[#8bd6b6]">
+                  <span className="material-symbols-outlined mr-1 align-middle text-[14px]">group</span>
+                  {t('portal.crm.activity.companion_pre')}{' '}
+                  {peers.find(p => p.id === a.companion_id)?.full_name ?? '—'}
+                </p>
+              )}
               {a.notes && <p className="mt-2 text-xs text-[var(--crm-muted)]">{a.notes}</p>}
             </div>
             {!a.done_at && (
