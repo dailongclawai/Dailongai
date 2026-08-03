@@ -764,6 +764,7 @@ const en: Record<string, string> = {
     'portal.crm.demo.field_purpose': 'Purpose / note',
     'portal.crm.demo.submit': 'Check out',
     'portal.crm.demo.no_units_free': 'No units available',
+    'portal.crm.demo.no_units_yet': 'No demo units registered yet — admin can add one below',
     'portal.crm.demo.loans_caps': 'Loans',
     'portal.crm.demo.col_unit': 'Unit',
     'portal.crm.demo.col_borrower': 'Borrower',

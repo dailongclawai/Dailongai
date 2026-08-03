@@ -159,6 +159,11 @@ export default function CrmDemoPage() {
 
       {/* Danh mục máy */}
       <p className={`${caps} mb-3`}>{t('portal.crm.demo.units_caps')}</p>
+      {!busy && units.length === 0 && (
+        <div className="mb-8 rounded-xl border border-dashed border-[var(--crm-line)] p-6 text-center text-sm text-[var(--crm-muted)]">
+          {t('portal.crm.demo.no_units_yet')}
+        </div>
+      )}
       <div className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {units.map(u => {
           const open = openLoanByUnit.get(u.id);
@@ -205,7 +210,9 @@ export default function CrmDemoPage() {
             <label className={label} htmlFor="demo-unit">{t('portal.crm.demo.field_unit')}</label>
             <select id="demo-unit" className={field} value={unitId} onChange={e => setUnitId(e.target.value)}>
               <option value="">
-                {freeUnits.length ? t('portal.crm.demo.field_unit_placeholder') : t('portal.crm.demo.no_units_free')}
+                {units.length === 0
+                  ? t('portal.crm.demo.no_units_yet')
+                  : freeUnits.length ? t('portal.crm.demo.field_unit_placeholder') : t('portal.crm.demo.no_units_free')}
               </option>
               {freeUnits.map(u => <option key={u.id} value={u.id}>{u.label} · {u.serial_number}</option>)}
             </select>

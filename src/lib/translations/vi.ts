@@ -767,6 +767,7 @@ const vi: Record<string, string> = {
     'portal.crm.demo.field_purpose': 'Mục đích / ghi chú',
     'portal.crm.demo.submit': 'Đăng ký mượn',
     'portal.crm.demo.no_units_free': 'Không còn máy rảnh',
+    'portal.crm.demo.no_units_yet': 'Chưa có máy demo trong danh mục — quản trị thêm máy ở khung bên dưới',
     'portal.crm.demo.loans_caps': 'Phiếu mượn',
     'portal.crm.demo.col_unit': 'Máy',
     'portal.crm.demo.col_borrower': 'Người mượn',
