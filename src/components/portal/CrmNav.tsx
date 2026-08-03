@@ -10,6 +10,7 @@ const ITEMS = [
   { href: '/portal/crm/accounts', key: 'portal.crm.nav.accounts', icon: 'contacts', adminOnly: false },
   { href: '/portal/crm/pipeline', key: 'portal.crm.nav.pipeline', icon: 'view_kanban', adminOnly: false },
   { href: '/portal/crm/activities', key: 'portal.crm.nav.activities', icon: 'task_alt', adminOnly: false },
+  { href: '/portal/crm/demo', key: 'portal.crm.nav.demo', icon: 'devices', adminOnly: false },
   { href: '/portal/crm/commission', key: 'portal.crm.nav.commission', icon: 'payments', adminOnly: false },
   { href: '/portal/crm/kpi', key: 'portal.crm.nav.kpi', icon: 'military_tech', adminOnly: false },
   { href: '/portal/crm/feedback', key: 'portal.crm.nav.feedback', icon: 'rate_review', adminOnly: false },

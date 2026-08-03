@@ -517,3 +517,32 @@ export interface CrmEvidence {
   note: string | null;
   created_at: string;
 }
+
+/** crm_demo_units: máy công ty dành cho nhân viên mượn đi demo. */
+export interface CrmDemoUnit {
+  id: string;
+  serial_number: string;
+  label: string;
+  model_id: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** crm_demo_loans: phiếu mượn máy demo — mỗi máy chỉ một phiếu đang mở
+ *  (unique index tầng DB), trả xong ghi returned_at. */
+export interface CrmDemoLoan {
+  id: string;
+  unit_id: string;
+  borrower_id: string;
+  account_id: string | null;
+  purpose: string | null;
+  borrowed_at: string;
+  due_date: string;
+  returned_at: string | null;
+  return_note: string | null;
+  created_at: string;
+  unit: { label: string; serial_number: string } | null;
+  borrower: { full_name: string | null } | null;
+  account: { name: string } | null;
+}

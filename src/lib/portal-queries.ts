@@ -3,7 +3,7 @@ import type { Order, DealerSummary, TeamMember, UnassignedDealer, FleetSummary, 
   CrmTimelineEntry, CrmFollowupRow, CrmOrgType, StaffPeer, CrmContact,
   CrmMonthlyReportRow, CrmLostReasonReportRow, CrmSourceReportRow,
   CrmKpiDeviceMonth, CrmKpiNewAccountsDay,
-  CrmEvidence, CrmEvidenceKind, CrmFeedback } from './portal-types';
+  CrmEvidence, CrmEvidenceKind, CrmFeedback, CrmDemoUnit, CrmDemoLoan } from './portal-types';
 
 export async function getCommissionPlans(): Promise<CommissionPlan[]> {
   const { data } = await getSupabaseClient()
@@ -1342,5 +1342,58 @@ export async function updateCrmContact(id: string, input: CrmContactInput): Prom
 
 export async function deleteCrmContact(id: string): Promise<void> {
   const { error } = await getSupabaseClient().from('crm_contacts').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ── Máy demo ──
+
+/** Danh mục máy demo. RLS: staff/admin đọc, chỉ admin ghi. */
+export async function getCrmDemoUnits(): Promise<CrmDemoUnit[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_demo_units').select('*').order('label');
+  if (error) throw error;
+  return (data as CrmDemoUnit[]) ?? [];
+}
+
+/** Phiếu mượn kèm tên máy/người/khách. RLS: nhân viên thấy phiếu mình, admin thấy hết. */
+export async function getCrmDemoLoans(): Promise<CrmDemoLoan[]> {
+  const { data, error } = await getSupabaseClient()
+    .from('crm_demo_loans')
+    .select('*, unit:crm_demo_units(label, serial_number), borrower:profiles(full_name), account:crm_accounts(name)')
+    .order('borrowed_at', { ascending: false });
+  if (error) throw error;
+  return (data as unknown as CrmDemoLoan[]) ?? [];
+}
+
+export async function createCrmDemoLoan(input: {
+  unitId: string; borrowerId: string; accountId: string | null; dueDate: string; purpose: string;
+}): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_demo_loans').insert({
+    unit_id: input.unitId, borrower_id: input.borrowerId,
+    account_id: input.accountId, due_date: input.dueDate,
+    purpose: input.purpose.trim() || null,
+  });
+  if (error) {
+    // Index unique một-phiếu-mở-mỗi-máy nổ khi máy vừa bị người khác mượn.
+    if (error.code === '23505') throw new Error('demo_unit_taken');
+    throw error;
+  }
+}
+
+export async function returnCrmDemoLoan(id: string): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_demo_loans')
+    .update({ returned_at: new Date().toISOString() }).eq('id', id);
+  if (error) throw error;
+}
+
+export async function createCrmDemoUnit(input: { serial: string; label: string; modelId: string | null }): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_demo_units').insert({
+    serial_number: input.serial.trim(), label: input.label.trim(), model_id: input.modelId,
+  });
+  if (error) throw error;
+}
+
+export async function setCrmDemoUnitActive(id: string, active: boolean): Promise<void> {
+  const { error } = await getSupabaseClient().from('crm_demo_units').update({ active }).eq('id', id);
   if (error) throw error;
 }
