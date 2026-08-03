@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "build": "next build && npm run search:index",
+    "build": "next build && npm run search:index && node scripts/generate-llms.mjs",
     "search:index": "pagefind --site out --output-subdir _pagefind",
     "embed:blog": "node scripts/embed-blog.mjs",
     "blog:to-mdx": "node scripts/blog-json-to-mdx.mjs",

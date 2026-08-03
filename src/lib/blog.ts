@@ -82,6 +82,36 @@ export function getRelatedArticles(slug: string, limit = 6): BlogArticle[] {
   return ordered.slice(0, limit)
 }
 
+export interface FaqItem {
+  question: string
+  answer: string
+}
+
+const FAQ_HEADING = /<h2[^>]*>[^<]*(?:Câu hỏi thường gặp|Hỏi đáp|FAQ)[^<]*<\/h2>/i
+
+function stripTags(s: string): string {
+  return s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+// Trích Q&A từ mục "Câu hỏi thường gặp" (h2 + các cặp h3/nội dung) trong HTML bài viết
+// để render FAQPage JSON-LD — AI engines trích dẫn trực tiếp các khối này.
+export function extractFaq(html: string): FaqItem[] {
+  const heading = FAQ_HEADING.exec(html)
+  if (!heading) return []
+  const rest = html.slice(heading.index + heading[0].length)
+  const nextH2 = rest.search(/<h2[\s>]/i)
+  const section = nextH2 === -1 ? rest : rest.slice(0, nextH2)
+  const items: FaqItem[] = []
+  const re = /<h3[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3[\s>]|$)/gi
+  let m: RegExpExecArray | null
+  while ((m = re.exec(section))) {
+    const question = stripTags(m[1])
+    const answer = stripTags(m[2])
+    if (question && answer) items.push({ question, answer })
+  }
+  return items
+}
+
 export function toBlogCard(article: BlogArticle): BlogArticleCard {
   return {
     id: article.slug,

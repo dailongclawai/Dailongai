@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ZaloButton from "@/components/ZaloButton";
-import { getAllSlugs, getArticleBySlug, getRelatedArticles } from "@/lib/blog";
+import { getAllSlugs, getArticleBySlug, getRelatedArticles, extractFaq } from "@/lib/blog";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { notFound } from "next/navigation";
 import { contactInfo } from "@/data/siteData";
@@ -69,6 +69,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     wordCount: article.word_count,
   };
 
+  const faq = extractFaq(article.content);
+  const faqJsonLd = faq.length >= 2 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map(f => ({
+      "@type": "Question",
+      name: f.question,
+      acceptedAnswer: { "@type": "Answer", text: f.answer },
+    })),
+  } : null;
+
   const related = getRelatedArticles(article.slug, 6);
 
   return (
@@ -77,6 +88,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c") }}
+        />
+      )}
       <Header />
       <ZaloButton />
       <main className="pt-28 sm:pt-36 pb-20 sm:pb-32 bg-background min-h-screen">
