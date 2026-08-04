@@ -1027,6 +1027,28 @@ export async function completeActivity(id: string, outcome?: string): Promise<vo
   if (error) throw error;
 }
 
+// Hoãn = đẩy hạn tới 09:00 ngày đích + đếm số lần (Boss chốt 05/08/2026:
+// báo cáo EOD soi việc hoãn ≥3 lần, không cần cột hạn riêng).
+export async function snoozeActivity(id: string, days: number, currentCount: number): Promise<void> {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(9, 0, 0, 0);
+  const { error } = await getSupabaseClient()
+    .from('crm_activities')
+    .update({ due_at: d.toISOString(), snooze_count: currentCount + 1 })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// Đóng việc không làm nữa — KHÔNG tính là "xong" (EOD đếm xong theo done_at).
+export async function cancelActivity(id: string, reason: string): Promise<void> {
+  const { error } = await getSupabaseClient()
+    .from('crm_activities')
+    .update({ cancelled_at: new Date().toISOString(), cancel_reason: reason })
+    .eq('id', id);
+  if (error) throw error;
+}
+
 // ── CRM staff (Plan 2) ──
 
 

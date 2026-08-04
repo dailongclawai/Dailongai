@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { useI18n } from '@/lib/i18n';
-import { getCrmActivities, completeActivity, getFollowupDue, getStaffPeers } from '@/lib/portal-queries';
+import { getCrmActivities, completeActivity, snoozeActivity, cancelActivity, getFollowupDue, getStaffPeers } from '@/lib/portal-queries';
 import { PortalShell } from '@/components/portal/PortalShell';
 import { CrmNav } from '@/components/portal/CrmNav';
 import { CrmActivityDrawer } from '@/components/portal/CrmActivityDrawer';
@@ -16,7 +16,15 @@ type Bucket = 'overdue' | 'today' | 'upcoming' | 'done' | 'followup';
 
 const fmtVnd = (n: number) => new Intl.NumberFormat('vi-VN').format(Math.round(n));
 
+// Lý do đóng lưu tiếng Việt trực tiếp — báo cáo Telegram cho Boss đọc thẳng.
+const CANCEL_REASONS = [
+  { key: 'no_need', vi: 'Khách hết nhu cầu' },
+  { key: 'dup', vi: 'Trùng việc' },
+  { key: 'paused', vi: 'Khách xin dừng' },
+] as const;
+
 function bucketOf(a: CrmActivityRow, now: Date): Bucket {
+  if (a.cancelled_at) return 'done'; // việc đã đóng nằm chung tab "xong", phân biệt bằng badge
   if (a.done_at) return 'done';
   if (!a.due_at) return 'upcoming';
   const due = new Date(a.due_at);
@@ -36,6 +44,7 @@ export default function CrmActivitiesPage() {
   const [tab, setTab] = useState<Bucket>('today');
   const [followup, setFollowup] = useState<CrmFollowupRow[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [menu, setMenu] = useState<{ id: string; type: 'snooze' | 'cancel' } | null>(null);
 
   useEffect(() => {
     if (!loading && !session) router.replace('/portal/login');
@@ -75,6 +84,28 @@ export default function CrmActivitiesPage() {
   const done = async (id: string) => {
     try {
       await completeActivity(id);
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const snooze = async (a: CrmActivityRow, days: number) => {
+    try {
+      await snoozeActivity(a.id, days, a.snooze_count);
+      setMenu(null);
+      toast.success(t('portal.crm.activity.snoozed'));
+      await load();
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const cancel = async (id: string, reason: string) => {
+    try {
+      await cancelActivity(id, reason);
+      setMenu(null);
+      toast.success(t('portal.crm.activity.cancelled'));
       await load();
     } catch (e) {
       toast.error((e as Error).message);
@@ -169,16 +200,62 @@ export default function CrmActivitiesPage() {
                   {peers.find(p => p.id === a.companion_id)?.full_name ?? '—'}
                 </p>
               )}
+              {a.cancelled_at && (
+                <p className="mt-1 text-xs text-[var(--crm-muted)]">
+                  <span className="material-symbols-outlined mr-1 align-middle text-[14px]">block</span>
+                  {t('portal.crm.activity.cancelled')}{a.cancel_reason ? ` · ${a.cancel_reason}` : ''}
+                </p>
+              )}
+              {!a.cancelled_at && !a.done_at && a.snooze_count > 0 && (
+                <p className="mt-1 text-xs text-[#ffb77d]">{t('portal.crm.activity.snoozed')} ×{a.snooze_count}</p>
+              )}
               {a.notes && <p className="mt-2 text-xs text-[var(--crm-muted)]">{a.notes}</p>}
             </div>
-            {!a.done_at && (
-              <button
-                onClick={() => void done(a.id)}
-                className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff8a50]"
-              >
-                <span className="material-symbols-outlined text-[15px] text-[#ff8a50]">task_alt</span>
-                {t('portal.crm.activity.mark_done')}
-              </button>
+            {!a.done_at && !a.cancelled_at && (
+              <div className="flex flex-col items-end gap-1.5">
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => void done(a.id)}
+                    className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ff8a50]"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-[#ff8a50]">task_alt</span>
+                    {t('portal.crm.activity.mark_done')}
+                  </button>
+                  <button
+                    onClick={() => setMenu(menu?.id === a.id && menu.type === 'snooze' ? null : { id: a.id, type: 'snooze' })}
+                    className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:border-[#ffb77d]"
+                  >
+                    <span className="material-symbols-outlined text-[15px] text-[#ffb77d]">schedule</span>
+                    {t('portal.crm.activity.snooze')}
+                  </button>
+                  <button
+                    onClick={() => setMenu(menu?.id === a.id && menu.type === 'cancel' ? null : { id: a.id, type: 'cancel' })}
+                    className="inline-flex items-center gap-1 rounded-xl border border-[var(--crm-line)] px-3 py-1.5 text-xs text-[var(--crm-muted)] hover:border-[var(--crm-muted)]"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">block</span>
+                    {t('portal.crm.activity.cancel')}
+                  </button>
+                </div>
+                {menu?.id === a.id && menu.type === 'snooze' && (
+                  <div className="flex gap-1.5">
+                    <button onClick={() => void snooze(a, 1)} className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:text-[#ffb77d]">
+                      {t('portal.crm.activity.snooze_tomorrow')}
+                    </button>
+                    <button onClick={() => void snooze(a, 3)} className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:text-[#ffb77d]">
+                      {t('portal.crm.activity.snooze_3d')}
+                    </button>
+                  </div>
+                )}
+                {menu?.id === a.id && menu.type === 'cancel' && (
+                  <div className="flex flex-wrap justify-end gap-1.5">
+                    {CANCEL_REASONS.map(r => (
+                      <button key={r.key} onClick={() => void cancel(a.id, r.vi)} className="rounded-xl bg-[var(--crm-s3)] px-3 py-1.5 text-xs text-[var(--crm-text)] hover:text-[#f87171]">
+                        {t('portal.crm.activity.cancel_' + r.key)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </li>
         ))}

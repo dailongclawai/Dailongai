@@ -380,6 +380,9 @@ export interface CrmActivityRow {
   owner_id: string;
   companion_id: string | null;
   created_at: string;
+  snooze_count: number;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
 }
 
 // ── CRM staff (Plan 2) ──
