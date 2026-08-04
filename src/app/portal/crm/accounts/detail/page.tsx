@@ -317,10 +317,11 @@ function AccountDetail() {
               )}
               {timeline.map((e, i) => (
                 <li key={`${e.entry}-${e.at}-${i}`} className={`${card} flex gap-3 p-4`}>
-                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#ff8a50]' : 'text-[#ffb77d]'}`}>
+                  <span className={`material-symbols-outlined text-[20px] ${e.entry === 'stage' ? 'text-[#ff8a50]' : e.entry === 'field' ? 'text-[var(--crm-muted)]' : 'text-[#ffb77d]'}`}>
                     {e.entry === 'stage' ? 'trending_up'
-                      : e.sub_kind === 'call' ? 'call'
-                        : e.sub_kind === 'meeting' ? 'event' : 'task_alt'}
+                      : e.entry === 'field' ? 'edit_note'
+                        : e.sub_kind === 'call' ? 'call'
+                          : e.sub_kind === 'meeting' ? 'event' : 'task_alt'}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-[var(--crm-text)]">{e.title}</p>

@@ -196,11 +196,11 @@ export type CrmSource =
 export type CrmOrgType =
   | 'benh_vien_cong' | 'benh_vien_tu' | 'phong_kham' | 'spa' | 'dai_ly' | 'khac';
 
-/** Một mốc trên dòng thời gian của khách: hoạt động hoặc lần đổi giai đoạn. */
+/** Một mốc trên dòng thời gian của khách: hoạt động, đổi giai đoạn, hoặc sửa thông tin. */
 export interface CrmTimelineEntry {
   account_id: string;
   at: string | null;
-  entry: 'activity' | 'stage';
+  entry: 'activity' | 'stage' | 'field';
   sub_kind: string | null;
   title: string;
   detail: string | null;
