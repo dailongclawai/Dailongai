@@ -76,9 +76,6 @@ export default function BlogContent({
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  useEffect(() => {
-    window.dispatchEvent(new Event(playingVideo ? "blog-video:open" : "blog-video:close"));
-  }, [playingVideo]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchInput, setSearchInput] = useState<string>("");
   const [listPage, setListPage] = useState<number>(1);

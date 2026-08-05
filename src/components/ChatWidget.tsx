@@ -14,10 +14,6 @@ export default function ChatWidget() {
   const pathname = usePathname();
   const isPortal = pathname?.startsWith('/portal') ?? false;
 
-  useEffect(() => {
-    window.dispatchEvent(new Event(open ? 'meo-chat:open' : 'meo-chat:close'));
-  }, [open]);
-
   // Idle-preload Meo chat bundle so first click does not pay parse cost on main thread
   useEffect(() => {
     type IdleWindow = Window & {
