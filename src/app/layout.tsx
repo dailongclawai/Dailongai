@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import ChatWidget from "@/components/ChatWidget";
-import BackgroundMusic from "@/components/BackgroundMusic";
 import Observability from "@/components/Observability";
 import { I18nProvider } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -122,6 +121,7 @@ export default function RootLayout({
                     "https://www.tiktok.com/@dailongai",
                     "https://zalo.me/2860930231550407599",
                     "https://maps.google.com/?cid=6086458135801533925",
+                    "https://www.youtube.com/@dongoclong2985",
                   ],
                   subjectOf: [
                     {
@@ -150,11 +150,14 @@ export default function RootLayout({
                 },
                 {
                   "@type": "Product",
-                  name: "Zhi Dun CEO — Máy Laser Bán dẫn Công suất thấp",
-                  alternateName: "Lipid Shield",
+                  "@id": `${siteUrl}/san-pham#product`,
+                  name: "Máy laser trị liệu Zhi Dun CEO",
+                  alternateName: ["Zhi Dun CEO — Máy Laser Bán dẫn Công suất thấp", "ZhiDun CEO", "Zhi Dun Model CEO", "Lipid Shield"],
+                  model: "CEO",
                   description:
-                    "Thiết bị laser trị liệu bước sóng 650nm, hỗ trợ tuần hoàn máu, cải thiện giấc ngủ. Bảo hành 5 năm chính hãng.",
+                    "Máy laser bán dẫn công suất thấp, model CEO, bước sóng 650nm — hỗ trợ tuần hoàn máu, cải thiện giấc ngủ. Bảo hành 5 năm chính hãng.",
                   image: `${siteUrl}/images/sp-1.webp`,
+                  url: `${siteUrl}/san-pham`,
                   brand: { "@type": "Brand", name: "Zhi Dun" },
                   offers: {
                     "@type": "Offer",
@@ -218,7 +221,6 @@ export default function RootLayout({
           <div id="main-content" tabIndex={-1}>
             {children}
           </div>
-          <BackgroundMusic />
           <ChatWidget />
         </I18nProvider>
         <Observability />

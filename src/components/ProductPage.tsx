@@ -119,6 +119,7 @@ export default function ProductPage() {
                 <span className="text-secondary font-normal tracking-normal text-sm sm:text-base ml-2">(trước đây: Lipid Shield)</span>
               </h2>
               <p className="text-secondary text-xs sm:text-sm mt-1">{t('product.subtitle')}</p>
+              <p className="text-secondary/90 text-xs sm:text-sm mt-3 max-w-2xl leading-relaxed">{t('product.entity_intro')}</p>
             </div>
             <div className="flex items-center gap-4 sm:gap-6">
               <div className="text-center px-4 py-2 bg-surface-highest/50 rounded-lg border border-white/5">
@@ -393,6 +394,23 @@ export default function ProductPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+
+            {/* Video guide */}
+            <div className="space-y-4">
+              <h3 className="text-xl sm:text-2xl font-headline font-bold text-on-surface tracking-tight">
+                {t('product.video_guide_title')}
+              </h3>
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-surface-container">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/mSNff8wZ4ck"
+                  title={t('product.video_guide_title')}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full border-0"
+                />
               </div>
             </div>
 
