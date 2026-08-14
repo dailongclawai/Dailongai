@@ -163,9 +163,15 @@ export default function RootLayout({
                     "@type": "Offer",
                     price: "29500000",
                     priceCurrency: "VND",
+                    itemCondition: "https://schema.org/NewCondition",
                     availability: "https://schema.org/InStock",
+                    priceValidUntil: "2026-12-31",
                     url: `${siteUrl}/san-pham`,
                     seller: { "@id": `${siteUrl}/#organization` },
+                    warranty: {
+                      "@type": "WarrantyPromise",
+                      durationOfWarranty: { "@type": "QuantitativeValue", value: 5, unitCode: "ANN" },
+                    },
                   },
                 },
                 {
