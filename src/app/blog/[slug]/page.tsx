@@ -47,6 +47,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   });
 
   const isoDate = new Date(article.date).toISOString();
+  const modifiedIso = article.date_modified ? new Date(article.date_modified).toISOString() : isoDate;
+  const formattedModified = article.date_modified
+    ? new Date(article.date_modified).toLocaleDateString("vi-VN", { year: "numeric", month: "long", day: "numeric" })
+    : null;
   const canonicalUrl = `https://dailongai.com/blog/${article.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
@@ -55,7 +59,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     description: article.meta_description,
     image: article.featured_image ? [article.featured_image] : undefined,
     datePublished: isoDate,
-    dateModified: isoDate,
+    dateModified: modifiedIso,
     inLanguage: "vi-VN",
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
     author: { "@type": "Organization", name: article.author || "Đại Long", url: "https://dailongai.com" },
@@ -113,6 +117,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {article.category}
             </span>
             <span className="text-xs text-secondary">{formattedDate}</span>
+            {formattedModified && (
+              <span className="text-xs text-secondary">Cập nhật: {formattedModified}</span>
+            )}
             <span className="text-xs text-secondary">{article.word_count} từ</span>
           </div>
 

@@ -9,6 +9,7 @@ export interface BlogArticle {
   meta_description: string
   featured_image: string | null
   date: string
+  date_modified?: string
   author: string
   word_count: number
   seo_keyword: string
